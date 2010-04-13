@@ -2,7 +2,7 @@
 ## Mean times plot
 ## ====================
 
-plot.stslist.meant <- function(x, cpal=NULL, ylab=NULL, yaxis=TRUE, xaxis=TRUE, xtlab=NULL, cex.plot=1, ylim=NULL, ...) {
+plot.stslist.meant <- function(x, cpal=NULL, ylab=NULL, yaxis=TRUE, xaxis=TRUE, cex.plot=1, ylim=NULL, ...) {
 
 	n <- attr(x,"nbseq")
 	seql <- length(attr(x,"xtlab"))
@@ -12,9 +12,6 @@ plot.stslist.meant <- function(x, cpal=NULL, ylab=NULL, yaxis=TRUE, xaxis=TRUE, 
 
 	if (is.null(ylim))
 		ylim <- c(0,seql)
-
-	if (is.null(xtlab))
-		xtlab <- attr(x,"xtlab")
 
 	if (is.null(cpal))
 		cpal <- attr(x,"cpal")
