@@ -5,11 +5,11 @@
 Computes the frequency table of the sequences (count and percent of each sequence).
 }
 \usage{
- seqtab(seqdata, tlim=10, weighted=TRUE, format="SPS")
+ seqtab(seqdata, tlim=1:10, weighted=TRUE, format="SPS")
 }
 \arguments{
   \item{seqdata}{a sequence object as defined by the \code{\link{seqdef}} function.}
-  \item{tlim}{if tlim>0, return frequencies only for the 'tlim' most frequent sequences. Default to 10.}
+  \item{tlim}{if tlim>0, return frequencies only for the 'tlim' most frequent sequences. Default to 1:10, i.e the 10 most frequent sequences.}
   \item{weighted}{if TRUE, frequencies account for the weights assigned to the state sequence object 
   (see \code{\link{seqdef}}). Set to FALSE if you want ignore the weights. If no weights were assigned during the creation of the sequence object, \code{weighted=TRUE} will yield the same result as \code{weighted=FALSE} since each sequence is allowed a weight of 1.}
   \item{format}{format used for displaying sequences as rownames in the output table. 

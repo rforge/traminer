@@ -1,4 +1,13 @@
 ## ==========
+Version 1.7
+
+Changes in existing functions:
+  - seqtab() and seqfplot(): tlim argument now allows to return any selected frequent sequences, 
+    in the same way as the tlim argument used in plot.stslist() and seqiplot(). 
+    For example, tlim=3:6 returns the third, fourth, fifth and sixth most frequent sequences 
+    in the set. Default for tlim is now 1:10 instead of 10. 
+
+## ==========
 Version 1.6
 
 New functionalities:
