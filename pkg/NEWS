@@ -7,6 +7,9 @@ Changes in existing functions:
     For example, tlim=3:6 returns the third, fourth, fifth and sixth most frequent sequences 
     in the set. Default for tlim is now 1:10 instead of 10. 
 
+Bug fixes:
+  - seqmeant(): added color for missing state to color palette when using with.missing=TRUE 
+
 ## ==========
 Version 1.6
 
