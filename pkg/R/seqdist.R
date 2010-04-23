@@ -13,6 +13,17 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	if (!inherits(seqdata,"stslist")) {
 		stop(" [!] data is not a state sequence object, use 'seqdef' function to create one", call.=FALSE)
 	}
+	if (method=="OMopt") {
+		method <- "OM"
+		optimized <- TRUE
+	} 
+	else if (method=="LCSopt") {
+		method <- "LCS"
+		optimized <- TRUE
+	} 
+	else {
+		optimized <- FALSE
+	}
 	metlist <- c("OM","LCP", "LCS", "RLCP", "DHD", "HAM")
 	if (missing(method)) {
 		stop(" [!] You should specify a method to compute the distances. It must be one of: ", paste(metlist,collapse=" "))
@@ -128,7 +139,7 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 		}
 		else {
 			sm <- seqsubm(seqdata, "TRATE", cval=1, with.missing=with.missing,
-					miss.cost=1, time.varying=TRUE)
+					miss.cost=4, time.varying=TRUE)
 		}
 	}
 
@@ -176,7 +187,7 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	}
 	else {
 		distances <- TraMineR.seqdist.all(seqdata, method, 
-			norm, indel, sm, alphsize, nd, dseq, slength, mcorr)
+			norm, indel, sm, alphsize, nd, dseq, slength, mcorr, optimized)
 	}
 
 	fin <- Sys.time()

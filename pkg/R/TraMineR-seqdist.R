@@ -70,7 +70,7 @@ TraMineR.seqdist.refseq <- function(seqdata, method, refseq,
 
 
 TraMineR.seqdist.all <- function(seqdata, method, 
-	norm, indel, sm, alphsize, nd, dseq, slength, mcorr){
+	norm, indel, sm, alphsize, nd, dseq, slength, mcorr, optimized){
 	
 	magicSeq <- order(mcorr)
 	magicIndex <- c(unique(rank(mcorr, ties.method="min")), nrow(seqdata)+1)-1
@@ -78,6 +78,9 @@ TraMineR.seqdist.all <- function(seqdata, method,
 	if (method=="OM") {
 		## One for OM, 2 for LCP
    		disttype <- as.integer(1)
+		if (optimized) {
+			disttype <- as.integer(0)
+		}
 	}
 	else if (method=="LCP") {
 		disttype <- as.integer(2) ## One for OM, 2 for LCP
