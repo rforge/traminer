@@ -3,7 +3,7 @@
 ## =============================
 
 plot.stslist <- function(x, tlim=NULL, weighted=TRUE, sortv=NULL, 
-	cpal=NULL, missing.color=NULL, ylab=NULL, yaxis=TRUE, xaxis=TRUE, xtlab=NULL, cex.plot=1, ...) {
+	cpal=NULL, missing.color=NULL, ylab=NULL, yaxis=TRUE, xaxis=TRUE, ytlab=NULL, ylas=0, xtlab=NULL, cex.plot=1, ...) {
 
 	n <- nrow(x)
 	seql <- ncol(x)
@@ -113,7 +113,10 @@ plot.stslist <- function(x, tlim=NULL, weighted=TRUE, sortv=NULL,
 			}
 		}
 
-		axis(2, at=y.lab.pos, mgp=c(1.5,0.5,0), labels=tlim, tick=FALSE, cex.axis=cex.plot)
+		if (is.null(ytlab)) {ytlab <- tlim}
+		else if (ytlab=="id") {ytlab <- rownames(x)[tlim]}
+
+		axis(2, at=y.lab.pos, mgp=c(1.5,0.5,0), labels=ytlab, las=ylas, tick=FALSE, cex.axis=cex.plot)
 	}
 
 }
