@@ -104,7 +104,7 @@ plot.stslist <- function(x, tlim=NULL, weighted=TRUE, sortv=NULL,
 			}
 		}
 		else {
-			y.lab.pos <- (weights[1]/2)+1
+			y.lab.pos <- (weights[1]/2)+sp
 			sep <- sp*mean(weights)
 
 			if (idxmax>1) {
