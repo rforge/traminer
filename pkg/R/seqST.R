@@ -33,7 +33,8 @@ seqST <- function(seqdata) {
 	nr <- attr(seqdata,"nr")
 	with.missing=FALSE
 	if (any(seqdata==nr)) {
-		message(" [!] found missing state in the sequence(s), \n     adding missing state to the alphabet")
+		message(" [!] found missing state in one or more sequences")
+		message("     [>] adding missing state to the alphabet")
 		with.missing=TRUE
 	}
 
