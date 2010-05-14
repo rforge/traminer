@@ -183,7 +183,7 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	## Function and arguments
 	if (!missing(refseq) && !is.null(refseq)) {
 		distances <- TraMineR.seqdist.refseq(seqdata, method, refseq,
-			norm, indel, sm, alphsize, nd, dseq, slength, mcorr)	
+			norm, indel, sm, alphsize, nd, dseq, slength, mcorr, with.missing)	
 	}
 	else {
 		distances <- TraMineR.seqdist.all(seqdata, method, 

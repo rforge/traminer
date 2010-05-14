@@ -7,7 +7,7 @@
 
 
 TraMineR.seqdist.refseq <- function(seqdata, method, refseq,
-	norm, indel, sm, alphsize, nd, dseq, slength, mcorr){
+	norm, indel, sm, alphsize, nd, dseq, slength, mcorr,with.missing){
 	
 	## Getting refseq
 	##User specified
@@ -37,7 +37,7 @@ TraMineR.seqdist.refseq <- function(seqdata, method, refseq,
 	lcompseq <- seqlength(compseq)
 	## Vector of distance
 	m <- vector(mode="numeric", length=nd)
-	compseq <- seqasnum(seqnum(compseq))
+	compseq <- seqasnum(seqnum(compseq), with.missing=with.missing)
 	if (method=="OM") {
 		for (i in 1:nd) {
 			m[i] <- levenshtein(dseq[i,], slength[i], compseq, lcompseq, indel,sm,alphsize,norm)
