@@ -5,7 +5,9 @@ Changes in existing functions:
   - seqtab() and seqfplot(): tlim argument now allows to return any selected frequent sequences, 
     in the same way as the tlim argument used in plot.stslist() and seqiplot(). 
     For example, tlim=3:6 returns the third, fourth, fifth and sixth most frequent sequences 
-    in the set. Default for tlim is now 1:10 instead of 10. 
+    in the set. Default for tlim is now 1:10 instead of 10.
+  - seqsubsn(): added detection of missing state in the sequences and computation of subsequences number by adding missing state to the alphabet.
+  - seqST(): added detection of missing state in the sequences and computation of turbulence by adding missing state to the alphabet.
 
 Bug fixes:
   - seqmeant(): added color for missing state to color palette when using with.missing=TRUE
