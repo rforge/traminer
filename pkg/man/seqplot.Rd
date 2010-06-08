@@ -134,7 +134,7 @@ ex1.seq <- seqdef(ex1, 1:13, weights=ex1$weights)
 seqplot(biofam.seq, type="f")
 
 ## Grouped by sex
-seqfplot(actcal.seq, group=actcal$sex, tlim=10)
+seqfplot(actcal.seq, group=actcal$sex)
 
 ## Unweighted vs weighted frequencies
 seqfplot(ex1.seq, weighted=FALSE)
