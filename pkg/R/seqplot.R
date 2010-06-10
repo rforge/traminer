@@ -131,6 +131,10 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 			if (!"dist.matrix" %in% names(olist))
 				stop("You must provide a distance matrix", call.=FALSE)
 			else {
+				if (inherits(dist.matrix, "dist")) {
+        				dist.matrix <- TraMineR:::dist2matrix(dist.matrix)
+				} 
+
 				olist[["dist.matrix"]] <- dist.matrix[gindex[[np]],gindex[[np]]]
 
 				## Max theoretical distance for the scale
