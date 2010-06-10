@@ -8,6 +8,8 @@ Changes in existing functions:
     in the set. Default for tlim is now 1:10 instead of 10.
   - seqsubsn(): added detection of missing state in the sequences and computation of subsequences number by adding missing state to the alphabet.
   - seqST(): added detection of missing state in the sequences and computation of turbulence by adding missing state to the alphabet.
+  - seqrplot now accepts "half" matrices ("dist" objects) as produced by seqdist with the "full.matrix=FALSE" option.
+
 
 Bug fixes:
   - seqmeant(): added color for missing state to color palette when using with.missing=TRUE
