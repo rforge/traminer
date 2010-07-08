@@ -138,7 +138,7 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 			}
 		}
 		else {
-			sm <- seqsubm(seqdata, "TRATE", cval=1, with.missing=with.missing,
+			sm <- seqsubm(seqdata, "TRATE", cval=4, with.missing=with.missing,
 					miss.cost=4, time.varying=TRUE)
 		}
 	}
