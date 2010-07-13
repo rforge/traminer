@@ -3,7 +3,7 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Plot method for sequence frequency tables}
 \description{
-Plot method for output produced by the seqmeant function, i.e objects of class \emph{stslist.freq}. 
+Plot method for output produced by the seqtab function, i.e objects of class \emph{stslist.freq}. 
 }
 \usage{
 \method{plot}{stslist.freq}(x, cpal = NULL, missing.color = NULL, pbarw = TRUE, 
@@ -47,7 +47,7 @@ actcal.lab <- c("> 37 hours", "19-36 hours", "1-18 hours", "no work")
 actcal.seq <- seqdef(actcal, 13:24, labels=actcal.lab)
 
 ## 10 most frequent sequences in the data
-actcal.freq <- seqtab(actcal.seq, tlim=10)
+actcal.freq <- seqtab(actcal.seq)
 
 ## Plotting the object
 plot(actcal.freq, main="Sequence frequencies - actcal data set")
