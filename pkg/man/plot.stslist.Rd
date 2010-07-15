@@ -7,7 +7,8 @@ This is the plot method for state sequence objects of class \emph{stslist} creat
 \usage{
 \method{plot}{stslist}(x, tlim=NULL, weighted=TRUE, sortv=NULL,
     cpal=NULL, missing.color=NULL,
-    ylab, yaxis=TRUE, xaxis=TRUE, ytlab=NULL, ylas=0, xtlab=NULL, cex.plot=1, ...)
+    ylab, yaxis=TRUE, xaxis=TRUE, ytlab=NULL, ylas=0, 
+    xtlab=NULL, cex.plot=1, ...)
 }
 \arguments{
 	\item{x}{a state sequence object created with the \code{\link{seqdef}} function.}
