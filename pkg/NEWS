@@ -3,34 +3,35 @@ Version 1.7
 
 Changes in existing functions:
   - seqtab() and seqfplot(): tlim argument now allows to return any selected frequent sequences, 
-    in the same way as the tlim argument used in plot.stslist() and seqiplot(). 
-    For example, tlim=3:6 returns the third, fourth, fifth and sixth most frequent sequences 
-    in the set. Default for tlim is now 1:10 instead of 10. 
+      in the same way as the tlim argument used in plot.stslist() and seqiplot(). 
+      For example, tlim=3:6 returns the third, fourth, fifth and sixth most frequent sequences 
+      in the set. Default for tlim is now 1:10 instead of 10. 
   - seqsubsn(): added detection of missing state in the sequences and computation of subsequences 
-    number by adding missing state to the alphabet.
+      number by adding missing state to the alphabet.
   - seqST(): added detection of missing state in the sequences and computation of turbulence 
-    by adding missing state to the alphabet.
+      by adding missing state to the alphabet.
   - seqrplot now accepts "half" matrices ("dist" objects) as produced by seqdist 
-    with the "full.matrix=FALSE" option.
-  - seqiplot() and plot.stslist(): new "ytlab" option allowing to display sequence labels on the Y-axis in sequence 
-    index plots (if set to "id", the sequence ids are displayed). An additional "ylas" option sets the orientation 
-    of the labels.
+      with the "full.matrix=FALSE" option.
+  - seqiplot() and plot.stslist(): new "ytlab" option allowing to display sequence labels 
+      on the Y-axis in sequence index plots (if set to "id", the sequence ids are displayed). 
+      An additional "ylas" option sets the orientation of the labels. (Feature requested by Andrew).
   - seqsubm(): 
-		- When method="TRATE", the substitution cost is now based on the value of cval: 
+		- When method="TRATE", the substitution costs are now based on the value of "cval": 
 		  SC(i,j) = cval -P(i,j) -P(j,i) where P(i,j) is the transition rate from state i to j. 
 		- added a new "transition" argument to use only transition from "previous" or "next" state 
-		  instead of the default "both" when time.varying is TRUE.
-		- Now, by default cval equals 2, unless transition is set to "both" and time.varying is TRUE 
-		  in which case cval equals 4.
+		  instead of the default "both" when "time.varying" is TRUE.
+		- Now, by default "cval" equals 2, unless "transition" is set to "both" and 
+            "time.varying" is TRUE in which case "cval" equals 4.
   - Added a startup message when loading the TraMineR library.
 
 Bug fixes:
   - seqmeant(): added color for missing state to color palette when using with.missing=TRUE.
   - dissrep(), seqrep(), seqrplot(): fixed bad coverage statistics when tsim set to other 
-    than default value of 0.10.
+      than default value of 0.10.
   - seqdist(): Bad handling of missing values in DHD distance (wrong default substitution costs 
-               with missing values, set to one instead of four).
-  - seqdist(): Fixed an error in seqdist when using refseq with missing values (Reported by an anonymous user).
+      with missing values, set to one instead of four).
+  - seqdist(): Fixed an error in seqdist when using refseq with missing values (Reported by an 
+      anonymous user).
 
 ## ==========
 Version 1.6
