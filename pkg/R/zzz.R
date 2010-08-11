@@ -12,5 +12,5 @@
 	builtDate <- strsplit(strsplit(descr$Built, ";")[[1]][3], " ")[[1]][2]
 	packageStartupMessage("\n",descr$Package," ", state, " version ", descr$Version, " (Built: ", builtDate, ")")
 	packageStartupMessage("Website: ", descr$URL)
-	packageStartupMessage("Please type 'citation(\"TraMineR\")' for information on how to cite TraMineR.\n")
+	packageStartupMessage("Please type 'citation(\"TraMineR\")' for citation information.\n")
 }
