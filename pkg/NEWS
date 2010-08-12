@@ -3,19 +3,19 @@ Version 1.7
 
 Changes in existing functions:
   - seqtab() and seqfplot(): tlim argument now allows to return any selected frequent sequences, 
-      in the same way as the tlim argument used in plot.stslist() and seqiplot() (Feature 
-      requested by G. Ritschard). 
+      in the same way as the tlim argument used in plot.stslist() and seqiplot() (Requested
+      by G. Ritschard). 
       For example, tlim=3:6 returns the third, fourth, fifth and sixth most frequent sequences 
       in the set. Default for tlim is now 1:10 instead of 10. 
   - seqsubsn(): added detection of missing state in the sequences and computation of subsequences 
       number by adding missing state to the alphabet.
   - seqST(): added detection of missing state in the sequences and computation of turbulence 
-      by adding missing state to the alphabet.
+      by adding missing state to the alphabet (Requested by G. Ristschard).
   - seqrplot now accepts "half" matrices ("dist" objects) as produced by seqdist 
       with the "full.matrix=FALSE" option (Reported by L. Lesnard).
   - seqiplot() and plot.stslist(): new "ytlab" option allowing to display sequence labels 
       on the Y-axis in sequence index plots (if set to "id", the sequence ids are displayed). 
-      An additional "ylas" option sets the orientation of the labels (Feature requested by Andrew
+      An additional "ylas" option sets the orientation of the labels (Requested by Andrew
 	 and P. Jeuniaux).
   - seqsubm(): 
 		- When method="TRATE", the substitution costs are now based on the value of "cval": 
@@ -25,8 +25,11 @@ Changes in existing functions:
 		- Now, by default "cval" equals 2, unless "transition" is set to "both" and 
             "time.varying" is TRUE in which case "cval" equals 4.
   - Added a startup message when loading the TraMineR library.
+  - plot.stslist.meant(), seqmtplot(), plot.stslist.freq(), seqfplot(), plot.stslist.modst(), 
+    seqmsplot(): added display of weighted n instead of n in axis label if weighted=TRUE
 
 Bug fixes:
+  - plot.stslist.modst(), seqmsplot(): fixed bad display of missing states if with.missing=TRUE
   - seqmeant(): added color for missing state to color palette when using with.missing=TRUE.
   - dissrep(), seqrep(), seqrplot(): fixed bad coverage statistics when tsim set to other 
       than default value of 0.10 (Reported by G. Ritschard).

@@ -93,15 +93,17 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 
 			## Removing the 'cpal' argument which is not used
 			## in Entropy index plots
-			if (type=="Ht")
-				plist <- plist[!names(plist) %in% "cpal"]
+			if (type=="Ht") {plist <- plist[!names(plist) %in% "cpal"]}
 		}
 		## Sequence frequency plot
-		else if (type=="f")
+		else if (type=="f") {
+			with.missing <- TRUE
 			f <- seqtab
+		}
 		## Sequence index plot
 		else if (type=="i" || type=="I") {
 			f <- function(seqdata) return(seqdata)
+			with.missing <- TRUE
 
 			## Selecting sub sample for sort variable
 			## according to 'group'
@@ -115,15 +117,16 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 			}
 		}
 		## Mean times
-		else if (type=="mt")
-			f <- seqmeant
+		else if (type=="mt") {f <- seqmeant}
 		## Mean times
-		else if (type=="ms")
+		else if (type=="ms") {
 			f <- seqmodst
+		}
 		## Representative sequence
 		else if (type=="r") {
 			f <- seqrep
-			
+			with.missing <- TRUE
+
 			## Removing unused arguments
 			plist <- plist[!names(plist) %in% "yaxis"]
 			
@@ -149,6 +152,13 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 
 		## Calling appropriate function and plotting
 		flist <- names(formals(f))
+
+		if ("with.missing" %in% names(olist)) {
+			with.missing <- olist[["with.missing"]]
+		} else if ("with.missing" %in% names(flist)) {
+			with.missing <- formals(f)$with.missing
+		}
+
 		match.args <- names(olist) %in% flist
 		fargs <- olist[match.args]
 		fargs <- c(list(seqdata=subdata), fargs)
@@ -171,7 +181,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 		if (is.null(cpal)) cpal <- attr(seqdata,"cpal")
 
 		## Adding an entry for missing in the legend
-		if (any(seqdata==nr)) {
+		if (with.missing & any(seqdata==nr)) {
 			cpal <- c(cpal,missing.color)
 			ltext <- c(ltext,"missing")
 		## statl <- c(statl,nr)
