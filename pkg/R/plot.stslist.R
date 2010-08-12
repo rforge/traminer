@@ -68,7 +68,7 @@ plot.stslist <- function(x, tlim=NULL, weighted=TRUE, sortv=NULL,
 	else {wlab <- NULL}
 
 	if (is.null(ylab))
-		ylab <- paste(length(tlim)," seq. ", "(", wlab,"n=",sum(weights),")", 
+		ylab <- paste(length(tlim)," seq. ", "(", wlab,"n=", round(sum(weights),2),")", 
 			sortlab, sep="")
 
 	## The PLot

@@ -33,7 +33,7 @@ seqmeant <- function(seqdata, weighted=TRUE, with.missing=FALSE) {
 		col <- c(col, attr(seqdata,"missing.color"))
 	}
 
-	attr(res,"nbseq") <- nrow(seqdata)
+	attr(res,"nbseq") <- sum(weights)
 	attr(res,"cpal") <- col
 	attr(res,"xtlab") <- colnames(seqdata)
 	attr(res,"weighted") <- weighted
