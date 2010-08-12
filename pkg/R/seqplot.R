@@ -155,7 +155,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 
 		if ("with.missing" %in% names(olist)) {
 			with.missing <- olist[["with.missing"]]
-		} else if ("with.missing" %in% names(flist)) {
+		} else if ("with.missing" %in% flist) {
 			with.missing <- formals(f)$with.missing
 		}
 

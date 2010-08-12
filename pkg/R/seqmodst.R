@@ -2,7 +2,7 @@
 ## Modal state sequence
 ## ====================
 
-seqmodst <- function(seqdata, weighted=TRUE, with.missing=FALSE, dist=FALSE, ...) {
+seqmodst <- function(seqdata, weighted=TRUE, with.missing=FALSE) {
 
 	if (!inherits(seqdata,"stslist")) 
 		stop("data is not a sequence object, see seqdef function to create one", call.=FALSE)
@@ -43,15 +43,15 @@ seqmodst <- function(seqdata, weighted=TRUE, with.missing=FALSE, dist=FALSE, ...
 	nbocc <- length(seqfind(res, seqdata))
 
 	## Distance to modal state sequence
-	if (dist)
-		dist.modst <- seqdist(seqdata, refseq=res, ...)
-	else 
-		dist.modst <- NULL
+	## if (dist)
+	##	dist.modst <- seqdist(seqdata, refseq=res, ...)
+	## else 
+	##	dist.modst <- NULL
 
 	class(res) <- c("stslist.modst", class(res))
 
 	attr(res, "Frequencies") <- stfreq
-	attr(res, "Distances") <- dist.modst
+	## attr(res, "Distances") <- dist.modst
 	attr(res, "Occurences") <- nbocc
 
 	## Weights
