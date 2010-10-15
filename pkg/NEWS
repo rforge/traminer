@@ -1,13 +1,14 @@
-
 ## ==========
 Version 1.6-2
 
-Changes in existing functions:
+Bug fixes:
   - seqdef(): now checks whether all states encountered in the input data are present in an optional 
       user provided alphabet ('state' argument) 
+  - seqefsub(): The support of a subsequence with a total support of 1 was set to 0 (hence, this only 
+	applies if the minimum support is 1.) This is now corrected (Reported by Anna Hera).
+  - Corrected compilation problems under SOLARIS (Reported by Prof Brian Ripley).
 
-
-## ==========
+  ## ==========
 Version 1.6-1
 
 New functionalities:
