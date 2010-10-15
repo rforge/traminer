@@ -7,7 +7,7 @@ Bug fixes:
   - seqefsub(): The support of a subsequence with a total support of 1 was set to 0 (hence, this only 
 	applies if the minimum support is 1.) This is now corrected (Reported by Anna Hera).
   - Corrected compilation problems under SOLARIS (Reported by Prof Brian Ripley).
-
+  - seqformat(): when converting from SPELL to STS, the fillblank argument was not used.
   ## ==========
 Version 1.6-1
 
