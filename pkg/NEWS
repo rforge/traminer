@@ -8,7 +8,8 @@ Bug fixes:
 	applies if the minimum support is 1.) This is now corrected (Reported by Anna Hera).
   - Corrected compilation problems under SOLARIS (Reported by Prof Brian Ripley).
   - seqformat(): when converting from SPELL to STS, the fillblank argument was not used.
-  ## ==========
+
+## ==========
 Version 1.6-1
 
 New functionalities:
