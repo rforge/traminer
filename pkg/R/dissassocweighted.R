@@ -60,7 +60,7 @@ TraMineR.indgrplist <- function(grpint, k=max(grpint)){
 }
 
 dissassocweighted.permgroup <- function(diss, grpint, weights, R, ret, randomWeight) {
-	SCtot <- ret$anova.table$SS[3]
+	# SCtot <- ret$anova.table$SS[3]
 	k <- length(ret$groups$n)-1
 	totweights <- ret$groups$n[k+1]
 	indgrp <- TraMineR.indgrplist(grpint, k)
@@ -207,12 +207,12 @@ dissassocweighted.internaldisscenter <- function(diss, grpint, indiv, k, weights
 }
 
 dissassocweighted.permbootstrap <- function(diss, grpint, weights, R, ret, samplesize, sampleprob) {
-	SCtot <- ret$anova.table$SS[3]
+	# SCtot <- ret$anova.table$SS[3]
 	k <- length(ret$groups$n)-1
 	totweights <- ret$groups$n[k+1]
 	n <- nrow(diss)
 	wwall <- rep(1, n)
-	allpop <- 1:samplesize
+	# allpop <- 1:samplesize
 	WeightedGroupTestValues <- function(dissindiv, grpindiv){
 		##permut weights
 		grpp <- grpint[grpindiv]

@@ -53,16 +53,16 @@ dissmfacw <- function(formula, data, R=1000, gower=FALSE,
 		} else {
 			g_matrix <- dissmatrix
 		}
-		n <- nrow(g_matrix)
+		# n <- nrow(g_matrix)
 		totalweight <- sum(weights)
 		var_list <- attr(predictor, "assign")
 		W_sqrt <- sqrt(weights)
 		W_sqrt_mat <- tcrossprod(W_sqrt)
-		hat_matrix_qr <- function(pred) {
-			qr_matrix <- qr(W_sqrt*pred)
-			q_matrix <- qr.Q(qr_matrix)
-			hat_matrix <- tcrossprod(q_matrix)
-		}
+		# hat_matrix_qr <- function(pred) {
+			# qr_matrix <- qr(W_sqrt*pred)
+			# q_matrix <- qr.Q(qr_matrix)
+			# hat_matrix <- tcrossprod(q_matrix)
+		# }
 		hatw_matrix_qr <- function(pred) {
 			qr_matrix <- qr(W_sqrt*pred)
 			q_matrix <- qr.Q(qr_matrix)

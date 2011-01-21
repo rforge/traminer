@@ -166,7 +166,7 @@ DTNBuildNode <- function(dmat, pred, minSize, ind, vardis,
 	SCres <- SCtot
 	bestSpl <- NULL
 	## print(SCtot)
-	varnames <- colnames(pred)
+	#varnames <- colnames(pred)
 	if (depth>=maxdepth) {
 			return(node)
 	}

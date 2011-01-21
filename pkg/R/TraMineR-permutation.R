@@ -41,7 +41,7 @@ TraMineR.permutationweight <- function(data, R, statistic,samplesize, sampleprob
 	allind <- 1:n
 	perms$t0 <- t0
 	ntest <- length(perms$t0)
-	spop <- 1:samplesize
+	# spop <- 1:samplesize
 	#print(data.frame(allind,sampleprob))
 	if (perms$R>1) {
 		#perms$t0boot <- matrix(NA, perms$R,length(perms$t0))
