@@ -3,25 +3,22 @@
 \alias{disstree2dotp}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Graphical representation of a dissimilarity tree}
-
 \description{
- Generate a "dot" file and associated images files that
-can be used in GraphViz to get a graphical representation of the
-tree.
- }
-
+Generate a "dot" file and associated images files that can be used in GraphViz to get a graphical representation of the tree.
+}
 \usage{
 disstree2dot(tree, filename, digits = 3,
    imagefunc = NULL, imagedata = NULL, imgLeafOnly = FALSE,
    devicefunc = "jpeg", imageext = "jpg", device.arg = list(),
    use.title = TRUE, label.loc = "main", node.loc = "main",
-   split.loc = "sub", title.cex = 1, ...)
+   split.loc = "sub", title.cex = 1, legendtext=NULL,
+   legendimage=NULL, ...)
 
 disstree2dotp(tree, filename,
    imagedata=NULL, imgLeafOnly=FALSE,
-   imagefunc=plot, ...)
+   imagefunc=plot, title.cex = 3, ...)
 }
-
+%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tree}{The tree to be plotted.}
   \item{filename}{A filename, without extension, that will be used to generate image and dot files.}
@@ -37,9 +34,10 @@ disstree2dotp(tree, filename,
   \item{node.loc}{Node content location, see \code{\link{title}} for possible values.}
   \item{split.loc}{Split information location, see \code{\link{title}} for possible values.}
   \item{title.cex}{\code{cex} applied to all calls to \code{title} (see \code{use.title}).}
+  \item{legendtext}{An optional text appearing in a distinct node.}
+  \item{legendimage}{An optional image file appearing in a distinct node.}
   \item{\dots}{other parameters that will be passed to \code{imagefunc}.}
 }
-
 \details{
   This function generates a "dot" file that can be used in GraphViz (\url{http://www.graphviz.org}).
 It also generates one image per node through a call to
@@ -54,8 +52,8 @@ to leave enough space for the title.
 \code{disstree2dot}. These functions are intended to be generic. See
 \code{\link{seqtree2dot}} for an even simpler version for state
 sequences objects.
- }
 
+}
 \value{
   Nothing but generates a file in the current working directory (see \code{\link{setwd}}).
 }

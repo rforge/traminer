@@ -10,22 +10,24 @@
 }
 \usage{
 seqdiff(seqdata, group, cmprange = c(0, 1),
-        seqdist_arg=list(method="LCS",norm=TRUE))
+        seqdist_arg=list(method="LCS",norm=TRUE),
+		with.missing = FALSE, weighted = TRUE, squared = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{seqdata}{a state sequence object created with the \code{\link{seqdef}} function.}
-  \item{group}{The group variable}
-  \item{cmprange}{The range used to compare subsequences}
-  \item{seqdist_arg}{argument passed directly to seqdist as a list}
+  \item{group}{The group variable.}
+  \item{cmprange}{The time range of the sliding window on which subsequences are compared.}
+  \item{seqdist_arg}{List of arguments passed directly to seqdist.}
+  \item{with.missing}{Logical. If \code{TRUE}, missing values are considered as an additional state. If \code{FALSE} subsequences with missing values are removed from the analysis.}
+  \item{weighted}{Logical. If \code{TRUE}, \code{seqdiff} uses the weights specified in \code{seqdata}.}
+  \item{squared}{Logical. If \code{TRUE} the dissimilarities are squared for computing the discrepancy.}
 }
 \details{
-  Analyses at each timestamp the sequence discrepancy within a sliding
-  time window (of range defined by \code{cmprange})
-  that is explained by the \code{group} variable.
-  The method computes a distance matrix, using \code{\link{seqdist}} at
-  each timestamp and then derives the explained
-  discrepancy with \code{\link{dissassoc}}.
+  The function analyses
+  the sequence discrepancy explained by the \code{group} variable within a sliding
+  time-window (of range defined by \code{cmprange}). At
+  each timestamp, the method uses \code{\link{seqdist}} to compute a distance matrix over the time-window and then derives the explained discrepancy on that window with \code{\link{dissassoc}}.
 
   There are print and plot methods for the result returned.
 }
@@ -37,16 +39,16 @@ seqdiff(seqdata, group, cmprange = c(0, 1),
   for each timestamp of the sequence,
       see \code{\link{dissassoc}}}
 
-  \item{variance}{A \code{data.frame} with, at each time stamp, the discrepancy within each group defined by the
+  \item{discrepancy}{A \code{data.frame} with, at each time stamp, the discrepancy within each group defined by the
       \code{group} variable and for the whole population.}
 }
 
 \references{
-  Studer, M., G. Ritschard, A. Gabadinho, and N. S. Müller (2009)
+  Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
   Discrepancy	analysis of complex objects using dissimilarities.
-  In H. Briand, F. Guillet, G. Ritschard, and D. A. Zighed (Eds.),
+  In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),
   \emph{Advances in Knowledge Discovery and Management},
-  Studies in Computational Intelligence. Berlin: Springer.
+  Studies in Computational Intelligence, Volume 292, pp. 3-19. Berlin: Springer.
 	
   Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2009)
   Analyse de dissimilarités par arbre d'induction. In EGC 2009,
@@ -63,5 +65,5 @@ mvad.seq <- seqdef(mvad[, 17:86])
 mvad.diff <- seqdiff(mvad.seq, group=mvad$gcse5eq)
 print(mvad.diff)
 plot(mvad.diff)
-plot(mvad.diff, stat="Variance")
+plot(mvad.diff, stat="discrepancy")
 }

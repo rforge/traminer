@@ -1,22 +1,27 @@
 \name{seqelength}
 \alias{seqelength}
+\alias{seqelength<-}
 \alias{seqesetlength}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Length of event sequences}
 \description{
 The length of an event sequence is its time span, i.e. the total time of observation. This information is optional but may be useful to perform for instance a survival analysis.
 \code{seqelength} retrieves the length the given sequences.
-\code{seqesetlength} sets the length of the sequences.
+\code{seqelength <-} sets the length of the sequences.
+
+\code{seqesetlength} is depreaceted.
 
 }
 \usage{
 seqelength(s)
-seqesetlength(s,len)
+seqelength(s) <- value
+seqesetlength(s, len)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{s}{An event sequence object (\code{seqelist}).}
   \item{len}{A list of sequence lengths.}
+  \item{value}{A list of sequence lengths.}
 }
 \value{
   \code{seqelength} returns a numeric vector with the length of each sequences.
@@ -33,7 +38,7 @@ actcal.seqe <- seqecreate(actcal.tse)
 sl <- numeric()
 sl[1:2000] <- 12
 ##All sequences with same length
-seqesetlength(actcal.seqe, sl)
+seqelength(actcal.seqe) <- sl
 actcal.seqe[1:10]
 ##Retrieve length
 seqelength(actcal.seqe)
