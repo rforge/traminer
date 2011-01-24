@@ -263,13 +263,14 @@ dissassocweighted <- function(diss, group, weights, R, weight.permutation, squar
 	
 	use.replicate <- weight.permutation %in% c("rounded-replicate", "replicate")
 	unweighted <- is.null(weights)
-	
+
 	if (unweighted) {
 		weights <- rep(1, n)
 		use.replicate <- FALSE
 		weight.permutation <- "none"
+	} else {
+		weights <- as.double(weights[!is.na(group)])	
 	}
-	weights <- as.double(weights[!is.na(group)])
 	## Allow integer weights for replicates
 	if(use.replicate) {
 		rounderror <- sum(abs(round(weights, 0) - weights))

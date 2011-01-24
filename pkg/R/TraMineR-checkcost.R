@@ -1,0 +1,49 @@
+
+TraMineR.checkcost <- function(sma, seqdata, with.missing, indel) {
+	alphabet <- attr(seqdata,"alphabet")
+	## Gaps in sequences
+	if (with.missing) {
+		alphabet <- c(alphabet,attr(seqdata,"nr"))
+	}
+	alphsize <- length(alphabet)
+	
+	if(length(dim(sma))==2){
+		dim(sma) <- c(dim(sma),1)
+	}
+	else {
+		if(ncol(seqdata)!=dim(sma)[3]){
+			stop(" [!] size of substitution cost matrix must be ", alphsize,"x", alphsize, "x", ncol(seqdata))
+		}
+	}
+	if (!missing(indel) && indel <= 0) {
+		stop(" [!] indel cost should be positive")
+	}
+	for(i in 1:dim(sma)[3]) {
+		sm <- sma[,,i]
+		if (nrow(sm)!=alphsize | ncol(sm)!=alphsize) {
+			stop(" [!] size of substitution cost matrix must be ", alphsize,"x", alphsize)
+		}
+		if (any(sm<0)) {
+			stop(" [!] Negative substitution costs are not allowed")
+		}
+		if (any(diag(sm)!=0)) {
+			stop(" [!] All element on the diagonal of sm (substitution cost) should be equal to zero")
+		}
+		triangleineq <- checktriangleineq(sm, warn=FALSE, indices=TRUE)
+		## triangleineq contain a vector of problematic indices.
+		if (!is.logical(triangleineq)) {
+			warning("The substitution cost matrix doesn't respect the triangle inequality.\n",
+        			" At least, substitution cost between indices ",triangleineq[1]," and ",triangleineq[2],
+        			" does not respect the triangle inequality. It costs less to first transform ",
+        			triangleineq[1], " into ",triangleineq[3])
+		}
+		if (!missing(indel) && any(sm>2*indel)) {
+			warning("Some substitution cost are greater that two times the indel cost.",
+				" Such substitution cost will thus never be used.")
+		}
+		## Testing for symmetric matrix
+		if (sum(sm-t(sm)!=0)) {
+			warning("The substitution cost matrix is not symmetric.")
+		}
+	}
+}
