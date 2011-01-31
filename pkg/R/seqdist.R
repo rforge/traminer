@@ -178,7 +178,7 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	}
 
 	fin <- Sys.time()
-	message(" [>] Total time: ", format(round(fin-debut, 3)))
+	message(" [>] total time: ", format(round(fin-debut, 3)))
 
 	if (full.matrix && inherits(distances, "dist")) {
 		return(dist2matrix(distances))
