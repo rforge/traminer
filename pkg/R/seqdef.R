@@ -5,7 +5,7 @@
 seqdef <- function(data, var=NULL, informat="STS", stsep=NULL, 
 	alphabet=NULL, states=NULL, id=NULL, weights=NULL, start=1, 
 	left=NA, right="DEL", gaps=NA, missing=NA, void="%", nr="*",
-	cnames=NULL, cpal=NULL, missing.color="darkgrey", labels=NULL, ...) {
+	cnames=NULL, xtstep=1, cpal=NULL, missing.color="darkgrey", labels=NULL, ...) {
 
 	## Parameters
 	maxstatedisplay <- 12
@@ -201,7 +201,9 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	## ======================
 	## Rows and columns names
 	## ======================
-	if (!is.null(cnames)) colnames(seqdata) <- cnames
+	if (!is.null(cnames)) {
+		colnames(seqdata) <- cnames
+	}
 	else {
 		if (is.null(cntmp)) 
 			colnames(seqdata) <- paste("T",start:(max(seql)+start-1),sep="")
@@ -209,6 +211,8 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 			colnames(seqdata) <- cntmp
 		else colnames(seqdata) <- paste("T",start:(max(seql)+start-1),sep="")
 	}
+
+	attr(seqdata,"xtstep") <- xtstep
 
 	if (!is.null(id))
 		rownames(seqdata) <- if (length(id)==1 && id=="auto") paste("[",1:nbseq,"]",sep="") else id

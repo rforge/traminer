@@ -4,13 +4,15 @@
 
 plot.stslist.rep <- function(x, cpal=NULL, missing.color=NULL,
 	pbarw=TRUE, dmax=NULL, stats=TRUE,
-	ylab=NULL, xaxis=TRUE, xtlab=NULL, cex.plot=1, ...) {
+	ylab=NULL, xaxis=TRUE, xtlab=NULL, xtstep=NULL, cex.plot=1, ...) {
 
 	## Extracting attributes
 	n <- attr(x,"nbseq")
 	
-	if (is.null(xtlab))
-		xtlab <- colnames(x)
+	if (is.null(xtlab)) {xtlab <- colnames(x)}
+
+	if (is.null(xtstep)) {xtstep <- attr(x,"xtstep")}
+
 	seql <- length(xtlab)
 	statl <- attr(x,"alphabet")
 	nr <- attr(x,"nr")
@@ -76,7 +78,9 @@ plot.stslist.rep <- function(x, cpal=NULL, missing.color=NULL,
 		...)
 
 	## Time axis for the sequence
-	axis(1, at=1:seql-0.5, labels=xtlab, 
+	tpos <- seq(1,seql, xtstep)
+
+	axis(1, at=tpos-0.5, labels=xtlab[tpos], 
 		pos=-0.04, 
 		## mgp=c(.5,.5,0), 
 		cex.axis=cex.plot)
