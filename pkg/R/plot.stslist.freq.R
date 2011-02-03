@@ -16,7 +16,9 @@ plot.stslist.freq <- function(x, cpal=NULL, missing.color=NULL, pbarw=TRUE,
 		xtlab <- attr(x,"names")
 
 	if (is.null(xtstep)) {
-		xtstep <- attr(x,"xtstep")
+		if (!is.null(attr(x,"xtstep"))) {xtstep <- attr(x,"xtstep")} 
+		## For sequence objects created with previous versions
+		else {xtstep <- 1}
 	}
 
 	seql <- length(xtlab)

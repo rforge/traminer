@@ -12,7 +12,11 @@ plot.stslist.statd <- function(x, type="d", cpal=NULL, ylab=NULL, yaxis=TRUE, xa
 
 	if (is.null(xtlab)) {xtlab <- attr(x,"xtlab")}
 
-	if (is.null(xtstep)) {xtstep <- attr(x,"xtstep")}
+	if (is.null(xtstep)) {
+		if (!is.null(attr(x,"xtstep"))) {xtstep <- attr(x,"xtstep")} 
+		## For sequence objects created with previous versions
+		else {xtstep <- 1}
+	}
 
 	seql <- length(xtlab)
 

@@ -25,7 +25,11 @@ plot.stslist.modst <- function(x, cpal=NULL,
 	else {wlab <- NULL}
 
 	if (is.null(xtlab)) {xtlab <- colnames(x)}
-	if (is.null(xtstep)) {xtstep <- attr(x,"xtstep")}
+	if (is.null(xtstep)) {
+		if (!is.null(attr(x,"xtstep"))) {xtstep <- attr(x,"xtstep")} 
+		## For sequence objects created with previous versions
+		else {xtstep <- 1}
+	}
 
 	if (is.null(ylab)) ylab <- paste("State freq. (",wlab,"n=",round(n,2),")",sep="")
 

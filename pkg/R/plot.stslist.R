@@ -14,7 +14,9 @@ plot.stslist <- function(x, tlim=NULL, weighted=TRUE, sortv=NULL,
 		xtlab <- colnames(x)
 
 	if (is.null(xtstep)) {
-		xtstep <- attr(x,"xtstep")
+		if (!is.null(attr(x,"xtstep"))) {xtstep <- attr(x,"xtstep")} 
+		## For sequence objects created with previous versions
+		else {xtstep <- 1}
 	}
 
 	## Range 
