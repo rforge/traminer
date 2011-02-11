@@ -13,7 +13,7 @@ seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object, imgLeafOnly = 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{tree}{The tree to be plotted.}
+  \item{tree}{A \code{seqtree} object (as produced by \code{\link{seqtree}}).}
   \item{filename}{The name of a file where to save the plot. If \code{NULL}, a temporary file is created.}
   \item{seqdata}{The sequence object containing the state sequences plotted in the nodes.}
   \item{imgLeafOnly}{Logical. If \code{TRUE} sequences are plotted only in terminal nodes.}
@@ -29,9 +29,9 @@ seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object, imgLeafOnly = 
   \item{\dots}{additional arguments passed to seqplot}
 }
 \details{
-The plot is actually not generated as an R plot but with GraphViz (www.graphviz.org). Hence, \code{seqtreedisplay} will only work when GraphViz is correctly installed.
+The plot is actually not generated as an R plot, but with GraphViz (www.graphviz.org). Hence, \code{seqtreedisplay} will only work when GraphViz is correctly installed.
 
-Conversion to image formats other than "jpeg" or "png" is done using ImageMagick (www.imagemagick.org). To use this feature,  ImageMagick should hence also be installed.
+Conversion to image formats other than "jpeg" or "png" is done using ImageMagick (www.imagemagick.org). To use this feature,  ImageMagick (www.imagemagick.org) should hence also be installed.
 }
 \value{None}
 

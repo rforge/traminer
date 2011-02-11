@@ -68,17 +68,19 @@ the National Academy of Sciences of the United States of America} 103(51), 19430
    \cr
    \code{\link{dissassoc}} to test association between objects represented by their dissimilarities and a covariate.
 \cr
-\code{\link{disstree}} for an induction tree analyse of objects characterized by a dissimilarity matrix.
+\code{\link{disstree}} for an induction tree analysis of objects characterized by a dissimilarity matrix.
 \cr
 \code{\link{disscenter}} to compute the distance of each object to its group center from pairwise dissimilarities.
 }
 \examples{
-## Defining a state sequence object
+## Define the state sequence object
 data(mvad)
 mvad.seq <- seqdef(mvad[, 17:86])
 
-## Building dissimilarities
+## Compute dissimilarities
 mvad.lcs <- seqdist(mvad.seq, method="LCS")
+
+## And now the multi-factor analysis
 print(dissmfac(mvad.lcs ~ male + Grammar + funemp +
 	gcse5eq + fmpr + livboth, data=mvad, R=10))
 }

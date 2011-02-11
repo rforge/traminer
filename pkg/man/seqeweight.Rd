@@ -3,7 +3,7 @@
 \alias{seqeweight<-}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-	Setting or getting weights of an event sequence object. 
+	Setting or retrieving weights of an event sequence object.
 }
 \description{
 	Event sequence objects can be weighted. Weights may be used by other functions such as \code{\link{seqefsub}} or \code{\link{seqecmpgroup}} to compute weighted statistics.
@@ -18,7 +18,7 @@ seqeweight(s) <- value
   \item{value}{Numerical vector containing weights}
 }
 \value{
-\code{seqeweight} return a numerical vector containing the weights associated to each event sequence.
+\code{seqeweight} returns a numerical vector containing the weights associated to each event sequence.
 }
 
 \examples{
@@ -34,10 +34,10 @@ biofam.seqe <- seqecreate(biofam.seq, weighted=FALSE)
 ## Using the weights
 seqeweight(biofam.seqe) <- biofam$wp00tbgs
 
-## Now seqefsub makes use of weights unless weighted is set to FALSE
+## Now seqefsub accoounts for weights unless weighted is set to FALSE
 fsubseq <- seqefsub(biofam.seqe, pMinSupport=0.01)
 
-##searching for susbsequences discriminating the cohort using weights
+## Searching for weighted susbsequences which best discriminate the birth cohort
 discr <- seqecmpgroup(fsubseq, group=biofam$birthyr>=1940)
 plot(discr[1:15])
 
