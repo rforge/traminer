@@ -93,7 +93,7 @@ The \emph{representative sequence plot} (\code{type="r"}) displays a reduced, no
 }
 
 \seealso{
- \code{\link{plot.stslist.statd} \code{\link{plot.stslist.freq}} \code{\link{plot.stslist}} \code{\link{plot.stslist.modst}} \code{\link{plot.stslist.meant}} \code{\link{plot.stslist.rep}}.
+ \code{\link{plot.stslist.statd}} \code{\link{plot.stslist.freq}} \code{\link{plot.stslist}} \code{\link{plot.stslist.modst}} \code{\link{plot.stslist.meant}} \code{\link{plot.stslist.rep}}.
 }
 
 

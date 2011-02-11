@@ -8,7 +8,9 @@
 
 seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE, 
 	indel=1, sm=NA,	with.missing=FALSE, full.matrix=TRUE) {
-	debut <- Sys.time()
+	gc(FALSE)
+	debut <- proc.time()
+
 	## Checking correct arguments
 	if (!inherits(seqdata,"stslist")) {
 		stop(" [!] data is not a state sequence object, use 'seqdef' function to create one", call.=FALSE)
@@ -121,7 +123,7 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	## and if the triangle inequality is respected
 	if(methodname == "DHD"){
 		## User entered substitution cost
-		if(!is.na(sm)){
+		if(length(sm)>1){
 			TraMineR.checkcost(sma=sm, seqdata=seqdata, with.missing=with.missing)
 		}
 		else {
@@ -177,8 +179,9 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 			norm, indel, sm, alphsize, nd, dseq, slength, mcorr, optimized)
 	}
 
-	fin <- Sys.time()
-	message(" [>] total time: ", format(round(fin-debut, 3)))
+	fin <- proc.time()
+	totaltime <- format(round(difftime(as.POSIXct(sum(fin[1:2]), origin="1960-01-01"), as.POSIXct(sum(debut[1:2]), origin="1960-01-01")), 3))
+	message(" [>] total time: ", totaltime)
 
 	if (full.matrix && inherits(distances, "dist")) {
 		return(dist2matrix(distances))

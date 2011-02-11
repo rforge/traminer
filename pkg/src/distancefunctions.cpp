@@ -184,7 +184,8 @@ extern "C" {
         if (disttype==1) {
             fmatsize=maxlen+1;
             //PROTECT(Fmat = allocVector(REALSXP, (fmatsize*fmatsize)));
-            fmat= new double[fmatsize*fmatsize];
+            //fmat= new double[fmatsize*fmatsize];
+			fmat= (double*) R_alloc(fmatsize*fmatsize,sizeof(double));
             for (i=0;i<alphasize;i++) {
                 for (j=i; j<alphasize;j++) {
                     if (scost[MINDICE(i,j,alphasize)]>maxscost) {
@@ -217,6 +218,7 @@ extern "C" {
 
         for (is=0;is<nseq;is++) {
             //toutes les distances intra-groupes=0
+			R_CheckUserInterrupt();
             setDistance(is,is,magicIndex,magicSeq, finalnseq, ans, 0);
             for (js=is+1;js<nseq;js++) {
                 double cmpres=0;
