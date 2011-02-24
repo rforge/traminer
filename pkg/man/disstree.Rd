@@ -31,6 +31,8 @@ disstree(formula, data = NULL, weights = NULL, minSize = 0.05,
   The procedure iteratively splits the data. At each step, the procedure selects the variable and split that explains the greatest part of the discrepancy,
   i.e. the split for which we get the highest pseudo R2.
   The significance of the retained split is assessed through a permutation test.
+  
+  \code{\link{seqtree}} provides a simplier interface if you plan to use \code{disstree} with states sequences objects.
 }
 \value{
 An object of class \code{disstree} that contains the following components:
@@ -63,9 +65,11 @@ algorithm. \emph{Journal of the Royal Statistical Society A} \bold{170}(4), 1061
 }
 %\author{}
 \seealso{
-   \code{\link{seqtree2dot}} to generate graphic representation of \code{disstree} objects when analyzing state sequences.
+	\code{\link{seqtree}} to generate a specific \code{disstree} objects for analyzing state sequences.
    \cr
-   \code{\link{disstree2dot}} is a more general interface to generate such representation.
+	\code{\link{seqtreedisplay}} to generate graphic representation of \code{seqtree} objects when analyzing state sequences.
+   \cr
+   \code{\link{disstree2dot}} is a more general interface to generate such representation for other type of objects.
    \cr
    \code{\link{dissvar}} to compute discrepancy using dissimilarities and for a basic introduction to discrepancy analysis.
    \cr
@@ -88,9 +92,6 @@ dt <- disstree(mvad.lcs~ male + Grammar + funemp + gcse5eq + fmpr + livboth,
     data=mvad, R = 10)
 print(dt)
 
-## Using simplified interface to generate a file for GraphViz
-seqtree2dot(dt, "mvadseqtree", seqdata=mvad.seq, type="d",
-	border=NA, withlegend=FALSE, axes=FALSE, ylab="", yaxis=FALSE)
 
 ## Generating a file for GraphViz
 disstree2dot(dt, "mvadtree", imagefunc=seqdplot, imagedata=mvad.seq,
@@ -116,4 +117,7 @@ disstree2dot(dt, "mvadtree", imagefunc=myplotfunction, title.cex=3,
 
 ## To run GraphViz (dot) from R and generate an "svg" file
 ## shell("dot -Tsvg -O mvadtree.dot")
+
+## On some system you should run:
+## system("dot -Tsvg -O mvadtree.dot")
 }

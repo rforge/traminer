@@ -29,6 +29,9 @@ seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object, imgLeafOnly = 
   \item{\dots}{additional arguments passed to seqplot}
 }
 \details{
+This function generates a tree image. For each node, it calls \code{\link{seqplot}} passing the selected lines of \code{seqdata} as argument. 
+You should at least specify the \code{type} of the plot to use (i.e. using \code{type="d"} for instance, see \code{\link{seqplot}} for more details).
+	
 The plot is actually not generated as an R plot, but with GraphViz (www.graphviz.org). Hence, \code{seqtreedisplay} will only work when GraphViz is correctly installed.
 
 Conversion to image formats other than "jpeg" or "png" is done using ImageMagick (www.imagemagick.org). To use this feature,  ImageMagick (www.imagemagick.org) should hence also be installed.
@@ -36,5 +39,5 @@ Conversion to image formats other than "jpeg" or "png" is done using ImageMagick
 \value{None}
 
 \seealso{
-See \code{\link{seqtree}}
+See \code{\link{seqtree} for examples}
 }

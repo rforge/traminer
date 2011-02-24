@@ -26,6 +26,7 @@ TraMineR.checkcost <- function(sma, seqdata, with.missing, indel) {
 		if (any(sm<0)) {
 			stop(" [!] Negative substitution costs are not allowed")
 		}
+		
 		if (any(diag(sm)!=0)) {
 			stop(" [!] All element on the diagonal of sm (substitution cost) should be equal to zero")
 		}
@@ -37,12 +38,16 @@ TraMineR.checkcost <- function(sma, seqdata, with.missing, indel) {
         			" does not respect the triangle inequality. It costs less to first transform ",
         			triangleineq[1], " into ",triangleineq[3])
 		}
+		if(!missing(indel) && indel<=0){
+			stop(" [!] indel should be greater than zero")
+		}
 		if (!missing(indel) && any(sm>2*indel)) {
 			warning("Some substitution cost are greater that two times the indel cost.",
 				" Such substitution cost will thus never be used.")
 		}
+		
 		## Testing for symmetric matrix
-		if (sum(sm-t(sm)!=0)) {
+		if (any((sm-t(sm))!=0)) {
 			warning("The substitution cost matrix is not symmetric.")
 		}
 	}

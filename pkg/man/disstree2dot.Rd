@@ -49,13 +49,13 @@ if \code{use.title} is \code{TRUE}, \code{imagefunc} should take care
 to leave enough space for the title.
 
 \code{disstree2dotp} is a simplified interface of
-\code{disstree2dot}. These functions are intended to be generic. See
-\code{\link{seqtree2dot}} for an even simpler version for state
-sequences objects.
+\code{disstree2dot} which automatically leaves enough space for the title and subtitles. These functions are intended to be generic. 
+
+See \code{\link{seqtreedisplay}} for a much simpler way to generate a graphical representation of a \code{\link{seqtree}}; that is a \code{disstree} built using a sequence object. 
 
 }
 \value{
-  Nothing but generates a file in the current working directory (see \code{\link{setwd}}).
+  Nothing but generates a "dot" and several images files (on per node) in the current working directory (see \code{\link{setwd}}).
 }
 
-\seealso{\code{\link{disstree}} for an example.}
+\seealso{\code{\link{seqtree}} and \code{\link{seqtreedisplay}}, \code{\link{disstree}} for an example.}
