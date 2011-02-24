@@ -41,15 +41,16 @@ recodef <- function(x, recodes, otherwise=NULL, na=NULL){
 }
 
 seqrecode <- function(seqdata, recodes, otherwise=NULL, labels=NULL, cpal=NULL){
-	if (!inherits(seqdata,"stslist")) 
+	if (!inherits(seqdata,"stslist")) {
 		stop(" [!] data is not a sequence object, see seqdef function to create one")
+	}
 	seqdatar <- seqdata
 	prev_al <- alphabet(seqdata)
 	used_al <- unlist(recodes)
 	## Seek for coding instruction not in previous alphabet
-	inexistant_al <- is.na(match(used_al, prev_al))
+	inexistant_al <- is.na(match(used_al, c(prev_al, attr(seqdata, "nr"), attr(seqdata, "void"))))
 	if(sum(inexistant_al)>0) {
-		warning(" [!] Some state are not defined in the alphabel of seqdata:", paste(used_al[inexistant_al], sep=" "))
+		warning(" [!] Some state are not defined in the alphabet of seqdata:", paste(used_al[inexistant_al], sep=" "))
 	}
 	al <- c(names(recodes), otherwise)
 	alph <- NULL
@@ -94,7 +95,14 @@ seqrecode <- function(seqdata, recodes, otherwise=NULL, labels=NULL, cpal=NULL){
 			} else {
 				a <- alph[i]
 			}
-			cpal[i] <- attr(seqdata, "cpal")[match(a, alphabet(seqdata))]
+			if(a ==attr(seqdata, "nr")){
+				cpal[i] <- attr(seqdata, "missing.color")
+			} else if(a==attr(seqdata, "void")){
+				warning("[!] no previous color defined for the 'void' (", attr(seqdata, "void"), ") state, setting it to 'white'")
+				cpal[i] <- "white"
+			}else{
+				cpal[i] <- attr(seqdata, "cpal")[match(a, alphabet(seqdata))]
+			}
 		}
 	}
 	attr(seqdatar,"alphabet") <- alph
