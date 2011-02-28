@@ -89,7 +89,7 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
     		} else {
     			cpal <- col
     		}
-    		if (stat %in% c("Residuals","residuals")) {
+    		if (stat %in% c("Residuals", "residuals")) {
     			toplot <- x$discrepancy*(1-x$stat[, "Pseudo R2"])
     		} else {
     			toplot <- x$discrepancy
@@ -104,7 +104,7 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
     		}
     		legend(legendposition, fill = cpal, legend = colnames(x$discrepancy))
     		if(xaxt) axis(1, at=1:nrow(x$discrepancy), labels=rownames(x$stat) )
-    		return(invisible()) 
+    		return(invisible())
     	}
 	
 	    ##if(length(stat)==1){
@@ -115,13 +115,16 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
 			plot(x$stat[, stat], type=type, ylab=ylab, xlab=xlab, xaxt="n",col=col, ...)
 		}
 		else {
-			stop("Unknow value: ", stat," for the 'stat' argument")
+			stop(" [!] 'stat' argument should be one of ", paste(c("discrepancy", colnames(x$stat)), sep=", "), ".")
 		}
 		
 	}else if (length(stat)==2) {
+		if(sum(stat %in% colnames(x$stat)) < 2 ){
+			stop(" [!] The two values of the 'stat' argument should be one of ", paste(colnames(x$stat), sep=", "), ".")
+		}
         for (i in 1:2){
             if (!(stat[i] %in% colnames(x$stat))){
-          			stop("Invalid value of the 'stat' argument")
+          			
             }
         }
 		if(is.null(col)){
@@ -135,7 +138,7 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
 		legend(legendposition, fill = col, legend =stat)
 	}
 	else{
-		stop("Too many values for the 'stat' argument (max 2)")
+		stop(" [!] Too many values for the 'stat' argument (max 2)")
 	}
 	if(xaxt) axis(1, at=1:nrow(x$discrepancy), labels=rownames(x$stat) )
 }

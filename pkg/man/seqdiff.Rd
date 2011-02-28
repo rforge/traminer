@@ -2,7 +2,6 @@
 \name{seqdiff}
 \alias{seqdiff}
 \alias{print.seqdiff}
-\alias{plot.seqdiff}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Position-wise discrepancy analysis between groups of sequences}
 \description{

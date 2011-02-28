@@ -12,7 +12,7 @@ disstree2dot(tree, filename, digits = 3,
    devicefunc = "jpeg", imageext = "jpg", device.arg = list(),
    use.title = TRUE, label.loc = "main", node.loc = "main",
    split.loc = "sub", title.cex = 1, legendtext=NULL,
-   legendimage=NULL, ...)
+   legendimage=NULL, showdepth = FALSE, ...)
 
 disstree2dotp(tree, filename,
    imagedata=NULL, imgLeafOnly=FALSE,
@@ -36,6 +36,7 @@ disstree2dotp(tree, filename,
   \item{title.cex}{\code{cex} applied to all calls to \code{title} (see \code{use.title}).}
   \item{legendtext}{An optional text appearing in a distinct node.}
   \item{legendimage}{An optional image file appearing in a distinct node.}
+  \item{showdepth}{Logical. If \code{TRUE}, information about depth of the tree is added to the plot.}
   \item{\dots}{other parameters that will be passed to \code{imagefunc}.}
 }
 \details{
