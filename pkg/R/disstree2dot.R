@@ -24,7 +24,7 @@ DTNseqplot <- function(ind, seqdata, sortv=NULL, dist.matrix=NULL, ...) {
 	}
 }
 
-seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLeafOnly=FALSE, sortv=NULL, dist.matrix=NULL, title.cex=3, withlegend="auto", legend.fontsize=title.cex, axes=FALSE, imageformat="png", withquality=TRUE, legendtext=NULL, ...) {
+seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLeafOnly=FALSE, sortv=NULL, dist.matrix=NULL, title.cex=3, withlegend="auto", legend.fontsize=title.cex, axes=FALSE, imageformat="png", withquality=TRUE, legendtext=NULL, showtree=TRUE, ...) {
 	actualdir <- getwd()
 	tmpdir <- tempdir()
 	setwd(tmpdir)
@@ -40,17 +40,17 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 			return(paste("<TR><TD ALIGN=\"LEFT\">",n,":</TD><TD ALIGN=\"LEFT\">", formd(x$info$adjustment$stat[n,1]),
 						 "</TD><TD ALIGN=\"LEFT\">", star(x$info$adjustment$stat[n,2]),"</TD></TR>", sep=""))
 		}
-		legendtext <- paste("<FONT POINT-SIZE=\"",round(title.cex*11,0),"\"><TABLE BORDER=\"0\" CELLPADDING=\"5\"><TR><TD COLSPAN=\"3\">Global quality</TD></TR>", 
+		legendtext <- paste("<FONT POINT-SIZE=\"",round(title.cex*11,0),"\"><TABLE BORDER=\"0\" CELLPADDING=\"5\"><TR><TD COLSPAN=\"3\">Global quality</TD></TR>",
 							rowStat(tree, "Pseudo F"), rowStat(tree, "Pseudo R2"), rowStat(tree, "Levene"),"</TABLE></FONT>", sep="")
 	}
 	if(imageformat!="jpg"){
 		seqtree2dot(tree=tree, filename="tmpseqtree", seqdata=seqdata, imgLeafOnly=imgLeafOnly,
-			sortv=sortv, dist.matrix=dist.matrix, title.cex=title.cex, withlegend=withlegend, 
+			sortv=sortv, dist.matrix=dist.matrix, title.cex=title.cex, withlegend=withlegend,
 			legend.fontsize=legend.fontsize, axes=axes, devicefunc="png", imageext="png", legendtext=legendtext, ...)
 	}
 	else {
 		seqtree2dot(tree=tree, filename="tmpseqtree", seqdata=seqdata, imgLeafOnly=imgLeafOnly,
-			sortv=sortv, dist.matrix=dist.matrix, title.cex=title.cex, withlegend=withlegend, 
+			sortv=sortv, dist.matrix=dist.matrix, title.cex=title.cex, withlegend=withlegend,
 			legend.fontsize=legend.fontsize, axes=axes, legendtext=legendtext, ...)
 	}
 	
@@ -77,17 +77,20 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 			stop("To use another format than jpeg or png, you should install ImageMagick: see http://www.imagemagick.org")
 		}
 	}
-	if (.Platform$OS.type=="windows") {
-		myshellrun(paste("start tmpseqtree", imageformat, sep="."), wait=FALSE)
-	}
-	else {
-		myshellrun(paste("display tmpseqtree", imageformat, sep="."), wait=FALSE)
-	}
+    if (showtree) {
+    	if (.Platform$OS.type=="windows") {
+    		myshellrun(paste("start tmpseqtree", imageformat, sep="."), wait=FALSE)
+    	}
+    	else {
+    		myshellrun(paste("display tmpseqtree", imageformat, sep="."), wait=FALSE)
+    	}
+    }
 	
 	setwd(actualdir)
 	if(!is.null(filename)){
 		file.copy(file.path(tmpdir, paste("tmpseqtree", imageformat, sep=".")), filename)
 	}
+	return(invisible(TRUE))
 }
 
 ###########################
@@ -138,7 +141,7 @@ disstree2dotp <- function(tree, filename, imagedata=NULL, imgLeafOnly=FALSE,
 disstree2dot <- function(tree, filename, digits=3, imagefunc=NULL, imagedata=NULL,
 							imgLeafOnly=FALSE, devicefunc="jpeg", imageext="jpg",
 							device.arg=list(), use.title=TRUE, label.loc="main",
-							node.loc="main", split.loc="sub", title.cex=1, legendtext=NULL, legendimage=NULL, ...) {
+							node.loc="main", split.loc="sub", title.cex=1, legendtext=NULL, legendimage=NULL, showdepth=FALSE, ...) {
 	dotfile <- paste(filename, ".dot", sep="")
 	node <- tree$root
 	cat("digraph distree{\n", file=dotfile)
@@ -153,9 +156,10 @@ disstree2dot <- function(tree, filename, digits=3, imagefunc=NULL, imagedata=NUL
 	formd <- function (x){
 		return(format(x, digits =digits))
 	}
-	
+	nodedepthranking <- list()
 	DTN2DotInternal <- function(preced, node, pos, label) {
 		nodename <- paste(preced, "_", pos, sep="")
+		nodedepthranking[[nodename]] <<- node$info$depth
 		stringcontentnode <- paste("n: ", formd(node$info$n), " s2: ",
 				formd(node$info$vardis), sep="")
 		if (!is.null(node$split)) {
@@ -247,11 +251,23 @@ disstree2dot <- function(tree, filename, digits=3, imagefunc=NULL, imagedata=NUL
 	}
 	
 	DTN2DotInternal(preced=filename, node=node, pos="none", label="Root")
-	DTN2DotInternalRelation(preced=filename, node=node, pos="none")
 	if (!is.null(legendtext)) {
 		str <- paste("\"node_legendtext\"[shape=box, label=<", legendtext, ">", sep="")
 		cat(paste(str, "];\n", sep=""), file=dotfile, append=TRUE)
 	}
+	if(showdepth){
+		fontsize <- paste("[shape=box, fontsize=", title.cex*20, "];\n", sep="")
+		unikrank <- unlist(unique(nodedepthranking))
+		cat(paste(unikrank, collapse=fontsize),fontsize, file=dotfile, append=TRUE)
+		nodename <- names(nodedepthranking)
+		for(rank in unikrank){
+			cat("{ rank=same ;", rank, ";", paste(nodename[nodedepthranking==rank], collapse="; "), ";}\n", file=dotfile, append=TRUE)
+		}
+		cat(paste(sort(unikrank), collapse=" -> "), ";\n", file=dotfile, append=TRUE)
+	}
+	DTN2DotInternalRelation(preced=filename, node=node, pos="none")
+	
+	
 	cat("}\n", file=dotfile, append=TRUE)
 
-}
+} 

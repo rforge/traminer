@@ -14,7 +14,7 @@ disstree(formula, data = NULL, weights = NULL, minSize = 0.05,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{formula}{A formula where the left hand side is a dissimilarity matrix and the right hand specifies the candidate partitioning variables to partition the population}
+  \item{formula}{A formula where the left hand side is a dissimilarity matrix and the right hand specifies the candidate partitioning variables to partition the cases}
   \item{data}{a data frame where arguments in formula will be searched}
   \item{weights}{optional numerical vector of weights.}
   \item{minSize}{minimum number of cases in a node, will be treated as a proportion if less than 1.}
@@ -28,11 +28,11 @@ disstree(formula, data = NULL, weights = NULL, minSize = 0.05,
 }
 
 \details{
-  The procedure iteratively splits the data. At each step, the procedure selects the variable and split that explains the greatest part of the discrepancy,
-  i.e. the split for which we get the highest pseudo R2.
+  The procedure iteratively splits the data. At each step, the procedure selects the variable and split that explain the greatest part of the discrepancy,
+  i.e., the split for which we get the highest pseudo R2.
   The significance of the retained split is assessed through a permutation test.
-  
-  \code{\link{seqtree}} provides a simplier interface if you plan to use \code{disstree} with states sequences objects.
+
+  \code{\link{seqtree}} provides a simpler interface if you plan to use \code{disstree} for state sequence objects.
 }
 \value{
 An object of class \code{disstree} that contains the following components:

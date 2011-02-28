@@ -80,33 +80,34 @@ print.seqdiff <- function(x, ...) {
 ###########################
 plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
 							legendposition="top", ylim=NULL, xaxt=TRUE, col=NULL, ...) {
-	if (stat=="discrepancy" || stat=="Residuals") {
-		nbstates=ncol(x$discrepancy)
-		if(is.null(col)) {
-			if (nbstates <= 8) cpal <- brewer.pal(nbstates, "Accent")
-			else if (nbstates > 8 & nbstates <= 12) cpal <- brewer.pal(nbstates, "Set3")
-		} else {
-			cpal <- col
-		}
-		if (stat=="Residuals") {
-			toplot <- x$discrepancy*(1-x$stat[, "Pseudo R2"])
-		} else {
-			toplot <- x$discrepancy
-		}
-		if (is.null(ylim)) {
-			ylim=c(min(toplot), max(toplot))
-		}
-		plot(1:nrow(x$discrepancy), x$discrepancy[, ncol(x$discrepancy)], type=type, ylab=ylab, xlab=xlab, xaxt="n", col=cpal[nbstates], ylim=ylim, ...)
-
-		for (i in 1:(ncol(x$discrepancy)-1)) {
-			lines(toplot[, i], type=type, col=cpal[i], ...)
-		}
-		legend(legendposition, fill = cpal, legend = colnames(x$discrepancy))
-		if(xaxt) axis(1, at=1:nrow(x$discrepancy), labels=rownames(x$stat) )
-		return(invisible())
-	}
-	
 	if(length(stat)==1){
+    	if (stat %in% c("Variance", "discrepancy", "Residuals","residuals")) {
+    		nbstates=ncol(x$discrepancy)
+    		if(is.null(col)) {
+    			if (nbstates <= 8) cpal <- brewer.pal(nbstates, "Accent")
+    			else if (nbstates > 8 & nbstates <= 12) cpal <- brewer.pal(nbstates, "Set3")
+    		} else {
+    			cpal <- col
+    		}
+    		if (stat %in% c("Residuals","residuals")) {
+    			toplot <- x$discrepancy*(1-x$stat[, "Pseudo R2"])
+    		} else {
+    			toplot <- x$discrepancy
+    		}
+    		if (is.null(ylim)) {
+    			ylim=c(min(toplot), max(toplot))
+    		}
+    		plot(1:nrow(x$discrepancy), x$discrepancy[, ncol(x$discrepancy)], type=type, ylab=ylab, xlab=xlab, xaxt="n", col=cpal[nbstates], ylim=ylim, ...)
+
+    		for (i in 1:(ncol(x$discrepancy)-1)) {
+    			lines(toplot[, i], type=type, col=cpal[i], ...)
+    		}
+    		legend(legendposition, fill = cpal, legend = colnames(x$discrepancy))
+    		if(xaxt) axis(1, at=1:nrow(x$discrepancy), labels=rownames(x$stat) )
+    		return(invisible()) 
+    	}
+	
+	    ##if(length(stat)==1){
 		if(is.null(col)){
 			col <- c("black")
 		}
@@ -118,14 +119,19 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
 		}
 		
 	}else if (length(stat)==2) {
+        for (i in 1:2){
+            if (!(stat[i] %in% colnames(x$stat))){
+          			stop("Invalid value of the 'stat' argument")
+            }
+        }
 		if(is.null(col)){
 			col <- c("red", "blue")
 		}
 		plot(x$stat[, stat[1]], type=type, ylab=ylab, xlab=xlab, xaxt="n",col=col[1],axes=FALSE, ...)
-		axis(2,col=col[1],col.axis=col[1]) 
+		axis(2,col=col[1],col.axis=col[1])
 		par(new=TRUE)
-		plot(x$stat[, stat[2]],type=type,xlab="",ylab="", xaxt="n",col=col[2],axes=FALSE, ...) 
-		axis(4,col=col[2],col.axis=col[2]) 
+		plot(x$stat[, stat[2]],type=type,xlab="",ylab="", xaxt="n",col=col[2],axes=FALSE, ...)
+		axis(4,col=col[2],col.axis=col[2])
 		legend(legendposition, fill = col, legend =stat)
 	}
 	else{

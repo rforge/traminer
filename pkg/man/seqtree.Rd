@@ -5,19 +5,19 @@
 	Tree structured analysis of a state sequence object.
 }
 \description{
-	Facility to produce a tree structured analysis of a sequence object. 
+	Facility to produce a tree structured analysis of a sequence object.
 }
 \usage{
-seqtree(formula, data = NULL, weighted = TRUE, minSize = 0.05, 
-     maxdepth = 5, R = 1000, pval = 0.01, weight.permutation = "replicate", 
-     seqdist_arg = list(method = "LCS", norm = TRUE), 
+seqtree(formula, data = NULL, weighted = TRUE, minSize = 0.05,
+     maxdepth = 5, R = 1000, pval = 0.01, weight.permutation = "replicate",
+     seqdist_arg = list(method = "LCS", norm = TRUE),
      diss = NULL, squared = FALSE, first = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{a formula where the left hand side is a state sequence object (see \code{\link{seqdef}})  and the right hand specifies the candidate variables for partitioning the set of sequences.}
   \item{weighted}{Logical. If \code{TRUE}, use the weights of the state sequence object.}
-  \item{data}{a data frame where variable in formula will be searched}
+  \item{data}{a data frame where variables in the formula will be searched}
   \item{minSize}{minimum number of cases in a node, in percentage if less than 1.}
   \item{maxdepth}{maximum depth of the tree.}
   \item{R}{Number of permutations used to assess the significance of the split.}
@@ -31,7 +31,7 @@ seqtree(formula, data = NULL, weighted = TRUE, minSize = 0.05,
 \details{
 	The function provides a simplified interface for applying \code{\link{disstree}} on state sequence objects.
 	
-	The \code{seqtree} objects can be "plotted" using \code{\link{seqtreedisplay}}. A print method is also available which print medoid sequences in each terminal node. 
+	The \code{seqtree} objects can be "plotted" with \code{\link{seqtreedisplay}}. A print method is also available which prints the medoid sequence for each terminal node.
 }
 \value{
 	a seqtree object.

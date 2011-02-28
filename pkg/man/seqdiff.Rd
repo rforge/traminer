@@ -27,18 +27,16 @@ seqdiff(seqdata, group, cmprange = c(0, 1),
   The function analyses how the part of discrepancy explained by the \code{group} variable evolves along the position axis. It runs successively discrepancy analyses within a sliding time-window of range \code{cmprange}). At
   each position, the method uses \code{\link{seqdist}} to compute a distance matrix over the time-window and then derives the explained discrepancy on that window with \code{\link{dissassoc}}.
 
-  There are print and plot methods for the result returned.
-}
+  There are print and plot methods for the returned value.}
 
 \value{
   A \code{seqdiff} object, with the following items:
 
-  \item{stat}{A \code{data.frame} with three statistics (PseudoF, PseudoR2 and PseudoT)
-  for each timestamp of the sequence,
+  \item{stat}{A \code{data.frame} with three statistics (PseudoF, PseudoR2
+  and PseudoT) for each time stamp of the sequence,
       see \code{\link{dissassoc}}}
 
-  \item{discrepancy}{A \code{data.frame} with, at each time stamp, the discrepancy within each group defined by the
-      \code{group} variable and for the whole population.}
+  \item{discrepancy}{A \code{data.frame} with, at each time stamp, the discrepancy within each group defined by the \code{group} variable and for the whole population.}
 }
 
 \references{
