@@ -1,3 +1,47 @@
+## =========
+Version 1.8
+
+New functionalities:
+  - seqtreedisplay(): Display (i.e. plot) a sequence regression tree.
+  - seqtree(): Create a sequence regression tree from a 
+      dissimilarity matrix
+  - seqrecode(): for recoding state sequences objects (i.e., merging states)
+  - weights are now supported by all dissimilarity analysis functions
+  - weights can be assigned to event sequence objects and are 
+      supported by all related functions
+  - seqdef(): 'xtstep' option added to set step between displayed tick-marks and 
+    labels on the x-axis of state sequence plots
+  - seqplot(): 'xtstep' option added to state sequence plots
+
+Bug fixes:
+  - seqformat (BIOSPELL_TO_STS) ....:
+  - seqdist() and seqdistmc(): when method="HAM" the substitution cost matrix 
+      was not used. Substitution costs were all set to 1 (Reported by Florian Hertel).
+  - seqdist(): Fixed a (possible) memory leak.
+  - seqdss, seqdur: fixed bad handling of missing values in several cases: 
+    - sequences finishing with missing values, 
+    - sequences made of only one distinct state and missing values
+  - seqiplot, seqIplot, seqfplot: changed the automatic setting of the x axis length, so as to have 
+    identical axes lengths when using 'group' option and groups of sequences have unequal max. length 
+    (reported by M. Studer)
+
+Changes in existing functions:
+  - seqdist(): enhanced check of substitution cost matrix. 
+      The function can now be cleanly interrupted by the user.
+  - seqformat: 
+    - when converting from "SPELL", added an error message if any starting time is lower than 1 
+    - when converting from "SPELL", added an error message if any ending time is lower than starting time
+  - disstree() has been entirely rewritten, objects created by the old disstree function are not supported anymore.
+  - seqdss and seqdur: the number of columns of the returned object is now adpated to the maximum DSS length, 
+    instead of the length of the original sequence object 
+ 
+Internal:
+    - option 'base' added to the entropy function, allowing to compute entropy using logarithm with base 'base' 
+
+Misc:
+    - added sequence 's7' containing only missing values to the 'ex1' example data set
+
+
 ## ==========
 Version 1.6-2
 
