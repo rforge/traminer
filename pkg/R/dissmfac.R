@@ -11,7 +11,7 @@ dissreg <- function(formula, data, R=1000, gower=FALSE,
 					squared=TRUE, permutation="dissmatrix") {
 
 	warning("dissreg function is deprecated. It has been renamed dissmfac.")
-	return(dissmfac(formula, data, R, gower, squared=TRUE, permutation))
+	return(dissmfac(formula, data, R, gower, squared=squared, permutation))
 }
 
 dissmfac <- function(formula, data, R=1000, gower=FALSE,

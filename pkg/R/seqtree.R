@@ -27,5 +27,5 @@ print.seqtree <- function(x, digits = getOption("digits") - 2, medoid=TRUE, ...)
 		x <- suppressMessages(seqformat(x, from='STS', to='SPS', compressed=TRUE))
 		return(x)
 	}
-	print.disstree(x, digits = digits, medoid=TRUE, medoid.fun=stslistmedoid,...)
+	print.disstree(x, digits = digits, medoid=medoid, medoid.fun=stslistmedoid,...)
 }

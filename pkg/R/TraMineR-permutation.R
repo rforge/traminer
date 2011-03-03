@@ -29,7 +29,7 @@ TraMineR.permutation <- function(data, R, statistic, ...) {
 	return(perms)
 }
 
-TraMineR.permutationweight <- function(data, R, statistic,samplesize, sampleprob, t0, ...) {
+TraMineR.permutationweight <- function(data, R, statistic, samplesize, sampleprob, t0, ...) {
 	if (is.vector(data)) {
 		n <- length(data)
 	}
@@ -84,7 +84,7 @@ hist.TraMineRPermut <- function(x, index=1, breaks="FD",main=paste("Distribution
 		stop("Cannot plot permutation test (none detected)")
 	}
 	if(type=="hist") {
-		hist(x$t[, index], main=main, xlab=xlab, breaks=breaks, ...)
+		hist(x$t[, index], main=main, xlab=xlab, breaks=breaks, freq=freq, ...)
 		if (!is.null(pvalue.limit)) {
 			testbootorder <- order(x$t[, index], decreasing=TRUE)
 			abline(v=x$t[testbootorder[round(pvalue.limit*x$R)], index], col="blue")
@@ -118,7 +118,7 @@ hist.TraMineRPermutWeight <- function(x, index=1, main=paste("Distribution of te
 	#grp <- factor(c(rep("Permutation", length(x$t[, index])), rep("Bootstrap", length(x$t0boot[, index]))))
 	#vals  <- c(x$t[, index], x$t0boot[, index])
 	#sm.density.compare(vals, grp)
-	plot(range(tal$x, t0boot$x), range(tal$y, t0boot$y), type = "n", xlab = xlab, ylab = "Density")
+	plot(range(tal$x, t0boot$x), range(tal$y, t0boot$y), type = "n", main=main, xlab = xlab, ylab = "Density")
 	lines(tal, col = "red")
 	lines(t0boot, col = "blue")
 	legend("topright",legend=c("Null distribution","Bootstrap distribution"), fill=c("red","blue"))

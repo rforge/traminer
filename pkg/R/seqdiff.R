@@ -61,6 +61,7 @@ seqdiff <- function(seqdata, group, cmprange=c(0, 1),
 		ret$stat[i,rownames(tmp$stat)] <- tmp$stat[,1]
 		ret$discrepancy[i,rownames(tmp$groups)] <- tmp$groups$discrepancy
 	}
+	attr(ret, "xtstep") <- attr(seqdata, "xtstep")
 	class(ret) <- "seqdiff"
 	return(ret)
 }
@@ -79,7 +80,10 @@ print.seqdiff <- function(x, ...) {
 ## Plot method for seqdiff
 ###########################
 plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
-							legendposition="top", ylim=NULL, xaxt=TRUE, col=NULL, ...) {
+							legendposition="top", ylim=NULL, xaxt=TRUE, col=NULL, xtstep=NULL, ...) {
+	if(is.null(xtstep)){
+		xtstep <- ifelse(!is.null(attr(x, "xtstep")), attr(x, "xtstep"), 1)
+	}
 	if(length(stat)==1){
     	if (stat %in% c("Variance", "discrepancy", "Residuals","residuals")) {
     		nbstates=ncol(x$discrepancy)
@@ -103,7 +107,10 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
     			lines(toplot[, i], type=type, col=cpal[i], ...)
     		}
     		legend(legendposition, fill = cpal, legend = colnames(x$discrepancy))
-    		if(xaxt) axis(1, at=1:nrow(x$discrepancy), labels=rownames(x$stat) )
+			if(xaxt){
+				tpos <- seq(1,nrow(x$discrepancy), xtstep)
+				axis(1, at=tpos-0.5, labels=rownames(x$stat)[tpos])
+			}
     		return(invisible())
     	}
 	
@@ -132,7 +139,8 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
 		}
 		plot(x$stat[, stat[1]], type=type, ylab=ylab, xlab=xlab, xaxt="n",col=col[1],axes=FALSE, ...)
 		axis(2,col=col[1],col.axis=col[1])
-		par(new=TRUE)
+		oldpar <- par(new=TRUE)
+		on.exit(par(oldpar))
 		plot(x$stat[, stat[2]],type=type,xlab="",ylab="", xaxt="n",col=col[2],axes=FALSE, ...)
 		axis(4,col=col[2],col.axis=col[2])
 		legend(legendposition, fill = col, legend =stat)
@@ -140,5 +148,8 @@ plot.seqdiff <- function(x, stat="Pseudo R2", type="l", ylab=stat, xlab="",
 	else{
 		stop(" [!] Too many values for the 'stat' argument (max 2)")
 	}
-	if(xaxt) axis(1, at=1:nrow(x$discrepancy), labels=rownames(x$stat) )
+	if(xaxt){
+		tpos <- seq(1,nrow(x$discrepancy), xtstep)
+		axis(1, at=tpos-0.5, labels=rownames(x$stat)[tpos])
+	}
 }

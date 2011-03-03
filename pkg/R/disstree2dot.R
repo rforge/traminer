@@ -9,6 +9,7 @@ DTNplotfunc <- function(imagedata, plotfunc, plotfunc.title.cex,
 		bottom <- (as.integer(plotfunc.label.loc=="sub")+as.integer(plotfunc.node.loc=="sub")+as.integer(plotfunc.split.loc=="sub"))*plotfunc.title.cex
 		left <- (as.integer(plotfunc.label.loc=="ylab")+as.integer(plotfunc.node.loc=="ylab")+as.integer(plotfunc.split.loc=="ylab"))*plotfunc.title.cex
 		par(mar=c(bottom, left, top, 0), font.sub=2, mgp=c(0, 0, 0))
+		#on.exit(par(oldpar))
 	}
 	plotfunc(imagedata, ...)
 }
@@ -117,14 +118,14 @@ seqtree2dot <- function(tree, filename, seqdata=tree$info$object, imgLeafOnly=FA
 		seqlegend(seqdata, fontsize=legend.fontsize, title="Legend", position="center",  bty="n")
 		dev.off()
 	}
-	disstree2dotp(tree, filename, imagedata=NULL, seqdata=seqdata, title.cex=title.cex,
+	disstree2dotp(tree, filename, imagedata=NULL, imgLeafOnly=imgLeafOnly, seqdata=seqdata, title.cex=title.cex,
 			sortv=sortv,dist.matrix=dist.matrix, imagefunc=DTNseqplot, withlegend=FALSE, axes=axes, legendimage=legendimage, ...)
 }
 
 
 disstree2dotp <- function(tree, filename, imagedata=NULL, imgLeafOnly=FALSE,
 						imagefunc=plot, title.cex=3, ...){
-	disstree2dot(tree, filename, imagedata=NULL,  title.cex=title.cex, imagefunc=DTNplotfunc, plotfunc=imagefunc,
+	disstree2dot(tree, filename, imagedata=imagedata, imgLeafOnly=imgLeafOnly, title.cex=title.cex, imagefunc=DTNplotfunc, plotfunc=imagefunc,
 			use.title=TRUE, label.loc="main", node.loc="main", split.loc="sub",
 			plotfunc.use.title=TRUE, plotfunc.label.loc="main", plotfunc.node.loc="main",
 			plotfunc.split.loc="sub", plotfunc.title.cex=3, ...)

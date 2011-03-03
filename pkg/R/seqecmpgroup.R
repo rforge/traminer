@@ -105,49 +105,54 @@ seqecmpgroup<-function(subseq, group, method="chisq", pvalue.limit=NULL, weighte
 plot.subseqelistchisq<-function(x, ylim="uniform", rows=NA, cols=NA,
             residlevels=c(0.05,0.01), cpal=brewer.pal(1+2*length(residlevels),"RdBu"),legendcol=NULL,legend.cex=1,ptype="freq",...){
 
-  if(!inherits(x,"subseqelistchisq"))stop("Subseq should be a result of seqecmpgroup")
-  nplot<-length(x$labels)
-#  print(ylim)
+	if(!inherits(x,"subseqelistchisq")) {
+		stop(" [!] x should be a result of seqecmpgroup")
+	}
+	nplot<-length(x$labels)
+	#  print(ylim)
 	pvalue.levels <- residlevels
 	if (x$bonferroni$used) {
 		residlevels <- (1- (1-residlevels)^(1/x$bonferroni$ntest))
 	}
 	residlevels <- sort(-qnorm(residlevels))
 	
-  #print(cpal)
-  residbreaks<-c(-Inf,-sort(residlevels),sort(residlevels),Inf)
-  lout <- TraMineR.setlayout(nplot, rows, cols, TRUE, "all")
-  layout(lout$laymat, heights=lout$heights, widths=lout$widths)
+	#print(cpal)
+	residbreaks <- c(-Inf, -sort(residlevels), sort(residlevels), Inf)
+	lout <- TraMineR.setlayout(nplot, rows, cols, TRUE, "all")
+	## Save all current settings
+	savepar <- par(no.readonly = TRUE)
+	on.exit(par(savepar))
+	layout(lout$laymat, heights=lout$heights, widths=lout$widths)
  
-  if(ptype=="resid"){
-    baseIndex <- 4 +nplot
-  }else{
-     baseIndex<-4
-  }
-  if(ylim=="uniform"){
-    ylim<-c(min(min(x$data[,(baseIndex+1):(baseIndex+nplot)]),0),max(x$data[,(baseIndex+1):(baseIndex+nplot)]))
-  }
-  for(i in 1:nplot){
-    ccol<-as.character(cut(x$data[,4+nplot+i], breaks=residbreaks,labels=cpal))
-    plot.subseqelist(x,freq=x$data[,baseIndex+i],col=ccol,main=x$labels[i],ylim=ylim,...)
-  }
-  savepar <- par(no.readonly = TRUE)
-  par(mar = c(1, 1, 0.5, 1) + 0.1, xpd=FALSE)
-  plot(0, type = "n", axes = FALSE, xlab = "", ylab = "")
-  title(main="Pearson residuals",cex=legend.cex)
-  legncol<-length(c(paste("-",rev(residlevels)),"neutral",residlevels))
-  if(is.null(legendcol)&&lout$legpos=="center"){
-    legncol<-1
-  }
-  else if(!is.null(legendcol)&&legendcol)legncol<-1
-  legend(lout$legpos,
+	if(ptype=="resid"){
+		baseIndex <- 4 + nplot
+	} else {
+		baseIndex <- 4
+	}
+	if(ylim=="uniform"){
+		ylim <- c(min(min(x$data[ , (baseIndex+1):(baseIndex+nplot)]), 0),max(x$data[ , (baseIndex+1):(baseIndex+nplot)]))
+	}
+	for(i in 1:nplot){
+		ccol <- as.character(cut(x$data[ , 4+nplot+i], breaks=residbreaks, labels=cpal))
+		plot.subseqelist(x, freq=x$data[,baseIndex+i], col=ccol, main=x$labels[i], ylim=ylim, ...)
+	}
+	par(mar = c(1, 1, 0.5, 1) + 0.1, xpd=FALSE)
+	#on.exit(par(savepar))
+	plot(0, type = "n", axes = FALSE, xlab = "", ylab = "")
+	title(main="Pearson residuals", cex=legend.cex)
+	legncol <- length(c(paste("-", rev(residlevels)), "neutral", residlevels))
+	if(is.null(legendcol) && lout$legpos=="center"){
+		legncol <- 1
+	}
+	else if(!is.null(legendcol) && legendcol){
+		legncol <- 1
+	}
+	legend(lout$legpos,
 			# inset=c(0,leg.inset),
-			legend=c(paste("Negative",rev(pvalue.levels)),"neutral",paste("Positive",pvalue.levels)),
+			legend=c(paste("Negative", rev(pvalue.levels)), "neutral", paste("Positive", pvalue.levels)),
 			fill=cpal,
 			ncol=legncol,
 			cex=legend.cex,
 			bty="o"
-      )
-   par(savepar)
-  
+		)
 }
