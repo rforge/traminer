@@ -63,7 +63,7 @@ print(seqt)
 ### Will only work if GraphViz is properly installed
 ### Uncomment to run the examples
 # seqtreedisplay(seqt, type="d", border=NA)
-# seqtreedisplay(seqt, type="I", sortv=cmdscale(mvad.ham, k=1))
+# seqtreedisplay(seqt, type="I", sortv=cmdscale(mvad.dhd, k=1))
 
 }
 
