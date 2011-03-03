@@ -72,8 +72,12 @@ plot.stslist.rep <- function(x, cpal=NULL, missing.color=NULL,
 	if (stats) ymax <- 2.5
 	else ymax <- 1.3
 
+	if (is.null(ylab)) {
+		ylab <- paste(nbrep, " representative(s) (n=",n,")",sep="")
+	}
+
 	barplot(seqbar,col=cpal, width=barw,
-		ylab=paste(nbrep, " representative(s) (n=",n,")",sep=""),
+		ylab=ylab,
 		xlim=c(-2,seql),
 		ylim=c(0,ymax),
 		horiz=TRUE,
@@ -82,12 +86,14 @@ plot.stslist.rep <- function(x, cpal=NULL, missing.color=NULL,
 		...)
 
 	## Time axis for the sequence
-	tpos <- seq(1,seql, xtstep)
+	if (xaxis) {
+		tpos <- seq(1,seql, xtstep)
 
-	axis(1, at=tpos-0.5, labels=xtlab[tpos], 
-		pos=-0.04, 
-		## mgp=c(.5,.5,0), 
-		cex.axis=cex.plot)
+		axis(1, at=tpos-0.5, labels=xtlab[tpos], 
+			pos=-0.04, 
+			## mgp=c(.5,.5,0), 
+			cex.axis=cex.plot)
+	}
 
 	## y (percents) axis
 
