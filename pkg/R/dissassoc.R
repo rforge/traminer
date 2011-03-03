@@ -91,7 +91,7 @@ hist.olddissassoc <- function(x, test="PseudoF", breaks="FD", main=paste("Distri
 		stop("Cannot plot permutation test distribution for R = 1")
 	}
 	testbootorder <- order(x$perms$t[, ti], decreasing=TRUE)
-	hist(x$perms$t[, ti], main=main, xlab=xlab, breaks=breaks, ...)
+	hist(x$perms$t[, ti], main=main, xlab=xlab, breaks=breaks, freq=freq, ...)
 	if (!is.null(pvalue.limit)) {
 		abline(v=x$perms$t[testbootorder[round(pvalue.limit*x$R)], ti], col="blue")
 	}

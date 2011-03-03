@@ -104,25 +104,6 @@ hist.TraMineRPermut <- function(x, index=1, breaks="FD",main=paste("Distribution
 
 }
 
-
-hist.TraMineRPermutWeight <- function(x, index=1, main=paste("Distribution of test statistic number ", index), xlab=index, pvalue.limit=NULL, freq=FALSE, ...) {
-	ntest <- length(x$t0)
-	if(index >ntest){
-		stop("index should be in range 1, ", ntest)
-	}
-	if (x$R==0) {
-		stop("Cannot plot permutation test (none detected)")
-	}
-	tal <- density(x$t[, index])
-	t0boot <- density(x$t0boot[, index])
-	#grp <- factor(c(rep("Permutation", length(x$t[, index])), rep("Bootstrap", length(x$t0boot[, index]))))
-	#vals  <- c(x$t[, index], x$t0boot[, index])
-	#sm.density.compare(vals, grp)
-	plot(range(tal$x, t0boot$x), range(tal$y, t0boot$y), type = "n", main=main, xlab = xlab, ylab = "Density")
-	lines(tal, col = "red")
-	lines(t0boot, col = "blue")
-	legend("topright",legend=c("Null distribution","Bootstrap distribution"), fill=c("red","blue"))
-}
 print.TraMineRPermut <- function(x,...){
 	cat("\nPermutation test\n\n")
 	print(summary(x),...)

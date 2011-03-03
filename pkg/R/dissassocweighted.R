@@ -276,7 +276,7 @@ dissassocweighted <- function(diss, group, weights, R, weight.permutation, squar
 		rounderror <- sum(abs(round(weights, 0) - weights))
 		if(rounderror>0){
 			if (weight.permutation=="replicate") {
-				stop("To permute replicate, you should specify integer weights")
+				stop(" [!] to permute replicate, you should specify integer weights")
 			}
 			message("Weigths loss : ", rounderror, " (", (rounderror/sum(weights)), ")")
 			weights <- round(weights, 0)
@@ -287,7 +287,7 @@ dissassocweighted <- function(diss, group, weights, R, weight.permutation, squar
 		w2 <- (weights*samplesize)/sum(weights)
 		rounderror <- mean(abs(w2 - weights))
 		if(rounderror>0){
-			message("Weights corrected to match sample size. Mean correction ", rounderror)
+			message(" [>] weights corrected to match sample size. Mean correction ", format(rounderror))
 		}
 		weights <- w2
 	}
