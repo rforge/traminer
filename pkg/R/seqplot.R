@@ -102,13 +102,14 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 		}
 		## Sequence index plot
 		else if (type=="i" || type=="I") {
-			f <- function(seqdata) return(seqdata)
+			f <- function(seqdata) {return(seqdata)}
 			with.missing <- TRUE
 
 			## Selecting sub sample for sort variable
 			## according to 'group'
-			if ("sortv" %in% names(olist))
+			if ("sortv" %in% names(olist)) {
 				olist[["sortv"]] <- sortv[gindex[[np]]]
+			}
 
 			if (type=="I") {
 				if (!"tlim" %in% names(olist)) {olist <- c(olist, list(tlim=0))}
@@ -157,6 +158,13 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 			with.missing <- olist[["with.missing"]]
 		} else if ("with.missing" %in% flist) {
 			with.missing <- formals(f)$with.missing
+		}
+
+		## Xlim when plotting individual sequences
+		if (type %in% c("i", "I", "f")) {
+			if (!"xlim" %in% names(olist)) {
+				olist <- c(olist, list(xlim=c(0, ncol(seqdata))))
+			}
 		}
 
 		match.args <- names(olist) %in% flist

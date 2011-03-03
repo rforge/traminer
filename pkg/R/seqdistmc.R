@@ -13,7 +13,7 @@ seqdistmc <- function(channels, method, norm=FALSE, indel=1, sm=NULL,
 	}
 	numseq <- sapply(channels,nrow)
 	if(any(numseq!=numseq[1])) {
-		stop(" [!] sequence objects have different numbers of sequences")
+		stop(" [!] sequence objects have different numbers of rows")
 	}
 	numseq <- numseq[1]
 	message(" [>] ", nchannels, " channels with ", numseq, " sequences")

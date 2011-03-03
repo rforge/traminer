@@ -47,9 +47,13 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	## ===================
 
 	## Turning missing values to NA's
-	if (!is.na(missing)) seqdata[seqdata==missing] <- NA
+	## if (!is.na(missing)) seqdata[seqdata==missing] <- NA
 
 	statl <- seqstatl(seqdata)
+	if (!is.na(missing)) {
+		statl <- statl[!statl==missing & !statl==void]
+	}
+
 	if (is.null(alphabet)) {
 		plevels <- statl
 	} else {
@@ -67,9 +71,9 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 		}
 	}
 
-	if (any(is.na(seqdata))) {
+	if ((is.na(missing) && any(is.na(seqdata))) || ((!is.na(missing)) && any(seqdata==missing, na.rm=TRUE))) {
 		message(" [>] found missing values ('",missing,"') in sequence data") 
-		seqdata <- seqprep(seqdata, left=left, gaps=gaps, right=right, void=void, nr=nr)
+		seqdata <- seqprep(seqdata, left=left, gaps=gaps, right=right, missing=missing, void=void, nr=nr)
 	}
 
 	## DEFINING THE CLASS AND SOME ATTRIBUTES
@@ -123,7 +127,7 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	if (nbstates==1) 
 		stop("\n [!] alphabet contains only one state", call.=FALSE)
 	else if (nbstates>12 && missing(cpal)) 
-		warning(" [!] no automatic color palete attributed, number of states too high. \n     Use 'cpal' argument to define one.", call.=FALSE)
+		warning(" [!] no automatic color palete attributed, number of states>12. \n     Use 'cpal' argument to define one.", call.=FALSE)
 
 	## Converting each column to a factor
 	for (i in 1:ncol(seqdata)) {

@@ -73,9 +73,10 @@ plot.stslist <- function(x, tlim=NULL, weighted=TRUE, sortv=NULL,
 	if (weighted) {wlab <- "weighted "}
 	else {wlab <- NULL}
 
-	if (is.null(ylab))
+	if (is.null(ylab)) {
 		ylab <- paste(length(tlim)," seq. ", "(", wlab,"n=", round(sum(weights),2),")", 
 			sortlab, sep="")
+	}
 
 	## The PLot
 	barplot(seqbar,col=cpal, width=weights,
