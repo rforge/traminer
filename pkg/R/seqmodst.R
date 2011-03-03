@@ -9,9 +9,6 @@ seqmodst <- function(seqdata, weighted=TRUE, with.missing=FALSE) {
 
 	slength <- ncol(seqdata)
 	statl <- alphabet(seqdata)
-	col <- cpal(seqdata)
-	lab <- attr(seqdata,"labels")
-
 	cnames <- colnames(seqdata)
 
 	if (with.missing) {
