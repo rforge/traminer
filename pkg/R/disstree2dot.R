@@ -27,6 +27,7 @@ DTNseqplot <- function(ind, seqdata, sortv=NULL, dist.matrix=NULL, ...) {
 seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLeafOnly=FALSE, sortv=NULL, dist.matrix=NULL, title.cex=3, withlegend="auto", legend.fontsize=title.cex, axes=FALSE, imageformat="png", withquality=TRUE, legendtext=NULL, showtree=TRUE, ...) {
 	actualdir <- getwd()
 	tmpdir <- tempdir()
+	tmpseqtree <- basename(tempfile(pattern="tmpseqtree"))
 	setwd(tmpdir)
 	if(withquality){
 		
@@ -44,12 +45,12 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 							rowStat(tree, "Pseudo F"), rowStat(tree, "Pseudo R2"), rowStat(tree, "Levene"),"</TABLE></FONT>", sep="")
 	}
 	if(imageformat!="jpg"){
-		seqtree2dot(tree=tree, filename="tmpseqtree", seqdata=seqdata, imgLeafOnly=imgLeafOnly,
+		seqtree2dot(tree=tree, filename=tmpseqtree, seqdata=seqdata, imgLeafOnly=imgLeafOnly,
 			sortv=sortv, dist.matrix=dist.matrix, title.cex=title.cex, withlegend=withlegend,
 			legend.fontsize=legend.fontsize, axes=axes, devicefunc="png", imageext="png", legendtext=legendtext, ...)
 	}
 	else {
-		seqtree2dot(tree=tree, filename="tmpseqtree", seqdata=seqdata, imgLeafOnly=imgLeafOnly,
+		seqtree2dot(tree=tree, filename=tmpseqtree, seqdata=seqdata, imgLeafOnly=imgLeafOnly,
 			sortv=sortv, dist.matrix=dist.matrix, title.cex=title.cex, withlegend=withlegend,
 			legend.fontsize=legend.fontsize, axes=axes, legendtext=legendtext, ...)
 	}
@@ -63,34 +64,34 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 		}
 	}
 	if(imageformat!="jpg"){
-		dotval <- myshellrun("dot -Tpng -otmpseqtree.png tmpseqtree.dot")
+		dotval <- myshellrun(paste("dot -Tpng -o", tmpseqtree,".png ", tmpseqtree,".dot", sep=""))
 	}else{
-		dotval <- myshellrun("dot -Tjpg -otmpseqtree.jpg tmpseqtree.dot")
+		dotval <- myshellrun(paste("dot -Tjpg -o", tmpseqtree,".jpg ", tmpseqtree,".dot", sep=""))
 	}
 	if (dotval==1) {
 		stop("You should install GraphViz to use this function: see http://www.graphviz.org")
 	}
 	
 	if (!(imageformat %in% c("jpg", "png"))) {
-		imagickval <- myshellrun(paste("convert tmpseqtree.png tmpseqtree", imageformat, sep="."))
+		imagickval <- myshellrun(paste("convert ", tmpseqtree,".png ",tmpseqtree,".", imageformat, sep=""))
 		if (imagickval == 1) {
 			stop("To use another format than jpeg or png, you should install ImageMagick: see http://www.imagemagick.org")
 		}
 	}
     if (showtree) {
     	if (.Platform$OS.type=="windows") {
-    		myshellrun(paste("start tmpseqtree", imageformat, sep="."), wait=FALSE)
+    		myshellrun(paste("start ", tmpseqtree, ".", imageformat, sep=""), wait=FALSE)
     	}
     	else {
-    		myshellrun(paste("display tmpseqtree", imageformat, sep="."), wait=FALSE)
+    		myshellrun(paste("display ", tmpseqtree, ".", imageformat, sep=""), wait=FALSE)
     	}
     }
 	
 	setwd(actualdir)
 	if(!is.null(filename)){
-		file.copy(file.path(tmpdir, paste("tmpseqtree", imageformat, sep=".")), filename)
+		file.copy(file.path(tmpdir, paste(tmpseqtree, imageformat, sep=".")), filename)
 	}
-	return(invisible(TRUE))
+	return(invisible())
 }
 
 ###########################
