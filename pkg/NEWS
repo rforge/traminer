@@ -11,6 +11,11 @@ New functionalities:
   - seqdef(): 'xtstep' option added to set step between displayed tick-marks and
       labels on the x-axis of state sequence plots.
   - seqplot(): 'xtstep' option added to state sequence plots.
+  - seqtransn() and seqici(): fixed normalized number of transitions equal to NaN whith sequences 
+      of length 1 (this value was returned by the formula: transn.norm=0/seqlength-1); now set to 0.
+      Since complexity index returned by seqici() is based on the normalized number of transitions, 
+      the returned value was NaN as well.
+
 
 Bug fixes:
   - seqformat(): fixed problems with BIOSPELL_TO_STS.
