@@ -13,29 +13,30 @@ New functionalities:
   - seqplot(): 'xtstep' option added to state sequence plots.
 
 Bug fixes:
-  - seqformat (BIOSPELL_TO_STS) ....:
+  - seqformat(): fixed problems with BIOSPELL_TO_STS.
   - seqdist() and seqdistmc(): method="HAM" did not account for the provided substitution
       cost matrix; it used 1 for all substitution costs (Reported by Florian Hertel).
   - seqdist(): fixed a (possible) memory leak.
-  - seqdss, seqdur: fixed bad handling of missing values in several cases:
+  - seqdss(), seqdur(): fixed bad handling of missing values in several cases:
     - sequences finishing with missing values,
     - sequences made of only one distinct state and missing values.
-  - seqiplot, seqIplot, seqfplot: changed the automatic setting of the x-axis length, 
-      so as to have identical axes lengths when using 'group' option and groups of 
-      sequences have unequal max. length (reported by M. Studer)
+  - seqiplot(), seqIplot(), seqfplot(): changed the automatic setting of the x-axis length,
+      to ensure identical lengths of the x-axis when the maximal sequence length differs
+      between groups (reported by M. Studer).
+  - seqplot() and aliases: fixed error with 'xaxis' argument.
 
 Changes in existing functions:
-  - seqient(): new option 'base' for choosing the base of the logarithm used to compute the entropy. 
+  - seqient(): new option 'base' for choosing the base of the logarithm used to compute the entropy.
   - seqdist(): enhanced check of substitution cost matrix.
-      The function can now be cleanly interrupted by the user.
-	  Timing information now uses the processor time (and not elapsed time).
-  - seqformat() when converting from "SPELL": new error message when a start time is 
+      - The function can now be cleanly interrupted by the user.
+      - Timing information now uses the processor time (instead of the elapsed time).
+  - seqformat() when converting from "SPELL": new error message when a start time is
       lower than 1 and/or an end time is smaller than the start time.
-  - disstree() and dissassoc() has been entirely rewritten; objects created by the old function 
+  - disstree() and dissassoc() have been entirely redesigned; objects created with the old function
       are no longer supported.
-  - seqdss and seqdur: the number of columns of the returned object is now set to the 
+  - seqdss() and seqdur(): the number of columns of the returned object is now set to the
       maximum DSS length rather than to the length of the original state sequence object.
-  
+
 Misc:
   - 'ex1' example data set: contains now an additional sequence 's7' with only missing values.
 
