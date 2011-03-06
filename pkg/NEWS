@@ -11,11 +11,6 @@ New functionalities:
   - seqdef(): 'xtstep' option added to set step between displayed tick-marks and
       labels on the x-axis of state sequence plots.
   - seqplot(): 'xtstep' option added to state sequence plots.
-  - seqtransn() and seqici(): fixed normalized number of transitions equal to NaN whith sequences 
-      of length 1 (this value was returned by the formula: transn.norm=0/seqlength-1); now set to 0.
-      Since complexity index returned by seqici() is based on the normalized number of transitions, 
-      the returned value was NaN as well.
-
 
 Bug fixes:
   - seqformat(): fixed problems with BIOSPELL_TO_STS.
@@ -29,21 +24,28 @@ Bug fixes:
       to ensure identical lengths of the x-axis when the maximal sequence length differs
       between groups (reported by M. Studer).
   - seqplot() and aliases: fixed error with 'xaxis' argument.
+  - seqtransn(): the returned normalized number of transitions for
+      sequences of length 1 was NaN (value of transn.norm=0/seqlength-1). Now set to 0.
+  - seqici(): the values returned by seqici() for sequences of length 1 is now 0
+      instead of NaN.
 
 Changes in existing functions:
-  - seqient(): new option 'base' for choosing the base of the logarithm used to compute the entropy.
+  - seqient(): new option 'base' for choosing the base of the logarithm used
+      to compute the entropy.
   - seqdist(): enhanced check of substitution cost matrix.
       - The function can now be cleanly interrupted by the user.
       - Timing information now uses the processor time (instead of the elapsed time).
   - seqformat() when converting from "SPELL": new error message when a start time is
       lower than 1 and/or an end time is smaller than the start time.
-  - disstree() and dissassoc() have been entirely redesigned; objects created with the old function
-      are no longer supported.
+  - disstree() and dissassoc() have been entirely redesigned; objects created
+      with the old function are no longer supported.
   - seqdss() and seqdur(): the number of columns of the returned object is now set to the
       maximum DSS length rather than to the length of the original state sequence object.
 
 Misc:
-  - 'ex1' example data set: contains now an additional sequence 's7' with only missing values.
+  - 'ex1' example data set: contains now an additional sequence 's7'
+      with only missing values.
+
 
 
 ## ==========
