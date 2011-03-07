@@ -13,7 +13,7 @@ New functionalities:
   - seqplot(): 'xtstep' option added to state sequence plots.
 
 Bug fixes:
-  - seqformat(): fixed problems with BIOSPELL_TO_STS.
+  - seqformat(): fixed problems with fillblanks argument when converting from SPELL to STS.
   - seqdist() and seqdistmc(): method="HAM" did not account for the provided substitution
       cost matrix; it used 1 for all substitution costs (Reported by Florian Hertel).
   - seqdist(): fixed a (possible) memory leak.
