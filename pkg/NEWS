@@ -26,8 +26,7 @@ Bug fixes:
   - seqplot() and aliases: fixed error with 'xaxis' argument.
   - seqtransn(): the returned normalized number of transitions for
       sequences of length 1 was NaN (value of transn.norm=0/seqlength-1). Now set to 0.
-  - seqici(): the values returned by seqici() for sequences of length 1 is now 0
-      instead of NaN.
+  - seqici(): returns now correctly 0 instead of NaN for sequences of length 1.
 
 Changes in existing functions:
   - seqient(): new option 'base' for choosing the base of the logarithm used
