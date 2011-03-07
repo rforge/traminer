@@ -10,7 +10,7 @@
 \alias{seqmtplot}
 \alias{seqrplot}
 
-\title{Plot functions for state sequence objects}
+\title{Plot state sequence objects}
 \description{
 High level plot functions for state sequence objects that can produce state distribution, frequency, index,  transversal entropy, sequence of modes, meant time, and representative plots.
 }
@@ -40,23 +40,23 @@ seqrplot(seqdata, group=NULL, title=NULL, ...)
 
 	\item{title}{title for the graphic. Default is \code{NULL}.}
 
-	\item{cpal}{Color palette used for the states. By default, the 'cpal' attribute of the 'seqdata' sequence object is used (see \code{\link{seqdef}}). If user specified, a vector of colors with number of elements equal to the number of distinct states.}
+	\item{cpal}{Color palette used for the states. By default, the \code{cpal} attribute of the \code{seqdata} sequence object is used (see \code{\link{seqdef}}). If user specified, a vector of colors with number of elements equal to the number of distinct states.}
 
-	\item{missing.color}{alternative color for representing missing values inside the sequences. By default, this color is taken from the "missing.color" attribute of the sequence object being plotted.}
+	\item{missing.color}{alternative color for representing missing values inside the sequences. By default, this color is taken from the \code{missing.color} attribute of the plotted sequence object.}
 
-	\item{ylab}{an optional label for the y axis. If set to NA, no label is drawn.}
+	\item{ylab}{an optional label for the y-axis. If set to \code{NA}, no label is drawn.}
 
-	\item{yaxis}{controls whether a y axis is plotted. When set to \code{'TRUE'} (default value), sequence indexes are displayed for \code{"i"} and \code{"I"}, mean time values for \code{"mt"} and percentages for \code{"d"} and \code{"f"}. }
+	\item{yaxis}{controls whether a y-axis is plotted. When set to \code{TRUE} (default value), sequence indexes are displayed for \code{"i"} and \code{"I"}, mean time values for \code{"mt"} and percentages for \code{"d"} and \code{"f"}. }
 
-	\item{axes}{if set to \code{"all"} (default value) x axes are drawn for each plot in the graphic. If set to \code{"bottom"} and \code{group} is used, axes are drawn only under the plots located at the bottom of the graphic area. If \code{FALSE}, no x axis is drawn.}
+	\item{axes}{if set to \code{"all"} (default value) x axes are drawn for each plot in the graphic. If set to \code{"bottom"} and \code{group} is used, axes are drawn only under the plots located at the bottom of the graphic area. If \code{FALSE}, no x-axis is drawn.}
 
-  \item{xtlab}{optional labels for the x axis ticks labels. If unspecified, the column names of the 'seqdata' sequence object are used (see \code{\link{seqdef}}).}
+  \item{xtlab}{optional labels for the x-axis tick labels. If unspecified, the column names of the \code{seqdata} sequence object are used (see \code{\link{seqdef}}).}
 
 	\item{cex.plot}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
 
   \item{withlegend}{defines if and where the legend of the state colors is plotted. The default value \code{"auto"} sets the position of the legend automatically. Other possible value is \code{"right"}. Obsolete value \code{TRUE} is equivalent to \code{"auto"}.}
 
-  \item{ltext}{optional description of the states to appear in the legend. Must be a vector of character strings with number of elements equal to the size of the alphabet. If unspecified, the 'label' attribute of the 'seqdata' sequence object is used (see \code{\link{seqdef}}).}
+  \item{ltext}{optional description of the states to appear in the legend. Must be a vector of character strings with number of elements equal to the size of the alphabet. If unspecified, the \code{label} attribute of the \code{seqdata} sequence object is used (see \code{\link{seqdef}}).}
 
 	\item{cex.legend}{expansion factor for setting the size of the font for the labels in the legend. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
 
@@ -81,7 +81,7 @@ The \code{tlim} optional argument may be specified for selecting the sequences t
 
 In \emph{sequence index plots} (\code{type="i"} or \code{type="I"}), the requested individual sequences are rendered with horizontal stacked bars depicting the states over successive positions (time). Optional arguments are \code{tlim} for specifying the indexes of the sequences to be plotted (when \code{type="i"} defaults to the first ten sequences, i.e \code{tlim=1:10}). For plotting nicely a (big) whole set one can use \code{type="I"} which is the same as using \code{tlim=0} together with the additional graphical parameters \code{border=NA} and \code{space=0} to suppress bar borders and space between bars. The \code{sortv} argument can be used to pass a vector of numerical values for sorting the sequences. See \code{\link{plot.stslist}} for a complete list of optional arguments.
 
-The interest of sequence index plots has for instance been stressed by \cite{Scherer (2001)} and \cite{Brzinsky-Fay et al. (2006)}. Notice that index plots for thousands of sequences result in very heavy PDF or POSTSCRIPT graphic files. Dramatic file size reduction may be achieved by saving the figures in bitmap format with using for instance the \code{\link[grDevices]{png}} graphic device instead of \code{\link[grDevices]{postscript}} or \code{\link[grDevices]{pdf}}.
+The interest of sequence index plots has, for instance, been stressed by \cite{Scherer (2001)} and \cite{Brzinsky-Fay et al. (2006)}. Notice that index plots for thousands of sequences result in very heavy PDF or POSTSCRIPT graphic files. Dramatic file size reduction may be achieved by saving the figures in bitmap format with using for instance the \code{\link[grDevices]{png}} graphic device instead of \code{\link[grDevices]{postscript}} or \code{\link[grDevices]{pdf}}.
 
 The \emph{transversal entropy plot} (\code{type="Ht"}) displays the evolution over positions of the transversal entropies (\cite{Billari, 2001}). Transversal entropies are computed by calling \code{\link{seqstatd}} function and then plotted by calling the \code{\link{plot.stslist.statd}} plot method.
 
