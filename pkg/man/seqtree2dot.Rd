@@ -9,8 +9,8 @@ This function offers shortcuts to generate a "dot" file and associated images fi
 \usage{
 seqtree2dot(tree, filename, seqdata = tree$info$object,
            imgLeafOnly = FALSE, sortv = NULL, dist.matrix = NULL,
-           title.cex = 3, withlegend = "auto", legend.fontsize = title.cex, 
-		   axes = FALSE, ...)
+           title.cex = 3, withlegend = "auto", 
+           legend.fontsize = title.cex, axes = FALSE, ...)
   
 %disstree2dotp(tree, filename, imagedata=NULL, imgLeafOnly=FALSE, imagefunc=plot, ...)
 }

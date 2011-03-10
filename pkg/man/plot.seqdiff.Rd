@@ -9,20 +9,21 @@ Plotting a seqdiff object.
 }
 \usage{
 \method{plot}{seqdiff}(x, stat = "Pseudo R2", type = "l", ylab = stat, xlab = "",
-			legendposition = "top", ylim = NULL, xaxt = TRUE, col = NULL, xtstep=NULL, ...)
+     legendposition = "top", ylim = NULL, 
+     xaxt = TRUE, col = NULL, xtstep=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{an object produced by \code{\link{seqdiff}}}
-  \item{stat}{Character. Name of the statistic to be plotted. Can be any of the statistics returned by \code{\link{seqdiff}} or \code{"discrepancy"}. See details.}
+  \item{stat}{character. Name of the statistic to be plotted. Can be any of the statistics returned by \code{\link{seqdiff}} or \code{"discrepancy"}. See details.}
   \item{type}{the line \code{type}, see \code{\link{lines}} }
-  \item{ylab}{Character. y-axis label.}
-  \item{xlab}{Character. x-axis label.}
-  \item{legendposition}{Character. Position of the line legend, see \code{\link{legend}}}
-  \item{ylim}{Numeric. If not \code{NULL}, range of the y-axis.}
-  \item{xaxt}{Logical. If \code{TRUE} an x-axis is plotted.}
+  \item{ylab}{character: y-axis label.}
+  \item{xlab}{character: x-axis label.}
+  \item{legendposition}{character: position of the line legend, see \code{\link{legend}}}
+  \item{ylim}{numeric: if not \code{NULL}, range of the y-axis.}
+  \item{xaxt}{logical: if \code{TRUE} an x-axis is plotted.}
   \item{col}{list of colors to use for each line.}
-  \item{xtstep}{optional interval at which the tick-marks and labels of the x-axis are displayed. If unspecified, the \code{xtstep} attribute of the sequence object used in \code{\link{seqdiff}} is used.}
+  \item{xtstep}{integer: optional step between tick-marks and labels on the x-axis. If unspecified, the \code{xtstep} attribute of the sequence object \code{x} is used. (see \code{\link{seqdef}})}
   \item{\dots}{Additional parameters passed to \code{\link{lines}}}
 }
 \details{
@@ -35,4 +36,4 @@ Plotting a seqdiff object.
   For \code{"discrepancy"}, a separate line is drawn for the whole set of sequences and for each group. Those two values cannot be paired with another statistic.
 }
 
-\seealso{\code{\link{seqdiff}}} 
+\seealso{\code{\link{seqdiff}}}

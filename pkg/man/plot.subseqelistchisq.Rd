@@ -1,6 +1,6 @@
 \name{plot.subseqelistchisq}
 \alias{plot.subseqelistchisq}
-\title{Plotting discriminant subsequences}
+\title{Plot discriminant subsequences}
 \description{
 Plot the result of \code{\link{seqecmpgroup}}
 }

@@ -14,7 +14,8 @@
 }
 \usage{
 seqecreate(data = NULL, id = NULL, timestamp = NULL, event = NULL,
-    endEvent = NULL, tevent =  "transition", use.labels=TRUE, weighted=TRUE)
+    endEvent = NULL, tevent =  "transition", use.labels=TRUE, 
+    weighted=TRUE)
 %  seqecreatesub(timestamp, event)
 }
 \arguments{

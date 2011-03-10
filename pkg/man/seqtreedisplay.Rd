@@ -6,10 +6,12 @@
 Generate a graphical representation of a regression tree of state sequence data.
 }
 \usage{
-seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object, imgLeafOnly = FALSE,
-        sortv = NULL, dist.matrix = NULL, title.cex = 3, withlegend = "auto",
-        legend.fontsize = title.cex, axes = FALSE, imageformat = "png",
-        withquality = TRUE, legendtext = NULL, showtree=TRUE, ...)
+seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object, 
+               imgLeafOnly = FALSE, sortv = NULL, 
+               dist.matrix = NULL, title.cex = 3, withlegend = "auto",
+               legend.fontsize = title.cex, axes = FALSE, 
+               imageformat = "png", withquality = TRUE, 
+               legendtext = NULL, showtree=TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

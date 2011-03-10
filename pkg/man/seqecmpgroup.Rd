@@ -5,7 +5,8 @@
   Identify and sort the most discriminating subsequences by their discriminating power.
 }
 \usage{
-seqecmpgroup(subseq, group, method="chisq", pvalue.limit=NULL, weighted = TRUE)
+seqecmpgroup(subseq, group, method="chisq", pvalue.limit=NULL, 
+             weighted = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

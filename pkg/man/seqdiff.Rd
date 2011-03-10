@@ -9,8 +9,8 @@
 }
 \usage{
 seqdiff(seqdata, group, cmprange = c(0, 1),
-        seqdist_arg=list(method="LCS",norm=TRUE),
-		with.missing = FALSE, weighted = TRUE, squared = FALSE)
+    seqdist_arg=list(method="LCS",norm=TRUE),
+    with.missing = FALSE, weighted = TRUE, squared = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
