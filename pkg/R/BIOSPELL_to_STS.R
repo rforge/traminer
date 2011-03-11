@@ -10,10 +10,10 @@ BIOSPELL_to_STS <- function(seqdata, id=1, begin=2, end=3, status=4,
 	## if overwrite=TRUE, the latest spell overwrite the one before, if set to FALSE, the earlier is kept
 	begincolumn <- seqdata[,begin]
 	endcolumn <- seqdata[,end]
-	if (any(begincolumn<1)) {
+	if (any(begincolumn<1, na.rm=TRUE)) {
 		stop(" [!] found one or more spell with starting time < 1", call.=FALSE)
 	} 
-	if (any(endcolumn-begincolumn<0)) {
+	if (any(endcolumn-begincolumn<0, na.rm=TRUE)) {
 		stop(" [!] found one or more spell with ending time < starting time", call.=FALSE)
 	}
 	
