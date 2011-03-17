@@ -138,12 +138,15 @@ BIOSPELL_to_STS <- function(seqdata, id=1, begin=2, end=3, status=4,
 			#print(birthy)
 			age1 <- spell[1,begin]
 		}
-		if (is.na(age1)) { age1 <- -1 }
+		if (is.na(age1)) { 
+			message(" [>] warning, start time is missing for case ", i,", skipping sequence creation")
+			age1 <- -1 
+		}
 
 		# we fill the line with NAs
 		seqresult[i,1:(limit)] <- c(rep(NA,(limit)))
 		
-	      	if (age1 >= 0) {
+	    if (age1 >= 0) {
 			if (idxmax>0) {
 				# by default, the most recent episode erases the one before
 				if(overwrite==TRUE) {      
@@ -180,58 +183,62 @@ BIOSPELL_to_STS <- function(seqdata, id=1, begin=2, end=3, status=4,
 						sstart <- spell[j,begin] - birthy + 1
 						sstop <- spell[j,end] - birthy + 1
 					}
-					
+					if(is.na(sstart) | is.na(sstop)) {
+						message(" [>] warning, skipping episode ",j, " for case ", i, " due to missing start/end time")
+					}
+					else {
 					#######################
 					# fillblanks option
 					# if fillblanks is not null, the gaps between episodes is filled with its value
-					if (!is.null(fillblanks)) {
+						if (!is.null(fillblanks)) {
 						#print(fillblanks)
-						if (j>1) {
+							if (j>1) {
 							# for every episode after the first one, we check if there is a gap between the one before and this one
-							if(frmoption=="age2age" || frmoption=="age2year") {
-								previousend <- spell[j-1,end]
-							}
-							if(frmoption=="year2age") {
-								previousend <- spell[j-1,end] - birthy
-							}
-							if(frmoption=="year2year") {
-								previousend <- (spell[j-1, end] - tmin)+1
-							}
-							if (sstart != previousend && sstart != (previousend+1)) {
-								dur <- sstart - (previousend+1)
-								if (dur>0 & (sstart-1 < limit) && sstart > 0 && spell[j-1,end] > 0) {
-									seqresult[i,(previousend+1):(sstart-1)] <- rep(fillblanks, dur)
+								if(frmoption=="age2age" || frmoption=="age2year") {
+									previousend <- spell[j-1,end]
 								}
-							}
+								if(frmoption=="year2age") {
+									previousend <- spell[j-1,end] - birthy
+								}
+								if(frmoption=="year2year") {
+									previousend <- (spell[j-1, end] - tmin)+1
+								}
+								if (sstart != previousend && sstart != (previousend+1)) {
+									dur <- sstart - (previousend+1)
+									if (dur>0 & (sstart-1 < limit) && sstart > 0 && spell[j-1,end] > 0) {
+										seqresult[i,(previousend+1):(sstart-1)] <- rep(fillblanks, dur)
+									}
+								}
 
+							}
 						}
-					}
 					#
 					#########################
 					
 					#########################
 					# conversion from episode to subsequence
-					dur <- sstop - sstart + 1
+						dur <- sstop - sstart + 1
 					# we check if all values look normal
-					if (dur >= 0 && sstop > 0 && sstart >= 0) {
-						state <- spell[j,status]
-						if (!is.na(state)) {
+						if (dur >= 0 && sstop > 0 && sstart >= 0) {
+							state <- spell[j,status]
+							if (!is.na(state)) {
 							# if dur == 0, it means the individual stays in the state only one year
 							# if (dur == 0 && (sstop < limit) ) {
 							#	seqresult[i,sstart] <- state
                             #                            }
 				
-								if(sstop <= limit) {
+									if(sstop <= limit) {
 									# if the sequence begins at age 0, we delete the first state
 									# if (sstart==0) { 
 									#	sstart <- sstart+1 
 									#	dur <- dur -1
 									#	} 
-									seqresult[i,sstart:sstop] <- rep(state, dur)
+										seqresult[i,sstart:sstop] <- rep(state, dur)
                                                                         
-								}
+									}
 							
-					    }
+					   		 }
+						}
 					}
 				}
 			 }
