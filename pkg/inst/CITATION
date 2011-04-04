@@ -74,7 +74,7 @@ citEntry(entry="incollection",
   editor = "A. Fred, J.L.G. Dietz, K. Liu, J. Filipe",
   pages = "94-106",
   note = "128",
-  textVersion="Gabadinho, A., Ritschard, G., Studer, M. & Müller, N.S. (2011), Extracting and Rendering Representative Sequences, In A. Fred, J.L.G. Dietz, K. Liu, J. Filipe (eds.), Knowledge Discovery, Knowledge Engineering and Knowledge Management. Series:  Communications in Computer and Information Science (CCIS), Vol. 128, pp. 94-106. Springer-Verlag.
+  textVersion="Gabadinho, A., Ritschard, G., Studer, M. & Müller, N.S. (2011), Extracting and Rendering Representative Sequences, In A. Fred, J.L.G. Dietz, K. Liu, J. Filipe (eds.), Knowledge Discovery, Knowledge Engineering and Knowledge Management. Series: Communications in Computer and Information Science (CCIS), Vol. 128, pp. 94-106. Springer-Verlag.",
   header="For representative sequences:"
 )
 citEntry(entry="article",
