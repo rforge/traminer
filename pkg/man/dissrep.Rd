@@ -80,7 +80,7 @@ The \emph{centrality} criterion uses the sum of distances to all
 other objects, i.e. the centrality as a representativeness criterion.
 The smallest the sum, the most representative the candidate.
 
-For more details, see \cite{Gabadinho et al., 2009}.
+For more details, see \cite{Gabadinho et al., 2011}.
 }
 
 \value{An object of class \code{diss.rep}. This is a vector containing
