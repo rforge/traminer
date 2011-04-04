@@ -97,10 +97,8 @@ Print and summary methods are available.
 }
 
 \references{
- Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009).
-Summarizing Sets of Categorical Sequences, In International
-Conference on Knowledge Discovery and Information Retrieval, Madeira,
-6-8 October, INSTICC.}
+Gabadinho A, Ritschard G, Studer M, Müller NS (2011). "Extracting and Rendering Representative Sequences", In A Fred, JLG Dietz, K Liu, J Filipe (eds.), \emph{Knowledge Discovery, Knowledge Engineering and Knowledge Management}, volume 128 of \emph{Communications in Computer and Information Science (CCIS)}, pp. 94-106. Springer-Verlag.
+}
 
 \seealso{\code{\link{seqrep}}, \code{\link{plot.stslist.rep}}}
 

@@ -52,7 +52,7 @@ When sequences contain gaps and the \code{gaps=NA} option was passed to \code{\l
 
 \references{
 Elzinga, Cees H. (2008). Sequence analysis: Metric representations of categorical time
-series. Technical report.
+series. \emph{Technical Report}, Department of Social Science Research Methods, Vrije Universiteit, Amsterdam.
 
 Gabadinho, A., G. Ritschard, N. S. Müller and M. Studer (2011). Analyzing and Visualizing State Sequences in R with TraMineR. \emph{Journal of Statistical Software} \bold{40}(4), 1-37.
 
