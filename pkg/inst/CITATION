@@ -23,9 +23,8 @@ citEntry(entry = "Article",
   paste("Alexis Gabadinho, Gilbert Ritschard, Nicolas S. Mueller, Matthias Studer (2011).",
         "Analyzing and Visualizing State Sequences in R with TraMineR.",
         "Journal of Statistical Software, 40(4), 1-37.",
-        "URL http://www.jstatsoft.org/v40/i04/.")
+        "URL http://www.jstatsoft.org/v40/i04/."),
 		header="For state sequences:\n"
-
 )
 
 citEntry(entry="incollection",
@@ -68,13 +67,14 @@ citEntry(entry="article",
 
 citEntry(entry="incollection",
   author = personList(p1, p2, p3, p4),
-  title = "Summarizing Sets of Categorical Sequences",
-  booktitle = "International Conference on Knowledge Discovery and Information Retrieval, Madeira, 6-8 October, 2009",
-  publisher = "INSTICC",
-  year = "2009",
-  pages = "62-69",
-  note = "(Received the Best Paper Award)",
-  textVersion="Gabadinho, A., Ritschard, G., Studer, M. & Müller, N.S. (2009), Summarizing Sets of Categorical Sequences, In International Conference on Knowledge Discovery and Information Retrieval, Madeira, 6-8 October, 2009, pp. 62-69. INSTICC. (Received the Best Paper Award).",
+  title = "Extracting and Rendering Representative Sequences",
+  booktitle = "Knowledge Discovery, Knowledge Engineering and Knowledge Management",
+  publisher = "Springer-Verlag",
+  year = "2011",
+  editor = "A. Fred, J.L.G. Dietz, K. Liu, J. Filipe",
+  pages = "94-106",
+  note = "128",
+  textVersion="Gabadinho, A., Ritschard, G., Studer, M. & Müller, N.S. (2011), Extracting and Rendering Representative Sequences, In A. Fred, J.L.G. Dietz, K. Liu, J. Filipe (eds.), Knowledge Discovery, Knowledge Engineering and Knowledge Management. Series:  Communications in Computer and Information Science (CCIS), Vol. 128, pp. 94-106. Springer-Verlag.
   header="For representative sequences:"
 )
 citEntry(entry="article",
