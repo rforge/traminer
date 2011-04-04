@@ -135,8 +135,10 @@ plotting functions (\code{seqdplot}, \code{seqiplot} or
 \code{seqfplot}), functions to compute distances (\code{seqdist}),
 etc...}
 
-\references{Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller
-(2008). Mining Sequence Data in \code{R} with the \code{TraMineR}
+\references{
+Gabadinho, A., G. Ritschard, N. S. Müller and M. Studer (2011). Analyzing and Visualizing State Sequences in R with TraMineR. \emph{Journal of Statistical Software} \bold{40}(4), 1-37.
+
+Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2008). Mining Sequence Data in \code{R} with the \code{TraMineR}
 package: A user's guide. \emph{Department of Econometrics and
 Laboratory of Demography, University of Geneva}. }
 
