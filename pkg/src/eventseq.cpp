@@ -1,6 +1,6 @@
 #include "eventseq.h"
-#include<R.h>
-#include <Rinternals.h>
+#include <sstream>
+
 using namespace std;
 
 /** Sequence finalizer, used by R to free memory
@@ -71,71 +71,53 @@ Sequence::~Sequence() {
     if(this->dict->shouldDelete())delete this->dict;
 }
 
-int Sequence::sprint(char * buffer) {
-    int n2=0;
-    int n=0;
+string Sequence::sprint() {
+	ostringstream oss;
+	oss.precision(2);
     //if(!this->isGeneric())n = sprintf(buffer, (char*)"[%i] ",this->idpers);
     //Rprintf((char*)"Current buffer %s\n",buffer);
-    if (n==-1)return -1;
     if (this->hasEvent()) {
-        n2=this->event->sprint(buffer, n,true, !this->isGeneric(), (*this->dict),this->obsTime);
-        if (n2==-1)return -1;
+        this->event->sprint(oss, true, !this->isGeneric(), (*this->dict), this->obsTime);
     }
-    return n+n2;
+    return oss.str();
 
 }
 void Sequence::print() {
-    char buffer[TMR_STRING_BUFFER_SIZE];
-    buffer[0]='\0';
-    int r=this->sprint(buffer);
+    string r=this->sprint();
     //Rprintf((char *)"%s %i",buffer,r);
-    if (r>0)	Rprintf((char *)"%s\n",buffer);
-    else Rprintf((char *)"Error %i\n",r);
+    REprintf((char *)"%s\n",r.c_str());
 }
-int SequenceEventNode::sprint(char * buffer, int index, const bool& start, const bool &printGap, const EventDictionary& ed, const double & remainingTime) {
-    int tmp=0;
+void SequenceEventNode::sprint(ostringstream &oss, const bool& start, const bool &printGap, const EventDictionary& ed, const double & remainingTime) {
     if (start) {
         if (this->gap>0&&printGap) {
-            tmp=sprintf(&buffer[index],(char*)"%.2f-",this->gap);
-            if (tmp==-1)return -1;
-            index+=tmp;
-            tmp=0;
-            tmp=ed.sprint(&buffer[index],"(",this->type);
+			oss << this->gap << "-(" << ed.find(this->type)->second;
+            //tmp=sprintf(&buffer[index],(char*)"%.2f-",this->gap);
         } else {
-            tmp=ed.sprint(&buffer[index],"(",this->type);
+            //tmp=ed.sprint(&buffer[index],"(",this->type);
+			oss << "(" << ed.find(this->type)->second;
         }
 
 
     } else if (this->gap>0) {
         if (printGap) {
-            tmp=sprintf(&buffer[index],(char*)")-%.2f-",this->gap);
-            if (tmp==-1)return -1;
-            index+=tmp;
-            tmp=0;
-            tmp=ed.sprint(&buffer[index],"(",this->type);
+			oss << ")-" << this->gap << "-(" << ed.find(this->type)->second;
         } else {
-            tmp=ed.sprint(&buffer[index],")-(",this->type);
+			oss << ")-(" << ed.find(this->type)->second;
         }
     } else {
-        tmp=ed.sprint(&buffer[index],",",this->type);
+		oss << "," << ed.find(this->type)->second;
     }
-    if (tmp==-1)return -1; //An error occured
-    index+=tmp; //Increment index
-    //Print next elements
     if (this->hasNext()) {
-        tmp=this->next->sprint(buffer, index, false, printGap,ed, remainingTime-this->gap);
+        this->next->sprint(oss, false, printGap, ed, remainingTime-this->gap);
     } else {
     	if(remainingTime>0){
-    		tmp=sprintf(&buffer[index],(char*)")-%.2f", remainingTime-this->gap);
+			oss << ")-" << (remainingTime-this->gap);
     	}
     	else{
-    		tmp=sprintf(&buffer[index],(char*)")");
+    		oss << ")";
     	}
 
     }
-    //Rprintf((char*)"Current buffer %s => %i\n",buffer, index);
-    if (tmp==-1)return -1; //An error occured
-    else return tmp+index;
 }
 
 

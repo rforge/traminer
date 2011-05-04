@@ -7,6 +7,7 @@
 #include "constraint.h"
 #include <Rmath.h>
 #include "TraMineR.h"
+#include <string>
 
 /**
 	tmrsequence build a sequence obect and return an external pointer to that object
@@ -211,10 +212,8 @@ extern "C" {
     SEXP tmrsequencestringinternal(SEXP seq) {
         Sequence *s =NULL;
         ASSIGN_TMRSEQ_TYPE(s,seq);
-        char buffer[TMR_STRING_BUFFER_SIZE];
-        buffer[0]='\0';
-        s->sprint(buffer);
-        return mkChar(buffer);
+        std::string buffer = s->sprint();
+        return mkChar(buffer.c_str());
     }
     /**Return a string representation of a sequence*/
     SEXP tmrsequencestring(SEXP seq) {
@@ -305,6 +304,7 @@ extern "C" {
         SET_VECTOR_ELT(ans,0,supp);
         SET_VECTOR_ELT(ans,1,subseq);
         UNPROTECT(3);
+		delete cst;
         delete root;
         return ans;
     }
@@ -392,15 +392,15 @@ extern "C" {
             seq=VECTOR_ELT(seqs,i);
 			ASSIGN_TMRSEQ_TYPE(s,seq);
             if(s->hasEvent()){
-              sen=s->getEvent();
-              nseqevent=0;
-              while(sen!=NULL){
-				if(sen->getType()==event){
-					nseqevent++;
+				sen=s->getEvent();
+				nseqevent=0;
+				while(sen!=NULL){
+					if(sen->getType()==event){
+						nseqevent++;
+					}
+					sen=sen->getNext();
 				}
-                sen=sen->getNext();
-              }
-              if(nseqevent>maxnevent)maxnevent=nseqevent;
+				if(nseqevent>maxnevent)maxnevent=nseqevent;
             }
         }
 		TMRLOG(4, "Maximum numbers of event %d is %d", event, maxnevent);

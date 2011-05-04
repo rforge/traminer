@@ -1,10 +1,15 @@
 #ifndef _EVENT_SEQ_INCLUDED_
 #define _EVENT_SEQ_INCLUDED_
 #include <map>
-#include <R.h>
-#include <Rinternals.h>
+#include <sstream>
+#include <string>
 #include "eventdictionary.h"
 #include "TraMineR.h"
+extern "C"{
+	#include <R.h>
+	#include <Rinternals.h>
+}
+
 //using namespace std;
 //Déclaration des types (définitions ci-après)
 class SequenceEventNode;
@@ -13,7 +18,7 @@ class Sequence;
 //static SEXP TMRSEQUENCE_type_tag;
 #define TMRSEQUENCE_type_tag R_NilValue
 
-#define TMR_STRING_BUFFER_SIZE 2048
+//#define TMR_STRING_BUFFER_SIZE 2048
 
 ///Macro checking for type
 
@@ -123,7 +128,7 @@ public:
     //virtual void print(const bool& start);
     ///Print a representation on a given string
     ///Return the number of char used
-    virtual int sprint(char * buffer, int index, const bool& start, const bool &printGap, const EventDictionary& ed, const double & remainingTime);
+    virtual void sprint(std::ostringstream &oss, const bool& start, const bool &printGap, const EventDictionary& ed, const double & remainingTime);
     ///Add an event at the end of the event chain
     void addEvent(const int &e,const double &t);
 
@@ -168,7 +173,7 @@ public:
     ///Print event chain
     void print();
     ///Print event chain on a string buffer
-    int sprint(char * buffer);
+    std::string sprint();
     ///Return true, if generic subsequence
     bool isGeneric() {
         return this->idpers==-1;
