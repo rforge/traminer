@@ -1,6 +1,6 @@
 ## Check all possible 3 distance and check for triangle inequality consistency
 
-checktriangleineq <- function(mat, warn=TRUE, indices = FALSE) {
+checktriangleineq <- function(mat, warn=TRUE, indices = FALSE, tol = 1e-7) {
 	## Take care to get a matrix
 	mat <- dist2matrix(mat)
 	n <- nrow(mat)
@@ -16,7 +16,7 @@ checktriangleineq <- function(mat, warn=TRUE, indices = FALSE) {
 			## Try to find a z point that break triangle inequality
 			for (z in 1:n) {
 				## Triangle inequality check
-				if (d>(mat[i, z]+mat[z, j])) {
+				if (d-(mat[i, z] + mat[z, j]) >= tol) {
 					## if warn, shout for problem
 					if (warn) {
 						warning("At least the indices [", i, ", ", j, "] does not respect the triangle inequality when going through ", z)
