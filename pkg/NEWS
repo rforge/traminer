@@ -1,4 +1,15 @@
 ## ==========
+Version development 
+
+Bug fixes:
+  - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint 
+		was not taken into account.
+  - seqeconstraint(): added consistency checks to avoid misuses.
+  - print.seqelist() and as.character.seqelist(): Corrected segfault when 
+		converting long event sequences to character.
+  - seqsubm(): Very small rounding errors (1e-16) were sometimes leading to non symmetric
+		substitution cost matrix.
+## ==========
 Version 1.8-1
 
 Misc:
