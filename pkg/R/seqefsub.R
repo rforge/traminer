@@ -25,7 +25,12 @@ seqefsub <- function(seq, strsubseq=NULL, minSupport=NULL, pMinSupport=NULL, con
 		ret <- createsubseqelist(seq, constraint, subseq, data.frame(), type="user")
 		ww <- seqeweight(seq)
 		## Taking weights into account
-		support <- colSums(ww*seqeapplysub(ret, method="presence"))
+		method <- "presence"
+		if(constraint$countMethod==2){
+			method <- "count"
+		}
+		
+		support <- colSums(ww*seqeapplysub(ret, method=method, constraint=constraint))
 		ord <- order(unlist(support), decreasing=TRUE)
 		support <- support[ord]
 		ret <- createsubseqelist(seq, constraint, subseq[ord], data.frame(Support=(support/totseq), Count=support),type="user")
@@ -42,7 +47,7 @@ seqefsub <- function(seq, strsubseq=NULL, minSupport=NULL, pMinSupport=NULL, con
 						as.double(c(constraint$windowSize)), as.double(c(constraint$ageMin)), 
 						as.double(c(constraint$ageMax)), as.double(c(constraint$ageMaxEnd)), 
 						as.double(c(constraint$countMethod)), as.double(c(minSupport)), 
-						as.integer(c(maxK)), classname, PACKAGE="TraMineR")
+						as.integer(c(maxK)), classname)
 		
 		ord <- order(unlist(subseq[1]), decreasing=TRUE)
 		support <- unlist(subseq[1])[ord]
