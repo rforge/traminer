@@ -90,13 +90,6 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	## SETTING THE ALPHABET
 	## ====================
 	if (is.null(states)) {
-		nbdatastat <- length(statl)
-		message(" [>] ", nbdatastat," distinct states appear in the data: ")
-		for (i in 1:min(nbdatastat,maxstatedisplay)) {
-			message("     ",i, " = ", statl[i])
-		}		
-		if (nbdatastat>maxstatedisplay) message("      ...")
-
 		A <- plevels
 	} else {
 		## plevels <- states
@@ -148,11 +141,11 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	attr(seqdata,"labels") <- labels
 
 	## Displaying the alphabet
-	message(" [>] state coding")
+	message(" [>] state coding:")
 	nc1 <- max(nchar(plevels)+1, 12)
 	nc2 <- max(nchar(A)+1, 9)
 
-	message("	", format("[alphabet]", width=nc1), format("[label]", width=nc2), "[long label] ")
+	message("       ", format("[alphabet]", width=nc1), format("[label]", width=nc2), "[long label] ")
 	for (i in 1:min(nbstates,maxstatedisplay)) {
 		message("     ",i, "  ", format(plevels[i], width=nc1),
 			format(A[i], width=nc2), labels[i])
