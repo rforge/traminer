@@ -89,7 +89,14 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	## ====================
 	## SETTING THE ALPHABET
 	## ====================
-	if (is.null(states)) {
+	if (missing(states)) {
+		nbdatastat <- length(statl)
+		message(" [>] ", nbdatastat," distinct states appear in the data: ")
+		for (i in 1:min(nbdatastat,maxstatedisplay)) {
+			message("     ",i, " = ", statl[i])
+		}		
+		if (nbdatastat>maxstatedisplay) message("      ...")
+
 		A <- plevels
 	} else {
 		## plevels <- states
@@ -154,6 +161,7 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	if (nbstates>12) {
 		message("      ... (", nbstates, " states)")
 	}
+
 
 	## message(" [>] labels: ",paste(1:nbstates,collapse=" ",sep="="))
 
