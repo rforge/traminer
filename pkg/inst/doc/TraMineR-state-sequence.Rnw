@@ -13,14 +13,14 @@
 %% almost as usual
 \author{Alexis Gabadinho\\University of Geneva \And
         Gilbert Ritschard\\University of Geneva \And
-        Nicolas S. Müller\\University of Geneva \And
+        Nicolas S. Mller\\University of Geneva \And
         Matthias Studer\\ University of Geneva}
 \title{\mbox{\ }
 \\[0ex]
 Analyzing and Visualizing State Sequences in \proglang{R} with \pkg{TraMineR}}
 
 %% for pretty printing and a nice hypersummary also set:
-\Plainauthor{Alexis Gabadinho, Gilbert Ritschard, Nicolas S. Müller, Matthias Studer} %% comma-separated
+\Plainauthor{Alexis Gabadinho, Gilbert Ritschard, Nicolas S. Mller, Matthias Studer} %% comma-separated
 \Plaintitle{Analyzing and Visualizing State Sequences in R with TraMineR} %% without formatting
 \Shorttitle{Analyzing and Visualizing State Sequences in \R with \traminer} %% a short title (if necessary)
 
@@ -47,7 +47,7 @@ The functions can then easily retrieve this information to ensure presentation h
 %% The address of (at least) one author should be given
 %% in the following format:
 \Address{
-  Alexis Gabadinho, Gilbert Ritschard, Nicolas S.\ Müller, Matthias Studer\\
+  Alexis Gabadinho, Gilbert Ritschard, Nicolas S.\ Mller, Matthias Studer\\
   Institute for Demographic and Life Course Studies\\
   University of Geneva\\
   CH-1211 Geneva 4, Switzerland\\
@@ -116,6 +116,12 @@ The functions can then easily retrieve this information to ensure presentation h
 
 \SweaveOpts{prefix.string=Graphiques/SW} % sets the prefix for figure files generated par Sweave
 
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl,formatcom=\color{FireBrick}}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{formatcom=\color{DarkBlue}}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl}
+
+
  \hypersetup{
  %ps2pdf=true,
  urlcolor=DarkRed,%dark-blue, %magenta,
@@ -161,8 +167,8 @@ graphdir <- "Graphiques/"
 
 \begin{document}
 
-\raisebox{14.3cm}[0cm][0cm]{\parbox{\linewidth}{\small\normalfont This vignette is distributed with the \R package \traminer. Please, cite it as:\\[.5ex]
-Gabadinho, A., G. Ritschard, N.S. Müller and M. Studer (2011). ``Analyzing and Visualizing State Sequences in \proglang{R} with \pkg{TraMineR}.'' \textit{Journal of Statistical Software}, \textbf{40}(4), 1--37. URL \url{http://www.jstatsoft.org/v40/i04}    }}
+\raisebox{14.3cm}[0cm][0cm]{\parbox{\linewidth}{\small\normalfont This vignette is distributed with the \R package \traminer. Please cite as:\\[.5ex]
+Gabadinho, A., G. Ritschard, N.S. Mller and M. Studer (2011). ``Analyzing and Visualizing State Sequences in \proglang{R} with \pkg{TraMineR}.'' \textit{Journal of Statistical Software}, \textbf{40}(4), 1--37. URL \url{http://www.jstatsoft.org/v40/i04}    }}
 
 \section{Introduction}
 
@@ -1426,7 +1432,9 @@ The \emph{total coverage} of the representative set corresponds to the percentag
 The list of representative sequences is obtained by printing the outcome of \Comt{seqrep()} and we get the quality measures with the \Comt{summary()} method. The \Comt{seqrplot()} function generates representative sequence plots.
 
 \subsubsection{Example 1: Medoid and the centrality criterion}
-A first simple example of a representative sequence is the \emph{medoid} %or \emph{centrotype}
+A first simple example
+\footnote{Results for representative sequences differ from the ones published in the original JSS article. This is due to the use of weights, which was not implemented in the TraMineR version (1.8) the article is based on.} 
+ of a representative sequence is the \emph{medoid} %or \emph{centrotype}
 of a set of sequences. The medoid is the most central object; i.e., the one with minimal sum of distances to all other objects in the set \citep{Kaufman-2005}. It is a special case of representative sequence obtained by selecting the centrality sorting criterion (\Comt{criterion="dist"}) and setting the size of the representative set to 1 (\Comt{nrep=1}).
 %
 <<seqrep-mvad, echo=TRUE, results=verbatim>>=
@@ -1439,7 +1447,7 @@ print(medoid, format="SPS")
 The medoid of a set of sequences usually yields poor coverage.
 To increase coverage we should allow for more than one representative. When seeking for more than one representative, an initial sort of the sequences according to the density of their neighborhood yields better results. Neighborhood density is, therefore, the default criterion used by \Comt{seqrep()}.
 
-The command below finds and plots the smallest representative set that, with a neighborhood radius of 10\% (default \Comt{tsim} value), covers at least 25\% (default \Comt{trep} value) of the sequences in each of the two \emph{gcse5eq} groups:
+The command below finds and plots the representative set that, with a neighborhood radius of 10\% (default \Comt{tsim} value), covers at least 25\% (default \Comt{trep} value) of the sequences in each of the two \emph{gcse5eq} groups:
 %
 <<seqrplot-mvad-density, echo=TRUE, results=verbatim, fig=FALSE, cache=TRUE>>=
 seqrplot(mvad.seq, group=mvad$gcse5eq, dist.matrix=mvad.om, border=NA)
@@ -1461,7 +1469,7 @@ seqrplot(mvad.seq, group=mvad$gcse5eq, dist.matrix=mvad.om, border=NA)
 %
 In the resulting plot (Figure~\ref{fg_seqrplot_mvad_density}) the selected representative sequences are plotted bottom-up according to their representativeness score with bar width proportional to the number of sequences assigned to them. At the top of the plot, two parallel series of symbols standing each for a representative are displayed horizontally on a scale ranging from 0 to the maximal theoretical distance $D_{max}$. The location of the symbol associated with the representative, $r_i$, indicates on axis $A$ the discrepancy within the subset $R_i$ of sequences assigned to $r_i$ and on axis $B$ the mean distance to the representative.
 
-We learn from the plots that two representatives are necessary for each of the two groups to achieve the 25\% coverage and that the actual coverages are, respectively, 25\% and 26\%.
+We learn from the plots that respectively five and one representatives are necessary for each of the two groups to achieve the 25\% coverage and that the actual coverage is 29\% in both cases.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Clustering sequences}
@@ -1629,9 +1637,9 @@ Billari FC (2001{\natexlab{b}}).
 \newblock \emph{Canadian Studies in Population}, \textbf{28}(2), 439--458.
 \newblock Special Issue on Longitudinal Methodology.
 
-\bibitem[{Billari \emph{et~al.}(2006)Billari, Fürnkranz, and
+\bibitem[{Billari \emph{et~al.}(2006)Billari, Frnkranz, and
   Prskawetz}]{billa:furn:prsk:2006}
-Billari FC, Fürnkranz J, Prskawetz A (2006).
+Billari FC, Frnkranz J, Prskawetz A (2006).
 \newblock \enquote{Timing, Sequencing, and Quantum of Life Course Events: A
   Machine Learning Approach.}
 \newblock \emph{European Journal of Population}, \textbf{22}(1), 37--65.
@@ -1689,8 +1697,8 @@ Fussell E (2005).
   Research, Vol. 9, pp. 91--122. Elsevier, Amsterdam.
 
 \bibitem[{Gabadinho \emph{et~al.}(2009)Gabadinho, Ritschard, Studer, and
-  Müller}]{Gabadinho_et_al_2009TraMineR-UGuide}
-Gabadinho A, Ritschard G, Studer M, Müller NS (2009).
+  Mller}]{Gabadinho_et_al_2009TraMineR-UGuide}
+Gabadinho A, Ritschard G, Studer M, Mller NS (2009).
 \newblock \enquote{Mining Sequence Data in \proglang{{R}} with the
   \pkg{{T}ra{M}ine{R}} package: {A} User's Guide.}
 \newblock \emph{Technical report}, Department of Econometrics and Laboratory of
@@ -1698,10 +1706,10 @@ Gabadinho A, Ritschard G, Studer M, Müller NS (2009).
 \newblock \urlprefix\url{http://mephisto.unige.ch/traminer/}.
 
 \bibitem[{Gabadinho \emph{et~al.}(2010)Gabadinho, Ritschard, Studer, and
-  Müller}]{GabadinhoRitschardStuderMuller2010EGC}
-Gabadinho A, Ritschard G, Studer M, Müller NS (2010).
-\newblock \enquote{Indice de complexité pour le tri et la comparaison de
-  séquences catégorielles.}
+  Mller}]{GabadinhoRitschardStuderMuller2010EGC}
+Gabadinho A, Ritschard G, Studer M, Mller NS (2010).
+\newblock \enquote{Indice de complexit pour le tri et la comparaison de
+  squences catgorielles.}
 \newblock \emph{Revue des nouvelles technologies de l'information {RNTI}},
   \textbf{E-19}, 61--66.
 
@@ -1739,7 +1747,7 @@ Kaufman L, Rousseeuw PJ (2005).
 \bibitem[{Lesnard(2006)}]{lesnard:2006insee}
 Lesnard L (2006).
 \newblock \enquote{Optimal Matching and Social Sciences.}
-\newblock \emph{Série des Documents de Travail du CREST 2006-01}, Institut
+\newblock \emph{Srie des Documents de Travail du CREST 2006-01}, Institut
   National de la Statistique et des Etudes Economiques, Paris.
 
 \bibitem[{Lesnard(2010)}]{Lesnard2010}
@@ -1777,11 +1785,11 @@ McVicar D, Anyadike-Danes M (2002).
 \newblock \emph{Journal of the Royal Statistical Society A}, \textbf{165}(2),
   317--334.
 
-\bibitem[{Müller \emph{et~al.}(2010)Müller, Studer, Ritschard, and
+\bibitem[{Mller \emph{et~al.}(2010)Mller, Studer, Ritschard, and
   Gabadinho}]{MullerStuderRitschardGabadinho2010EGC}
-Müller NS, Studer M, Ritschard G, Gabadinho A (2010).
-\newblock \enquote{Extraction de règles d'association séquentielle
-  à l'aide de modèles de durée.}
+Mller NS, Studer M, Ritschard G, Gabadinho A (2010).
+\newblock \enquote{Extraction de rgles d'association squentielle
+   l'aide de modles de dure.}
 \newblock \emph{Revue des nouvelles technologies de l'information {RNTI}},
   \textbf{E-19}, 25--36.
 
@@ -1813,9 +1821,9 @@ Pollock G (2007).
 \newblock \proglang{R} Foundation for Statistical Computing, Vienna, Austria.
 \newblock {ISBN} 3-900051-07-0, \urlprefix\url{http://www.r-project.org}.
 
-\bibitem[{Ritschard \emph{et~al.}(2008)Ritschard, Gabadinho, Müller, and
+\bibitem[{Ritschard \emph{et~al.}(2008)Ritschard, Gabadinho, Mller, and
   Studer}]{RitschardGabadinhoMullerStuder2008IJDMMM}
-Ritschard G, Gabadinho A, Müller NS, Studer M (2008).
+Ritschard G, Gabadinho A, Mller NS, Studer M (2008).
 \newblock \enquote{Mining Event Histories: A Social Science Perspective.}
 \newblock \emph{International Journal of Data Mining, Modelling and
   Management}, \textbf{1}(1), 68--90.
@@ -1830,10 +1838,10 @@ Ritschard G, Gabadinho A, Studer M, M\"uller NS (2009).
   Springer-Verlag, Berlin.
 \newblock \doi{10.1007/978-3-642-02190-9\_8}.
 
-\bibitem[{Rohwer and Pötter(2002)}]{RohwerPotter2002}
-Rohwer G, Pötter U (2002).
+\bibitem[{Rohwer and Ptter(2002)}]{RohwerPotter2002}
+Rohwer G, Ptter U (2002).
 \newblock \enquote{\proglang{{TDA}}: Transition Data Analysis.}
-\newblock \emph{Software}, Ruhr-Universität Bochum, Fakultät für
+\newblock \emph{Software}, Ruhr-Universitt Bochum, Fakultt fr
   Sozialwissenschaften, Bochum.
 \newblock \urlprefix\url{http://www.ruhr-uni-bochum.de/tda.html}.
 
@@ -1843,17 +1851,17 @@ Scherer S (2001).
   {W}est {G}ermany.}
 \newblock \emph{European Sociological Review}, \textbf{17}(2), 119--144.
 
-\bibitem[{Studer \emph{et~al.}(2010)Studer, Müller, Ritschard, and
+\bibitem[{Studer \emph{et~al.}(2010)Studer, Mller, Ritschard, and
   Gabadinho}]{StuderMullerRitschardGabadinho2010EGC}
-Studer M, Müller NS, Ritschard G, Gabadinho A (2010).
-\newblock \enquote{Classer, discriminer et visualiser des séquences
-  d'événements.}
+Studer M, Mller NS, Ritschard G, Gabadinho A (2010).
+\newblock \enquote{Classer, discriminer et visualiser des squences
+  d'vnements.}
 \newblock \emph{Revue des nouvelles technologies de l'information {RNTI}},
   \textbf{E-19}, 37--48.
 
 \bibitem[{Studer \emph{et~al.}(2011)Studer, Ritschard, Gabadinho, and
-  Müller}]{StuderRitschardGabadinhoMuller2011SMR}
-Studer M, Ritschard G, Gabadinho A, Müller NS (2011).
+  Mller}]{StuderRitschardGabadinhoMuller2011SMR}
+Studer M, Ritschard G, Gabadinho A, Mller NS (2011).
 \newblock \enquote{Discrepancy Analysis of State Sequences.}
 \newblock \emph{Sociological Methods and Research}.
 \newblock In press.
