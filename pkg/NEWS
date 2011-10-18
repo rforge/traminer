@@ -7,6 +7,10 @@ New functionalities:
   - New interface between C code and R which should be faster.
 
 Changes in existing functions:
+  - seqtrate() added two arguments:
+		- lag: compute transition rates from (t) to (t+lag), set to one by default
+		- with.missing: If TRUE, compute transition rates to and from missing values.
+  - seqsubm(): added 
   - seqtreedisplay(): now overwrites previous file if filename is not NULL. 
   - checktriangleineq(): internal function to check triangle inequality is now
 	  in C. It is now possible to check much bigger distance matrix.
