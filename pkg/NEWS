@@ -3,7 +3,15 @@ Version development
 
 Vignettes: JSS article vol. 40(4) added as a vignette on state sequence analysis.
 
+New functionalities:
+  - New interface between C code and R which should be faster.
+
+Changes in existing functions:
+  - seqtreedisplay(): now overwrite previous file if filename is not NULL. 
+
 Bug fixes:
+  - seqtreedisplay(): was changing current directory when an error occured in 
+		the plotting function.
   - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint
 		was not taken into account (Reported by Reto Buergin).
   - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto Buergin).

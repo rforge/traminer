@@ -20,7 +20,7 @@
 .localstuffDissTree$DTNnodeCounter <- as.integer(1)
 DTNInit <- function(ind, vardis, depth, dmat, weights) {
 	##cat("Disscenter\n")
-	dc <- .Call("tmrWeightedInertiaContrib", dmat, as.integer(ind),as.double(weights), PACKAGE="TraMineR")
+	dc <- .Call(TMR_tmrWeightedInertiaContrib, dmat, as.integer(ind),as.double(weights))
 	#dc <- .Call("tmrinertiacontrib", dmat, as.integer(ind), PACKAGE="TraMineR")
 	medoid <- ind[which.min(dc)]
 	info <- list(depth=depth, vardis=vardis, n=sum(weights[ind]), medoid=medoid)
@@ -255,23 +255,23 @@ DTNGroupFactorBinary <- function(dissmatrix, currentSCres, pred, minSize, varind
 		for (j in (i+1):nbGrp) {
 			grpindiv2 <- ind[grpCond[[j]]]
 			#cat("Inter Inertia", i, "  ", j, "\n")
-			r <- .Call("tmrWeightedInterInertia", dissmatrix, as.integer(grpindiv1),
-						as.integer(grpindiv2), as.double(weights),PACKAGE="TraMineR")
+			r <- .Call(TMR_tmrWeightedInterInertia, dissmatrix, as.integer(grpindiv1),
+						as.integer(grpindiv2), as.double(weights))
 				## using only one half of the matrix
 			inertiaMat[j, i] <- r
 		}
 		#cat("Inertia", i,"\n")
-		r <- .Call("tmrWeightedInertiaDist", dissmatrix, as.integer(nrow(dissmatrix)), 
+		r <- .Call(TMR_tmrWeightedInertiaDist, dissmatrix, as.integer(nrow(dissmatrix)), 
 					as.integer(FALSE), as.integer(grpindiv1), as.double(weights), 
-					as.integer(FALSE), PACKAGE="TraMineR")
+					as.integer(FALSE))
 		
 		inertiaMat[i, i] <- r*grpSize[i]
 	}
 	## FIXME This step is missing in the loop
 	#cat("Inertia", nbGrp,"\n")
-	r <- .Call("tmrWeightedInertiaDist", dissmatrix, as.integer(nrow(dissmatrix)), 
+	r <- .Call(TMR_tmrWeightedInertiaDist, dissmatrix, as.integer(nrow(dissmatrix)), 
 					as.integer(FALSE), as.integer(ind[grpCond[[nbGrp]]]), as.double(weights), 
-					as.integer(FALSE), PACKAGE="TraMineR")
+					as.integer(FALSE))
 	inertiaMat[nbGrp, nbGrp] <- r*grpSize[nbGrp]
 	## Computing residuals
 	#print(inertiaMat)

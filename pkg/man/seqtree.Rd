@@ -9,8 +9,9 @@
 }
 \usage{
 seqtree(formula, data = NULL, weighted = TRUE, minSize = 0.05,
-     maxdepth = 5, R = 1000, pval = 0.01, weight.permutation = "replicate",
-     seqdist_arg = list(method = "LCS", norm = TRUE),
+     maxdepth = 5, R = 1000, pval = 0.01, 
+	 weight.permutation = "replicate",
+	 seqdist_arg = list(method = "LCS", norm = TRUE),
      diss = NULL, squared = FALSE, first = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -47,8 +48,10 @@ data(mvad)
 mvad.seq <- seqdef(mvad[, 17:86])
 
 ## Building a seqtree using hamming distance
-## You should use much higher value for the R parameter, thus the results may be unstable.
-## R should be at least 1000 (R is keeped low to avoid too much computation in examples).
+## You should use much higher value for the R parameter,
+## thus the results may be unstable.
+## R should be at least 1000 
+## (R is keeped low to avoid too much computation in examples).
 seqt <- seqtree(mvad.seq~ male + Grammar + funemp + gcse5eq + fmpr + livboth,
     data=mvad, R = 10, seqdist_arg=list(method="HAM", norm=TRUE))
 print(seqt)

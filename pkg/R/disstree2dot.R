@@ -29,6 +29,7 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 	actualdir <- getwd()
 	tmpdir <- tempdir()
 	tmpseqtree <- basename(tempfile(pattern="tmpseqtree"))
+	on.exit(setwd(actualdir))
 	setwd(tmpdir)
 	if(withquality){
 		
@@ -90,7 +91,7 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 	
 	setwd(actualdir)
 	if(!is.null(filename)){
-		file.copy(file.path(tmpdir, paste(tmpseqtree, imageformat, sep=".")), filename)
+		file.copy(file.path(tmpdir, paste(tmpseqtree, imageformat, sep=".")), filename, overwrite=TRUE)
 	}
 	return(invisible())
 }

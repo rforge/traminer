@@ -44,11 +44,14 @@ actcal.seq <- seqdef(actcal,13:24, labels=c("> 37 hours", "19-36 hours",
 ## Regrouping states B and C and setting the whole alphabet to A BC D
 actcal.new <-seqrecode(actcal.seq, 
     recodes = list("A"="A", "BC"=c("B", "C"), "D"="D"))
-## Crosstabulate the first column of the recoded and original state sequence objects
+## Crosstabulate the first column of the recoded and 
+## original state sequence objects
 table(actcal.new[,1], actcal.seq[,1])
 
-## Same as before but using automatically original codes for unspecified states.
-actcal.new2 <-seqrecode(actcal.seq, recodes = list("BC"=c("B", "C")))
+## Same as before but using automatically original 
+## codes for unspecified states.
+actcal.new2 <-seqrecode(actcal.seq, 
+	recodes = list("BC"=c("B", "C")))
 table(actcal.new2[,1], actcal.seq[,1])
 
 ## Same as before but using otherwise
@@ -58,8 +61,8 @@ table(actcal.new3[,1], actcal.seq[,1])
 
 ## Recoding factors
 ## Recoding the marital status to oppose married to all other case
-maritalstatus <- recodef(actcal$civsta00, recodes=list("Married"="married"),
-   otherwise="Single")
+maritalstatus <- recodef(actcal$civsta00, 
+	recodes=list("Married"="married"), otherwise="Single")
 summary(maritalstatus)
 table(maritalstatus, actcal$civsta00)
 

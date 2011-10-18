@@ -8,15 +8,16 @@ Generate a graphical representation of a regression tree of state sequence data.
 \usage{
 seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object, 
                imgLeafOnly = FALSE, sortv = NULL, 
-               dist.matrix = NULL, title.cex = 3, withlegend = "auto",
-               legend.fontsize = title.cex, axes = FALSE, 
-               imageformat = "png", withquality = TRUE, 
-               legendtext = NULL, showtree=TRUE, ...)
+               dist.matrix = NULL, title.cex = 3, 
+			   withlegend = "auto", legend.fontsize = title.cex, 
+			   axes = FALSE, imageformat = "png", 
+			   withquality = TRUE, legendtext = NULL, 
+			   showtree=TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tree}{A \code{seqtree} object (as produced by \code{\link{seqtree}}).}
-  \item{filename}{The name of a file where to save the plot. If \code{NULL}, a temporary file is created.}
+  \item{filename}{The name of a file where to save the plot (overwritting existing file). If \code{NULL}, a temporary file is created.}
   \item{seqdata}{The sequence object containing the state sequences plotted in the nodes.}
   \item{imgLeafOnly}{Logical. If \code{TRUE} sequences are plotted only in terminal nodes.}
   \item{sortv}{Argument passed to \code{\link{seqplot}}}

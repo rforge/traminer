@@ -43,7 +43,7 @@ seqefsub <- function(seq, strsubseq=NULL, minSupport=NULL, pMinSupport=NULL, con
 			minSupport<-pMinSupport*sum(seqeweight(seq))
 		}
 		classname <- c("seqe")
-		subseq <- .Call("tmrfindsubsequences", unlist(list(seq)), as.double(c(constraint$maxGap)), 
+		subseq <- .Call(TMR_tmrfindsubsequences, unlist(list(seq)), as.double(c(constraint$maxGap)), 
 						as.double(c(constraint$windowSize)), as.double(c(constraint$ageMin)), 
 						as.double(c(constraint$ageMax)), as.double(c(constraint$ageMaxEnd)), 
 						as.double(c(constraint$countMethod)), as.double(c(minSupport)), 
