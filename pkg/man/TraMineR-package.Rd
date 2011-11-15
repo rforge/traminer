@@ -3,7 +3,7 @@
 \alias{TraMineR}
 \docType{package}
 \title{
-Trajectory miner, a toolbox for exploring and rendering sequence data
+Trajectory miner: a toolbox for exploring and rendering sequence data
 }
 \description{
 This package is a toolbox for sequence manipulation, description, rendering and more generally the mining of sequence data in the field of social sciences. Though it is primarily intended for analyzing state or event sequences that describe life courses such as family formation histories or professional careers its features indeed also apply to many other kinds of categorical sequence data. It accepts as input many different sequence representations and provides tools for translating sequences from one format to another. It offers several statistical functions for describing and rendering sequences, for computing distances between sequences with different metrics among which optimal matching, the longest common prefix and the longest common subsequence, and simple functions for extracting the most frequent subsequences and identifying the most discriminating ones among them. A user's guide can be found on TraMineR's web page.
