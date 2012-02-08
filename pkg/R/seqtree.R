@@ -2,15 +2,15 @@ seqtree <- function(formula, data=NULL, weighted=TRUE, minSize=0.05, maxdepth=5,
 	formula.call <- formula
 	seqdata <- eval(formula[[2]], data, parent.frame()) # to force evaluation
 	if (!inherits(seqdata, "stslist")) {
-		stop("Right hand of formula should be a stslist object (see seqdef)")
+		stop("Left hand term in formula should be a stslist object (see seqdef)")
  	}
 	if(is.null(diss)){
 		seqdist_arg$seqdata <- seqdata
 		diss <- do.call(seqdist, seqdist_arg)
 	}
 	if(weighted){
-		weights <- attr(seqdata,"weights") 
-	} 
+		weights <- attr(seqdata,"weights")
+	}
 	else {
 		weights <- NULL
 	}
