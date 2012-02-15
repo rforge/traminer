@@ -120,7 +120,9 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 			## Selecting sub sample for sort variable
 			## according to 'group'
 			if ("sortv" %in% names(olist)) {
-				olist[["sortv"]] <- sortv[gindex[[np]]]
+				if (!length(sortv)==1) {
+					olist[["sortv"]] <- sortv[gindex[[np]]]
+				}
 			}
 
 			if (type=="I") {

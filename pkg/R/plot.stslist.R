@@ -31,14 +31,21 @@ plot.stslist <- function(x, tlim=NULL, weighted=TRUE, sortv=NULL,
 	
 	## Sorting
 	if (!is.null(sortv)) {
-		if (length(sortv)!=n) {
+		if (length(sortv)==1 & sortv %in% c("first.state", "last.state")) {
+        		end <- if (sortv=="last.state") { max(seqlength(x)) } else { 1 }
+        		beg <- if (sortv=="last.state") { 1 } else { max(seqlength(x)) }
+
+			sortv <- do.call(order, as.data.frame(x)[,end:beg])
+			x <- x[sortv,]
+		} else if (length(sortv)!=n) {
 			stop(call.=FALSE, "sortv must contain one value for each row in the sequence object")
+		} else { 
+			x <- x[order(sortv),]
 		}
 
-		x <- x[order(sortv),]
 		sortlab <- paste(", sorted")
-		}
-	else sortlab <- NULL
+		
+	} else { sortlab <- NULL }
 
 	## 
 	if (is.null(cpal))
