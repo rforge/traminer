@@ -1,0 +1,12 @@
+Package: TraMineRextras
+Version: 0.1
+Date: 2012-02-08
+Title: Extras for use with the TraMineR package
+Author: Gilbert Ritschard <gilbert.ritschard@unige.ch>.
+Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
+Depends: R (>= 2.8.1), TraMineR
+Suggests: 
+Description: This package is a collection of functions mainly intended to be used with TraMineR.
+License: GPL (>= 2)
+URL: http://mephisto.unige.ch/traminer
+Encoding: latin1

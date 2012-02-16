@@ -1,0 +1,10 @@
+import(TraMineR)
+
+export(
+    group.p,
+    convert.g,
+    pamward,
+    rowmode,
+    sorti,
+    sortv
+)
