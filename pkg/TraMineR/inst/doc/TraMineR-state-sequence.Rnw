@@ -484,7 +484,7 @@ lm.ent <- lm(entropies ~ male + funemp + gcse5eq, mvad)
 \begin{table}[tb]
 \begin{center}%\sffamily
 \label{tab_reg-entropies}
-<<regression-output, echo=FALSE, results=TeX>>=
+<<regression-output, echo=FALSE, results=tex>>=
 ##xt1 <- xtable(lm.ent, align="|crrr|", digits=1)
 lm.xtable <- xtable(lm.ent, digits=2, align="|r|rrrr|")
 rownames(lm.xtable)[2:4] <- c("Male", "Father unemployed", "Good end compulsory school grade")
@@ -1542,7 +1542,7 @@ OR.table <- data.frame(Cluster1 = exp(cl1.coeff$Estimate), sig1 = cl1.coeff[,"Pr
 %	\begin{center}
 \bigskip
 \centerline{%\sffamily
-<<mvad-OR-table, echo=FALSE, results=TeX>>=
+<<mvad-OR-table, echo=FALSE, results=tex>>=
 OR.xtable <- xtable(OR.table, digits=3, align="|r|rrrrrrrr|")
 rownames(OR.xtable) <- c("(Constant)", "Male", "Father unemployed", "Good end cs grade")
 colnames(OR.xtable) <- c("Clust 1", "Sig", "Clust 2", "Sig", "Clust 3", "Sig", "Clust 4", "Sig")
