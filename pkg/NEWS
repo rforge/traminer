@@ -10,13 +10,16 @@ Changes in existing functions:
   - seqtrate() added two arguments:
 		- lag: compute transition rates from (t) to (t+lag), set to one by default
 		- with.missing: If TRUE, compute transition rates to and from missing values.
-  - seqsubm(): added 
-  - seqtreedisplay(): now overwrites previous file if filename is not NULL. 
+  - seqsubm(): added
+  - seqtreedisplay(): now overwrites previous file if filename is not NULL.
   - checktriangleineq(): internal function to check triangle inequality is now
-	  in C. It is now possible to check much bigger distance matrix.
+	    in C. It is now possible to check much bigger distance matrix.
+  - seqIplot() and seqplot(..., type = "I", ...): the 'sortv' argument now also
+        accepts a sorting method, namely one of "from.start" or "from.end".
+
 
 Bug fixes:
-  - seqtreedisplay(): was changing current directory when an error occured in 
+  - seqtreedisplay(): was changing current directory when an error occurred in
 		the plotting function.
   - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint
 		was not taken into account (Reported by Reto Buergin).
