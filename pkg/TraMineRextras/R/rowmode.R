@@ -3,6 +3,6 @@
 
 rowmode <- function(v, except = "*") {
 	tt <- table(v)
-	tt <- tt[!(names(tt) %in% "*")]
+	tt <- tt[!(names(tt) %in% except)]
 	return(names(tt)[which.max(tt)])
 }

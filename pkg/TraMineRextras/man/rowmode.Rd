@@ -2,7 +2,7 @@
 \name{rowmode}
 \alias{rowmode}
 
-\author{Gilbert Ritschard} 
+\author{Gilbert Ritschard}
 
 \title{Modal state of a variable}
 
@@ -11,7 +11,7 @@
 Returns the modal state of a variable, e.g., the modal state in a sequence.}
 
 \usage{
-rowmode <- function(v, except = "*")
+rowmode <- function(v, except = NULL)
 }
 
 \arguments{
