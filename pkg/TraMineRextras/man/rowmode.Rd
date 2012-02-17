@@ -11,13 +11,13 @@
 Returns the modal state of a variable, e.g., the modal state in a sequence.}
 
 \usage{
-rowmode <- function(v, except = NULL)
+rowmode(v, except = NULL)
 }
 
 \arguments{
   \item{v}{A numerical or factor variable.}
 
-  \item{except}{Vector of values that should be ignored.}
+  \item{except}{Vector of values that should be ignored; e.g., set \code{except="*"} to ignore missing states with default coding.}
 }
 
 \details{
