@@ -3,10 +3,10 @@
 
 sorti <- function(seqdata, start = "end", sort.index = "TRUE"){
     seqdata[seqdata==attr(seqdata,"void")] <- attr(seqdata,"nr")
-    
+
 	if (start %in% c("beg", "end")) {
     	end <- if (start=="end") { max(seqlength(seqdata)) } else { 1 }
-    	beg <- if (start=="end") { 1 } else { max(seqlength(x)) }
+    	beg <- if (start=="end") { 1 } else { max(seqlength(seqdata)) }
     }
     else{
         warning('start should be one of "beg" or "end" ')
