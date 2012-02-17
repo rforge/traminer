@@ -48,6 +48,8 @@ seqplot.tentrop.m(seqdata.list, title=NULL,
 
   \item{legendpos}{legend position: default is \code{"topright"}. See\code{\link{legend} }.}
   \item{horiz}{logical: Should the legend be displayed horizontally. Set as \code{FALSE} by default, i.e., legend is displayed vertically.}
+  
+  \item{...}{additional plot parameters (see \code{\link{par}}).}  
 }
 
 \details{
