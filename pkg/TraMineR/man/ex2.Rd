@@ -1,21 +1,29 @@
 \name{ex2}
 \docType{data}
 \alias{ex2}
+\alias{ex2.weighted} 
+\alias{ex2.unweighted}
+
 \title{Example data sets with weighted and unweighted sequence data}
+
 \description{
-Example data set used to demonstrate the handling of weights. The 'ex2.weighted' data set contains 6 sequences whith weights inflating to 100 sequences (sum of weights is 100), the same as in the 'ex2.unweighted' data set. 
+Example data sets used to demonstrate the handling of weights. The \code{'ex2.weighted'} data set contains 6 sequences with weights inflating to 100 sequences (sum of weights is 100). The second data frame \code{'ex2.unweighted'} contains the corresponding 100 sequences.
 
-The sequences are in the 'seq' column, weights (in the 'ex2.weighted' data set) are in the 'weight' column.
+The sequences are, in both data frames, in the \code{'seq'} column, and weights in the \code{'weight'} column of \code{'ex2.weighted'}.
 
-The alphabet is made of four possible states: A, B, C and D.
+The alphabet is made of four possible states: \code{A, B, C} and \code{D}.
 \cr
 
-These data sets are intended mainly to test and illustrate the handling of weights in TraMineR's functions. Weighted results obtained with 'ex2.weighted' data set should be exactly the same as unweighted results obtained with the 'ex2.unweighted' data set.
+These data sets are mainly intended to test and illustrate the handling of weights in TraMineR's functions. Weighted results obtained with '\code{ex2.weighted}' data set should be exactly the same as unweighted results obtained with the '\code{ex2.unweighted}' data set.
 }
+
 \usage{data(ex2)}
-\format{ex2.weighted: a data frame with 6 rows, 1 variable containing sequences as character strings, 1 weight variable.
+\format{
+The command \code{data(ex2)} generates two data frames:
+\cr 
+\code{ex2.weighted}: a data frame with 6 rows, 1 variable containing sequences as character strings, 1 weight variable.
 \cr
-ex2.unweighted: a data frame with 100 rows, 1 variable containing sequences as character strings.
+\code{ex2.unweighted}: a data frame with 100 rows, 1 variable containing sequences as character strings.
 
 }
 
