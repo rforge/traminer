@@ -53,10 +53,12 @@ This is the plot method for state sequence objects of class \code{stslist} creat
 
 \details{
 This is the default plot method for state sequence objects (produced by the \code{\link{seqdef}} function), i.e., for objects of class \emph{stslist}. It produces a sequence index plot, where individual sequences are rendered with stacked bars depicting the states over time.
+\cr
+\cr
 
 This method is called by the generic \code{\link{seqplot}} function (if \code{type="i"}). The latter produces more sophisticated plots, allowing grouping and automatic display of the state color legend. The \code{seqiplot} function is a shortcut for calling \code{seqplot} with \code{type="i"}.
 
-When a \code{sortv} variable is provided, its values define the order in which the sequences are plotted. With \code{sortv = "from.start"}, sequence are sorted by the elements of the alphabet at the successive positions starting from the beginning of the sequences. The {"from.end"} method proceeds similarly, but backward from the last position.
+When a \code{sortv} variable is provided to \code{seqiplot} or \code{seqIplot}, its values define the order in which the sequences are plotted. With \code{sortv = "from.start"}, sequence are sorted by the elements of the alphabet at the successive positions starting from the beginning of the sequences. The {"from.end"} method proceeds similarly, but backward from the last position.
 
 The interest of sequence index plots has for instance been stressed by \cite{Scherer (2001)} and \cite{Brzinsky-Fay et al. (2006)}. Notice that such index plots for thousands of sequences result in very heavy graphic files if they are stored in PDF or POSTSCRIPT format. To reduce the size, we suggest saving the figures in bitmap format by using for instance \code{\link{png}} instead of \code{\link{postscript}} or \code{\link{pdf}}.
 }
