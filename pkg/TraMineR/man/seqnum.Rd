@@ -4,7 +4,6 @@
 
 \description{
   The function \code{seqnum} transforms the provided state sequence object into an equivalent sequence object in which the original alphabet is replaced with an alphabet of numbers ranging from \code{0} to \code{(nbstates-1)}.
-  }. 
 }
 \usage{
  seqnum(seqdata, with.missing=FALSE)
@@ -12,7 +11,7 @@
 \arguments{
 	\item{seqdata}{a state sequence object as defined by the \code{\link{seqdef}} function.}
 
-	\item{with.missing}{logical: Should missing elements in the sequences be turned into numerical values as well?  The code for missing values in the sequences is retrieved from the \cod{'nr'} attribute of \code{seqdata}.}
+	\item{with.missing}{logical: Should missing elements in the sequences be turned into numerical values as well?  The code for missing values in the sequences is retrieved from the \code{'nr'} attribute of \code{seqdata}.}
 }
 
 \details{
