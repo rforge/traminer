@@ -9,7 +9,7 @@ The function extracts a set of representative objects that exhibits the key feat
 \usage{
 dissrep(diss, criterion="density",
     score=NULL, decreasing=TRUE,
-    trep=0.25, nrep=NULL, tsim=0.1, dmax=NULL)
+    trep=0.25, nrep=NULL, tsim=0.1, dmax=NULL, weights=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 
@@ -51,6 +51,8 @@ diameter is thus twice this threshold. }
   \item{dmax}{maximum theoretical distance. Redundancy and neighborhood
 diameters are defined as a proportion of this maximum theoretical
 distance. If \code{NULL}, it is derived from the distance matrix.}
+
+    \item{weights}{vector of weights of length equal to the number of rows of the dissimilarity matrix. If \code{NULL}, equal weights are assigned.}
  }
 
 \details{

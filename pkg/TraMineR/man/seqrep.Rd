@@ -11,7 +11,7 @@ set, the goal being to get easy sounded interpretation of the latter.
 
 \usage{ seqrep(seqdata, criterion="density", score=NULL,
     decreasing=TRUE, trep=0.25, nrep=NULL,
-    tsim=0.1, dmax=NULL, dist.matrix=NULL, ...)
+    tsim=0.1, dmax=NULL, dist.matrix=NULL, weighted=TRUE, ...)
 }
 
 \arguments{
@@ -47,6 +47,8 @@ neighborhood diameter is thus twice this threshold.}
   \item{dist.matrix}{a matrix containing the pairwise distances between sequences in \code{seqdata}. If \code{NULL}, the
       matrix is computed by calling the \code{\link{seqdist}} function. In that case, optional arguments to be passed to
       the \code{seqdist} function (see ... hereafter) should also be provided.}
+      
+  \item{weighted}{logical: Should weights be accounted for?}  
 
   \item{...}{optional arguments to be passed to the \code{seqdist} function, mainly \code{dist.method} specifying the
       metric for computing the distance matrix, \code{norm} for normalizing the distances, \code{indel} and \code{sm} for
