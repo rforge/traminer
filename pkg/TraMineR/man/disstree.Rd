@@ -44,6 +44,8 @@ An object of class \code{disstree} that contains the following components:
   \item{weights}{weights}
 }
 \references{
+    Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
+
   Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
   Discrepancy	analysis of complex objects using dissimilarities.
   In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),

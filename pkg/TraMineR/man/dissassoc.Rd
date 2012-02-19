@@ -21,33 +21,35 @@ dissassoc(diss, group, weights=NULL, R=1000,
   \item{group}{The grouping variable}
   \item{weights}{optional numerical vector containing weights.}
   \item{R}{Number of permutations for computing the p-value. If equal to 1, no permutation test is performed.}
-  \item{weight.permutation}{Weights permutation method: \code{"diss"} 
+  \item{weight.permutation}{Weights permutation method: \code{"diss"}
   (attach weigths to the dissimilarity matrix), \code{"replicate"} (replicate case according to the \code{weights} arguments), \code{"rounded-replicate"} (replicate case according to the rounded \code{weights} arguments), \code{"random-sampling"} (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
   \item{squared}{Logical. If \code{TRUE} the dissimilarities \code{diss} are squared.}
 }
 
-\details{ The \code{dissassoc} function assesses the association 
-between objects characterized by their dissimilarity matrix and a 
-discrete covariate. It provides a generalization of the ANOVA 
-principle to any kind of distance metric. The function returns a 
-pseudo R-square that can be interpreted as a usual R-square. The 
-statistical significance of the association is computed by means of 
-permutation tests. The function performs also a test of discrepancy 
-homogeneity (equality of within variances) using a generalization of 
-the Levene statistic and Bartlett's statistics. \cr There are 
-\code{print} and \code{hist} methods (the latter producing an 
-histogram of the permuted values used for testing the significance). 
-} 
+\details{ The \code{dissassoc} function assesses the association
+between objects characterized by their dissimilarity matrix and a
+discrete covariate. It provides a generalization of the ANOVA
+principle to any kind of distance metric. The function returns a
+pseudo R-square that can be interpreted as a usual R-square. The
+statistical significance of the association is computed by means of
+permutation tests. The function performs also a test of discrepancy
+homogeneity (equality of within variances) using a generalization of
+the Levene statistic and Bartlett's statistics. \cr There are
+\code{print} and \code{hist} methods (the latter producing an
+histogram of the permuted values used for testing the significance).
+}
 
-\value{ Returns an object of class \code{dissassoc} with the 
-following components: 
+\value{ Returns an object of class \code{dissassoc} with the
+following components:
   \item{groups}{A data frame with the number of cases and the discrepancy of each group}
   \item{anova.table}{The pseudo ANOVA table}
   \item{stat}{The value of the statistics and their p-values}
   \item{perms}{The permutation object, containing the values computed for each permutation}
 }
 \references{
-  Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2009)
+    Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
+
+  Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
   Discrepancy	analysis of complex objects using dissimilarities.
   In F. Guillet, G. Ritschard, H. Briand, and D. A. Zighed (Eds.),
   \emph{Advances in Knowledge Discovery and Management},

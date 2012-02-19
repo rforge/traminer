@@ -43,6 +43,8 @@ dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
   \item{perms}{Permutation values as a \code{boot} object}
 }
 \references{
+    Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
+
   Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
   Discrepancy	analysis of complex objects using dissimilarities.
   In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),
@@ -59,10 +61,11 @@ dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
   McArdle, B. H. and M. J. Anderson (2001). Fitting multivariate models to community data: A
 comment on distance-based redundancy analysis. \emph{Ecology} 82(1), 290-297.
 
-  Zapala, M. A. and N. J. Schork (2006). Multivariate regression analysis of distance matrices for
+  Zapala, M. A. and N. J. Schork (2006). Multivariate regression analysis of distance matrices for 
   testing associations between gene expression patterns and related variables. \emph{Proceedings of
 the National Academy of Sciences of the United States of America} 103(51), 19430-19435.
 }
+
 \seealso{
 \code{\link{dissvar}} to compute a pseudo variance from dissimilarities and for a basic introduction to concepts of discrepancy analysis.
    \cr

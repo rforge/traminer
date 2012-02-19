@@ -47,7 +47,12 @@ DTNsplit <- function(varindex, index,  prob, info, labels=NULL, breaks=NULL, naG
 ###########################
 
 disstreeleaf <- function(tree) {
-	if (!inherits(tree, "DissTreeNode"))stop("tree should be a DissTreeNode object")
+	if (inherits(tree, "disstree")) {
+		tree <- tree$root
+	}
+	if (!inherits(tree, "DissTreeNode")) {
+		stop("tree should be a DissTreeNode object")
+	}
 	categorie <- numeric(length(tree$ind))
 	categorie[] <- -1
 	return(DTNdisstreeleaf(tree, categorie))

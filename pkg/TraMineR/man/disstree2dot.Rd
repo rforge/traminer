@@ -12,7 +12,7 @@ disstree2dot(tree, filename, digits = 3,
    devicefunc = "jpeg", imageext = "jpg", device.arg = list(),
    use.title = TRUE, label.loc = "main", node.loc = "main",
    split.loc = "sub", title.cex = 1, legendtext=NULL,
-   legendimage=NULL, showdepth = FALSE, ...)
+   legendimage=NULL, qualityimage = NULL, showdepth = FALSE, ...)
 
 disstree2dotp(tree, filename,
    imagedata=NULL, imgLeafOnly=FALSE,
@@ -36,6 +36,7 @@ disstree2dotp(tree, filename,
   \item{title.cex}{\code{cex} applied to all calls to \code{title} (see \code{use.title}).}
   \item{legendtext}{An optional text appearing in a distinct node.}
   \item{legendimage}{An optional image file appearing in a distinct node.}
+  \item{qualityimage}{Quality of the produced image.}  
   \item{showdepth}{Logical. If \code{TRUE}, information about depth of the tree is added to the plot.}
   \item{\dots}{other parameters that will be passed to \code{imagefunc}.}
 }
@@ -46,17 +47,17 @@ It also generates one image per node through a call to
 present or otherwise a list of indexes (of individuals belonging to a
 node).
 
-if \code{use.title} is \code{TRUE}, \code{imagefunc} should take care
+If \code{use.title} is \code{TRUE}, \code{imagefunc} should take care
 to leave enough space for the title.
 
 \code{disstree2dotp} is a simplified interface of
-\code{disstree2dot} which automatically leaves enough space for the title and subtitles. These functions are intended to be generic. 
+\code{disstree2dot} which automatically leaves enough space for the title and subtitles. These functions are intended to be generic.
 
-See \code{\link{seqtreedisplay}} for a much simpler way to generate a graphical representation of a \code{\link{seqtree}}; that is a \code{disstree} built using a sequence object. 
+See \code{\link{seqtreedisplay}} for a much simpler way to generate a graphical representation of a \code{\link{seqtree}}; that is a \code{disstree} built using a sequence object.
 
 }
 \value{
-  Nothing but generates a "dot" and several images files (on per node) in the current working directory (see \code{\link{setwd}}).
+  Nothing but generates a "dot" and several images files (one per node) in the current working directory (see \code{\link{setwd}}).
 }
 
 \seealso{\code{\link{seqtree}} and \code{\link{seqtreedisplay}}, \code{\link{disstree}} for an example.}

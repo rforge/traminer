@@ -7,21 +7,22 @@ New functionalities:
   - New interface between C code and R which should be faster.
 
 Changes in existing functions:
-  - seqtrate() added two arguments:
+  - dissrep(), seqrep(), seqrplot(): now accounts for weights when present.
+  - seqtrate(), seqsubm(): added two arguments:
 		- lag: compute transition rates from (t) to (t+lag), set to one by default
 		- with.missing: If TRUE, compute transition rates to and from missing values.
-  - seqsubm(): added
-  - seqtreedisplay(): now overwrites previous file if filename is not NULL.
+  - seqtreedisplay(): now overwrites previous file if filename is not NULL. 
+        Tree quality measures displayed with R code.
   - checktriangleineq(): internal function to check triangle inequality is now
-	    in C. It is now possible to check much bigger distance matrix.
-  - seqIplot(), seqiplot() and seqplot() with type "I" or "i": the 'sortv' argument now also
-        accepts a sorting method, namely one of "from.start" or "from.end".
+	    in C. It is now possible to check much bigger distance matrices.
+  - seqIplot(), seqiplot() and seqplot() with type "I" or "i": the 'sortv' argument now 
+        also accepts a sorting method, namely one of "from.start" or "from.end".
         See the help page ?plot.stslist for explanation.
-
 
 Bug fixes:
   - seqtreedisplay(): was changing current directory when an error occurred in
 		the plotting function.
+  - dissrep(), seqrep(): error when 'nrep' cannot be reached (reported by M. Studer)
   - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint
 		was not taken into account (Reported by Reto Buergin).
   - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto Buergin).
@@ -29,6 +30,7 @@ Bug fixes:
 		converting long event sequences to character (Reported by Pierre Molinier).
   - seqsubm(): Very small rounding errors (1e-16) were sometimes leading to non symmetric
 		substitution cost matrix (Reported by Alexandre Pollien).
+
 ## ==========
 Version 1.8-1
 

@@ -6,18 +6,18 @@
 Generate a graphical representation of a regression tree of state sequence data.
 }
 \usage{
-seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object, 
-               imgLeafOnly = FALSE, sortv = NULL, 
-               dist.matrix = NULL, title.cex = 3, 
-			   withlegend = "auto", legend.fontsize = title.cex, 
-			   axes = FALSE, imageformat = "png", 
-			   withquality = TRUE, legendtext = NULL, 
-			   showtree=TRUE, ...)
+seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object,
+       imgLeafOnly = FALSE, sortv = NULL,
+       dist.matrix = NULL, title.cex = 3,
+       withlegend = "auto", legend.fontsize = title.cex,
+       axes = FALSE, imageformat = "png",
+       withquality = TRUE, quality.fontsize = title.cex, 
+       legendtext = NULL, showtree=TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tree}{A \code{seqtree} object (as produced by \code{\link{seqtree}}).}
-  \item{filename}{The name of a file where to save the plot (overwritting existing file). If \code{NULL}, a temporary file is created.}
+  \item{filename}{The name of a file where to save the plot (overwriting existing file). If \code{NULL}, a temporary file is created.}
   \item{seqdata}{The sequence object containing the state sequences plotted in the nodes.}
   \item{imgLeafOnly}{Logical. If \code{TRUE} sequences are plotted only in terminal nodes.}
   \item{sortv}{Argument passed to \code{\link{seqplot}}}
@@ -27,8 +27,9 @@ seqtreedisplay(tree, filename = NULL, seqdata = tree$info$object,
   \item{legend.fontsize}{Font \code{cex} value for the legend.}
   \item{axes}{Argument passed to \code{\link{seqplot}}}
   \item{imageformat}{Image format of the output file (\code{filename})}
-  \item{withquality}{If \code{TRUE}, a node displaying fitting measures of the tree is added to the plot.}
-  \item{legendtext}{Character. Optional text information that should be added.}
+  \item{withquality}{Logical: Should quality measures be displayed?}
+  \item{quality.fontsize}{Font size for displaying quality measures.}
+  \item{legendtext}{Character. Optional additional legend information text.}
   \item{showtree}{Logical. Should the tree be shown on the screen?}
   \item{\dots}{additional arguments passed to seqplot}
 }
