@@ -153,7 +153,7 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 ###########################
 seqtree2dot <- function(tree, filename, seqdata=tree$info$object, imgLeafOnly=FALSE, sortv=NULL,dist.matrix=NULL, title.cex=3, withlegend="auto",
 						 legend.fontsize=title.cex, withquality=FALSE, quality.fontsize=title.cex, axes=FALSE, ...) {
-	legendimage <- DTNseqlegend(filename=tmpdisstree, seqdata=seqdata, legend.fontsize=legend.fontsize, withlegend=withlegend, ...)
+	legendimage <- DTNseqlegend(filename=filename, seqdata=seqdata, legend.fontsize=legend.fontsize, withlegend=withlegend, ...)
 	
 	disstree2dotp(tree, filename, imagedata=NULL, imgLeafOnly=imgLeafOnly, seqdata=seqdata, title.cex=title.cex,
 			sortv=sortv,dist.matrix=dist.matrix, imagefunc=DTNseqplot, withlegend=FALSE, axes=axes,
