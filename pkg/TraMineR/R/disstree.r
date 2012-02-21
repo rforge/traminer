@@ -70,8 +70,47 @@ DTNdisstreeleaf <- function(node, co) {
 		return(DTNdisstreeleaf(node$kids[[2]], co1))
 	}
 }
+DTNaddCovariateSplitschedule <- function(tree) {
+	treeSize <- function(node){
+		if (is.null(node$kids)) {
 
-
+			return(1)
+		}else{
+			return( treeSize(node$kids[[1]])+ treeSize(node$kids[[2]])+1)
+		}
+	}
+	
+	trsize <- treeSize(tree$root)
+	treeEnv <- environment()
+	treeEnv$SCexpl <- numeric(trsize)
+	NodeCovariate <- function(node, parent=NULL){
+		if(is.null(parent)){ ## root node
+			treeEnv$SCexpl[as.character(node$id)] <- node$info$vardis*node$info$n
+		}
+		else{
+			SCtot <- parent$info$vardis*parent$info$n
+			SCexpl <- parent$split$info$R2*SCtot
+			treeEnv$SCexpl[as.character(node$id)] <- SCexpl
+		}
+		if (!is.null(node$kids)) {
+			NodeCovariate(node$kids[[1]], node)
+			NodeCovariate(node$kids[[2]], node)
+		}
+	}
+	NodeCovariate(tree$root)
+	treeEnv$depth <- as.integer(factor(1-rank(treeEnv$SCexpl), ordered=TRUE))
+	
+	NodeDepth <- function(node){
+		node$info$splitschedule <- treeEnv$depth[as.character(node$id)==names(treeEnv$SCexpl)]
+		if (!is.null(node$kids)) {
+			node$kids[[1]] <- NodeDepth(node$kids[[1]])
+			node$kids[[2]] <- NodeDepth(node$kids[[2]])
+		}
+		return(node)
+	}
+	tree$root <- NodeDepth(tree$root)
+	return(tree)
+}
 
 
 ###########################
@@ -97,7 +136,7 @@ disstree <- function(formula, data=NULL, weights=NULL, minSize=0.05, maxdepth=5,
 	
 	## Allow integer weights for replicates
 	if(is.null(weights)) {
-		weights <- as.double(rep(1,nobs))
+		weights <- as.double(rep(1, nobs))
 		weight.permutation <- "none"
 	}
 	if(weight.permutation %in% c("replicate", "rounded-replicate")) {
