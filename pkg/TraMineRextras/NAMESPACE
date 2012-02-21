@@ -3,6 +3,7 @@ import(TraMineR)
 export(
     group.p,
     convert.g,
+    ctplot,
     pamward,
     rowmode,
     seqplot.tentrop,
