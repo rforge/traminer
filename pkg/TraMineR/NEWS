@@ -7,6 +7,12 @@ New functionalities:
   - New interface between C code and R which should be faster.
 
 Changes in existing functions:
+  - seqdef(): changed the display of alphabet, state labels and long labels when 
+        creating a state sequence object.
+  - seqistatd() and seqmeant(): added 'prop' argument to calculate proportions of time spent in 
+        each state instead of absolute values.
+  - seqplot() and aliases: 'group' now also accepts as argument a list of variables/vectors 
+        and produces a plot for each combination of the values of the variables in the list.
   - dissrep(), seqrep(), seqrplot(): now accounts for weights when present.
   - seqtrate(), seqsubm(): added two arguments:
 		- lag: compute transition rates from (t) to (t+lag), set to one by default
