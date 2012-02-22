@@ -18,6 +18,8 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 	## Preparing if group is not null
 	## ==============================
 	if (!is.null(group)) {
+		group <- group(group)
+
 		## Check length
 		if (length(group)!=nrow(seqdata))
 			stop(call.=FALSE, "group must contain one value for each row in the sequence object")
