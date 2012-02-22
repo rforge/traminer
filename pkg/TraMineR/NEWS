@@ -3,6 +3,9 @@ Version development
 
 Vignettes: JSS article vol. 40(4) added as a vignette on state sequence analysis.
 
+Misc:
+  - added 'ex2' data sets to test and illustrate the handling of weitghts, type help(ex2) for details.
+
 New functionalities:
   - New interface between C code and R which should be faster.
 
