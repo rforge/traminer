@@ -9,3 +9,5 @@ w <- c(10,1,30,4,15,40)
 
 ex2.weighted <- data.frame(seq=c(s1, s2, s3, s4, s5, s6), weight=w)
 ex2.unweighted <- data.frame(seq=c(rep(s1,w[1]), rep(s2,w[2]), rep(s3,w[3]), rep(s4,w[4]), rep(s5,w[5]), rep(s6, w[6])))
+
+rm(s1, s2, s3, s4, s5, s6, w)

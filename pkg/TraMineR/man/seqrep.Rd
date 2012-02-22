@@ -48,7 +48,8 @@ neighborhood diameter is thus twice this threshold.}
       matrix is computed by calling the \code{\link{seqdist}} function. In that case, optional arguments to be passed to
       the \code{seqdist} function (see ... hereafter) should also be provided.}
       
-  \item{weighted}{logical: Should weights be accounted for?}  
+  \item{weighted}{logical: Should weights assigned to the state sequence object be accounted for? (See \code{\link{seqdef}}.)
+  Set as \code{FALSE} to ignore the weights.}
 
   \item{...}{optional arguments to be passed to the \code{seqdist} function, mainly \code{dist.method} specifying the
       metric for computing the distance matrix, \code{norm} for normalizing the distances, \code{indel} and \code{sm} for
