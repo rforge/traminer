@@ -4,7 +4,7 @@ Version development
 Vignettes: JSS article vol. 40(4) added as a vignette on state sequence analysis.
 
 Misc:
-  - added 'ex2' data sets to test and illustrate the handling of weights, 
+  - added 'ex2' data sets to test and illustrate the handling of weights,
         type help(ex2) for details.
 
 New functionalities:
@@ -13,11 +13,11 @@ New functionalities:
 Changes in existing functions:
   - seqdef(): changed the display of alphabet, state labels and long labels when
         creating a state sequence object.
-  - seqistatd() and seqmeant(): added 'prop' argument to calculate 
+  - seqistatd() and seqmeant(): added 'prop' argument to calculate
         proportions of time spent in
         each state instead of absolute values.
-  - seqplot() and aliases: 'group' now also accepts as argument a list of 
-        variables/vectors and produces a plot for each combination of the 
+  - seqplot() and aliases: 'group' now also accepts as argument a list of
+        variables/vectors and produces a plot for each combination of the
         values of the variables in the list.
   - dissrep(), seqrep(), seqrplot(): now accounts for weights when present.
   - seqtrate(), seqsubm(): added two arguments:
@@ -31,11 +31,12 @@ Changes in existing functions:
         also accepts a sorting method, namely one of "from.start" or "from.end".
         See the help page ?plot.stslist for explanation.
   - seqeconstraint() and other 'seqe...' functions for event sequences: support
-        of subsequences can now be determined by means of any of 
-        Joshi's 5 counting methods (see the ref manual page). The method should be 
+        of subsequences can now be determined by means of any of
+        Joshi's 5 counting methods (see the ref manual page). The method should be
         specified with seqeconstraint().
-  - seqeapplaysub(): when "method=count" is specified, the count method assigned 
-        to the event sequence object is used.
+  - seqeapplaysub(): when "method=NULL" is specified (now the default), the count method 
+        assigned to the event sequence object is used. With method="count" 
+        CDIST_O (number of distinct occurrences) is used as previously.
 
 Bug fixes:
   - seqtreedisplay(): was changing current directory when an error occurred in
