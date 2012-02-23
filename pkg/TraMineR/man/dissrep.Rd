@@ -43,9 +43,9 @@ representative set.}
 
  \item{tsim}{threshold for setting the redundancy and neighborhood
 radius. Defined as a percentage of the maximum (theoretical)
-distance. Defaults to 0.1 (10\%). Object $y$ is considered as
-redundant to/in the neighborhood of object $x$ if the distance from
-$y$ to $x$ is less than \code{tsim}*\code{dmax}. The neighborhood
+distance. Defaults to 0.1 (10\%). Object \eqn{y} is considered as
+redundant to/in the neighborhood of object \eqn{x} if the distance from
+\eqn{y} to \eqn{x} is less than \code{tsim}*\code{dmax}. The neighborhood
 diameter is thus twice this threshold. }
 
   \item{dmax}{maximum theoretical distance. Redundancy and neighborhood

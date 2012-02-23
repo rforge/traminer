@@ -14,16 +14,16 @@ disstree(formula, data = NULL, weights = NULL, minSize = 0.05,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{formula}{A formula where the left hand side is a dissimilarity matrix and the right hand specifies the candidate partitioning variables to partition the cases}
-  \item{data}{a data frame where arguments in formula will be searched}
-  \item{weights}{optional numerical vector of weights.}
-  \item{minSize}{minimum number of cases in a node, will be treated as a proportion if less than 1.}
-  \item{maxdepth}{maximum depth of the tree}
+  \item{formula}{A formula where the left hand side is a dissimilarity matrix and the right hand specifies the candidate partitioning variables}
+  \item{data}{A data frame where arguments in formula will be searched}
+  \item{weights}{Optional numerical vector of weights.}
+  \item{minSize}{Minimum number of cases in a node, will be treated as a proportion if less than 1.}
+  \item{maxdepth}{Maximum depth of the tree}
   \item{R}{Number of permutations used to assess the significance of the split.}
-  \item{pval}{Maximum p-value}
+  \item{pval}{Maximum allowed p-value for a split}
   \item{object}{An optional R object represented by the dissimilarity matrix. This object may be used by the \code{print} method or  \code{\link{disstree2dot}} to render specific object type.}
-  \item{weight.permutation}{Weights permutation method: \code{"diss"} (attach weigths to the dissimilarity matrix), \code{"replicate"} (replicate cases according to the \code{weights} arguments), \code{"rounded-replicate"} (replicate case according to the rounded \code{weights} arguments), \code{"random-sampling"} (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
-  \item{squared}{Logical. Set to \code{TRUE} to square the \code{diss} dissimilarities.}
+  \item{weight.permutation}{Weight permutation method: \code{"diss"} (attach weigths to the dissimilarity matrix), \code{"replicate"} (replicate cases according to the \code{weights} arguments), \code{"rounded-replicate"} (replicate case according to the rounded \code{weights} arguments), \code{"random-sampling"} (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
+  \item{squared}{Logical: Should the \code{diss} dissimilarities be squared?}
   \item{first}{One of the variable in the right-hand side of the formula. This forces the first node of the tree to be split by this variable.}
 }
 

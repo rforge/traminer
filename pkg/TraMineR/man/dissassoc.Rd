@@ -3,7 +3,7 @@
 \alias{dissassoc}
 \alias{hist.dissassoc}
 \alias{print.dissassoc}
-\title{Analysis of discrepancy based on dissimilarity measure}
+\title{Analysis of discrepancy from dissimilarity measures}
 
 \description{
 Compute and test the share of discrepancy (defined from a dissimilarity matrix) explained by a categorical variable.
@@ -39,7 +39,7 @@ the Levene statistic and Bartlett's statistics. \cr There are
 histogram of the permuted values used for testing the significance).
 }
 
-\value{ Returns an object of class \code{dissassoc} with the
+\value{ An object of class \code{dissassoc} with the
 following components:
   \item{groups}{A data frame with the number of cases and the discrepancy of each group}
   \item{anova.table}{The pseudo ANOVA table}
@@ -50,7 +50,7 @@ following components:
     Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
 
   Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
-  Discrepancy	analysis of complex objects using dissimilarities.
+  Discrepancy analysis of complex objects using dissimilarities.
   In F. Guillet, G. Ritschard, H. Briand, and D. A. Zighed (Eds.),
   \emph{Advances in Knowledge Discovery and Management},
   Studies in Computational Intelligence, Volume 292, pp. 3-19. Berlin: Springer.

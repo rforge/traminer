@@ -1,10 +1,10 @@
 \name{disscenter}
 \alias{disscenter}
 \encoding{latin1}
-\title{Compute distance to the center of a group}
+\title{Compute distances to the center of a group}
 
 \description{
-	Computes the dissimilarity between a objects and their group center from their pairwise dissimilarity matrix.
+Computes the dissimilarity between objects and their group center from their pairwise dissimilarity matrix.
 }
 
 \usage{
@@ -42,7 +42,7 @@ center, each column corresponding to a group.}
 
 	It can be shown that this dissimilarity is equal to (see \cite{Batagelj 1988}):
 		\deqn{d_{x\tilde{g}}=\frac{1}{n}\big(\sum_{i=1}^{n}d_{xi}-SS\big)}{d_(xg)=1/n *(sum d_xi - SS)}
-	Where \eqn{SS} is the sum of squares (see \code{\link{dissvar}}).
+	where \eqn{SS} is the sum of squares (see \code{\link{dissvar}}).
 }
 \value{
 	A vector with the dissimilarity to the group center for each object, or a list of medoid indexes.

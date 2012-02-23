@@ -11,17 +11,17 @@ Functions to generate a "dot" file and associated images files that can be used 
 disstree2dot(tree, filename, digits=3, imagefunc=NULL, imagedata=NULL,
              imgLeafOnly=FALSE, devicefunc="jpeg", imageext="jpg",
              device.arg=list(), use.title=TRUE, label.loc="main",
-             node.loc="main", split.loc="sub", title.cex=1, legendtext=NULL, 
+             node.loc="main", split.loc="sub", title.cex=1, legendtext=NULL,
              legendimage=NULL, qualityimage=NULL, showdepth=FALSE, ...)
 
 disstree2dotp(tree, filename, imagedata=NULL, imgLeafOnly=FALSE,
-              imagefunc=plot, title.cex=3, withquality=TRUE, 
+              imagefunc=plot, title.cex=3, withquality=TRUE,
 			  quality.fontsize=title.cex, ...)
 
-seqtree2dot(tree, filename, seqdata=tree$info$object, imgLeafOnly=FALSE, 
+seqtree2dot(tree, filename, seqdata=tree$info$object, imgLeafOnly=FALSE,
             sortv=NULL, dist.matrix=NULL, title.cex=3, withlegend="auto",
-            legend.fontsize=title.cex, withquality=FALSE, 
-			quality.fontsize=title.cex, axes=FALSE, ...) 
+            legend.fontsize=title.cex, withquality=FALSE,
+			quality.fontsize=title.cex, axes=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -58,11 +58,11 @@ seqtree2dot(tree, filename, seqdata=tree$info$object, imgLeafOnly=FALSE,
 It also generates one image per node through a call to
 \code{imagefunc} passing the selected lines of \code{imagedata} if
 present or otherwise a list of indexes (of individuals belonging to a
-node). These functions are not intended to be used by end-user. See \code{\link{seqtreedisplay}} 
-and \code{\link{disstreedisplay}} for a much simpler way to generate a graphical representation of a 
+node). These functions are not intended to be used by end-user. See \code{\link{seqtreedisplay}}
+and \code{\link{disstreedisplay}} for a much simpler way to generate a graphical representation of a
 tree (\code{\link{seqtree}} or \code{\link{disstree}}).
 
-\code{seqtree2dot} is a shortcut for sequences objects using the plot function \code{\link{seqplot}}. For each node, it calls \code{\link{seqplot}} passing the selected lines of \code{seqdata} as argument. 
+\code{seqtree2dot} is a shortcut for sequences objects using the plot function \code{\link{seqplot}}. For each node, it calls \code{\link{seqplot}} passing the selected lines of \code{seqdata} as argument.
 	You should at least specify the \code{type} of the plot to use (i.e. using \code{type="d"} for instance, see \code{\link{seqplot}} for more details).
 	
 	
@@ -75,7 +75,7 @@ to leave enough space for the title.
 
 }
 \value{
-  Nothing but generates a "dot" and several images files (one per node) in the current working directory (see \code{\link{setwd}}).
+  Nothing but generates a "dot" and several images files (one per node) in the current working directory (see \code{\link{getwd}} and \code{\link{setwd}}).
 }
 
 \seealso{\code{\link{seqtree}} and \code{\link{seqtreedisplay}}, \code{\link{disstree}} and \code{\link{disstreedisplay}}.}
