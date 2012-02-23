@@ -6,7 +6,7 @@
 Checks occurrences of the subsequences \code{subseq} among the event sequences and returns the result according to the selected \code{method}.
 }
 \usage{
-seqeapplysub(subseq, method = "count", constraint = NULL,
+seqeapplysub(subseq, method = NULL, constraint = NULL,
             rules=FALSE)
 }
 \arguments{

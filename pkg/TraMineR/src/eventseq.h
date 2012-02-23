@@ -135,6 +135,22 @@ public:
     //Subsequence functions
     ///Count the number time we found this sequence in s
     int count(SequenceEventNode * s, const double &maxGap, const double& windowSize, const double & ageMaxEnd, const double& gapConsumed, const double& currentAge);
+    // one occurence per span-window
+    int count3(SequenceEventNode *s, const double &maxGap, 
+	       const double &windowSize, const double &ageMaxEnd, 
+	       const double &gapConsumed, const double &currentAge,
+	       int *Win, double *tWin, const int &lWin);
+    // count the number of minimum windows of occurence
+    int count4(SequenceEventNode *s, const double &maxGap, 
+	       const double &windowSize, const double &ageMaxEnd, 
+	       const double &gapConsumed, const double &currentAge,
+	       double &MinWin);
+    // distinct occurences with no event-timestamp overlap
+    int count5(SequenceEventNode *s, const double &maxGap, 
+	       const double &windowSize, const double &ageMaxEnd, 
+	       const double &gapConsumed, const double &currentAge,
+	       const int *typeSen, const double *tSen, 
+	       const int &lSen, int *flagSen);
     ///Check if this can be considered equal to s
     inline bool checkTypeGap(SequenceEventNode * s,const double& passedGap) {
         return this->type==s->type&&((this->gap>0&&passedGap>0)||(this->gap==0&&passedGap==0));
@@ -189,7 +205,9 @@ public:
     ///Add an event to this sequence (used to build sequences)
     void addEvent(const int &eventType,const double &t);
     ///Count the number time we found this sequence in s
-    int count(Sequence * s, const double &maxGap, const double& windowSize, const double & ageMin, const double & ageMax, const double & ageMaxEnd);
+    int count(Sequence * s,const double &maxGap, const double &windowSize, 
+	      const double &ageMin, const double &ageMax, 
+	      const double &ageMaxEnd,const int &cMethod);
     ///Return age of first occurence of this sequence in sequence s
     double first_occurence(Sequence * s, const double &maxGap, const double& windowSize, const double & ageMin, const double & ageMax, const double & ageMaxEnd);
     ///Give a deep copy of this subsequence

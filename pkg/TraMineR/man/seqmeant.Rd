@@ -13,7 +13,7 @@ seqmeant(seqdata, weighted=TRUE, with.missing=FALSE, prop=FALSE)
   \item{seqdata}{a sequence object as defined by the \code{\link{seqdef}} function.}
   \item{weighted}{logical: if \code{TRUE}, the weights (weights attribute) attached to the sequence object are used for computing weighted mean durations.}
   \item{with.missing}{logical: if set to \code{TRUE}, cumulated durations are also computed for the missing status (gaps in the sequences). See \link{seqdef} on options for handling missing values when creating sequence objects.}
-  \item{prop}{logical: if \code{TRUE}, proportions of time spent in each state are returned instead of absolute values. This option is specially useful when sequences contain missing states, since the sum of the state durations may not be the same for all sequences.}
+  \item{prop}{logical: if \code{TRUE}, proportions of time spent in each state are returned instead of absolute values. This option is especially useful when sequences contain missing states, since the sum of the state durations may not be the same for all sequences.}
 }
 %\details{}
 
