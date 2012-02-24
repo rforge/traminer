@@ -2,6 +2,11 @@ Package: TraMineRextras
 Version: 0.0
 Date: 2012-02-21
 Title: Extras for use with the TraMineR package
+Authors@R: c(
+  person("Gilbert", "Ritschard", role = c("aut", "cre"),
+    email = "gilbert.ritschard@unige.ch"),
+  person("Reto", "Bürgin", role = "aut",
+    email = "reto.buergin@unige.ch")
 Author: Gilbert Ritschard <gilbert.ritschard@unige.ch>.
 Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
 Depends: R (>= 2.8.1), TraMineR, RColorBrewer, combinat
