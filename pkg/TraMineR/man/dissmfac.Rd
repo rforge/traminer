@@ -11,10 +11,10 @@
   Perform a multi-factor analysis of variance from a dissimilarity matrix.
 }
 \usage{
-dissmfacw(formula, data, R=1000, gower=FALSE, squared=FALSE,
-          weights=NULL)
+dissmfacw(formula, data, R = 1000, gower = FALSE, squared = FALSE,
+    weights = NULL)
 dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
-         permutation = "dissmatrix")
+    permutation = "dissmatrix")
 }
 
 \arguments{
@@ -61,7 +61,7 @@ dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
   McArdle, B. H. and M. J. Anderson (2001). Fitting multivariate models to community data: A
 comment on distance-based redundancy analysis. \emph{Ecology} 82(1), 290-297.
 
-  Zapala, M. A. and N. J. Schork (2006). Multivariate regression analysis of distance matrices for 
+  Zapala, M. A. and N. J. Schork (2006). Multivariate regression analysis of distance matrices for
   testing associations between gene expression patterns and related variables. \emph{Proceedings of
 the National Academy of Sciences of the United States of America} 103(51), 19430-19435.
 }
