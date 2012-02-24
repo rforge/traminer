@@ -12,14 +12,16 @@ were followed up from July 1993 to June 1999. The monthly states are recorded
 in columns 15 (\code{Jul.93})  to 86 (\code{Jun.99}).
 
 States are:\cr
-\cr
-\code{employment}  (EM) \cr
-\code{FE} = further education (FE)\cr
-\code{HE} = higher education (HE) \cr
-\code{joblessness}  (JL) \cr
-\code{school} (SC) \cr
-\code{training} (TR)\cr
-\cr
+
+\tabular{ll}{
+\code{employment}  \tab (EM) \cr
+\code{FE}          \tab further education (FE)\cr
+\code{HE}          \tab higher education (HE) \cr
+\code{joblessness} \tab (JL) \cr
+\code{school}      \tab (SC) \cr
+\code{training}    \tab (TR)\cr
+}
+
 The data set contains also ids (\code{id}) and sample weights (\code{weight}) as well as the following binary covariates:\cr
 \cr
 \code{male}\cr
@@ -31,8 +33,6 @@ The data set contains also ids (\code{id}) and sample weights (\code{weight}) as
 \code{fmpr} (SOC code of father's current or most recent job, 1=SOC1 (professional, managerial or related))\cr
 \code{livboth} (living arrangements at time of first sweep of survey (June 1995), 1=living with both parents)\cr
 }
-
-
 
 \usage{data(mvad)}
 \format{A data frame containing 712 rows, 72 state variables, 1 id variable and 13 covariates.}

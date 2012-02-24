@@ -25,20 +25,23 @@ The states numbered from 0 to 7 are defined from the combination of five basic s
 7 = "Divorced" \cr
 
 The covariates are: \cr
-\cr
-\code{sex} \cr
-\code{birthyr }  (birth year)\cr
-\code{nat_1_02}  (first nationality) \cr
-\code{plingu02}  (language of questionnaire) \cr
-\code{p02r01 }   (religion)\cr
-\code{p02r04 }   (religious participation) \cr
-\code{cspfaj }   (father's social status) \cr
-\code{cspmoj }   (mother's social status) \cr
-\cr
+
+\tabular{ll}{
+\code{sex} \tab \cr
+\code{birthyr }  \tab (birth year)\cr
+\code{nat_1_02}  \tab (first nationality) \cr
+\code{plingu02}  \tab (language of questionnaire) \cr
+\code{p02r01 }   \tab (religion)\cr
+\code{p02r04 }   \tab (religious participation) \cr
+\code{cspfaj }   \tab (father's social status) \cr
+\code{cspmoj }   \tab (mother's social status) \cr
+}
+
 Two additional weights variables are inserted for illustrative purpose ONLY (since \code{biofam} is a subsample of the original data, these weights are not adapted to the actual data): \cr
-\cr
-\code{wp00tbgp} (weights inflating to the Swiss population)\cr
-\code{wp00tbgs} (weights respecting sample size) \cr
+\tabular{ll}{
+\code{wp00tbgp} \tab (weights inflating to the Swiss population)\cr
+\code{wp00tbgs} \tab (weights respecting sample size) \cr
+}
 }
 \usage{data(biofam)}
 \format{A data frame with 2000 rows, 16 state variables, 1 id variable and 7 covariates and 2 weights variables.}
