@@ -26,13 +26,12 @@ sequences and vice versa.
 \tabular{ll}{
 Package: \tab TraMineR\cr
 Version: \tab 1.9\cr
-Date: \tab 2012-02-23\cr
+Date: \tab 2012-02-28\cr
 Depends: \tab R (>= 2.8.1), RColorBrewer, boot\cr
 Suggests: \tab cluster, xtable\cr
 License: \tab GPL (>= 2)\cr
 URL: \tab http://mephisto.unige.ch/traminer\cr
 Encoding: \tab latin1\cr
-Built: \tab R 2.14.0; x86_64-pc-mingw32; 2012-02-23 15:39:16 UTC; windows\cr
 }
 Index:
 \preformatted{
@@ -49,9 +48,9 @@ biofam                  Example data set: Family life states from the
                         Swiss Household Panel biographical survey
 cpal                    Get or set the color palette of a sequence
                         object
-dissassoc               Analysis of discrepancy based on dissimilarity
-                        measure
-disscenter              Compute distance to the center of a group
+dissassoc               Analysis of discrepancy from dissimilarity
+                        measures
+disscenter              Compute distances to the center of a group
 dissmfac                Multi-factor ANOVA from a dissimilarity matrix
 dissrep                 Extracting sets of representative objects using
                         a dissimilarity matrix
@@ -160,7 +159,7 @@ Further information is available in the following vignettes:
 }
 }
 \author{
-Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. Müller <nicolas.muller@unige.ch>, Gilbert Ritschard <gilbert.ritschard@unige.ch>, Reto Bürgin <reto.buergin@unige.ch>.
+Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. Müller <nicolas.muller@unige.ch>, Gilbert Ritschard <gilbert.ritschard@unige.ch> and contributions from Reto Bürgin <reto.buergin@unige.ch>.
 Maintainer: Alexis Gabadinho <alexis.gabadinho@unige.ch>
 }
   
