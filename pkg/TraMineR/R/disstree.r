@@ -197,6 +197,7 @@ disstree <- function(formula, data=NULL, weights=NULL, minSize=0.05, maxdepth=5,
 	tree$root <- root
 	
 	class(tree) <- c("disstree", class(tree))
+	tree <- DTNaddCovariateSplitschedule(tree)
 	return(tree)
 }
 
