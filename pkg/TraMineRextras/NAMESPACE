@@ -8,5 +8,6 @@ export(
     rowmode,
     seqplot.tentrop,
     sorti,
-    sortv
+    sortv,
+    toPersonPeriod
 )
