@@ -9,5 +9,9 @@ export(
     seqplot.tentrop,
     sorti,
     sortv,
-    toPersonPeriod
+	toPersonPeriod,
+	FCE_to_TSE,
+	HSPELL_to_STS,
+	seqe2stm,
+	TSE_to_STS
 )
