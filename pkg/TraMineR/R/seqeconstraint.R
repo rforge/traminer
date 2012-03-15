@@ -38,23 +38,23 @@ print.seqeconstraint<-function(x, ...){
 	z <- z[z$"Value"!=-1, ]
         if (z[z$"Constraint"=="countMethod","Value"] == 1) {
           z[z$"Constraint"=="countMethod","Value"] <-
-            "One by sequence"
+            "COBJ"
 	}
 	if (z[z$"Constraint"=="countMethod","Value"] == 2) {
           z[z$"Constraint"=="countMethod","Value"] <-
-            "Several by sequence"
+            "CDIST_0"
 	}
         if (z[z$"Constraint"=="countMethod","Value"] == 3) {
           z[z$"Constraint"=="countMethod","Value"] <-
-            "One occurence per span window"
+            "CWIN"
 	}
         if (z[z$"Constraint"=="countMethod","Value"] == 4) {
           z[z$"Constraint"=="countMethod","Value"] <-
-            "Number of minimal windows of occurence"
+            "CMINWIN"
 	}
         if (z[z$"Constraint"=="countMethod","Value"] == 5) {
           z[z$"Constraint"=="countMethod","Value"] <-
-            "Distinct occurences with no event-timestamp overlap allowed"
+            "CDIST"
 	}
 	if(nrow(z) > 0) { 
 		print(z, row.names=FALSE,...) 
