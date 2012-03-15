@@ -1433,7 +1433,7 @@ The list of representative sequences is obtained by printing the outcome of \Com
 
 \subsubsection{Example 1: Medoid and the centrality criterion}
 A first simple example
-\footnote{Results for representative sequences differ from the ones published in the original JSS article. This is due to the use of weights, which was not implemented in the TraMineR version (1.8) the article is based on.} 
+\footnote{Results for representative sequences differ from the ones published in the original JSS article. This is due to the use of weights, which was not implemented in the TraMineR version (1.8) the article is based on.}
  of a representative sequence is the \emph{medoid} %or \emph{centrotype}
 of a set of sequences. The medoid is the most central object; i.e., the one with minimal sum of distances to all other objects in the set \citep{Kaufman-2005}. It is a special case of representative sequence obtained by selecting the centrality sorting criterion (\Comt{criterion="dist"}) and setting the size of the representative set to 1 (\Comt{nrep=1}).
 %
@@ -1458,7 +1458,7 @@ seqrplot(mvad.seq, group=mvad$gcse5eq, dist.matrix=mvad.om, border=NA)
 \begin{figure}[tb]
 \begin{center}\vskip-2ex
 \setkeys{Gin}{width=1\textwidth}
-<<label=fg-seqrplot-mvad, fig=TRUE, echo=FALSE, width=10, height=5.5, cache=TRUE>>=
+<<label=fg-seqrplot-mvad, fig=TRUE, echo=FALSE, width=10, height=5.5, cache=FALSE>>=
 <<seqrplot-mvad-density>>
 @
 \setkeys{Gin}{width=.8\textwidth}
@@ -1484,7 +1484,7 @@ plot(clusterward, which.plots=2, labels=FALSE)
 \begin{figure}[tb]
 \begin{center}
 \setkeys{Gin}{width=.6\textwidth}
-<<label=fig_cluster-mvad-om, fig=TRUE, echo=FALSE, width=8, height=6, cache=TRUE>>=
+<<label=fig_cluster-mvad-om, fig=TRUE, echo=FALSE, width=8, height=6, cache=FALSE>>=
 <<dendro-mvad-om>>
 @
 \setkeys{Gin}{width=.7\textwidth}
@@ -1521,21 +1521,21 @@ After having labeled the clusters, a common further step is to examine how the c
 
 <<mvad-cl4-logreg, echo=TRUE, results=hide>>=
 mb4 <- (cl4.lab=="Cluster 4")
-glm.cl4 <- glm(mb4 ~ male + funemp + gcse5eq, data=mvad)
+glm.cl4 <- glm(mb4 ~ male + funemp + gcse5eq, data=mvad, family="binomial")
 @
 
 <<mvad-prep-ORtable, echo=FALSE, results=hide>>=
-glm.cl1 <- glm((cl4.lab=="Cluster 1") ~ male + funemp + gcse5eq, data=mvad)
-glm.cl2 <- glm((cl4.lab=="Cluster 2") ~ male + funemp + gcse5eq, data=mvad)
-glm.cl3 <- glm((cl4.lab=="Cluster 3") ~ male + funemp + gcse5eq, data=mvad)
+glm.cl1 <- glm((cl4.lab=="Cluster 1") ~ male + funemp + gcse5eq, data=mvad, family="binomial")
+glm.cl2 <- glm((cl4.lab=="Cluster 2") ~ male + funemp + gcse5eq, data=mvad, family="binomial")
+glm.cl3 <- glm((cl4.lab=="Cluster 3") ~ male + funemp + gcse5eq, data=mvad, family="binomial")
 cl1.coeff <- as.data.frame(summary(glm.cl1)$coefficients)
 cl2.coeff <- as.data.frame(summary(glm.cl2)$coefficients)
 cl3.coeff <- as.data.frame(summary(glm.cl3)$coefficients)
 cl4.coeff <- as.data.frame(summary(glm.cl4)$coefficients)
-OR.table <- data.frame(Cluster1 = exp(cl1.coeff$Estimate), sig1 = cl1.coeff[,"Pr(>|t|)"],
-                       Cluster2 = exp(cl2.coeff$Estimate), sig2 = cl2.coeff[,"Pr(>|t|)"],
-                       Cluster3 = exp(cl3.coeff$Estimate), sig3 = cl3.coeff[,"Pr(>|t|)"],
-                       Cluster4 = exp(cl4.coeff$Estimate), sig4 = cl4.coeff[,"Pr(>|t|)"])
+OR.table <- data.frame(Cluster1 = exp(cl1.coeff$Estimate), sig1 = cl1.coeff[,"Pr(>|z|)"],
+                       Cluster2 = exp(cl2.coeff$Estimate), sig2 = cl2.coeff[,"Pr(>|z|)"],
+                       Cluster3 = exp(cl3.coeff$Estimate), sig3 = cl3.coeff[,"Pr(>|z|)"],
+                       Cluster4 = exp(cl4.coeff$Estimate), sig4 = cl4.coeff[,"Pr(>|z|)"])
 @
 
 \begin{table}[tb]
@@ -1555,7 +1555,7 @@ print(OR.xtable, floating=FALSE, caption.placement="top")
  \label{tab_OR-cluster-membership}
 \end{table}
 
-Proceeding the same way for the other clusters and taking the exponential of the regression coefficients, we get the odds ratios shown in Table~\ref{tab_OR-cluster-membership}. We learn from those figures that, among others, men are significantly more present in Cluster 1 and women in Cluster 3, and that the chances to follow the trajectory pattern with higher education depicted by Cluster 2 are multiplied by more than 1.5 for those with good results at the end of compulsory school.
+Proceeding the same way for the other clusters and taking the exponential of the regression coefficients, we get the odds ratios shown in Table~\ref{tab_OR-cluster-membership}. We learn from those figures that, among others, men are significantly more present in Cluster 1 and women in Cluster 3, and that the chances to follow the trajectory pattern with higher education depicted by Cluster 2 are multiplied by about 15 for those with good results at the end of compulsory school.
 
 % =======================
 \section{Conclusion}
