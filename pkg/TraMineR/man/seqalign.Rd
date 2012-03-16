@@ -36,16 +36,16 @@ seqalign(seqdata, indices, indel=1, sm, with.missing = FALSE)
 }
     \item{x}{
     an object of class \code{seqalign}}
-    \item{cpal}{}
-    \item{missing.color}{}
-    \item{ylab}{}
-    \item{yaxis}{}
-    \item{xaxis}{}
-    \item{ytlab}{}
-    \item{ylas}{}
-    \item{xtlab}{}
-    \item{cex.plot}{}
-    \item{digits}{}
+    \item{cpal}{color palette}
+    \item{missing.color}{color for missing elements}
+    \item{ylab}{y label}
+    \item{yaxis}{yaxis}
+    \item{xaxis}{xaxis}
+    \item{ytlab}{ytlab}
+    \item{ylas}{ylas}
+    \item{xtlab}{xtlab}
+    \item{cex.plot}{plot font size}
+    \item{digits}{number of digits for printed output}
     \item{...}{additional arguments passed to other functions}
 }
 \details{
