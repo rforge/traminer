@@ -9,6 +9,8 @@ Misc:
 
 New functionalities:
   - New faster interface between C code and R.
+  - seqalign() and associated print and plot methods to see computation details
+        about the alignment of two state sequences.
 
 Changes in existing functions:
   - seqdef(): changed the display of alphabet, state labels and long labels when
@@ -34,8 +36,8 @@ Changes in existing functions:
         of subsequences can now be determined by means of any of
         Joshi's 5 counting methods (see the ref manual page). The method should be
         specified with seqeconstraint().
-  - seqeapplaysub(): when "method=NULL" is specified (now the default), the count method 
-        assigned to the event sequence object is used. With method="count" 
+  - seqeapplaysub(): when "method=NULL" is specified (now the default), the count method
+        assigned to the event sequence object is used. With method="count"
         CDIST_O (number of distinct occurrences) is used as previously.
 
 Bug fixes:
