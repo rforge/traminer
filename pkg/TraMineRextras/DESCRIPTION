@@ -4,7 +4,7 @@ Date: 2012-03-08
 Title: Extras for use with the TraMineR package
 Author: Gilbert Ritschard <gilbert.ritschard@unige.ch> and Reto B\"{u}rgin and Matthias Studer.
 Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
-Depends: R (>= 2.8.1), TraMineR, RColorBrewer, combinat
+Depends: R (>= 2.8.1), TraMineR, RColorBrewer, combinat, survival
 Suggests: cluster
 Description: This package is a collection of functions mainly intended to be used with TraMineR.
 License: GPL (>= 2)

@@ -1,4 +1,5 @@
 import(TraMineR)
+import(survival)
 
 export(
     group.p,
@@ -13,5 +14,7 @@ export(
 	FCE_to_TSE,
 	HSPELL_to_STS,
 	seqe2stm,
-	TSE_to_STS
+	TSE_to_STS,
+	seqedist,
+	seqedplot
 )
