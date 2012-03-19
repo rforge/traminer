@@ -32,9 +32,9 @@ plot.seqalign <- function(x,
 	olist <- list(...)
 
 	ssamp <- rbind(x$seq2, x$seq1)
-	seqbar <- apply(ssamp, 1, TraMineRextras:::seqgbar, statl=statl, seql=seql)
+	seqbar <- apply(ssamp, 1, seqgbar, statl=statl, seql=seql)
 
-	seqop <- apply(matrix(op,nrow=1), 1, TraMineRextras:::seqgbar, statl=c("D","E","I","S"), seql=seql)
+	seqop <- apply(matrix(op,nrow=1), 1, seqgbar, statl=c("D","E","I","S"), seql=seql)
 	dummy <- rep(0,length(seqop))
 
 	seqins <- cbind(dummy, dummy, seqop)
@@ -115,7 +115,7 @@ plot.seqalign <- function(x,
 		y.lab.pos <- c(y.lab.pos, 1+(1*sp)+(0.5+sp))
 
 		if (is.null(ytlab)) {ytlab <- paste("seq",2:1, sep="")}
-		else if (ytlab=="id") {ytlab <- rownames(x)[tlim]}
+		## else if (ytlab=="id") {ytlab <- rownames(x)[tlim]}
 
 		axis(2, at=y.lab.pos, mgp=c(1.5,0.5,0), labels=ytlab, las=ylas, tick=FALSE, cex.axis=cex.plot)
 
