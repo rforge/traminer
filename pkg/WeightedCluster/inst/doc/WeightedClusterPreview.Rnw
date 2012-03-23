@@ -1,0 +1,286 @@
+%-*- TeX -*- -*- EN -*-
+%input "C:\Documents and Settings\Matthias\Application Data\MiKTeX\2.9\bibtex\bib\stat.bib"
+%input "C:\Documents and Settings\Matthias\Application Data\MiKTeX\2.9\bibtex\bib\bibliomat.bib"
+%input "C:\Users\Matthias-Util\AppData\Local\MiKTeX\2.9\bibtex\bib\stat.bib"
+%input "C:\Users\Matthias-Util\AppData\Local\MiKTeX\2.9\bibtex\bib\bibliomat.bib"
+
+
+%\VignetteIndexEntry{Clustering}
+%\VignetteIndexEntry{Weights}
+%\VignetteIndexEntry{state sequences}
+%\VignetteIndexEntry{Optimal matching}
+
+%\documentclass[article]{jss}
+%\documentclass[article, nojss, a4paper]{jss}
+\documentclass[a4paper]{article}
+\usepackage{thumbpdf}
+\usepackage{a4}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{ae}
+%% almost as usual
+\author{\pkg{Matthias Studer}\\ Institute for Demographic and Life Course Studies\\ University of Geneva\\matthias.studer@unige.ch}
+\title{A \pkg{WeightedCluster} Preview}
+
+%% for pretty printing and a nice hypersummary also set:
+%\Plainauthor{Matthias Studer} %% comma-separated
+%\Plaintitle{The WeightedCluster Preview} %% without formatting
+
+% an abstract and keywords
+%\Abstract{
+%    A short preview of WeightedCluster functionnalities.
+%}
+%
+%\Keywords{Sequence analysis, optimal matching, cluster, weights, cluster quality measure, \proglang{R}}
+%\Plainkeywords{Sequence analysis, optimal matching, cluster, weights, cluster quality measure, R}
+%%% without formatting
+%%% at least one keyword must be supplied
+%
+%%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+% \Volume{40}
+% \Issue{4}
+% \Month{April}
+% \Year{2011}
+% \Submitdate{2009-08-12}
+% \Acceptdate{2011-01-31}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+%\Address{
+%  Matthias Studer\\
+%  Institute for Demographic and Life Course Studies\\
+%  University of Geneva\\
+%  CH-1211 Geneva 4, Switzerland\\
+%  E-mail: \email{matthias.studer@unige.ch}\\
+%  URL: \url{http://mephisto.unige.ch/}
+%}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/1/31336-5053
+%% Fax: +43/1/31336-734
+
+%% for those who use Sweave please include the following line (with % symbols):
+
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\documentclass[10pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{Sweave}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{rotating}
+\usepackage{varioref}
+\usepackage{array}
+\usepackage{subfigure}
+\usepackage{afterpage}
+\usepackage{booktabs}
+\usepackage[svgnames]{xcolor}
+\usepackage[authoryear]{natbib}
+\usepackage{url}
+
+\usepackage[absolute,overlay]{textpos}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{calc}
+\makeatletter
+\newcommand\code{\bgroup\@makeother\_\@makeother\~\@makeother\$\@codex}
+\def\@codex#1{{\normalfont\ttfamily\hyphenchar\font=-1 #1}\egroup}
+\makeatother
+%%\let\code=\texttt
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+\newcommand{\Com}[1]{\code{#1}}
+\newcommand{\Comt}[1]{\code{#1}}
+\newcommand{\File}[1]{\texttt{#1}}
+\newcommand{\Filet}[1]{\texttt{#1}}
+\newcommand{\Dataset}[1]{\code{#1}}
+\newcommand{\Datasett}[1]{\code{#1}} % for dataset without index reference
+\newcommand*\guil[1]{``#1''}
+
+\newlength\TableWidth
+
+\graphicspath{
+	{./graphics/}
+	}
+
+\SweaveOpts{prefix.string=graphics/SWP, keep.source=FALSE, echo=TRUE, eps=FALSE} % sets the prefix for figure files generated par Sweave
+
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl,formatcom=\color{FireBrick}}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{formatcom=\color{DarkBlue}}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl}
+
+%
+% \hypersetup{
+% %ps2pdf=true,
+% urlcolor=DarkRed,%dark-blue, %magenta,
+% filecolor=DarkGreen, %red,
+% linkcolor=DarkBlue, % blue,
+% %menucolor=white,
+% citecolor=DarkBlue, % green,
+% colorlinks=true,
+% %a4paper=false,
+% %bookmarksnumbered=false,
+% %pdfpagemode=none,
+% %plainpages=true,
+% %pageanchor=false,
+% %linktocpage=true,
+% %pdfpagetransition=empty,
+% %bookmarksopen=false,
+% %backref=true
+% }
+
+
+\setcounter{topnumber}{4}          % \setcounter{topnumber}{2}
+\def\topfraction{1}                % \def\topfraction{.7}
+\setcounter{bottomnumber}{2}       % \setcounter{bottomnumber}{1}
+\def\bottomfraction{1}             % \def\bottomfraction{.3}
+\setcounter{totalnumber}{5}        % \setcounter{totalnumber}{3}
+\def\textfraction{0}               % \def\textfraction{.2}
+\def\floatpagefraction{1}          % \def\floatpagefraction{.5}
+
+
+%% preliminary R commands
+<<preliminary, echo=FALSE, results=hide>>=
+options(width=65, prompt="R> ", continue="+   ", encoding="latin1", useFancyQuotes=FALSE)
+library(xtable)
+library("WeightedCluster")
+
+## place where figures generated by Sweave will be stored
+dir.create("graphics", showWarnings = FALSE)
+graphdir <- "graphics/"
+
+sfig <- function(){
+    par(mar=c(2.1, 4.1, 4.1, 1.1))
+}
+
+sfig2 <- function(){
+    par(mar=c(3.1, 4.1, 4.1, 1.1))
+}
+options(SweaveHooks=list(fig=sfig))
+## Clearing cache
+sfig <- function(){
+    par(mar=c(2.1, 4.1, 4.1, 1.1))
+}
+#unlink(paste(getCacheDir(), "/cacheSweaveStorage*", sep=""), recursive=TRUE)
+@
+
+\bibliographystyle{jss}
+
+\begin{document}
+
+\setkeys{Gin}{width=.9\linewidth}
+\maketitle
+\section{Installation}
+Some functions of WeightedCluster uses the free GraphViz \citep{Gansner99anopen}. It should be installed before lauching R for these functions to work properly. You may download it here: \url{http:\\www.graphviz.org}.
+
+The \pkg{WeightedCluster} library can the be installed and loaded using the following commands. 
+<<install, echo=TRUE, results=hide, eval=FALSE>>=
+install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
+library(WeightedCluster)
+@
+
+
+\section{An illustrative example}
+
+Throughout this preview, we will use the dataset from \citet{McVicarAnyadike2002JRSSa} which is distributed with the \pkg{TraMineR} library \citep{GabadinhoRitschardMullerStuder2011JSS}. This dataset contains sequences of school to work transition in Northern Ireland. The dataset is loaded using :
+<<dataload, echo=TRUE, results=hide>>=
+data(mvad)
+@
+
+
+\code{wcAggregateCases} allows to identify and aggregate identical state sequences (which are in column \code{17:86}). We then print basic information about aggregation and create the \code{uniqueMvad} object which contains only unique sequence.
+<<wcagg, echo=TRUE, results=verbatim>>=
+aggMvad <- wcAggregateCases(mvad[, 17:86])
+print(aggMvad)
+uniqueMvad <- mvad[aggMvad$aggIndex, 17:86]
+@
+
+Using the unique sequence dataset, we build a sequence object and computing dissimilarities between sequences \citep[see][for more on this topics]{GabadinhoRitschardMullerStuder2011JSS}. The vector \code{aggMvad\$aggWeights} store the number of replication of each unique sequences. It is thus used as unique sequence weigtht.
+<<wcagg, echo=TRUE, results=verbatim>>=
+mvad.seq <- seqdef(uniqueMvad, weights=aggMvad$aggWeights)
+## Computing Hamming distance between sequence
+diss <- seqdist(mvad.seq, method="HAM")
+@
+
+\section{Hierarchical clustering}
+We can regroups similar sequence using hierchical clustering with \code{"average"} method using weights (\code{aggMvad\$aggWeights}) (any method may be used).
+<<hierclust, echo=TRUE>>=
+averageClust <- hclust(as.dist(diss), method="average", members=aggMvad$aggWeights)
+@
+
+The agglomeration schedule can be represented graphically as a tree using:
+
+<<avgtreecomputeecho, echo=TRUE, eval=FALSE>>=
+averageTree <- as.seqtree(averageClust, seqdata=mvad.seq, diss=diss, ncluster=6)
+seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE)
+@
+
+<<avgtreecompute, echo=FALSE, eval=TRUE>>=
+averageTree <- as.seqtree(averageClust, seqdata=mvad.seq, diss=diss, ncluster=6)
+seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE, showtree=FALSE, filename="previewhctree.png")
+@
+
+\begin{center}
+\includegraphics[width=0.5\linewidth]{previewHCtree}
+\end{center}
+
+\section{Cluster quality}
+We can automatically compute several clustering quality measure for a range number of groups: 2 until ncluster=10
+<<avgqualcompute, echo=TRUE>>=
+avgClustQual <- as.clustrange(averageClust, diss, weights=aggMvad$aggWeights, ncluster=10)
+@
+
+The results may then be plotted to identify the best number of groups (you may also try to print it)
+<<avgqualplot, echo=TRUE, fig=TRUE, height=3, width=9>>=
+plot(avgClustQual)
+@
+
+It is usually easier to choose the number of groups with normalized scores. Here, five groups seems to be a good solution.
+<<avgqualplotnorm, echo=TRUE, fig=TRUE, height=3, width=9>>=
+plot(avgClustQual, norm="zscore")
+@
+
+Alternatively, we can retrieve the two best solution according to each quality measure:
+<<avgqualprint, echo=TRUE, results=verbatim>>=
+summary(avgClustQual, max.rank=2)
+@
+
+\section{PAM clustering}
+
+The \pkg{WeightedCluster} library also provide an optimized PAM algorithm. We can automatically compute PAM cluster for a range of number of groups using :
+<<pamcompute, echo=TRUE>>=
+pamClustRange <- wcKMedRange(diss, kvals=2:10, weights=aggMvad$aggWeights)
+@
+
+As before, we may plot the quality measure of each solution (not shown here) or retrieve the two best solution according to each quality measure using:
+<<pamqualprint, echo=TRUE, results=verbatim>>=
+summary(pamClustRange, max.rank=2)
+@
+
+\section{Keeping a solution}
+
+The objets returned by \code{as.clustrange} or \code{wcKMedRange} contain a \code{data.frame} with cluster membership (named \code{clustering}). For instance, we may plot the sequences according to PAM clustering in 5 groups using:
+<<pam5plot, echo=TRUE, fig=TRUE, height=6, width=9>>=
+seqdplot(mvad.seq, group=pamClustRange$clustering$cluster5, border=NA)
+@
+
+
+\section{Disaggregating data}
+
+Once the sequence have been regrouped, it is often useful to ``disaggregate'' the data. For instance, we may want to add the cluster membership in the original data set (i.e. before unique sequences were identified). This may for instance allows us to compute a table between cluster membership and father unemployment (variable \code{funemp}). This operation is done using \code{aggMvad\$disaggIndex} which stores the index of each unique sequence in the original dataset.
+<<mvadcluster, echo=TRUE>>=
+uniqueCluster5 <- avgClustQual$clustering$cluster5
+mvad$cluster5 <- uniqueCluster5[aggMvad$disaggIndex]
+table(mvad$funemp, mvad$cluster5)
+@
+
+\bibliography{bibliomat,stat}
+
+\end{document}
