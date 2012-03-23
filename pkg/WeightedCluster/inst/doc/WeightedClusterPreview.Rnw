@@ -180,7 +180,7 @@ sfig <- function(){
 \section{Installation}
 Some functions of WeightedCluster uses the free GraphViz \citep{Gansner99anopen}. It should be installed before lauching R for these functions to work properly. You may download it here: \url{http:\\www.graphviz.org}.
 
-The \pkg{WeightedCluster} library can the be installed and loaded using the following commands. 
+The \pkg{WeightedCluster} library can the be installed and loaded using the following commands.
 <<install, echo=TRUE, results=hide, eval=FALSE>>=
 install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
 library(WeightedCluster)
@@ -228,7 +228,7 @@ seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE, showtree=FALSE
 @
 
 \begin{center}
-\includegraphics[width=0.5\linewidth]{previewHCtree}
+\includegraphics[width=0.5\linewidth]{previewhctree}
 \end{center}
 
 \section{Cluster quality}
