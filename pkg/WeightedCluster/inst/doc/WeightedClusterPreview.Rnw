@@ -222,10 +222,10 @@ averageTree <- as.seqtree(averageClust, seqdata=mvad.seq, diss=diss, ncluster=6)
 seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE)
 @
 
-<<avgtreecompute, echo=FALSE, eval=TRUE>>=
-averageTree <- as.seqtree(averageClust, seqdata=mvad.seq, diss=diss, ncluster=6)
-seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE, showtree=FALSE, filename="previewhctree.png")
-@
+%<<avgtreecompute, echo=FALSE, eval=TRUE>>=
+%averageTree <- as.seqtree(averageClust, seqdata=mvad.seq, diss=diss, ncluster=6)
+%seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE, showtree=FALSE, filename="previewhctree.png")
+%@
 
 \begin{center}
 \includegraphics[width=0.5\linewidth]{previewhctree}
@@ -281,6 +281,6 @@ mvad$cluster5 <- uniqueCluster5[aggMvad$disaggIndex]
 table(mvad$funemp, mvad$cluster5)
 @
 
-\bibliography{bibliomat,stat}
+\bibliography{preview}
 
 \end{document}
