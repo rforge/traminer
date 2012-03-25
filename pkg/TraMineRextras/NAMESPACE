@@ -16,5 +16,7 @@ export(
 	seqe2stm,
 	TSE_to_STS,
 	seqedist,
-	seqedplot
+	seqedplot,
+	createdatadiscrete,
+	seqerulesdisc
 )
