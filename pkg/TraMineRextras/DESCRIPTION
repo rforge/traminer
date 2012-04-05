@@ -1,6 +1,6 @@
 Package: TraMineRextras
-Version: 0.0
-Date: 2012-03-08
+Version: 0.1
+Date: 2012-04-05
 Title: Extras for use with the TraMineR package
 Author: Gilbert Ritschard <gilbert.ritschard@unige.ch> and Reto B\"{u}rgin and Matthias Studer.
 Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>

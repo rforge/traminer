@@ -10,14 +10,18 @@ export(
     seqplot.tentrop,
     sorti,
     sortv,
-	toPersonPeriod,
-	FCE_to_TSE,
-	HSPELL_to_STS,
-	seqe2stm,
-	TSE_to_STS,
-	seqedist,
-	seqedplot,
-	createdatadiscrete,
-	seqerulesdisc,
-	seqstart
+    toPersonPeriod,
+    FCE_to_TSE,
+    HSPELL_to_STS,
+    seqe2stm,
+    TSE_to_STS,
+    seqedist,
+    seqedplot,
+    createdatadiscrete,
+    seqerulesdisc,
+    seqstart,
+    seqeordplot,
+    seqrep.grp,
+    dissvar.grp
+    
 )
