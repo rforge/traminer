@@ -18,5 +18,6 @@ export(
 	seqedist,
 	seqedplot,
 	createdatadiscrete,
-	seqerulesdisc
+	seqerulesdisc,
+	seqstart
 )
