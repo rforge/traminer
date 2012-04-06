@@ -21,7 +21,6 @@ export(
     seqerulesdisc,
     seqstart,
     seqeordplot,
-    seqrep.grp,
-    dissvar.grp
+    seqrep.grp
     
 )
