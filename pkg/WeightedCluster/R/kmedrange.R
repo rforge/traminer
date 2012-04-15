@@ -28,10 +28,20 @@ wcKMedRange <- function(diss, kvals, ...){
 as.clustrange <- function(object, diss, weights=NULL, ...){
 	UseMethod("as.clustrange")
 }
+
 as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, ...){
+	
 	if(ncluster<3){
 		stop(" [!] ncluster should be greater than 2.")
 	}
+	if (is.null(n1 <- nrow(object$merge)) || n1 < 1) {
+		stop("invalid 'object' (merge component)")
+	}
+    n <- n1 + 1
+	if(ncluster > n){
+		stop(" [!] ncluster should be less than ", n)
+	}
+	
 	pred <- data.frame(Split2=factor(cutree(object, 2)))
 	for(p in 3:ncluster){
 		pred[, paste("Split", p, sep="")] <- factor(cutree(object, p))
@@ -39,9 +49,11 @@ as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, ...){
 	object <- pred
 	as.clustrange(object, diss, weights, ...)
 }
+
 as.clustrange.twins <- function(object, diss, weights=NULL, ncluster, ...) {
 	return(as.clustrange.hclust(object, diss=diss, weights=weights, ncluster=ncluster,...))
 }
+
 as.clustrange.default <- function(object, diss, weights=NULL, ...){
 	ret <- list()
 	ret$clustering <- as.data.frame(object)
