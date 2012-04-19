@@ -55,7 +55,7 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	}
 
 	if (is.null(alphabet)) {
-		plevels <- statl
+		plevels <- as.character(statl)
 	} else {
 		if (any(statl %in% alphabet==FALSE)) {
 			stop("\n [!] one or more states appearing in the data not included in 'alphabet'", call.=FALSE)
