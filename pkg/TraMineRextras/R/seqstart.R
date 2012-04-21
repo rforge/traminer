@@ -1,5 +1,13 @@
 seqstart <- function(seqdata, data.start, new.start, tmin=NULL, tmax=NULL, missing=NA){
 	new.index <- as.integer(data.start - new.start+1)
+	if(length(new.index)!=nrow(seqdata)){
+		if(length(new.index)==1){
+			new.index <- rep(new.index, nrow(seqdata))
+		}
+		else{
+			stop(" [!] number of individual in seqdata, data.start and/or new.start mismatch.")
+		}
+	}
 	if(any(new.index <1)){
 		correction <- -min(new.index)+1
 		new.index <- new.index + correction
@@ -24,9 +32,12 @@ seqstart <- function(seqdata, data.start, new.start, tmin=NULL, tmax=NULL, missi
 	seqdataindex <- matrix(1:ncol(seqdata), ncol=ncol(seqdata), nrow=nrow(seqdata), byrow=TRUE)
 	seqdata <- as.matrix(seqdata)
 	
-	for(oldindex in 1:ncol(seqdata)){
-		cond <- (seqindex== (new.index+oldindex-1))
-		new.data[cond] <- seqdata[rowSums(cond)>0 & seqdataindex==oldindex]
+	rowindex <- (1:ncol(seqdata))-1
+	for(ind in 1:nrow(seqdata)){
+		indexes <-  new.index[ind]+rowindex - tmin +1
+		cond <- (indexes <= ncol(new.data)) & (indexes > 0)
+		print(indexes)
+		new.data[ind, indexes[cond]] <- seqdata[ind, cond]
 		#print(seqdata[which.indiv, oldindex])
 		##print(new.data)
 	}
