@@ -48,7 +48,10 @@ The resulting state sequence object.
  Gilbert Ritschard
 }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+%\note{Warning: This function needs further testing.}
+
+%% ~Make other sections like Warning with 
+\section{Warning }{This function needs further testing.} 
 
 \seealso{
  \code{\link{seqdef}}
