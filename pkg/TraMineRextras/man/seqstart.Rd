@@ -5,7 +5,7 @@
 Aligning sequence data on a new start time.
 }
 \description{
-Changing the position alignment of a set of sequences. 
+Changing the position alignment of a set of sequences.
 }
 \usage{
 seqstart(seqdata, data.start, new.start, tmin = NULL, tmax = NULL, missing = NA)
@@ -39,13 +39,13 @@ print(paneldata)
 
 ## Assuming data are aligned on calendar years, starting in 2000
 ## Change from calendar date to age alignment
-startyear <- 2000 ##  
+startyear <- 2000 
 birthyear <- 1995:1999
 agedata <- seqstart(paneldata, data.start=startyear, new.start=birthyear)
 colnames(agedata) <- 1:ncol(agedata)
 print(agedata)
 
-## Setting minimum and maximum age explicitly as 3 and 7 (4th and 8th year after birthyear).
+## Retaining only ages between 3 and 7 (4th and 8th year after birthyear).
 seqstart(paneldata, data.start=startyear, new.start=birthyear, tmin=4, tmax=8, missing="*")
 
 ## Changing back from age to calendar time alignment
