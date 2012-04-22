@@ -25,7 +25,7 @@ seqstart <- function(seqdata, data.start, new.start, tmin=NULL, tmax=NULL, missi
 	if(tmax<0){
 		stop("[!] There are no data in the specified new time frame.")
 	}
-	cat(tmin, tmax, correction)
+	## cat(tmin, tmax, correction)
 	##new.index.mat <- new.index - tmin + 1
 	new.data <- matrix(as.character(missing), ncol=(tmax-tmin+1), nrow=nrow(seqdata))
 	seqindex <- matrix(tmin:tmax, ncol=(tmax-tmin+1), nrow=nrow(seqdata), byrow=TRUE)
@@ -36,7 +36,7 @@ seqstart <- function(seqdata, data.start, new.start, tmin=NULL, tmax=NULL, missi
 	for(ind in 1:nrow(seqdata)){
 		indexes <-  new.index[ind]+rowindex - tmin +1
 		cond <- (indexes <= ncol(new.data)) & (indexes > 0)
-		print(indexes)
+		## print(indexes)
 		new.data[ind, indexes[cond]] <- seqdata[ind, cond]
 		#print(seqdata[which.indiv, oldindex])
 		##print(new.data)
