@@ -1,5 +1,5 @@
 ## ===============================================
-## Plotting 
+## Plotting
 ## ===============================================
 
 seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
@@ -17,8 +17,8 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
                         main="",sub=NULL,mtext=TRUE,
                         xlab="order position",ylab="",
                         xlim=NULL,ylim=NULL,...)
-                        
-                       
+
+
   {
     print <- FALSE
 
@@ -50,16 +50,16 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     }
 
     require(RColorBrewer)
-    
+
     ## ==================
     ## preparing the data
     ## ==================
-    
+
     if (print) cat(" [>] preparing the data\n")
 
     ## extract the event data
     ## ======================
-    
+
     data <- seqe2OSE(seqe)
     id <- data$id
     x <- data$x
@@ -90,7 +90,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
 
     ## extract weights
     ## ===============
-    
+
     if (weighted) {
       if (!is.null(weights)) {
         if (length(weights)!=nlevels(id)) {
@@ -103,11 +103,11 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         }
       } else {
         weights <- seqeweight(seqe)
-      }   
+      }
     } else {
       weights <- rep(1,nlevels(id))
     }
-    
+
     ## erase useless NA entries
     ## ========================
 
@@ -130,7 +130,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         }
       }
     }
-    
+
     ## NAs in group variable
     if (!is.null(group)) {
       subscripts.ID <- is.na(group)
@@ -149,44 +149,44 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     }
 
     ## standardize weights
-    
+
     if (!is.null(group)) {
       weights.group <- table(group)[as.integer(group)]
       weights.sum <-
-        tapply(X=weights,IND=group,FUN=sum)[as.integer(group)]
+        tapply(X=weights,INDEX=group,FUN=sum)[as.integer(group)]
       weights <- weights.use <- weights/weights.sum*weights.group
       names(weights) <- levels(id)
     } else {
       weights <- weights.use <- weights/sum(weights)*nlevels(id)
     }
-    
+
     ## check the x variable
     ## ====================
 
     xtickat <- xticklab <- 1:max(x)
-    
+
     ## check the id variable
     ## =====================
-    
+
     nid.tot <- nid.use <- nlevels(id)
     id.int <- as.integer(id)
-        
+
     ## check the y variable
     ## ====================
-    
+
     ny <- nlevels(y)
     y.int <- as.integer(y)
 
     ## order the data entries
     ## ======================
-    
+
     ord <- order(id,x,y)
     id <- id[ord]
     id.int <- id.int[ord]
     x <- x[ord]
     y <- y[ord]
     y.int <- y.int[ord]
-    
+
     ## check group variable
     ## ====================
 
@@ -209,13 +209,13 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
       nid.group.tot <- nid.tot
       nid.group.use <- nid.use
     }
-    
+
     ## order alignment
     ## ===============
 
     if (is.character(orderalign)) {
       if (orderalign=="last") {
-        align <- tapply(X=x,IND=id.int,FUN=max)
+        align <- tapply(X=x,INDEX=id.int,FUN=max)
         x <- x-align[id.int]
         x <- x-min(x)+1
         xtickat <- 1:max(x)
@@ -223,12 +223,12 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
       } else if (orderalign%in%levels(y)) {
         subscripts <- y==orderalign
         subscripts <- unlist(tapply(X=subscripts,
-                                    IND=list(id.int),
+                                    INDEX=list(id.int),
                                     FUN=remfolltrues))
         aglevs <- c("no align",paste(orderalign,"align"))
         align <- rep(1,nid.use)
         tab <- table(y,id)[orderalign,]
-        align[which(tab>0)] <- x[subscripts]              
+        align[which(tab>0)] <- x[subscripts]
         aligngroup <- factor(aglevs[(tab>0)+1])
         if (!is.null(group)) {
           group <- factor(paste(group,aligngroup,sep="/"))
@@ -244,38 +244,38 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         xticklab <- xtickat-x[which(y==orderalign)[1]]
       }
     }
-    
+
     nx <- max(x)
 
     ## construct x and y lists (one element per id)
     ## ============================================
 
     y.list <- tapply(X=y.int,
-                    IND=list(id.int),
+                    INDEX=list(id.int),
                     FUN=function(x){return(x)})
     x.list <- tapply(X=x,
-                    IND=list(id.int),
+                    INDEX=list(id.int),
                     FUN=function(x){return(x)})
-    
+
     ## construct trajectory strings (one element per id)
     ## =================================================
 
     traj.seqe <- seqecreate(id=id.int,timestamp=x,event=y.int)
-    traj.string <- tapply(X=y.int,IND=list(id.int,x),paste,collapse=",")
+    traj.string <- tapply(X=y.int,INDEX=list(id.int,x),paste,collapse=",")
     traj.string <- apply(X=traj.string,MARGIN=1,FUN=createstring)
     traj.order <- order(nchar(traj.string),decreasing=TRUE)
-        
+
     ## ===========================================
     ## find distinctive trajectories
     ## ===========================================
-    
+
     if (print) cat(" [>] find distinctive trajectories\n")
-    
+
     traj.group <- c()
     traj.id <- c()
     group.id <- c()
     group.name <- c()
-    
+
     embedded <- c()
     if (type=="non-embeddable") {
       while (sum(!(1:nid.use)%in%embedded)>0) {
@@ -283,7 +283,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         gn <- ifelse(length(traj.group)==0,1,max(traj.group)+1)
         group.id <- append(group.id,traj.order[i])
         group.name <- append(group.name,gn)
-        
+
         ## check for embeddable trajectories
         if (is.null(embedded)) {
           subscripts <-
@@ -316,15 +316,15 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     ## erase difficult embeddings difficult to interprete
     ## in case a groupariate vector was entered
     ## ==================================================
-    
+
     tab <- table(traj.id,traj.group)
     if ((type=="non-embeddable")&(ngroup>1)) {
       uemb <- rowSums(tab)==1
       for (i in 1:ngroup) {
         ## for which non-embeddedable trajectories there are observed
         ## trajectories that were solely embedded into it
-        
-        uemb.groups <- traj.group[traj.id%in%which(uemb&(group.int==i))] 
+
+        uemb.groups <- traj.group[traj.id%in%which(uemb&(group.int==i))]
         for (j in which((group.int==i)&(!uemb)))
           ## erase embeddings
           if (sum(uemb.groups%in%traj.group[traj.id%in%j])>0) {
@@ -360,7 +360,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
 
     ntraj <- max(pointdata$group)
     linedata <- NULL
-    
+
     for (g in 1:ntraj) {
       subs <- which(pointdata$group==g)
       nsubs <- length(subs)
@@ -374,7 +374,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         linedata <- rbind(linedata,linedata.tmp)
       }
     }
-    
+
     ## ===============================================
     ## calculate weighted trajectory shape group sizes
     ## ===============================================
@@ -394,25 +394,25 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     ## option: trajectories that are embeddable into multiple
     ## non-embeddable trajectories are embedded into the most
     ## frequent non-embeddable trajectory
-    
+
     if (embedding=="most-frequent") {
 
       weights.group <- tapply(X=weights.use[w==1],
-                              IND=list(traj.group[traj.id%in%which(w==1)],
+                              INDEX=list(traj.group[traj.id%in%which(w==1)],
                                 factor(group.int[w==1],levels=1:ngroup)),
                               FUN=sum)
       weights.group[is.na(weights.group)] <- 0
-      
-      ## perform unique group assignements      
+
+      ## perform unique group assignements
       for (i in which(w!=1)) {
         group.iin <- traj.group[traj.id==i]
         group.iin <-
           group.iin[which.max(weights.group[group.iin,group.int[i]])]
         subs <- which((traj.group!=group.iin)&(traj.id==i))
         traj.id <- traj.id[-subs]
-        traj.group <- traj.group[-subs]  
+        traj.group <- traj.group[-subs]
       }
-      w <- rep(1,length(w)) # set all 
+      w <- rep(1,length(w)) # set all
     }
 
     ## point weights
@@ -428,11 +428,11 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         unlist(tapply(X=weights.use[isubs]*w[isubs]*
                       ((minx[isubs]<=pointdata$x[i])&
                        (maxx[isubs]>=pointdata$x[i])),
-                      IND=list(factor(group.int[isubs],levels=1:ngroup)),
+                      INDEX=list(factor(group.int[isubs],levels=1:ngroup)),
                       FUN=sum))
     }
     pointdata[is.na(pointdata)] <- 0
-    
+
     ## line weights
     if (!is.null(linedata)) {
       for (i in 1:nrow(linedata)) { # loop over all linedata entries
@@ -447,7 +447,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
           unlist(tapply(X=weights.use[isubs]*w[isubs]*
                         ((minx[isubs]<=linedata$x0[i])&
                          (maxx[isubs]>=linedata$x1[i])),
-                        IND=list(factor(group.int[isubs],levels=1:ngroup)),
+                        INDEX=list(factor(group.int[isubs],levels=1:ngroup)),
                         FUN=sum))
       }
       linedata[is.na(linedata)] <- 0
@@ -459,11 +459,11 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         maxprop <-
           apply(as.matrix(linedata[,paste("n",1:ngroup,sep=".")],
                           ncol=ngroup),2,max,na.rm=TRUE)/nid.group.tot
-        
+
         facm <- diag(maxprop/max(maxprop))
         scalem <- apply(as.matrix(linedata[,paste("n",1:ngroup,sep=".")],
                                   ncol=ngroup),2,max,na.rm=TRUE)
-        scalem[scalem==0] <- 1        
+        scalem[scalem==0] <- 1
         scalem <- scale(x=linedata[,paste("n",1:ngroup,sep=".")],
                         center=FALSE,scale=scalem)
         scalem <- scalem%*%facm
@@ -480,7 +480,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     ## ==============================
 
     if (print) cat(" [>] determine plot coordinates\n")
-    
+
     maxgs <- apply(X=as.matrix(x=pointdata[,paste("n",1:ngroup,sep=".")],
                      ncol=ngroup),MARGIN=2,FUN=tapply,
                    list(pointdata$group),max)
@@ -491,18 +491,18 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
 
     ## arrangement with non-overlapping positions
     ## ==========================================
-    
+
     ## create initial grid
     ngrid <- ngrid0 <- 10
     sl <- ceiling(ngrid*sqrt(maxgs.tot))
     ngrid <- ceiling(sqrt(sum(sl^2)))
     grid <- matrix(0,nrow=ngrid,ncol=ngrid) # generate initial grid
     gridsubs <- 1:(ngrid^2) # identifiers
-    pointdata$xpos <- pointdata$ypos <- NA      
+    pointdata$xpos <- pointdata$ypos <- NA
     potpos <- c()
     blacklist <- c()
     maxcount <- 200
-    
+
     ## extend grid
     for (g in 1:length(ord)) {
       subscripts <- pointdata$group==ord[g]
@@ -536,7 +536,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
           potpos <- potpos[!potpos%in%blacklist]
           count2 <- count2+1
         }
-        
+
         xpotpos <- floor(potpos/ngrid)+1
         ypotpos <- potpos%%ngrid
         ypotpos[ypotpos==0] <- ngrid
@@ -564,7 +564,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     }
     pointdata$xpos <- (pointdata$xpos-1)/ngrid
     pointdata$ypos <- (pointdata$ypos-1)/ngrid
-    
+
     ## determine widths of segments to draw
 
     pointdata[,paste("width",1:ngroup,sep=".")] <-
@@ -572,9 +572,9 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
                                center=FALSE,
                                scale=nid.group.tot))*sqrt(grid.scale)*
                     cex*ngrid0/ngrid)
-    
+
     ## determine central plot coordinates
-    
+
     pointdata$xpos <- pointdata$xpos*sqrt(grid.scale)+
       1/2*(1-sqrt(grid.scale))+
         c(sqrt(maxgs.tot)*sqrt(grid.scale)*
@@ -583,7 +583,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
       1/2*(1-sqrt(grid.scale))+pointdata$y-0.5+
         c(sqrt(maxgs.tot)*sqrt(grid.scale)*
               cex*ngrid0/ngrid)[pointdata$group]/2
-    
+
     ## ===================
     ## define group colors
     ## ===================
@@ -607,7 +607,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
       linedata[,paste("col",1:ngroup,sep=".")] <-
         matrix(rep(cpal[linedata$group],ngroup),ncol=ngroup)
     }
-    
+
     ## =================
     ## define line style
     ## =================
@@ -615,27 +615,27 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     if (!is.null(linedata)) {
       linedata$lty <- rep(lty,length.out=ntraj)[linedata$group]
     }
-    
+
     ## ================
     ## execute the plot
     ## ================
-    
+
     if (print) cat(" [>] plot the data\n")
-    
+
     if (is.null(split)) {
-      
+
       ## option no window split
       ## ======================
 
       splity <- 1 # dummy
       nsplits <- 1
     } else {
-      
+
       ## window split
       ## ============
 
       ## option "by a certain order"
-      if (is.numeric(split)) {       
+      if (is.numeric(split)) {
         pointdata$x <- pointdata$x-split
         if (!is.null(linedata)) {
           linedata[,c("x0","x1")] <- linedata[,c("x0","x1")]-split
@@ -690,7 +690,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
       pointdata[,paste("width",1:ngroup,sep=".")] <-
         min(pointdata[,paste("width",1:ngroup,sep=".")])
     }
-    
+
     ## set definitiv plot coordinates
     pointdata$xpos <- pointdata$xpos+pointdata$x-0.5
     if (!is.null(linedata)) {
@@ -705,9 +705,9 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
                         by.y=c("group","x","y"),
                         all.x=TRUE,all.y=FALSE,sort=FALSE)
       colnames(linedata)[(ncol(linedata)-3):ncol(linedata)] <-
-        c("x0pos","y0pos","x1pos","y1pos")        
+        c("x0pos","y0pos","x1pos","y1pos")
     }
-    
+
     ## set not observed trajectories to line width 0
     pointdata[,paste("width",1:ngroup,sep=".")] <-
       apply(as.matrix(pointdata[,paste("width",1:ngroup,sep=".")],
@@ -717,14 +717,14 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         apply(as.matrix(linedata[,paste("lwd",1:ngroup,sep=".")],
                         ncol=ngroup),2,zero2NA)
     }
-    
+
     ## ======================
     ## show/hide trajectories
     ## ======================
-    
+
     if (sum(!show%in%c(0,1))>0) {
         weights.group <- tapply(X=weights.use[traj.id]*w[traj.id],
-                                IND=list(traj.group,group.int[traj.id]),
+                                INDEX=list(traj.group,group.int[traj.id]),
                                 FUN=sum)
         weights.group[is.na(weights.group)] <- 0
         weights.group <- scale(x=weights.group,center=FALSE,
@@ -739,27 +739,27 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     ## ======================
     ## define background grid
     ## ======================
-    
+
     if (is.null(xlim)) {
       xlim <- c(min(pointdata$x)-sqrt(grid.scale)/2-
                 sqrt(max((nid.group.tot-nid.group.use)/nid.group.tot))*
                 sqrt(grid.scale)*ngrid0/ngrid*cex,
                 max(pointdata$x)+sqrt(grid.scale)/2)
     }
-    
+
     if (is.null(ylim)) {
       ylim <- c(min(pointdata$y)-sqrt(grid.scale)/2-
                sqrt(max((nid.group.tot-nid.group.use)/nid.group.tot))*
                 sqrt(grid.scale)*ngrid0/ngrid*cex,
                 max(pointdata$y)+sqrt(grid.scale)/2)
     }
-    
+
     seggrid <- expand.grid(xgrid=
                            seq(min(c(ceiling(xlim[1]),min(pointdata$x))),
                                max(c(floor(xlim[2]),max(pointdata$x))),),
                            ygrid=1:ny)
     seggrid$col <- grid.fill
-    
+
     for (sc in 1:ngroup) {
 
       ## determine line orders
@@ -777,12 +777,12 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         plotgroups.group <-
           (1:ntraj)[order(maxgs[,sc],decreasing=lorder=="background")]
       }
-        
+
       for (sy in splity) {
-        
+
         ## extract groups with equal start events
         ## ======================================
-       
+
         if (!is.null(split)) {
           plotgroups <-
             intersect(plotgroups.group,
@@ -794,7 +794,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
           plotgroups <- plotgroups.group
           hidegroups <- pg.hide
         }
-        
+
         ## call the plot
         ## =============
 
@@ -816,7 +816,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
             sub.sc <- paste("group = ",levels(group)[sc],sep="")
             mtextt <- sub.sc
           }
-          
+
           ## title text for category split
           if (!is.null(split)) {
             if (split%in%c("first","last")) {
@@ -829,14 +829,14 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
               paste(ifelse(is.null(mtextt),"",paste(mtextt,", ",sep="")),
                     sub.sy,sep="")
           }
-          
+
           ## title for split proportion
           if (sum(!show%in%c(0,1))>0) {
             sub.show <- paste("rendered: ",
                               round(100*sum(maxgs[plotgroups,sc])+
                                     100*((nid.group.tot-nid.group.use)/
                                      nid.group.tot)[sc],1),"%",sep="")
-            
+
             mtextt <- paste(ifelse(is.null(mtextt),"",
                                   paste(mtextt,", ",sep="")),sub.show,sep="")
           }
@@ -844,7 +844,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
           if (sy==splity[1]) {
             mtextt <- paste(mtextt,", n = ",nid.group.tot[sc],sep="")
           }
-          
+
           ## add title to plot
           if (!is.null(mtextt)) {
             if (((ngroup*nsplits)>1)&(length(main)==1)) {
@@ -867,10 +867,10 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
             }
           }
         }
-                
+
         ## draw a grid
         ## ===========
-        
+
         if (grid.shape=="default") {
           rect(xleft=seggrid$xgrid-sqrt(grid.scale)/2,
                ybottom=seggrid$ygrid-sqrt(grid.scale)/2,
@@ -971,14 +971,14 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
           }
         } else {
           ## plot the trajectories
-          for (pg in plotgroups) {        
+          for (pg in plotgroups) {
             ss.p <- (pointdata$group%in%pg)&
             c(!is.na(pointdata[,paste("width",sc,sep=".")]))
             if (!is.null(linedata)) {
               ss.l <- (linedata$group%in%pg)&
               c(!is.na(linedata[,paste("lwd",sc,sep=".")]))
             }
-            
+
             ## draw the points
             if (sum(ss.p)>0) {
               rect(xleft=pointdata$xpos[ss.p]-
@@ -992,7 +992,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
                    col=pointdata[ss.p,paste("col",sc,sep=".")],
                    border=border,lwd=border.lwd)
             }
-            
+
             ## draw the lines
             if (!is.null(linedata)) {
               if (sum(ss.l)>0) {
@@ -1011,7 +1011,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         box()
       }
     }
-    
+
     if (return.data) {
       tmp <- pointdata[,c("x","y","group")]
       tmp <- tmp[order(tmp$group,tmp$x,tmp$y),]
@@ -1025,7 +1025,7 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
         dn2 <- paste("n",levels(group),sep=".")
       } else {
         dn2 <- paste("n",1:ngroup,sep=".")
-      }      
+      }
       ret <-
         matrix(rbind(nid.group.tot-colSums(size),matrix(size,ncol=ngroup)),
                dimnames=list(c("()",traj.string),dn2),ncol=ngroup)
@@ -1067,7 +1067,7 @@ fmin <- function(nx,ny,n,c=0.5) {
   control <- nx*ny-n # number of empty windows
   opt <- control/n+c*abs(1-min(nx,ny)/max(nx,ny)) # optimization value:
                                         # function of number of empty windows
-                                        # and ncol/nrow ratio 
+                                        # and ncol/nrow ratio
   return(c(control,opt))
 }
 
@@ -1092,7 +1092,7 @@ optimpanelraster <- function(nx,ny,npanels,c=1) {
   }
   return(c(nx,ny))
 }
-  
+
 ## create trajectory strings
 ## =========================
 
@@ -1120,7 +1120,7 @@ seqe2OSE <- function(seqe) {
     unlist(lapply(X=seqe.string, # erase initial time points
                   FUN=function(x){
                     substr(x=x,start=grep("(",x,fixed=TRUE),
-                           stop=nchar(x))})) 
+                           stop=nchar(x))}))
   seqe.decomp <- lapply(X=seqe.string,
                         FUN=function(x){unlist(strsplit(x=x,split="-"))})
   seqe.decomp <-
