@@ -4,7 +4,7 @@
   Generate random missing states within a state sequence object
 }
 \description{
- The function assigns missing values (\code{nr} attribute of the object, which is \code{"*"} ba default) to randomly selected positions in randomly selected cases.
+ The function assigns missing values (\code{nr} attribute of the object, which is \code{"*"} by default) to randomly selected positions in randomly selected cases.
 }
 \usage{
 seqgen.missing(seqdata, p.cases = 0.1, p.left = 0.2, p.gaps = 0, p.right = 0.3,

@@ -23,6 +23,7 @@ export(
     seqeordplot,
     seqrep.grp,
     dissvar.grp,
-    seqgen.missing
+    seqgen.missing,
+    seqgranularity
 
 )
