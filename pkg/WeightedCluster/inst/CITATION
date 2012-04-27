@@ -1,0 +1,10 @@
+citHeader("To cite WeightedCluster in publications please use:")
+
+citEntry(entry="inbook",
+	author = person("Matthias", "Studer", email = "matthias.studer@unige.ch"),
+	chapter = "Le manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R",
+	title = "Étude des inégalités de genre en début de carrière académique l'aide de méthodes innovatrices d'analyse de données séquentielles",
+	year = "2012",
+	publisher="Thèse de doctorat inédite, Université de Genève",
+	textVersion="Studer, Matthias (2012). Étude des inégalités de genre en début de carrière académique l'aide de méthodes innovatrices d'analyse de données séquentielles, Chapitre: Le manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R. Thèse de doctorat inédite, Université de Genève."
+)
