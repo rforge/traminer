@@ -116,6 +116,9 @@ disstreedisplayInternal <- function(tree, filename, tmpdisstree, imagedata, imag
     	if (.Platform$OS.type=="windows") {
     		myshellrun(paste("start ", tmpdisstree, ".", imageformat, sep=""), wait=FALSE)
     	}
+    	else if(Sys.info()[1]=="Darwin"){
+			myshellrun(paste("open ", tmpdisstree, ".", imageformat, sep=""), wait=FALSE)
+		}
     	else {
     		myshellrun(paste("display ", tmpdisstree, ".", imageformat, sep=""), wait=FALSE)
     	}
