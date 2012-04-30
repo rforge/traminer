@@ -24,6 +24,7 @@ export(
     seqrep.grp,
     dissvar.grp,
     seqgen.missing,
-    seqgranularity
+    seqgranularity,
+    seqauto
 
 )
