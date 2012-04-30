@@ -108,7 +108,7 @@ hook_setwidth <- local({
 })
 
 knit_hooks$set(setwidth =hook_setwidth)
-
+knit_hooks$set(crop =hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
 })
@@ -125,7 +125,7 @@ knit_hooks$set(small.mar = function(before, options, envir) {
 \section{Installation}
 Some functions of WeightedCluster use the free GraphViz \citep{Gansner99anopen}. It should be installed before launching R for these functions to work properly. You may download it here: \url{http:\\www.graphviz.org}.
 
-The \pkg{WeightedCluster} library can the be installed and loaded using the following commands.
+The \pkg{WeightedCluster} library can then be installed and loaded using the following commands.
 
 <<install, echo=TRUE, results="hide", eval=FALSE>>=
 install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
