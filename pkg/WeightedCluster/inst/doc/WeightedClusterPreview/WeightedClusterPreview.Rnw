@@ -94,39 +94,21 @@
 options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
-tmpwidth <- function (before, options, envir){
-    if(before) {
-        message("setting width to ", options$tmpwidth)
-        envir$tmpwidthhook <- getOption("width")
-        options("width"=options$tmpwidth)
-    } else {
-        message("setting back to ", envir$tmpwidthhook)
-        options("width"=envir$tmpwidthhook)
-    }
-}
+hook_setwidth <- local({
+    default.width <- 0
+	function(before, options, envir){
+		if(before) {
+            default.width <<- getOption("width")
+			options(width = options$setwidth)
+		} else{
+			options(width = default.width)
+		}
+		return(NULL)
+	}
+})
 
-hook_pdfcrop2 <- function (before, options, envir)
-{
-    ext = options$fig.ext
-    if (options$dev == "tikz" && options$external)
-        ext = "pdf"
-    if (before || (fig.num <- options$fig.num) == 0L || ext !=
-        "pdf")
-        return()
-    paths = paste( knitr:::valid_path(options$fig.path, options$label),
-        if (fig.num == 1L)
-            ""
-        else seq_len(fig.num), ".pdf", sep = "")
-    lapply(paths, function(x) {
-        message("cropping ", x)
-        x = shQuote(x, type="cmd")
-        system(paste(Sys.getenv("COMSPEC"),"/c", "pdfcrop", x, x))
-        message("cropping ", paste("pdfcrop", x, x, sep = " "), " done")
-    })
-    return()
-}
-knit_hooks$set(tmpwidth=tmpwidth)
-knit_hooks$set(crop = hook_pdfcrop2)
+knit_hooks$set(setwidth =hook_setwidth)
+
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
 })
@@ -141,11 +123,11 @@ knit_hooks$set(small.mar = function(before, options, envir) {
 \setkeys{Gin}{width=.9\linewidth}
 \maketitle
 \section{Installation}
-Some functions of WeightedCluster uses the free GraphViz \citep{Gansner99anopen}. It should be installed before lauching R for these functions to work properly. You may download it here: \url{http:\\www.graphviz.org}.
+Some functions of WeightedCluster use the free GraphViz \citep{Gansner99anopen}. It should be installed before launching R for these functions to work properly. You may download it here: \url{http:\\www.graphviz.org}.
 
 The \pkg{WeightedCluster} library can the be installed and loaded using the following commands.
 
-<<install, echo=TRUE, results="hide", eval=FALSE, tmpwidth=10>>=
+<<install, echo=TRUE, results="hide", eval=FALSE>>=
 install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
 library(WeightedCluster)
 @
@@ -162,7 +144,7 @@ data(mvad)
 
 \code{wcAggregateCases} allows to identify and aggregate identical state sequences (which are in column \code{17:86}). We then print basic information about aggregation and create the \code{uniqueMvad} object which contains only unique sequence.
 
-<<wcagg, echo=TRUE, tmpwidth=10>>=
+<<wcagg, echo=TRUE>>=
 aggMvad <- wcAggregateCases(mvad[, 17:86])
 print(aggMvad)
 uniqueMvad <- mvad[aggMvad$aggIndex, 17:86]
@@ -177,7 +159,7 @@ diss <- seqdist(mvad.seq, method="HAM")
 @
 
 \section{Hierarchical clustering}
-We can regroups similar sequence using hierchical clustering with \code{"average"} method using weights (\code{aggMvad\$aggWeights}) (any method may be used).
+We can regroups similar sequence using hierarchical clustering with \code{"average"} method using weights (\code{aggMvad\$aggWeights}) (any method may be used).
 
 <<hierclust, echo=TRUE>>=
 averageClust <- hclust(as.dist(diss), method="average", members=aggMvad$aggWeights)
