@@ -63,7 +63,7 @@ seqrep <- function(seqdata, criterion="density", score=NULL, decreasing=TRUE,
 	attr(res, "nbseq") <- attr(rep, "n")
 	attr(res, "criterion") <- criterion
 	attr(res, "dmax") <- attr(rep,"dmax")
-	attr(res, "Index") <- rep
+	attr(res, "Index") <- as.vector(rep)
 	attr(res, "Scores") <- attr(rep,"Scores")
 	attr(res, "Distances") <- attr(rep,"Distances")
 	attr(res, "Statistics") <- attr(rep,"Statistics")

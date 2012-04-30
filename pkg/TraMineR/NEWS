@@ -39,6 +39,7 @@ Changes in existing functions:
   - seqeapplaysub(): when "method=NULL" is specified (now the default), the count method
         assigned to the event sequence object is used. With method="count"
         CDIST_O (number of distinct occurrences) is used as previously.
+  - seqrep(): attribute 'Index' of the returned object is now a vector instead of an object of class 'dissrep'. 
 
 Bug fixes:
   - seqtreedisplay(): was changing current directory when an error occurred in
