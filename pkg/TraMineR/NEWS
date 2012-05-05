@@ -39,7 +39,8 @@ Changes in existing functions:
   - seqeapplaysub(): when "method=NULL" is specified (now the default), the count method
         assigned to the event sequence object is used. With method="count"
         CDIST_O (number of distinct occurrences) is used as previously.
-  - seqrep(): attribute 'Index' of the returned object is now a vector instead of an object of class 'dissrep'. 
+  - seqrep(): attribute 'Index' of the returned object is now a vector instead of 
+        an object of class 'dissrep'.
 
 Bug fixes:
   - seqtreedisplay(): was changing current directory when an error occurred in
@@ -48,7 +49,7 @@ Bug fixes:
   - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint
         was not taken into account (Reported by Reto Buergin).
   - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto Buergin).
-  - print.seqelist() and as.character.seqelist(): Corrected segfault when
+  - print.seqelist() and as.character.seqelist(): generated segfault when
         converting long event sequences to character (Reported by Pierre Molinier).
   - seqsubm(): Very small rounding errors (1e-16) were sometimes leading to non symmetric
         substitution cost matrix (Reported by Alexandre Pollien).
