@@ -19,7 +19,7 @@
 \usepackage{ae}
 %% almost as usual
 \author{\pkg{Matthias Studer}\\ Institute for Demographic and Life Course Studies\\ University of Geneva\\matthias.studer@unige.ch}
-\title{A \pkg{WeightedCluster} Preview}
+\title{\pkg{WeightedCluster} Preview}
 
 \usepackage[latin1]{inputenc}
 \usepackage{Sweave}
@@ -123,9 +123,9 @@ knit_hooks$set(small.mar = function(before, options, envir) {
 \setkeys{Gin}{width=.9\linewidth}
 \maketitle
 \section{Installation}
-Some functions of WeightedCluster use the free GraphViz \citep{Gansner99anopen}. It should be installed before launching R for these functions to work properly. You may download it here: \url{http:\\www.graphviz.org}.
+Some functions of WeightedCluster require the free GraphViz program \citep{Gansner99anopen}. It needs to be installed before launching R for these functions to work properly. You can download it here: \url{http:\\www.graphviz.org}.
 
-The \pkg{WeightedCluster} library can then be installed and loaded using the following commands.
+The \pkg{WeightedCluster} library can be installed and loaded using the following commands:
 
 <<install, echo=TRUE, results="hide", eval=FALSE>>=
 install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
@@ -135,14 +135,14 @@ library(WeightedCluster)
 
 \section{An illustrative example}
 
-Throughout this preview, we will use the dataset from \citet{McVicarAnyadike2002JRSSa} which is distributed with the \pkg{TraMineR} library \citep{GabadinhoRitschardMullerStuder2011JSS}. This dataset contains sequences of school to work transition in Northern Ireland. The dataset is loaded using :
+In this preview, we use the dataset from \citet{McVicarAnyadike2002JRSSa} which is distributed with the \pkg{TraMineR} library \citep{GabadinhoRitschardMullerStuder2011JSS}. This dataset contains sequences of school-to-work transitions in Northern Ireland. The dataset is loaded using :
 
 <<dataload, echo=TRUE, results="hide">>=
 data(mvad)
 @
 
 
-\code{wcAggregateCases} allows to identify and aggregate identical state sequences (which are in column \code{17:86}). We then print basic information about aggregation and create the \code{uniqueMvad} object which contains only unique sequence.
+\code{wcAggregateCases} allows us to identify and aggregate identical state sequences (which are in columns \code{17:86}). We print out the basic information about the aggregation and create the \code{uniqueMvad} object which contains only unique sequences.
 
 <<wcagg, echo=TRUE>>=
 aggMvad <- wcAggregateCases(mvad[, 17:86])
@@ -150,7 +150,7 @@ print(aggMvad)
 uniqueMvad <- mvad[aggMvad$aggIndex, 17:86]
 @
 
-Using the unique sequence dataset, we build a sequence object and computing dissimilarities between sequences \citep[see][for more on this topics]{GabadinhoRitschardMullerStuder2011JSS}. The vector \code{aggMvad\$aggWeights} store the number of replication of each unique sequences. It is thus used as unique sequence weigtht.
+Using the unique sequence dataset, we build a sequence object and compute dissimilarities between sequences \citep[see][for more on this topics]{GabadinhoRitschardMullerStuder2011JSS}. The vector \code{aggMvad\$aggWeights} store the number of replication of each unique sequence. It is thus used as unique sequence weight.
 
 <<wcagg-diss, echo=TRUE>>=
 mvad.seq <- seqdef(uniqueMvad, weights=aggMvad$aggWeights)
@@ -159,7 +159,7 @@ diss <- seqdist(mvad.seq, method="HAM")
 @
 
 \section{Hierarchical clustering}
-We can regroups similar sequence using hierarchical clustering with \code{"average"} method using weights (\code{aggMvad\$aggWeights}) (any method may be used).
+We can regroup similar sequences using hierarchical clustering with \code{"average"} method using weights (\code{aggMvad\$aggWeights}) (any method may be used).
 
 <<hierclust, echo=TRUE>>=
 averageClust <- hclust(as.dist(diss), method="average", members=aggMvad$aggWeights)
@@ -182,25 +182,46 @@ seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE)
 \end{center}
 
 \section{Cluster quality}
-We can automatically compute several clustering quality measure for a range number of groups: 2 until ncluster=10
-
+We can automatically compute several clustering quality measures (presented in table~\ref{tb_cqm}) for a range of numbers of groups: 2 until ncluster=10.
 <<avgqualcompute, echo=TRUE>>=
 avgClustQual <- as.clustrange(averageClust, diss, weights=aggMvad$aggWeights, ncluster=10)
 @
 
-The results may then be plotted to identify the best number of groups (you may also try to print it)
+\begin{table}[htb]\centering
+\caption{Cluster Quality Measures Available in WeightedCluster}\label{tb_cqm}
+{\renewcommand\arraystretch{1.5}\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{2cm}lll>{\raggedright\arraybackslash}p{5.2cm}}
+\hline
+\hline
+Name   & Abrv. & Range & Min/Max & Interpretation\\
+\hline
+Point Biserial Correlation & PBC & $[-1;1]$ & Max & Capacity of the clustering to reproduce the original distance matrix.\\
+Hubert's Gamma & HG & $[-1;1]$ & Max & Capacity of the clustering to reproduce the original distance matrix (Order of magnitude).\\
+Hubert's Somers D & HGSD & $[-1;1]$ & Max & Same as above, taking into account ties in the distance matrix.\\
+Hubert's C & HC & $[0;1]$ & \textbf{Min} & Gap between the current quality of clustering and the best possible quality for this distance matrix and number of groups.\\
+Average Silhouette Width & ASW & $[-1;1]$ & Max & Coherence of the assignments. A high coherence indicates high between groups distances and high intra group homogeneity.\\
+Calinski-Harabasz index & CH & $[0;+\infty[$ & Max & Pseudo F computed from the distances.\\
+Calinski-Harabasz index & CHsq& $[0;+\infty[$ & Max & Idem, using the \textit{squared} distances.\\
+Pseudo $R^2$ & R2 & $[0;1]$ & Max & Share of the discrepancy explained by the clustering.\\
+Pseudo $R^2$ & R2sq & $[0;1]$ & Max & Idem, using the \textit{squared} distances.\\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+The results can be plotted and used to identify the best number of groups (you can also print them).
 
 <<avgqualplot, echo=TRUE, fig.height=3, fig.width=9>>=
 plot(avgClustQual)
 @
 
-It is usually easier to choose the number of groups with normalized scores. Here, five groups seems to be a good solution.
+It is usually easier to choose the number of groups based on standardized scores. Here, five groups seems to be a good solution.
 
 <<avgqualplotnorm, echo=TRUE, fig.height=3, fig.width=9>>=
 plot(avgClustQual, norm="zscore")
 @
 
-Alternatively, we can retrieve the two best solution according to each quality measure:
+Alternatively, we can retrieve the two best solutions according to each quality measure:
 
 <<avgqualprint, echo=TRUE>>=
 summary(avgClustQual, max.rank=2)
@@ -208,13 +229,13 @@ summary(avgClustQual, max.rank=2)
 
 \section{PAM clustering}
 
-The \pkg{WeightedCluster} library also provide an optimized PAM algorithm. We can automatically compute PAM cluster for a range of number of groups using :
+The \pkg{WeightedCluster} library also provides an optimized PAM algorithm. We can automatically compute PAM cluster for a range of numbers of groups using:
 
 <<pamcompute, echo=TRUE>>=
 pamClustRange <- wcKMedRange(diss, kvals=2:10, weights=aggMvad$aggWeights)
 @
 
-As before, we may plot the quality measure of each solution (not shown here) or retrieve the two best solution according to each quality measure using:
+As before, we can plot the quality measures of each solution (not shown here) or retrieve the two best solutions according to each quality measure using:
 
 <<pamqualprint, echo=TRUE>>=
 summary(pamClustRange, max.rank=2)
@@ -222,7 +243,7 @@ summary(pamClustRange, max.rank=2)
 
 \section{Keeping a solution}
 
-The objets returned by \code{as.clustrange} or \code{wcKMedRange} contain a \code{data.frame} with cluster membership (named \code{clustering}). For instance, we may plot the sequences according to PAM clustering in 5 groups using:
+The objets returned by \code{as.clustrange} or \code{wcKMedRange} contain a \code{data.frame} with cluster membership (named \code{clustering}). For instance, we can plot the sequences according to PAM clustering in 5 groups using:
 
 <<pam5plot, echo=TRUE, fig.height=6, fig.width=9>>=
 seqdplot(mvad.seq, group=pamClustRange$clustering$cluster5, border=NA)
@@ -231,7 +252,7 @@ seqdplot(mvad.seq, group=pamClustRange$clustering$cluster5, border=NA)
 
 \section{Disaggregating data}
 
-Once the sequence have been regrouped, it is often useful to ``disaggregate'' the data. For instance, we may want to add the cluster membership in the original data set (i.e. before unique sequences were identified). This may for instance allows us to compute a table between cluster membership and father unemployment (variable \code{funemp}). This operation is done using \code{aggMvad\$disaggIndex} which stores the index of each unique sequence in the original dataset.
+Once the sequences have been regrouped, it is often useful to ``disaggregate'' the data. For instance, we may want to add the cluster membership in the original data set (i.e. before unique sequences were identified). This allows us to cross-tabulate cluster membership and father unemployment (variable \code{funemp}). This operation is performed using \code{aggMvad\$disaggIndex} which stores the index of each unique sequence in the original dataset.
 
 <<mvadcluster, echo=TRUE>>=
 uniqueCluster5 <- avgClustQual$clustering$cluster5
