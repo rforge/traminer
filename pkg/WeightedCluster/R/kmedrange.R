@@ -91,7 +91,13 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 			stats <- x$stats[,stat]
 		}
 	}else{
-		stats <- x$stat[,stat]
+		if("RHC" %in% stat){
+			stats <- x$stat[ , stat[stat != "RHC"]]
+			stats[, "RHC"] <- 1 - x$stat[ , "HC"]
+		}
+		else{
+			stats <- x$stat[, stat]
+		}
 	}
 	ylim <- c(0,1)
 	if(norm == "range") {

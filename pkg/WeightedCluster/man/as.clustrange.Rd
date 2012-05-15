@@ -24,7 +24,7 @@ as.clustrange(object, diss, weights=NULL, ...)
   \item{weights}{Optional numerical vector containing weights.}
   \item{ncluster}{Integer. Maximum number of cluster. The range will include all clustering solution starting from two to \code{ncluster}.}
   \item{x}{A \code{clustrange} object to be plotted.}
-  \item{stat}{Character. The list of statistics to plot or "noCH" to plot all statistics except "CH" and "CHsq" or "all" for all statistics. See \code{\link{wcClusterQuality}}.}
+  \item{stat}{Character. The list of statistics to plot or "noCH" to plot all statistics except "CH" and "CHsq" or "all" for all statistics. See \code{\link{wcClusterQuality}} for a list of possible values. It is also possible to use "RHC" to plot the quality measure 1-HC. Unlike HC, RHC should be maximized as all other quality measures.}
   \item{legendpos}{Character. legend position, see \code{\link{legend}}.}
   \item{norm}{Character. Normalization method of the statistics can be one of "none" (no normalization), "range" (given as (value -min)/(max-min), "zscore" (adjusted by mean and standard deviation) or "zscoremed" (adjusted by median and median of the difference to the median).}
   \item{withlegend}{Logical. If \code{FALSE}, the legend is not plotted.}
@@ -71,5 +71,8 @@ wardRange <- as.clustrange(wardCluster, diss=diss,
 
 ## Plot all statistics (standardized)
 plot(wardRange, stat="all", norm="zscoremed", lwd=3)
+
+## Plot HC, RHC and ASW
+plot(wardRange, stat=c("HC", "RHC", "ASW"), norm="zscore", lwd=3)
 
 }
