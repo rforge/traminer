@@ -72,7 +72,7 @@ seqrplot(seqdata, group=NULL, title=NULL, ...)
 \details{
 \code{seqplot} is the generic function for high level plots of state sequence objects with group splits and automatic display of the color legend. Many different types of plots can be produced by means of the \code{type} argument. Except for sequence index plots, \code{seqplot} first calls the specific function producing the required statistics and then the plot method for objects produced by this function (see below). For sequence index plots, the state sequence object itself is plotted by calling the \code{\link{plot.stslist}} method. When splitting by groups and/or displaying the color legend, the \code{\link[graphics]{layout}} function is used for arranging the plots.
 
-The \code{seqdplot}, \code{seqfplot}, \code{seqiplot}, \code{seqIplot}, \code{seqHtplot}, \code{seqmsplot}, \code{seqmtplot} and \code{seqrplot} functions are aliases for calling \code{seqplot} with \code{type} argument set respectively to \code{"d", "f", "i", "I", "Ht", "ms", "mt"} or \code{"r"}.
+The \code{seqdplot}, \code{seqfplot}, \code{seqiplot}, \code{seqIplot}, \code{seqHtplot}, \code{seqmsplot}, \code{seqmtplot} and \code{seqrplot} functions are aliases for calling \code{seqplot} with \code{type} argument set respectively to \code{"d"}, \code{"f"}, \code{"i"}, \code{"I"}, \code{"Ht"}, \code{"ms"}, \code{"mt"} or \code{"r"}.
 
 State distribution plot (\code{type="d"}) represent the sequence of the transversal state frequencies by position (time point) computed by the \code{\link{seqstatd}} function.
 
@@ -93,7 +93,7 @@ The \emph{representative sequence plot} (\code{type="r"}) displays a reduced, no
 }
 
 \seealso{
- \code{\link{plot.stslist.statd}} \code{\link{plot.stslist.freq}} \code{\link{plot.stslist}} \code{\link{plot.stslist.modst}} \code{\link{plot.stslist.meant}} \code{\link{plot.stslist.rep}}.
+ \code{\link{plot.stslist.statd}}, \code{\link{plot.stslist.freq}}, \code{\link{plot.stslist}}, \code{\link{plot.stslist.modst}}, \code{\link{plot.stslist.meant}}, \code{\link{plot.stslist.rep}}.
 }
 
 

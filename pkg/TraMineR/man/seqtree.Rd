@@ -5,7 +5,7 @@
 	Tree structured analysis of a state sequence object.
 }
 \description{
-	Facility to produce a tree structured analysis of a sequence object.
+	Facility for growing a regression tree for a state sequence object.
 }
 \usage{
 seqtree(formula, data = NULL, weighted = TRUE, minSize = 0.05,
@@ -23,7 +23,7 @@ seqtree(formula, data = NULL, weighted = TRUE, minSize = 0.05,
   \item{maxdepth}{maximum depth of the tree.}
   \item{R}{Number of permutations used to assess the significance of the split.}
   \item{pval}{Maximum p-value, in percent.}
-  \item{weight.permutation}{Weights permutation method: "diss" (attach weigths to the dissimilarity matrix), "replicate" (replicate case according to the \code{weights} arguments), "rounded-replicate" (replicate case according to the rounded \code{weights} arguments), "random-sampling" (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
+  \item{weight.permutation}{Weights permutation method: "diss" (attach weights to the dissimilarity matrix), "replicate" (replicate case according to the \code{weights} arguments), "rounded-replicate" (replicate case according to the rounded \code{weights} arguments), "random-sampling" (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
   \item{seqdist_arg}{list of arguments directly passed to \code{\link{seqdist}}, only used if \code{diss=NULL}}
   \item{diss}{An optional dissimilarity matrix. If not provided, a dissimilarity matrix is computed using \code{\link{seqdist}} and \code{seqdist_arg}}
   \item{squared}{Logical. If \code{TRUE}, the dissimilarity matrix is squared}

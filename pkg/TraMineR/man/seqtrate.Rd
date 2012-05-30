@@ -14,10 +14,10 @@ Transition rates are the probabilities of transition from one state to another o
 \arguments{
   \item{seqdata}{a sequence object as defined by the \code{\link{seqdef}} function.}
   \item{statl}{a list of states or events for which the transition rates will be computed. If omitted (default), transition rates are computed between the distinct states in seqdata (obtained with the \code{\link{alphabet}} function).}
-  \item{time.varying}{Logical. If TRUE return an \code{\link{array}} containing a distinct matrix for each time unit. The time is the third dimension (subscript).}
-  \item{weighted}{Logical. If TRUE compute transition rates using weights specified in \code{seqdata}.}
+  \item{time.varying}{Logical. If \code{TRUE}, return an \code{\link{array}} containing a distinct matrix for each time unit. The time is the third dimension (subscript).}
+  \item{weighted}{Logical. If \code{TRUE}, compute transition rates using weights specified in \code{seqdata}.}
   \item{lag}{Integer. Time between the two states considered to compute transition rates (one by default).}
-  \item{with.missing}{Logical. If FALSE (default value), returned transition rates ignore missing values.}
+  \item{with.missing}{Logical. If \code{FALSE} (default value), returned transition rates ignore missing values.}
 }
 
 \value{a matrix of dimension \eqn{ns*ns}, where \eqn{ns} is the number of states in the \link{alphabet} of the sequence object.}

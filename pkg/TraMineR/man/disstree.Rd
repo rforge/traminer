@@ -22,7 +22,7 @@ disstree(formula, data = NULL, weights = NULL, minSize = 0.05,
   \item{R}{Number of permutations used to assess the significance of the split.}
   \item{pval}{Maximum allowed p-value for a split}
   \item{object}{An optional R object represented by the dissimilarity matrix. This object may be used by the \code{print} method or  \code{\link{disstree2dot}} to render specific object type.}
-  \item{weight.permutation}{Weight permutation method: \code{"diss"} (attach weigths to the dissimilarity matrix), \code{"replicate"} (replicate cases according to the \code{weights} arguments), \code{"rounded-replicate"} (replicate case according to the rounded \code{weights} arguments), \code{"random-sampling"} (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
+  \item{weight.permutation}{Weight permutation method: \code{"diss"} (attach weights to the dissimilarity matrix), \code{"replicate"} (replicate cases using \code{weights}), \code{"rounded-replicate"} (replicate case using rounded \code{weights}), \code{"random-sampling"} (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
   \item{squared}{Logical: Should the \code{diss} dissimilarities be squared?}
   \item{first}{One of the variable in the right-hand side of the formula. This forces the first node of the tree to be split by this variable.}
 }

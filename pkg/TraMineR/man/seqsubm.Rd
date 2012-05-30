@@ -66,7 +66,7 @@ matrix for each time unit. The time is the third dimension (subscript).}
 	\item{lag}{Integer. Only used with (\code{method="TRATE"}). Time between the two states considered to compute
 		transition rates (one by default).}
   \item{missing.trate}{Logical.  Only used with (\code{method="TRATE"}).
-		If TRUE, substitution costs with missing state are also based on transition rates. If FALSE (default value),
+		If \code{TRUE}, substitution costs with missing state are also based on transition rates. If \code{FALSE} (default value),
 		the substitution cost for the missing state are set to \code{miss.cost}.}
 }
 \seealso{

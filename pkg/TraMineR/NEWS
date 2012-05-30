@@ -1,7 +1,8 @@
 ## ==========
 Version development
 
-Vignettes: JSS article vol. 40(4) added as a vignette on state sequence analysis.
+Vignettes: Slightly modified JSS article vol. 40(4) added as a vignette 
+    on state sequence analysis.
 
 Misc:
   - added 'ex2' data sets to test and illustrate the handling of weights,
@@ -39,7 +40,7 @@ Changes in existing functions:
   - seqeapplaysub(): when "method=NULL" is specified (now the default), the count method
         assigned to the event sequence object is used. With method="count"
         CDIST_O (number of distinct occurrences) is used as previously.
-  - seqrep(): attribute 'Index' of the returned object is now a vector instead of 
+  - seqrep(): attribute 'Index' of the returned object is now a vector instead of
         an object of class 'dissrep'.
 
 Bug fixes:

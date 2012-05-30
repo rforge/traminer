@@ -21,8 +21,8 @@ dissassoc(diss, group, weights=NULL, R=1000,
   \item{group}{The grouping variable}
   \item{weights}{optional numerical vector containing weights.}
   \item{R}{Number of permutations for computing the p-value. If equal to 1, no permutation test is performed.}
-  \item{weight.permutation}{Weights permutation method: \code{"diss"}
-  (attach weigths to the dissimilarity matrix), \code{"replicate"} (replicate case according to the \code{weights} arguments), \code{"rounded-replicate"} (replicate case according to the rounded \code{weights} arguments), \code{"random-sampling"} (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
+  \item{weight.permutation}{Weighted permutation method: \code{"diss"}
+  (attach weights to the dissimilarity matrix), \code{"replicate"} (replicate case using \code{weights}), \code{"rounded-replicate"} (replicate case using rounded \code{weights}), \code{"random-sampling"} (random assignment of covariate profiles to the objects using distributions defined by the weights.)}
   \item{squared}{Logical. If \code{TRUE} the dissimilarities \code{diss} are squared.}
 }
 

@@ -159,7 +159,8 @@ Further information is available in the following vignettes:
 }
 }
 \author{
-Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. M\"{u}ller <nicolas.muller@unige.ch>, Gilbert Ritschard <gilbert.ritschard@unige.ch> and contributions from Reto B\"{u}rgin <reto.buergin@unige.ch>.
+Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. Müller <nsmuller@gmail.com>, Gilbert Ritschard <gilbert.ritschard@unige.ch> and contributions from Reto Bürgin <reto.buergin@unige.ch>.
+\cr
 Maintainer: Alexis Gabadinho <alexis.gabadinho@unige.ch>
 }
 
