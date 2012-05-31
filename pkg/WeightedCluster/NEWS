@@ -2,17 +2,16 @@
 
 NEW FEATURES
 
+  o Added the WeightedCluster vignette
   o It is now possible to plot the "RHC" statistic computed as 1-HC. This way all statistics should be maximized (Requested by Gilbert Ritschard).
   o Now testing for correct input in "as.clustrange".
 
 BUG FIXES
 
+  o Corrected citation
   o Many grammar and spelling corrections in the WeightedClusterPreview vignette (thanks to Nevena Zhelyazkova).
   
 			             WeightedCluster VERSION 0.9
 
 			
   o First release
-			
-			
-			

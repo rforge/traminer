@@ -17,7 +17,5 @@
 	packageStartupMessage("   acad\u00e9mique \u00e0 l\'aide de m\u00e9thodes innovatrices d\'analyse de donn\u00e9es")
 	packageStartupMessage("   s\u00e9quentielles, Chapitre: Le manuel de la librairie WeightedCluster :")
 	packageStartupMessage("   Un guide pratique pour la cr\u00e9ation de typologies de trajectoires en sciences")
-	packageStartupMessage("   sociales avec R. Th\u00e8se de doctorat in\u00e9dite, Universit\u00e9 de Gen\u00e8ve.\n")
+	packageStartupMessage("   sociales avec R. Th\u00e8se SES 777, Facult\u00E9 des sciences \u00E9conomiques\n   et sociales, Universit\u00e9 de Gen\u00e8ve.\n")
 }
-
-.onAttach()

@@ -1,0 +1,4 @@
+\documentclass[10pt]{article}
+%\VignetteIndexEntry{WeightedCluster}
+\begin{document}
+\end{document} 
