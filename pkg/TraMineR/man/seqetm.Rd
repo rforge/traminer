@@ -2,7 +2,7 @@
 \alias{seqetm}
 \title{Create a transition-definition matrix}
 \description{
-This function automatically creates a transition-definition matrix from a state sequence object to transform the state sequences into time stamped event sequences (in TSE format).
+This function automatically creates a transition-definition matrix from a state sequence object to  transform the state sequences into time stamped event sequences (in TSE format).
 }
 \usage{
 seqetm(seq, method = "transition", use.labels = TRUE,
@@ -17,6 +17,8 @@ seqetm(seq, method = "transition", use.labels = TRUE,
   \item{ep}{Prefix for end of period event names (\code{"period"} method)}
 }
 \details{
+  Warning!!!: State labels should not contain commas \code{","} which are reserved for separating multiple events of a same transition!
+    
   One of three methods can be selected with the \code{method} argument:
 
   \code{"transition"} generates a single (from-state > to-state) event for each found transition and a distinct start-state event for each different sequence start;
