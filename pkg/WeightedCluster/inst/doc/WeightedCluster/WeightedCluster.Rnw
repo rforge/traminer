@@ -112,9 +112,9 @@ knit_hooks$set(small.mar = function(before, options, envir) {
 \begin{center}
 Pour citer ce document ou la librairie \pkg{WeightedCluster}, merci d'utiliser:\\~\\
 \end{center}
-Studer, Matthias (2012).\textit{Étude des inégalités de genre en début de carrière académique
-à l’aide de méthodes innovatrices d’analyse de données séquentielles}, Chapitre: Le
-manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R. Thèse de doctorat inédite, Université de Genève.
+Studer, Matthias (2012).\textit{\'Etude des inégalités de genre en début de carrière académique
+à l'aide de méthodes innovatrices d'analyse de données séquentielles}, Chapitre: Le
+manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R. Thèse SES 777, Faculté des sciences économiques et sociales, Université de Genève.
 
 \section{Introduction}
 Ce manuel poursuit un double but. Il présente les fonctionnalités offertes par la librairie \pkg{WeightedCluster} pour la construction et la validation de clustering de données pondérées dans \proglang{R}. En même temps, nous appliquons, tout au long de ce manuel, les méthodes présentées à l'analyse de séquences en sciences sociales, ce qui en fait également un guide pas à pas de la construction de typologie de séquences. Nous discutons également des implications et des hypothèses sociologiques sous-jacentes à ces analyses.

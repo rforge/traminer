@@ -21,7 +21,7 @@ clean:
 WeightedClusterPreview.pdf: WeightedClusterPreview/WeightedClusterPreview.Rnw
 	cp -f WeightedClusterPreview/WeightedClusterPreview.Rnw .
 	cp -f WeightedClusterPreview/previewhctree.png .
-	$(RSCRIPT) --vanilla -e "library(knitr); knit2pdf('WeightedClusterPreview.Rnw');purl('WeightedClusterPreview.Rnw', output='WeightedClusterPreview.R')"
+	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedClusterPreview.Rnw')"
 	rm -f previewhctree.png
 	cp -f WeightedClusterPreview/WeightedClusterPreview-fake.Rnw WeightedClusterPreview.Rnw
 
@@ -29,7 +29,7 @@ WeightedCluster.pdf: WeightedCluster/WeightedCluster.Rnw
 	cp -f WeightedCluster/WeightedCluster.Rnw .
 	cp -f WeightedCluster/randB.RData .
 	cp -f WeightedCluster/wardtree.png .
-	$(RSCRIPT) --vanilla -e "library(knitr); knit2pdf('WeightedCluster.Rnw')"
+	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedCluster.Rnw')"
 	## $(RSCRIPT) --vanilla -e "tools::texi2dvi( 'WeightedCluster.tex', pdf = TRUE, clean = FALSE )"
 	## bibtex WeightedCluster
 	## $(RSCRIPT) -e "tools::texi2dvi( 'WeightedCluster.tex', pdf = TRUE, clean = TRUE )"
