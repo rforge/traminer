@@ -161,7 +161,7 @@ Further information is available in the following vignettes:
 \author{
 Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. Müller <nsmuller@gmail.com>, Gilbert Ritschard <gilbert.ritschard@unige.ch> and contributions from Reto Bürgin <reto.buergin@unige.ch>.
 \cr
-Maintainer: Alexis Gabadinho <alexis.gabadinho@unige.ch>
+Maintainer: TraMineR Team <traminer-team@unige.ch>
 }
 
 \references{
