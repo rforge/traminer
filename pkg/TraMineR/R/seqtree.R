@@ -10,7 +10,7 @@ seqtree <- function(formula, data=NULL, weighted=TRUE, minSize=0.05, maxdepth=5,
 		diss <- do.call(seqdist, seqdist_arg)
 	}
 	if(weighted){
-		weights <- attr(seqdata,"weights")
+		weights <- attr(seqdata, "weights")
 	}
 	else {
 		weights <- NULL
