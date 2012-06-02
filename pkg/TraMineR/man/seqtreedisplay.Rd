@@ -52,5 +52,5 @@ Conversion to image formats other than "jpeg" or "png" is done using ImageMagick
 \value{None}
 
 \seealso{
-See \code{\link{seqtree} for examples}
+See \code{\link{seqtree}} and \code{\link{disstree}} for examples, and \code{\link{disstree2dot}} for generating "dot" files.
 }

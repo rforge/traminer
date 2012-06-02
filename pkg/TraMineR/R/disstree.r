@@ -139,7 +139,6 @@ DTNdisstree <- function(dissmatrix, predictor, terms, weights=NULL, minSize=0.05
 	if (squared) {
 		dissmatrix <- dissmatrix^2
 	}
-	
 	nobs= nrow(dissmatrix)
 	if (nobs!=nrow(predictor)) {
 		stop(" [!] dissimilarity matrix and data should be of the same size")
@@ -182,7 +181,7 @@ DTNdisstree <- function(dissmatrix, predictor, terms, weights=NULL, minSize=0.05
 		minSize <- pop*minSize
 	}
 	if(pval<(1/sum(R))){
-		warning(" [!] Minimum possible p-value using ", R, " permutations is ", 1/sum(R), ". Parameter pval (=", pval, ") changed to ",1/sum(R))
+		warning(" [!] Minimum possible p-value using ", R, " permutations is ", 1/sum(R), ". Parameter pval (=", pval, ") changed to ", 1/sum(R))
 		pval <- 1/sum(R)
 	}
 	.localstuffDissTree$DTNnodeCounter <- as.integer(1)

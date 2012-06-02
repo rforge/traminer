@@ -25,7 +25,6 @@ seqtree <- function(formula, data=NULL, weighted=TRUE, minSize=0.05, maxdepth=5,
 						squared=squared, first=first)
 	class(tree) <- c("seqtree", class(tree))
 	return(tree)
-	return(tree)
 	
 }
 

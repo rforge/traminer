@@ -1,5 +1,12 @@
 
-TraMineR.checkcost <- function(sma, seqdata, with.missing, indel, tol = 1e-7*indel) {
+TraMineR.checkcost <- function(sma, seqdata, with.missing, indel, tol = NULL) {
+	if(is.null(tol)){
+		if(!missing(indel)){
+			tol <- 1e-7*indel
+		}else{
+			tol <- 1e-7
+		}
+	}
 	alphabet <- attr(seqdata,"alphabet")
 	## Gaps in sequences
 	if (with.missing) {

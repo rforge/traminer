@@ -71,7 +71,7 @@ algorithm. \emph{Journal of the Royal Statistical Society A} \bold{170}(4), 1061
    \cr
 	\code{\link{seqtreedisplay}} to generate graphic representation of \code{seqtree} objects when analyzing state sequences.
    \cr
-   \code{\link{disstree2dot}} is a more general interface to generate such representation for other type of objects.
+   \code{\link{disstreedisplay}} is a more general interface to generate such representation for other type of objects.
    \cr
    \code{\link{dissvar}} to compute discrepancy using dissimilarities and for a basic introduction to discrepancy analysis.
    \cr
@@ -95,31 +95,27 @@ dt <- disstree(mvad.ham~ male + Grammar + funemp + gcse5eq + fmpr + livboth,
 print(dt)
 
 
-## Generating a file for GraphViz
-disstree2dot(dt, "mvadtree", imagefunc=seqdplot, imagedata=mvad.seq,
+## Will only work if GraphViz is properly installed
+## See seqtree for simpler way to plot a sequence tree.
+\dontrun{
+disstreedisplay(dt, imagefunc=seqdplot, imagedata=mvad.seq,
 	## Additional parameters passed to seqdplot
 	withlegend=FALSE, axes=FALSE, ylab="")
-
+}
 ## Second method, using a specific function
-myplotfunction <- function(individuals, seqs, mds,...) {
+myplotfunction <- function(individuals, seqs, ...) {
 	par(font.sub=2, mar=c(3,0,6,0), mgp=c(0,0,0))
-
 	## using mds to order sequence in seqiplot
 	mds <- cmdscale(seqdist(seqs[individuals,], method="HAM"),k=1)
 	seqiplot(seqs[individuals,], sortv=mds,...)
 	}
 
-## Generating a file for GraphViz
 ## If imagedata is not set, index of individuals are sent to imagefunc
-disstree2dot(dt, "mvadtree", imagefunc=myplotfunction, title.cex=3,
+\dontrun{
+disstreedisplay(dt, imagefunc=myplotfunction, title.cex=3,
 	## additional parameters passed to myplotfunction
-	seqs=mvad.seq, mds=mvad.mds,
+	seqs=mvad.seq,
 	## additional parameters passed to seqiplot (through myplotfunction)
-	withlegend=FALSE, axes=FALSE,tlim=0,space=0, ylab="", border=NA)
-
-## To run GraphViz (dot) from R and generate an "svg" file
-## shell("dot -Tsvg -O mvadtree.dot")
-
-## On some system you should run:
-## system("dot -Tsvg -O mvadtree.dot")
+	withlegend=FALSE, axes=FALSE, tlim=0, space=0, ylab="", border=NA)
+}
 }
