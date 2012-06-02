@@ -1,5 +1,6 @@
 seqtree <- function(formula, data=NULL, weighted=TRUE, minSize=0.05, maxdepth=5, R=1000, pval=0.01, weight.permutation="replicate", seqdist_arg=list(method="LCS", norm=TRUE), diss=NULL, squared=FALSE, first=NULL){
-	formula.call <- formula
+	##formula.call <- formula
+	tterms <- terms(formula)
 	seqdata <- eval(formula[[2]], data, parent.frame()) # to force evaluation
 	if (!inherits(seqdata, "stslist")) {
 		stop("Left hand term in formula should be a stslist object (see seqdef)")
@@ -14,12 +15,20 @@ seqtree <- function(formula, data=NULL, weighted=TRUE, minSize=0.05, maxdepth=5,
 	else {
 		weights <- NULL
 	}
-	formula[[2]] <- diss
-	tree <- disstree(formula=formula, data=data, weights=weights ,minSize=minSize, maxdepth=maxdepth, R=R, pval=pval, object=seqdata,weight.permutation=weight.permutation, squared=squared, first=first)
-	tree$terms <- terms(formula.call)
+	dissmatrix <- diss
+	formula[[2]] <- NULL
+	## Model matrix from forumla
+	predictor <- as.data.frame(model.frame(formula, data, drop.unused.levels = TRUE, na.action=NULL))
+	tree <- DTNdisstree(dissmatrix=dissmatrix, predictor=predictor, terms=tterms, 
+						weights=weights, minSize=minSize, maxdepth=maxdepth, R=R, 
+						pval=pval, object=seqdata, weight.permutation=weight.permutation, 
+						squared=squared, first=first)
 	class(tree) <- c("seqtree", class(tree))
 	return(tree)
+	return(tree)
+	
 }
+
 
 print.seqtree <- function(x, digits = getOption("digits") - 2, medoid=TRUE, ...){
 	stslistmedoid <- function(object, index) {

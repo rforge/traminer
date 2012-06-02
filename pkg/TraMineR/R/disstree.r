@@ -117,18 +117,29 @@ DTNaddCovariateSplitschedule <- function(tree) {
 ## disstree main function
 ###########################
 disstree <- function(formula, data=NULL, weights=NULL, minSize=0.05, maxdepth=5, R=1000, pval=0.01, object =NULL, weight.permutation="replicate", squared=FALSE, first=NULL) {
-	
-	formula.call <- formula
+	##formula.call <- formula
+	tterms <- terms(formula)
 	dissmatrix <- eval(formula[[2]], data, parent.frame()) # to force evaluation
+	formula[[2]] <- NULL
+	## Model matrix from forumla
+	predictor <- as.data.frame(model.frame(formula, data, drop.unused.levels = TRUE, na.action=NULL))
+	tree <- DTNdisstree(dissmatrix=dissmatrix, predictor=predictor, terms=tterms, 
+						weights=weights, minSize=minSize, maxdepth=maxdepth, R=R, 
+						pval=pval, object =object, weight.permutation=weight.permutation, 
+						squared=squared, first=first)
+	return(tree)
+	
+}
+DTNdisstree <- function(dissmatrix, predictor, terms, weights=NULL, minSize=0.05, maxdepth=5, R=1000, pval=0.01, object =NULL, weight.permutation="replicate", squared=FALSE, first=NULL) {
+	
+	
 	if (inherits(dissmatrix, "dist")) {
 		dissmatrix <- as.matrix(dissmatrix)
  	}
 	if (squared) {
 		dissmatrix <- dissmatrix^2
 	}
-	formula[[2]] <- NULL
-	## Model matrix from forumla
-	predictor <- as.data.frame(model.frame(formula, data, drop.unused.levels = TRUE, na.action=NULL))
+	
 	nobs= nrow(dissmatrix)
 	if (nobs!=nrow(predictor)) {
 		stop(" [!] dissimilarity matrix and data should be of the same size")
@@ -191,8 +202,8 @@ disstree <- function(formula, data=NULL, weights=NULL, minSize=0.05, maxdepth=5,
 		tree$info$adjustment <- dissassoc(dissmatrix, tree$fitted[,1], R=R, weights=weights, weight.permutation=weight.permutation)
 	}
 	tree$data <- predictor
-	tree$terms <- terms(formula.call)
 	tree$weights <- weights
+	tree$terms <- terms
 	##tree <- party(root, data=predictor, fitted =fitted, terms = terms(formula.call),  info = info)
 	tree$root <- root
 	
