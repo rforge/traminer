@@ -88,9 +88,9 @@ data(mvad)
 ## Defining a state sequence object
 mvad.seq <- seqdef(mvad[, 17:86])
 
-## Computing dissimilarities
-mvad.lcs <- seqdist(mvad.seq, method="LCS")
-dt <- disstree(mvad.lcs~ male + Grammar + funemp + gcse5eq + fmpr + livboth,
+## Computing dissimilarities (any dissimilarity measure can be used)
+mvad.ham <- seqdist(mvad.seq, method="HAM")
+dt <- disstree(mvad.ham~ male + Grammar + funemp + gcse5eq + fmpr + livboth,
     data=mvad, R = 10)
 print(dt)
 
@@ -105,7 +105,7 @@ myplotfunction <- function(individuals, seqs, mds,...) {
 	par(font.sub=2, mar=c(3,0,6,0), mgp=c(0,0,0))
 
 	## using mds to order sequence in seqiplot
-	mds <- cmdscale(seqdist(seqs[individuals,], method="LCS"),k=1)
+	mds <- cmdscale(seqdist(seqs[individuals,], method="HAM"),k=1)
 	seqiplot(seqs[individuals,], sortv=mds,...)
 	}
 

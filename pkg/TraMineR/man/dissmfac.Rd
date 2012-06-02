@@ -80,10 +80,10 @@ the National Academy of Sciences of the United States of America} 103(51), 19430
 data(mvad)
 mvad.seq <- seqdef(mvad[, 17:86])
 
-## Compute dissimilarities
-mvad.lcs <- seqdist(mvad.seq, method="LCS")
+## Compute dissimilarities (any dissimilarity measure can be used)
+mvad.ham <- seqdist(mvad.seq, method="HAM")
 
 ## And now the multi-factor analysis
-print(dissmfac(mvad.lcs ~ male + Grammar + funemp +
+print(dissmfac(mvad.ham ~ male + Grammar + funemp +
 	gcse5eq + fmpr + livboth, data=mvad, R=10))
 }

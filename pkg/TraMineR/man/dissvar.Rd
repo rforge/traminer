@@ -62,9 +62,9 @@ In the Euclidean case, the sum of squares can be expressed as:
 data(mvad)
 mvad.seq <- seqdef(mvad[, 17:86])
 
-## Building dissimilarities
-mvad.lcs <- seqdist(mvad.seq, method="LCS")
+## Building dissimilarities (any dissimilarity measure can be used)
+mvad.ham <- seqdist(mvad.seq, method="HAM")
 
 ## Pseudo variance of the sequences
-print(dissvar(mvad.lcs))
+print(dissvar(mvad.ham))
 }
