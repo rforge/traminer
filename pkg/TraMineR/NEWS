@@ -1,7 +1,7 @@
 ## ==========
 Version development
 
-Vignettes: Slightly modified JSS article vol. 40(4) added as a vignette 
+Vignettes: Slightly modified JSS article vol. 40(4) added as a vignette
     on state sequence analysis.
 
 Misc:
@@ -15,6 +15,7 @@ New functionalities:
 
 Changes in existing functions:
   - seqtree(), disstree(): speed improvements.
+  - seqtm(): gives a warning when state names or state labels contain a comma.
   - seqdef(): changed the display of alphabet, state labels and long labels when
         creating a state sequence object.
   - seqistatd() and seqmeant(): added 'prop' argument to calculate
