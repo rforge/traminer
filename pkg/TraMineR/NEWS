@@ -14,6 +14,7 @@ New functionalities:
         about the alignment of two state sequences.
 
 Changes in existing functions:
+  - seqtree(), disstree(): speed improvements.
   - seqdef(): changed the display of alphabet, state labels and long labels when
         creating a state sequence object.
   - seqistatd() and seqmeant(): added 'prop' argument to calculate
