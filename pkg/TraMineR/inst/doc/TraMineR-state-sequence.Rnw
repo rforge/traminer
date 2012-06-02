@@ -114,7 +114,8 @@ The functions can then easily retrieve this information to ensure presentation h
 	{./Graphiques/}
 	}
 
-\SweaveOpts{prefix.string=Graphiques/SW} % sets the prefix for figure files generated par Sweave
+\SweaveOpts{prefix.string=Graphiques/SW, keep.source=FALSE} 
+% sets the prefix for figure files generated par Sweave
 
 
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl,formatcom=\color{FireBrick}}
