@@ -1,5 +1,14 @@
+## =========
+Version 1.9 (development version)
+
+Changes in existing functions:
+ - seqplot(): if group argument is a factor, the plots are now ordered the same way as the
+	factor levels
+ - seqplot(), plot.stslist(): if sortv is a factor, the sequences are now sorted 
+	according to the order of the factor levels
+
 ## ==========
-Version development
+Version 1.8-2
 
 Vignettes: Slightly modified JSS article vol. 40(4) added as a vignette
     on state sequence analysis.

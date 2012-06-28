@@ -24,8 +24,6 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 		if (length(group)!=nrow(seqdata))
 			stop(call.=FALSE, "group must contain one value for each row in the sequence object")
 
-		## Eliminate the unused levels
-		group <- factor(group)
 		nplot <- length(levels(group))
 		gindex <- vector("list",nplot)
 				
