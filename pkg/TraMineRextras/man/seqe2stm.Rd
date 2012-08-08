@@ -34,7 +34,7 @@ A matrix.
 }
 \note{This function is a pre-release and further testing is still needed, please report any problems.}
 \references{
-Ritschard, G., Gabadinho, A., Studer, M. & Müller, N.S. (2009), "Converting between various sequence representations",
+Ritschard, G., Gabadinho, A., Studer, M. & MÃ¼ller, N.S. (2009), "Converting between various sequence representations",
 In Ras, Z. & Dardzinska, A. (eds) \emph{Advances in Data Management}. Series: \emph{Studies in Computational Intelligence}. Volume 223, pp. 155-175. Berlin: Springer.
 }
 \author{
@@ -65,4 +65,3 @@ all.equal(stm, stmList)
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{data format}
-

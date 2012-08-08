@@ -102,7 +102,7 @@ ctplot(x,y,id,weights=NULL,
     sunflowers.}
   \item{sf.pch}{Plotting character to be used for points
     (\code{number[i]==1}) and center of sunflowers.}
-  \item{rotate}{Logical. If TRUE, plotted sunflowers are rotated
+  \item{rotate}{Logical. If \code{TRUE}, plotted sunflowers are rotated
     randomly.}
   \item{split}{Logical value for plot panel arrangement modes. If
     \code{TRUE} and \code{x.orderalign="first"}, the plot produces one plot panel per
@@ -129,7 +129,7 @@ ctplot(x,y,id,weights=NULL,
 }
 
 \references{
- Bürgin, R., G. Ritschard and E. Rousseaux (2012), "Exploration graphique de données séquentielles". In Atelier Fouille Visuelle de Données : méthologie et évaluation, EGC 2012, Bordeaux. Association EGC: http://www.egc.asso.fr/sdoc-237-egc2012_atelier_fvd.pdf .
+ BÃ¼rgin, R., G. Ritschard and E. Rousseaux (2012), "Exploration graphique de donnÃ©es sÃ©quentielles". In Atelier Fouille Visuelle de DonnÃ©es : mÃ©thologie et Ã©valuation, EGC 2012, Bordeaux. Association EGC: http://www.egc.asso.fr/sdoc-237-egc2012_atelier_fvd.pdf .
 }
 
 \examples{

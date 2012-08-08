@@ -25,6 +25,7 @@ export(
     dissvar.grp,
     seqgen.missing,
     seqgranularity,
-    seqauto
+    seqauto,
+    seqentrans
 
 )

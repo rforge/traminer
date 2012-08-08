@@ -23,7 +23,7 @@ FCE_to_TSE(seqdata, id = NULL, cols, eventlist = NULL, firstEvent = NULL)
   \item{firstEvent}{Character. The name of an event to be added at the beginning of each event sequences. This allows to include individuals with no events. If \code{NULL} (default), no event is added.}
 }
 \details{
-The usual data format for event sequence is TSE (see \code{\link[TraMineR]{seqecreate}}). 
+The usual data format for event sequence is TSE (see \code{\link[TraMineR]{seqecreate}}).
 }
 \value{
 A \code{data.frame} containing three columns: "id", "timestamp" and "event".
@@ -46,7 +46,8 @@ fce <- data.frame(id=1:100, event1=runif(100), event2=runif(100))
 fce[runif(100)<0.1, "event1"] <- NA
 fce[runif(100)<0.1, "event2"] <- NA
 
-tse <- FCE_to_TSE(fce, id="id", cols=c("event1", "event2"), eventlist=c("Marriage", "Child birth"), firstEvent="Birth")
+tse <- FCE_to_TSE(fce, id="id", cols=c("event1", "event2"),
+       eventlist=c("Marriage", "Child birth"), firstEvent="Birth")
 
 seq <- seqecreate(tse)
 print(seq[1:10])

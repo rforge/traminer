@@ -1,6 +1,6 @@
 seqedplot <- function(seqe, group=NULL, breaks=20, ages=NULL,title=NULL, type="survival", ignore=NULL,
 	withlegend="auto",cex.legend=1, use.layout=(!is.null(group) | withlegend!=FALSE),legend.prop=NA, rows=NA, cols=NA, axes="all",
-	xlab="time", ylab=ifelse(type=="survival", "survival probability", "mean number of event"), cpal=NULL, ...){
+	xlab="time", ylab=ifelse(type=="survival", "survival probability", "mean number of events"), cpal=NULL, ...){
 	
 	if(!is.seqelist(seqe)) stop("seqe should be a seqelist. See help on seqecreate.")
 	
@@ -21,9 +21,9 @@ seqedplot <- function(seqe, group=NULL, breaks=20, ages=NULL,title=NULL, type="s
 			gindex[[s]] <- which(group==levels(group)[s])
 
 		## Title of each plot
-		if (!is.null(title)) 
+		if (!is.null(title))
 			title <- paste(title,"-",levels(group))
-		else 
+		else
 			title <- levels(group)
 	}
 	else {
@@ -73,13 +73,13 @@ seqedplot <- function(seqe, group=NULL, breaks=20, ages=NULL,title=NULL, type="s
 	}
 	if(is.null(ages))ages <- c(minage, maxage)
 	if(is.null(cpal)) {
-		if (nevent==2) 
+		if (nevent==2)
 			cpal <- brewer.pal(3,"Dark2")[1:2]
-		else if (nevent<=8) 
+		else if (nevent<=8)
 			cpal <- brewer.pal(nevent,"Dark2")
-		else if (nevent>8 & nevent<=12) 
+		else if (nevent>8 & nevent<=12)
 			cpal <- brewer.pal(nevent,"Set3")
-		else 
+		else
 			cpal <- 1:nevent
 	}
 	## Finding correct cutpoints
