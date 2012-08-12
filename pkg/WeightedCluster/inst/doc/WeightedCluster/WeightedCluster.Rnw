@@ -242,7 +242,7 @@ wardTree <- as.seqtree(wardCluster, seqdata=mvadseq, diss=mvaddist, ncluster=6)
 
 Une fois l'arbre construit, la fonction \code{seqtreedisplay} de la librairie \pkg{TraMineR} \citep{StuderRitschardGabadinhoMuller2011SMR} permet de le représenter graphiquement. L'option \code{showdepth=TRUE} affiche les niveaux des regroupements sur la droite du graphique.
 
-<<seqtreedisplay, echo=FALSE, results="hide">>=
+<<seqtreedisplay, echo=FALSE, results="hide", eval=FALSE>>=
 seqtreedisplay(wardTree, type="d", border=NA, filename="wardtree.png", showdepth=TRUE, showtree=FALSE)
 @
 
