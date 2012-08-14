@@ -1,5 +1,5 @@
 seqstart <- function(seqdata, data.start, new.start, tmin=NULL, tmax=NULL, missing=NA){
-	new.start <- new.start
+	warning(" [!] Please check your results. This function needs further testing.")
 	new.index <- as.integer(data.start - new.start+1)
 	if(length(new.index)!=nrow(seqdata)){
 		if(length(new.index)==1){
