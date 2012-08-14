@@ -40,19 +40,20 @@ print(paneldata)
 ## Assuming data are aligned on calendar years, starting in 2000
 ## Change from calendar date to age alignment
 startyear <- 2000 
-birthyear <- 1995:1999
+birthyear <- 1996:2000
 agedata <- seqstart(paneldata, data.start=startyear, new.start=birthyear)
-colnames(agedata) <- 1:ncol(agedata)
+## First year is 0.
+colnames(agedata) <- 0:8
 print(agedata)
 
-## Retaining only ages between 3 and 7 (4th and 8th year after birthyear).
-seqstart(paneldata, data.start=startyear, new.start=birthyear, tmin=4, tmax=8, missing="*")
+## Retaining only ages between 3 and 7.
+seqstart(paneldata, data.start=startyear, new.start=birthyear, tmin=3, tmax=7, missing="*")
 
 ## Changing back from age to calendar time alignment
 ageatstart <- startyear - birthyear
-seqstart(agedata, data.start=1,  new.start=ageatstart)
+seqstart(agedata, data.start=0,  new.start=ageatstart)
 ## Same but dropping right columns filled with NA's
-seqstart(agedata, data.start=1,  new.start=ageatstart, tmax=5)
+seqstart(agedata, data.start=0,  new.start=ageatstart, tmax=5)
 
 }
 \keyword{data format}

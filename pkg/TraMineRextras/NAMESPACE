@@ -29,3 +29,7 @@ export(
     seqentrans
 
 )
+
+useDynLib(TraMineRextras,
+TMREXTRAS_tmrextrasseqstart=tmrextrasseqstart
+)
