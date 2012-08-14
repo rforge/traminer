@@ -1,4 +1,5 @@
 seqstart <- function(seqdata, data.start, new.start, tmin=NULL, tmax=NULL, missing=NA){
+	new.start <- new.start
 	new.index <- as.integer(data.start - new.start+1)
 	if(length(new.index)!=nrow(seqdata)){
 		if(length(new.index)==1){
@@ -31,7 +32,9 @@ seqstart <- function(seqdata, data.start, new.start, tmin=NULL, tmax=NULL, missi
 	seqdatadim <- dim(seqdata)
 	seqdata <- as.character(as.matrix(seqdata))
 	dim(seqdata) <- seqdatadim
-	return(.Call(TMREXTRAS_tmrextrasseqstart, seqdata, new.data, as.integer(new.index-tmin)))
+	#tmin <- tmin + 1 - firstyear
+	## print(tmin:tmax-correction-1)
+	return(.Call(TraMineRextras:::TMREXTRAS_tmrextrasseqstart, seqdata, new.data, as.integer(new.index-tmin)))
 }
 
 
