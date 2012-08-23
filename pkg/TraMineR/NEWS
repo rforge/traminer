@@ -7,9 +7,12 @@ Changes in existing functions:
   - seqplot(), plot.stslist(): if sortv is a factor, the sequences are now sorted
     according to the order of the factor levels
 
+Bug fixes:
+ - seqdef(): Corresponding weights not selected when selecting subsets of sequence objects using rownames instead of direct indexes. Now setting names of weight vector to be the same as sequences rownames. (Alexis Gabadinho)
+
 
 ## ==========
-Version 1-8-2
+Version 1.8-2
 
 Vignettes: Slightly modified JSS article vol. 40(4) added as a vignette
     on state sequence analysis.
