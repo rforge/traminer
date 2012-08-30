@@ -231,9 +231,9 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 		if (length(id)==1 && id=="auto") { 
 			rownames(seqdata) <- paste("[",1:nbseq,"]",sep="") } 
 		else { 
-			rownames(seqdata) <-id 
+			rownames(seqdata) <- id 
 		}
-		names(weights) <- rownames(seqdata)
+		if (!is.null(weights)) { names(weights) <- rownames(seqdata) }
 	}
 	
 	## TraMineR Version
