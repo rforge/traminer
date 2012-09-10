@@ -2,13 +2,17 @@
 Version 1.9-3 (development version)
 
 Changes in existing functions:
-  - seqplot(): if group argument is a factor, the plots are now ordered the same way as the
-    factor levels
-  - seqplot(), plot.stslist(): if sortv is a factor, the sequences are now sorted
-    according to the order of the factor levels
+  - seqplot(): if group argument is a factor, the plots are 
+    now ordered the same way as the factor levels
+  - seqplot(), plot.stslist(): if sortv is a factor, the 
+    sequences are now sorted according to the order of the factor levels.
+  - seqmodst() and plot.stslist.modst(): changed name of
+    attribute "occurences" of object returned by seqmodst to 
+    "occurrences". Made resulting changes in plot.stslsit.modst.
 
 Bug fixes:
- - seqdef(): Corresponding weights not selected when selecting subsets of sequence objects using rownames instead of direct indexes. Now setting names of weight vector to be the same as sequences rownames. (Alexis Gabadinho)
+  - seqdef(): Corresponding weights not selected when selecting 
+    subsets of sequence objects using rownames instead of direct indexes. Now setting names of weight vector to be the same as sequences rownames. (Alexis Gabadinho)
 
 
 ## ==========

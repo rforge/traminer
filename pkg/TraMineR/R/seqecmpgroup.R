@@ -15,7 +15,7 @@
 #  return(chi$statistic)
 #}
 
-seqecmpgroup<-function(subseq, group, method="chisq", pvalue.limit=NULL, weighted=TRUE){
+seqecmpgroup <- function(subseq, group, method="chisq", pvalue.limit=NULL, weighted=TRUE){
 	## If non weighted, we just change the weights to 1
 	if(!weighted) {
 		www <- seqeweight(subseq$seqe)
@@ -160,4 +160,4 @@ plot.subseqelistchisq<-function(x, ylim="uniform", rows=NA, cols=NA,
 			cex=legend.cex,
 			bty="o"
 		)
-} 
+}
