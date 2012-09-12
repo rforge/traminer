@@ -2,6 +2,9 @@
 Version 1.9-3 (development version)
 
 Changes in existing functions:
+  - seqplot(), seqdplot(), seqiplot(), seqfplot(), seqmsplot(), seqrplot(): if 'density' and/or 'angle' 
+    are used to produce shading lines instead of solid colors, the legend is plotted using the same
+    parameters and thus corresponds to the colors used in the plot
   - seqplot(): if group argument is a factor, the plots are 
     now ordered the same way as the factor levels
   - seqplot(), plot.stslist(): if sortv is a factor, the 
