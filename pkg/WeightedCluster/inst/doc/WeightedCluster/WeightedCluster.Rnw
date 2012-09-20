@@ -29,7 +29,7 @@
 %% an abstract and keywords
 \Abstract{
 Ce manuel poursuit un double but: présenter la librairie \pkg{WeightedCluster} et proposer un guide pas à pas à la création de typologie de séquences pour les sciences sociales. Cette librairie permet notamment de représenter graphiquement les résultats d'une analyse en clusters hiérarchique, de regrouper les séquences identiques afin d'analyser un nombre de séquences plus important, de calculer un ensemble de mesure de qualité d'une partition, ainsi qu'un algorithme PAM optimisé prenant en compte les pondérations. La libraire offre également des procédures pour faciliter le choix d'une solution de clustering particulière et définir le nombre de groupes.
-
+ 
 Outre les méthodes, nous discutons également de la construction de typologie de séquences en sciences sociales et des hypothèses sous-jacentes à cette démarche. Nous clarifions notamment la place que l'on devrait donner à la construction de typologie en analyse de séquences. Nous montrons ainsi que ces méthodes offrent un point de vue descriptif important sur les séquences en faisant ressortir des patterns récurrents. Toutefois, elles ne devraient pas être utilisées dans une optique confirmatoire, car elles peuvent conduire à des conclusions trompeuses.
 }
 
@@ -91,7 +91,7 @@ Outre les méthodes, nous discutons également de la construction de typologie de 
 
 
 %% preliminary R commands
-<<preliminary, echo=FALSE, results="hide", message=FALSE>>=
+<<preliminary, echo=FALSE, results="hide", message=FALSE, warning=FALSE>>=
 options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
@@ -100,9 +100,10 @@ knit_hooks$set(crop = hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
 })
+opts_knit$set(concordance=TRUE)
 @
 
-\SweaveOpts{message=FALSE, prompt=TRUE, echo=TRUE, comment=NA, crop=TRUE, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth"} % sets the prefix for figure files generated par Sweave
+\SweaveOpts{message=FALSE, prompt=TRUE, echo=TRUE, comment=NA, crop=TRUE, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth", concordance=TRUE} % sets the prefix for figure files generated par Sweave
 
 \begin{document}
 
