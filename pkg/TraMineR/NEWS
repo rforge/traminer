@@ -1,7 +1,11 @@
 ## =========
 Version 1.9-3 (development version)
 
+New functionalities:
+  - seqpcplot(): parallel coordinate plot for sequence data
+
 Changes in existing functions:
+  - seqplot(): new option type = "pc"
   - seqplot(), seqdplot(), seqiplot(), seqfplot(), seqmsplot(), seqrplot(): if 'density' and/or 'angle' 
     are used to produce shading lines instead of solid colors, the legend is plotted using the same
     parameters and thus corresponds to the colors used in the plot
