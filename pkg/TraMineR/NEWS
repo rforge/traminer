@@ -5,7 +5,7 @@ New functionalities:
   - seqpcplot(): parallel coordinate plot for sequence data
 
 Changes in existing functions:
-  - seqdss(): adding labels to returned values
+  - seqdss(): adding long state labels to returned sequence object
   - seqplot(): new option type = "pc"
   - seqplot(), seqdplot(), seqiplot(), seqfplot(), seqmsplot(), seqrplot(): if 'density' and/or 'angle' 
     are used to produce shading lines instead of solid colors, the legend is plotted using the same
