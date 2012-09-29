@@ -15,6 +15,7 @@ export(
     HSPELL_to_STS,
     seqe2stm,
     TSE_to_STS,
+	STS_to_SPELL,
     seqedist,
     seqedplot,
     createdatadiscrete,
@@ -26,10 +27,17 @@ export(
     seqgen.missing,
     seqgranularity,
     seqauto,
-    seqentrans
+    seqentrans,
+	seqemlt
 
 )
+
+## emlt methods
+S3method(plot, emlt)
+S3method(print, emlt)
+
 
 useDynLib(TraMineRextras,
 TMREXTRAS_tmrextrasseqstart=tmrextrasseqstart
 )
+
