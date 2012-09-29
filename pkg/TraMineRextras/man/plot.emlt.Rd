@@ -42,7 +42,7 @@ The "pca" components are the components of the emlt transformed sequences, see s
 - Rousset Patrick, Giret Jean-françois (2008) A longitudinal Analysis of  Labour Market Data with SOM, Encyclopedia of Artificial Intelligence, Edition Information Science Reference -
 %% ~put references to the literature/web site here ~
 }
-\author{Patrick Rousset, Senior researcher at Cereq, rousset@cereq.fr
+\author{Patrick Rousset, Senior researcher at Cereq, rousset@cereq.fr with the help of Matthias Studer
 }
 
 \seealso{

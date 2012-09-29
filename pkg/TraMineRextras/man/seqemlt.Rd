@@ -1,8 +1,8 @@
 \name{seqemlt}
 \alias{seqemlt}
-\title{Euclidean metric for longitudinal timelines}
+\title{Euclidean Metric for Longitudinal Timelines}
 \description{
-Computes a Euclidean distance of sequences.
+Computes a Euclidean distance of sequences.	
 transforms sequences such as distance beween sequences is equivalent to Euclidean distance between transformed sequences. 
 The transformed sequences may be used as inputs of any Euclidean algorithm (clustering algorithms, ...).
 The distance is built considering the transitions between states at any step.
@@ -46,7 +46,7 @@ A situation is defined as a state idexed with time, a sequence a timelines of st
 - Rousset Patrick, Giret Jean-françois (2008) A longitudinal Analysis of  Labour Market Data with SOM, Encyclopedia of Artificial Intelligence, Edition Information Science Reference -
 %% ~put references to the literature/web site here ~
 }
-\author{Patrick Rousset, Senior researcher at Cereq, rousset@cereq.fr
+\author{Patrick Rousset, Senior researcher at Cereq, rousset@cereq.fr with the help of Matthias Studer
 }
 
 \seealso{plot.emlt}
