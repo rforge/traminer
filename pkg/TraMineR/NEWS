@@ -1,27 +1,33 @@
 ## =========
 Version 1.9-3 (development version)
 
+Information pages:
+  - Updated online help pages.
+  - Updated list of references returned by citation("TraMineR").
+
 New functionalities:
   - seqpcplot(): parallel coordinate plot for sequence data
 
 Changes in existing functions:
   - seqdss(): adding long state labels to returned sequence object
   - seqplot(): new option type = "pc"
-  - seqplot(), seqdplot(), seqiplot(), seqfplot(), seqmsplot(), seqrplot(): if 'density' and/or 'angle' 
-    are used to produce shading lines instead of solid colors, the legend is plotted using the same
-    parameters and thus corresponds to the colors used in the plot
-  - seqplot(): if group argument is a factor, the plots are 
-    now ordered the same way as the factor levels
-  - seqplot(), plot.stslist(): if sortv is a factor, the 
+  - seqplot(), seqdplot(), seqiplot(), seqfplot(), seqmsplot(), seqrplot(): 
+    if 'density' and/or 'angle' are used to produce shading lines 
+    instead of solid colors, the legend is plotted using the same 
+    parameters and thus corresponds to the colors/shades used in the plot.
+  - seqplot(): if group argument is a factor, the plots are
+    now ordered the same way as the factor levels.
+  - seqplot(), plot.stslist(): if sortv is a factor, the
     sequences are now sorted according to the order of the factor levels.
   - seqmodst() and plot.stslist.modst(): changed name of
-    attribute "occurences" of object returned by seqmodst to 
+    attribute "occurences" of object returned by seqmodst to
     "occurrences". Made resulting changes in plot.stslsit.modst.
 
 Bug fixes:
-  - seqdef(): Corresponding weights not selected when selecting 
-    subsets of sequence objects using rownames instead of direct indexes. Now setting names of weight vector to be the same as sequences rownames. (Alexis Gabadinho)
-
+  - seqdef(): Corresponding weights not selected when selecting subsets of 
+    sequence objects using rownames instead of direct indexes. Now setting 
+    names of weight vector to be the same as sequences rownames. (Alexis Gabadinho)
+    
 
 ## ==========
 Version 1.8-2
