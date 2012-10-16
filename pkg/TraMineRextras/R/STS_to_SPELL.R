@@ -5,11 +5,11 @@
 STS_to_SPELL <- function(seqdata, id=NULL, pdata=NULL, birthdate=NULL, with.missing=TRUE) {
 
 	if (!inherits(seqdata,"stslist")){
-		stop("data is NOT a sequence object, see seqdef function to create one")
+		stop("data is NOT a state sequence object, see seqdef function to create one")
 	}
 	nbseq <- nrow(seqdata)
 
-	sl <- seqlength(seqdata) 
+	sl <- seqlength(seqdata)
 	sltot <- sum(sl)
 
 	void <- attr(seqdata, "void")
@@ -40,7 +40,7 @@ STS_to_SPELL <- function(seqdata, id=NULL, pdata=NULL, birthdate=NULL, with.miss
 		if(length(birthdate)!=nrow(seqdata)){
 			stop(" [!] 'birthdate' should have one entry per sequence.")
 		}
-		birthdate <- birthdate - 1 
+		birthdate <- birthdate - 1
 	}else{
 		birthdate <- rep(0, nrow(seqdata))
 	}
@@ -70,7 +70,7 @@ STS_to_SPELL <- function(seqdata, id=NULL, pdata=NULL, birthdate=NULL, with.miss
 				# print(iseq)
 				# print(str(states))
 			# }
-			while (idx <= sli && (seqdatamat[i, idx+1]==iseq)) { 
+			while (idx <= sli && (seqdatamat[i, idx+1]==iseq)) {
 				idx <- idx+1
 			}
 
@@ -92,4 +92,3 @@ STS_to_SPELL <- function(seqdata, id=NULL, pdata=NULL, birthdate=NULL, with.miss
 
 	return(spell)
 }
-

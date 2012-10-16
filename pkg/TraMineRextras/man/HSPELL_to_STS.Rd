@@ -31,14 +31,14 @@ Vector containing the columns (name or number) with the status of each spell.
 }
   \item{pvar}{ names or numbers of the column containing the 'birth' time.
 }
-  \item{overwrite}{If \code{TRUE}, the most recent episode overwrites the older one if they overlap each other. If set to FALSE, the most recent episode starts from the end of the previous one.
+  \item{overwrite}{Should the most recent episode overwrite the older one when they overlap? If \code{FALSE}, the most recent episode starts from the end of the previous one.
 }
-  \item{fillblanks}{If fillblanks is not NULL, gaps between episodes are filled with any character given as argument.
+  \item{fillblanks}{If not \code{NULL}, character used for filling gaps between episodes.
 }
   \item{tmin}{
-If sequences are to be defined on a calendar time axis, it defines the starting time of the axis. If set to NULL, the minimum time is taken from the 'begin' column in the data.}
+If sequences are to be defined on a calendar time axis, it defines the starting time of the axis. If set as NULL, the start time is set as the minimum of the 'begin' column in the data.}
   \item{tmax}{
-If year sequences are wanted, defines the ending year of the dataframe. If set to NULL, it is guessed from the data (not so accurately!).
+If year sequences are wanted, defines the ending year of the sequences. If set to NULL, it is guessed from the data (not so accurately!).
 }
   \item{id}{
 column containing the identification numbers for the sequences.
@@ -47,9 +47,9 @@ column containing the identification numbers for the sequences.
 }
 \details{
 Hortizontal spell data format has the following caracteristics:
-	- One row per individual
-	- Each spells are specified using three variable: a begin date, a end date, and the status.
-	- Value of variable for unused spells are should be set to \code{NA}.
+    - One row per individual
+    - Each spell is specified with three consecutive variables: a begin date, an end date, and the status.
+    - For unused spells, begin and end values should be set as \code{NA}.
 }
 \value{
 A \code{data.frame} with the sequence in STS format.

@@ -18,7 +18,7 @@ seqgranularity(seqdata, tspan = 3, method = "last")
     Integer. Number of successive positions grouped together.
 }
   \item{method}{
-    Character string. Aggregating method. Currently only \code{"last"} is supported.
+    Character string. Aggregating method. One of \code{"first"} or \code{"last"} (default).
 }
 }
 \details{
