@@ -1,5 +1,8 @@
 ## =========
-Version 1.9-3 (development version)
+Version 1.9-4 (Development version)
+
+## =========
+Version 1.8-3 
 
 Information pages:
   - Updated online help pages.
@@ -24,9 +27,10 @@ Changes in existing functions:
     "occurrences". Made resulting changes in plot.stslsit.modst.
 
 Bug fixes:
-  - seqdef(): Corresponding weights not selected when selecting subsets of 
-    sequence objects using rownames instead of direct indexes. Now setting 
-    names of weight vector to be the same as sequences rownames. (Alexis Gabadinho)
+  - seqdef(): When selecting subsets of sequence objects using rownames 
+    instead of row indexes, the corresponding weights were not selected. 
+    Fixed by setting (row)names of weight vector as the sequence 
+    rownames. (Alexis Gabadinho)
     
 
 ## ==========
@@ -155,7 +159,7 @@ Bug fixes:
   - seqdef(): now checks whether all states encountered in the input data are present in an optional
       user provided alphabet ('state' argument)
   - seqefsub(): The support of a subsequence with a total support of 1 was set to 0 (hence, this only
-	applies if the minimum support is 1.) This is now corrected (Reported by Anna Hera).
+    applies if the minimum support is 1.) This is now corrected (Reported by Anna Hera).
   - Corrected compilation problems under SOLARIS (Reported by Prof Brian Ripley).
   - seqformat(): when converting from SPELL to STS, the fillblank argument was not used.
 

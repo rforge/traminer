@@ -1,6 +1,6 @@
 Package: TraMineR
-Version: 1.9-3
-Date: 2012-06-28
+Version: 1.9-4
+Date: 2012-10-19
 Title: Trajectory miner: a toolbox for exploring and rendering sequence data
 Author: Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. Müller <nsmuller@gmail.com>, Gilbert Ritschard <gilbert.ritschard@unige.ch> and contributions from Reto Bürgin <reto.buergin@unige.ch>.
 Maintainer: TraMineR Team <traminer-team@unige.ch>

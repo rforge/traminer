@@ -25,10 +25,10 @@ seqgranularity(seqdata, tspan = 3, method = "last")
 Successive position are aggregated by group of \code{tspan}, starting from the first position and, with method \code{"last"}, the last state in the group is assigned to the group. In case of an incomplete last group, the last state is assigned to it.
 }
 \value{
-The resulting state sequence object. 
+The resulting state sequence object.
 }
 \author{
-Gilbert Ritschard
+Matthias Studer and Gilbert Ritschard
 }
 
 %% ~Make other sections like Warning with

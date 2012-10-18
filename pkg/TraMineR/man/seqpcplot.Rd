@@ -19,7 +19,7 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
           cex = 1, lwd = 1/4, cpal = NULL, grid.scale = 1/5,
           ltype = "unique", embedding = "most-frequent",
           lorder = NULL , lcourse = "upwards",
-          filter = NULL, hide.col = "grey80", 
+          filter = NULL, hide.col = "grey80",
           alphabet = NULL, order.align = "first",
           title = NULL, xlab = NULL, ylab = NULL,
           xaxis = TRUE, yaxis = TRUE, axes = "all",
@@ -34,14 +34,14 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
     \code{\link{seqecreate}}) or a state sequence object of class
     \code{stslist} (see \code{\link{seqdef}}).}
 
-  \item{group}{a vector (numeric or factor) of group memberships 
+  \item{group}{a vector (numeric or factor) of group memberships
     of length equal the number of
-    sequences. When specified, one plot is generated for each 
+    sequences. When specified, one plot is generated for each
     different membership value.}
 
   \item{weights}{a numeric vector of weights of length equal the number
-  of sequences. Overrides weights in the \code{seqdata} object.}  
-  
+  of sequences. Overrides weights in the \code{seqdata} object.}
+
   \item{cex}{expansion factor for the squared symbols.}
 
   \item{lwd}{expansion factor for line widths. The expansion is
@@ -58,14 +58,14 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
   \item{embedding}{The method for embedding sequences embeddable in
     multiple non-embeddable sequences. Either \code{"most-frequent"}
     (default) or \code{"uniformly"}. Relevant only with \code{ltype =
-      "non-embeddable"}.}  
-  
+      "non-embeddable"}.}
+
   \item{lorder}{line ordering. Either \code{"background"} or
-  \code{"foreground"}.}  
+  \code{"foreground"}.}
 
   \item{lcourse}{Method to connect simultaneous elements with the
     preceding and following ones. Either "upwards" (default) or
-    "downwards".} 
+    "downwards".}
 
   \item{filter}{list of line coloring options. See details.}
 
@@ -74,12 +74,12 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
 
   \item{alphabet}{a vector of response levels in the order they should
     appear on the y-axis. This argument is solely relevant for
-    \code{seqelist} objects.} 
+    \code{seqelist} objects.}
 
   \item{order.align}{Method for converting timestamps to individual
   order positions. Either \code{"first"} (default) or
   \code{"last"}. \code{"first"} numbers the positions from the beginning
-  while \code{"last"} numbers them from the end.} 
+  while \code{"last"} numbers them from the end.}
 
   \item{title}{title for the graphic.}
   \item{xlab}{label for the x axis}
@@ -119,34 +119,34 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
   interesting patterns. The filtered-out patterns are displayed in the
   \code{hide.col} color. The \code{filter} argument expects a list with
   at least elements \code{type} and \code{value}. The following types
-  are implemented: 
-  
-  Type \code{sequence}: colors a specific pattern, for example assign
+  are implemented:
+
+  Type \code{sequence}: colors a specific pattern, for example assign\cr
   \code{filter = list(type = "sequence", value = "(Leaving
-  Home,Union)-(Child)")}. 
-  
+  Home,Union)-(Child)")}.
+
   Type \code{subsequence}: colors patterns which include a specific
-  subsequence, for example \code{filter = list(type =
-    "subsequence", value = "(Child)-(Marriage)")} .
-  
+  subsequence, for example\cr \code{filter = list(type =
+  "subsequence", value = "(Child)-(Marriage)")} .
+
   Type \code{value}: gradually colors the patterns according to the
   numeric vector (of length equal to the number of sequences) provided as
   \code{"value"} element in the list. You can give something like
   \code{filter = list(type = "value", value = c(0.2, 1, ...))} or
   provide the distances to the medoid as \code{value} vector for
-  example. 
-  
+  example.
+
   Type \code{function}: colors the patterns depending on the values
   returned by a [0,1] valued function on the frequency x of the
   pattern. Two native functions can be used: \code{"minfreq"} and
   \code{"cumfreq"}. Use \code{filter = list(type = "function", value =
   "minfreq", level = 0.05)} to color patterns with a support of at least
-  5\% (within group). Or, use \code{filter = list(type = "function",
+  5\% (within group). Or, use\cr\code{filter = list(type = "function",
   value = "cumfreq", level = 0.5)} to highlight the 50\% most frequent
   patterns (within group). Other user-specified functions can be
-  provided by giving something like \code{filter = list(type =
+  provided by giving something like\cr\code{filter = list(type =
   "function", value = function(x, arg1, arg2) {return(x / max(x) * arg1
-    / arg2)}, arg1 = 1, arg2 = 1)}. This latter function adjusts
+  / arg2)}, arg1 = 1, arg2 = 1)}. This latter function adjusts
   gradually the color intensity of patterns according to the frequency
   of the pattern.
 
@@ -174,7 +174,7 @@ lab <- c("Parent","Left","Married","Left+Marr","Child","Left+Child",
 
 ## creating the weighted state sequence object.
 biofam.seq <- seqdef(data = biofam[,10:25], labels = lab,
-                     weights = biofam$wp00tbgs) 
+                     weights = biofam$wp00tbgs)
 
 ## select the first 20 weighted sequences (sum of weights = 18)
 biofam.seq <- biofam.seq[1:20, ]
@@ -266,5 +266,4 @@ seqpcplot(seqdata = biofam.seqe,
 
 }
 
-\keyword{plot, categorical longitudinal data, state sequences, event
-  sequences} 
+\keyword{hplot}
