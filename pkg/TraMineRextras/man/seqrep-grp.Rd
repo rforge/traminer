@@ -37,7 +37,7 @@ If \code{ret="stat"}, a list with the quality statistics for the set of represen
 
 If \code{ret="rep"}, a list with the set of representatives of each group.
 
-If \code{ret="rep"}, a list with the two previous outcomes.
+If \code{ret="both"}, a list with the two previous outcomes.
 }
 
 \note{This function is a pre-release and further testing is still needed, please report any problems.}
