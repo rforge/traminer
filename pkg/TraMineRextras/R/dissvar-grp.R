@@ -22,12 +22,14 @@ dissvar.grp <- function(mdis, group=NULL, ...){
     levg <- levels(grp <- factor(grp))
 
     v <- vector("double",length(levg))
+    ## We need to transform into a matrix to subset
+    ## an alternative would be use the subset.dist function from package cba
+    if (isdist) mdis <- as.matrix(mdis)
     for (i in 1:length(levg))
         {
-        ig <- which(grp==levg[i]) 
+        ig <- which(grp==levg[i])
         v[[i]] <- dissvar(mdis[ig,ig], ...)
         }
     names(v) <- levg
     return(v)
 }
-
