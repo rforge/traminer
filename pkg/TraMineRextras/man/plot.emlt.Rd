@@ -46,20 +46,5 @@ The "pca" components are the components of the emlt transformed sequences, see s
 }
 
 \seealso{
-See Also \code{\link{seqemlt}}
-}
-\examples{
-
-data(mvad)
-mvad.seq <- seqdef(mvad[, 17:86])
-
-## Compute emlt method (see emlt)
-mvad.emlt <- seqemlt(mvad.seq)
-
-## Plot the evolve of the state structure
-plot(mvad.emlt, from="employment", to="joblessness",type="cor")
-plot(mvad.emlt, from=c("employment","HE", "school", "FE"), to="joblessness", delay=0, leg=TRUE)
-plot(mvad.emlt, from="joblessness", to="employment", delay=6)
-plot(mvad.emlt, type="pca", cex=0.4, compx=1, compy=2)
-
+See Also \code{\link{seqemlt}} (with examples)
 }
