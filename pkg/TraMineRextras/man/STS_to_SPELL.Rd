@@ -31,7 +31,7 @@ vector of sequence birth dates or name of the birth date column in \code{pdata}.
 SPELL format is a vertical format with one row per spell, each spell being specified with four variables: an id, a begin date, a end date, and the state.
 }
 \value{
-A \code{data.frame} with the sequence in vertical SPELL format.
+A \code{data.frame} with the sequences in vertical SPELL format.
 }
 \author{
 Matthias Studer
