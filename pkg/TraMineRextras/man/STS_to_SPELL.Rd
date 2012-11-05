@@ -2,48 +2,45 @@
 \alias{STS_to_SPELL}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Data conversion from STS to SPELL.
+Data conversion from STS to SPELL format.
 }
 \description{
-Convert data from STS to SPELL.
+Convert data from STS to vertical SPELL format.
 }
 \usage{
-STS_to_SPELL(seqdata, id = NULL, pdata = NULL, birthdate = NULL, with.missing = TRUE)
+STS_to_SPELL(seqdata, id=NULL, pdata=NULL, birthdate=NULL, with.missing=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{seqdata}{
-a data frame or matrix containing sequence data in STS format
+a state sequence object of type \code{"stslist"} (see \code{\link[TraMineR]{seqdef}}).
 }
-  \item{id}{
-Either a column name (or number) of \code{pdata} or a vector of individual identification number or character. If \code{id=NULL}, \code{id} is set to \code{1:nrow(seqdata)} or \code{rownames} of \code{seqdata} (if not \code{NULL}). 
+  \item{id}{Either a
+vector of sequence id's or name of the id column in \code{pdata}. If \code{NULL},  \code{rownames(seqdata)} are used.
 }
   \item{pdata}{
-A data frame containing personal \code{id} and \code{birthdate}.
+Data frame with id and birth dates.
 }
   \item{birthdate}{
-Either a column name (or number) of \code{pdata} or a vector of individual process start date.
+Either a
+vector of sequence birth dates or name of the birth date column in \code{pdata}.
 }
-  \item{with.missing}{If \code{TRUE}, missing episodes are included. Otherwise, these episodes are ignored.}
-
+    \item{with.missing}{Logical. Should explicit spells of missing states be included?}
 }
 \details{
-Spell data format has the following caracteristics:
-	- One row per episode (spell)
-	- Each spells are specified using four variables: an id, a begin date, a end date, and the states.
+SPELL format is a vertical format with one row per spell, each spell being specified with four variables: an id, a begin date, a end date, and the state.
 }
-\value{A \code{data.frame} with the sequence data in the SPELL format.
+\value{
+A \code{data.frame} with the sequence in vertical SPELL format.
 }
 \author{
 Matthias Studer
 }
 
-\note{This function is a pre-release and further testing is still needed, please report any problems.}
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 See Also \code{\link[TraMineR]{seqformat}}.
 }
+\note{This function is a pre-release and further testing is still needed, please report any problems.}
 \examples{
 data(biofam)
 
@@ -56,3 +53,6 @@ spell <- STS_to_SPELL(bf.seq, birthdate=biofam$birthyr)
 head(spell)
 
 }
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{data format}

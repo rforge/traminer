@@ -104,7 +104,13 @@ lab <- c("Parent","Left","Married",
          "Left+Marr","Child","Left+Child",
          "Left+Marr+Child","Divorced")
 biofam.seq <- seqdef(data=biofam,var=10:25,labels=lab)
+## For this example, we consider only a sample of 150 cases
+set.seed(23653)
+sple <- sample(1:nrow(biofam.seq), size=200)
+biofam <- biofam[sple,]
+biofam.seq <- biofam.seq[sple,]
 bf.seqestate <- seqecreate(biofam.seq, tevent = "state")
+head(bf.seqestate)
 
 ## plot the data
 ## =============
@@ -125,7 +131,7 @@ seqeordplot(seqe=bf.seqestate,alphabet=lab,
                        lwd.max=6,cex=0.9,show=c(0.05,1),
                        type="non-embeddable")
 
-## some adds
+## some additional options
 
 par(mar=c(4,8,2,2)) # how the sequences end
 seqeordplot(seqe=bf.seqestate,alphabet=lab,

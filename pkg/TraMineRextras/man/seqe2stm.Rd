@@ -51,7 +51,7 @@ events <- c("marr", "child", "div")
 dm <- matrix(FALSE, 3,3, dimnames=list(events, events))
 dm[3, ] <- c(TRUE, TRUE, FALSE)
 dm[1, 3] <- TRUE
-## Using the matrix, we forget "marriage" and "child" events when "divorce" occurrs.
+## Using the matrix, we forget "marriage" and "child" events when "divorce" occurs.
 ## We also forget "divorce" after "marriage" occurs.
 print(dm)
 stm <- seqe2stm(events, dropMatrix=dm)
