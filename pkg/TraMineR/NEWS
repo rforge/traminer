@@ -2,10 +2,10 @@
 Version 1.9-4 (Development version)
 
 Bug fixes:
-  - seqrep(), dissrep(), seqrplot(): quality measures MD (mean distance to representative) 
-	and V (discrepancy) were not computed properly when more than one 
+  - seqrep(), dissrep(), seqrplot(): wrong (unweighted) "na" values and 
+	quality measures "MD" (mean distance to representative) and "V" (discrepancy) 
+	were not computed properly when more than one 
     representative selected (since version 1.8-2).
-
 
 ## =========
 Version 1.8-3 
