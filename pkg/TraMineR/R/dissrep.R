@@ -142,28 +142,28 @@ dissrep <- function(diss, criterion="density", score=NULL, decreasing=TRUE, trep
 	
 		## message(" [>] ",tied," observations equaly distant from two or more representatives")
 
-		na <- colSums((!is.na(dist.repseq))*weights)
-    		SD <- colSums(dist.repseq*weights, na.rm=TRUE)
-		MD <- SD/sum(weights)
+		na <- colSums(!is.na(dist.repseq)*weights)
+    	SD <- colSums(dist.repseq*weights, na.rm=TRUE)
+		MD <- SD/na
 
 		## Number of similar sequences attributed to each representative
 		nb <- colSums((dist.repseq < tsim)*weights, na.rm=TRUE)
 		
 		## DC: Sum of distances to global center
-    		## V: Inertia
+    	## V: Inertia
 		DC <- matrix(nrow=nbkeep,ncol=1)
-    		V <- matrix(nrow=nbkeep,ncol=1)
+    	V <- matrix(nrow=nbkeep,ncol=1)
 		for (i in 1:nbkeep) { 
-      			sel <- !is.na(dist.repseq[,i])
+      		sel <- !is.na(dist.repseq[,i])
 			DC[i] <- sum(dc.tot[sel]*weights[sel])
 			tmp <- as.matrix(diss[sel, sel])
-			V[i] <- DC[i]/sum(weights[sel])
+			V[i] <- mean(disscenter(tmp, weights=weights[sel]))
 		}
 
 	} else {
 		na <- sum((!is.na(dist.repseq))*weights)
 		SD <- sum(dist.repseq*weights, na.rm=TRUE)
-    MD <- SD/sum(weights)
+    	MD <- SD/sum(weights)
 		nb <- sum((dist.repseq < tsim)*weights, na.rm=TRUE)
 		DC <- sum(dc.tot*weights)
 		V <- DC/sum(weights)
