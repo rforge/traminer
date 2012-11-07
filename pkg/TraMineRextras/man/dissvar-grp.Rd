@@ -44,7 +44,7 @@ Gilbert Ritschard
 data(mvad)
 mvad.shortlab <- c("EM","FE","HE","JL","SC","TR")
 mvad.seq <- seqdef(mvad[, 17:86], states=mvad.shortlab, labels=mvad.shortlab)
-dist <- seqdist(mvad.seq, method="LCS")
+dist <- seqdist(mvad.seq, method="HAM")
 
 ## discrepancy based on non-squared dissimilarities
 dissvar.grp(dist, mvad$gcse5eq) 
