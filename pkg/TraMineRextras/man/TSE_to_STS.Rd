@@ -2,10 +2,10 @@
 \alias{TSE_to_STS}
 
 \title{
-Conversion from TSE data format (for event sequences) to STS (state sequence) data format.
+Converting TSE data into STS (state sequences) format.
 }
 \description{
-Conversion from TSE data format (for event sequences) to STS (state sequence) data format.
+Conversion from TSE (time stamped event sequences) vertical format into STS (state sequences) data format.
 }
 \usage{
 TSE_to_STS(seqdata, id = 1, timestamp = 2, event = 3, stm = NULL, tmin = 1, 
@@ -13,21 +13,21 @@ TSE_to_STS(seqdata, id = 1, timestamp = 2, event = 3, stm = NULL, tmin = 1,
 }
 
 \arguments{
-  \item{seqdata}{a data frame or matrix containing sequence data.}
-  \item{id}{Name or index of the column containing the identification numbers for the sequences.}
-  \item{timestamp}{Name or index of the column containing the timestamp of the events.}
+  \item{seqdata}{a data frame or matrix with event sequence data in TSE format.}
+  \item{id}{Name or index of the column containing the id's of the sequences.}
+  \item{timestamp}{Name or index of the column containing the timestamps of the events.}
   \item{event}{Name or index of the column containing the events.}
   \item{stm}{An event to state transition matrix (See \code{\link{seqe2stm}}).}
   \item{tmin}{Integer. Starting time of the state sequence.}
   \item{tmax}{Integer. Ending time of the state sequence.}
-  \item{firstState}{Character. The name of the state before any events has occured.}
+  \item{firstState}{Character. The name of the state before any events has occurred.}
 }
 \details{
-Convert data in TSE format (for event sequences) to STS (state sequence). By default, the states are defined has the combination of events that already has occured.
-Different scheme may be specified using the function \code{\link{seqe2stm}} and the \code{stm} argument.
+Convert TSE (time stamped event sequences) data into STS (state sequences) format. By default, the states are defined has the combination of events that already occurred.
+Different schemes may be specified using function \code{\link{seqe2stm}} and the \code{stm} argument.
 }
 \value{
-A \code{data.frame} with the sequence in STS format.
+A \code{data.frame} with the sequences in STS format.
 }
 \author{
 Matthias Studer

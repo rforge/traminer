@@ -1,10 +1,10 @@
 Package: TraMineRextras
-Version: 0.1-1131
-Date: 2012-10-28
+Version: 0.2
+Date: 2012-11-11
 Title: Extras for use with the TraMineR package
 Author: Gilbert Ritschard <gilbert.ritschard@unige.ch> and Reto Bürgin and Matthias Studer and Nicolas Müller.
 Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
-Depends: R (>= 2.8.1), TraMineR, RColorBrewer, combinat, survival (<= 2.36-14)
+Depends: R (>= 2.8.1), TraMineR, RColorBrewer, combinat, survival
 Suggests: cluster
 Description: Collection of ancillary functions and utilities to be used in conjunction with the TraMineR package for sequential data exploration. Most of the functions are in test phase, lack systematic consistency check of the arguments and are subject to changes. Once fully checked, some of the functions of this collection could be included in a next release of TraMineR.
 License: GPL (>= 2)

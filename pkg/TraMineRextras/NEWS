@@ -1,0 +1,7 @@
+﻿Changes in version 0.2 [2012-11-10] 
+
+    - First release on CRAN
+
+Bug Fixes
+
+    - dissvar.grp and seqrep.grp now also accept distance object as mdis argument.

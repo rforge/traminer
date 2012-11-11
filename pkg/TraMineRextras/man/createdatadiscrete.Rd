@@ -8,7 +8,7 @@ Transform time to event data (in a specific format, see the detailed description
  }
 
 \usage{
-createdatadiscrete(ids, data, vars, agemin, agemax, 
+createdatadiscrete(ids, data, vars, agemin, agemax,
     supvar=NULL)
 }
 
@@ -21,13 +21,13 @@ createdatadiscrete(ids, data, vars, agemin, agemax,
   \item{supvar}{a vector of variables to add to the resulting person-period data frame}
 }
 
-\details{The data frame from the \code{data} argument must contain two variables for each event : a duration variable that indicates the time when the event occured, and a status variable that indicates if the event occured (1) or not (0). If the event did not occur, the observation for this individual will go until the age specified through the \code{agemax} argument. Each status variable must have the same name than the duration variable, followed by "ST". For example, if the duration variable for an event "divorce" is called "div", then the status variable has to be named "divST". \cr
+\details{The data frame from the \code{data} argument must contain two variables for each event: a duration variable that indicates the time when the event occured, and a status variable that indicates if the event occurred (1) or not (0). If the event did not occur, the observation for this individual will go until the age specified through the \code{agemax} argument. Each status variable must have the same name than the duration variable, followed by "ST". For example, if the duration variable for an event "divorce" is called "div", then the status variable has to be named "divST". \cr
 
 The result from this function is a list with one person-period data frame by event, where the dependent event is different each time. Please see the attached data file and code for an example.   
 
 The resulting object is one of the required argument for the \code{seqerulesdisc} function that computes the association rules, the hazard ratios and the p-values, using discrete-time regressions. Unlike the method presented in Müller et al. 2010, this function does not use Cox proportional hazard models, but discrete-time regression models with a complementary log-log link function, which gives similar results.
  }
- 
+
  \author{Nicolas S. Müller}
 
 \seealso{
@@ -40,5 +40,5 @@ Müller, N.S., M. Studer, G. Ritschard et A. Gabadinho (2010), Extraction de règl
  }
 
 \examples{
-## 
+##
 }
