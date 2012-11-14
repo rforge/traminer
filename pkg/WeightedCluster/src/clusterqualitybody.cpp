@@ -21,6 +21,8 @@ void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weigh
 	//Maybe use  R_qsort_I to sort distances between individuals first
 	CmpCluster * cmpclust=NULL;
 	KendallTreeIterator it;
+	CmpCluster * ZeroDist=new CmpCluster();
+	kendall[0.0]=ZeroDist;
 	TMRLOG(2,"Pearson loop and kendall tree\n");
 	#ifdef DISTOBJECT_VERSION
 	ij =-nelements;
@@ -37,10 +39,18 @@ void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weigh
 			ij += nelements-i-1;
 			//ij  = i*nelements-((i+1)*i)/2-i-1;
 		#endif
+		
 		if(weights[i]>0){
+			// Take to not forget the diagonal!!!!
+			ww = weights[i]*weights[i];
+			// i obs is located in the same cluster as i :)
+			wy+=ww;
+			//Distance is 0 by definition
+			ZeroDist->clustDist0+=ww;
+			totweights+=ww;
 			for(j=i+1;j <nelements;j++){
 				if(weights[j]>0){
-					ww = weights[i]*weights[j];
+					ww = 2*weights[i]*weights[j];
 					xx = distmatrix[ij+j];
 					it=kendall.find(xx);
 					if (it!=kendall.end()) {
