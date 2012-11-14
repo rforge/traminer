@@ -43,11 +43,12 @@ See Also \code{\link[TraMineR]{seqformat}}.
 \note{This function is a pre-release and further testing is still needed, please report any problems.}
 \examples{
 data(biofam)
+biofam <- biofam[1:20,]
 
 ## Create the sequence object
 bfstates <- c("Parent", "Left", "Married", "Left/Married",  "Child", "Left/Child", "Left/Married/Child", "Divorced")
 bf.shortlab <- c("P","L","M","LM","C","LC", "LMC", "D")
-bf.seq <- seqdef(biofam[ ,10:25], alphabet=0:7, states=bf.shortlab, labels=bfstates)
+bf.seq <- seqdef(biofam[,10:25], alphabet=0:7, states=bf.shortlab, labels=bfstates)
 
 spell <- STS_to_SPELL(bf.seq, birthdate=biofam$birthyr)
 head(spell)

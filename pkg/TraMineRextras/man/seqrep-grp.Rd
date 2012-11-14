@@ -49,12 +49,16 @@ Gilbert Ritschard
 \code{\link{seqrep}}
 }
 \examples{
-data(mvad)
-mvad.shortlab <- c("EM","FE","HE","JL","SC","TR")
-mvad.seq <- seqdef(mvad[, 17:86], states=mvad.shortlab, labels=mvad.shortlab)
-dist <- seqdist(mvad.seq, method="LCS")
-seqrep.grp(mvad.seq, group=mvad$gcse5eq, mdis=dist, trep=.2, tsim=.1)
-seqrep.grp(mvad.seq, group=mvad$gcse5eq, mdis=dist, ret="rep", trep=.2, tsim=.1)
+data(biofam)
+biofam <- biofam[1:100,]
+biofam.lab <- c("Parent", "Left", "Married", "Left+Marr",
+"Child", "Left+Child", "Left+Marr+Child", "Divorced")
+biofam.short <- c("P","L","M","LM","C","LC","LMC","D")
+biofam.seq <- seqdef(biofam[,10:25], alphabet=0:7, states=biofam.short, labels=biofam.lab)
+dist <- seqdist(biofam.seq, method="HAM", with.missing=TRUE)
+
+seqrep.grp(biofam.seq, group=biofam$plingu02, mdis=dist, trep=.2, tsim=.1)
+seqrep.grp(biofam.seq, group=biofam$plingu02, mdis=dist, ret="rep", trep=.2, tsim=.1)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

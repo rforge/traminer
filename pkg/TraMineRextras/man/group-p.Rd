@@ -1,7 +1,7 @@
 \encoding{latin1}
 \name{group.p}
 \alias{group.p}
-\author{Gilbert Ritschard} 
+\author{Gilbert Ritschard}
 
 \title{Adds proportion of occurrences to each level names}
 
@@ -10,11 +10,13 @@
 Adds the proportion of occurrences of each level to the corresponding level name.}
 
 \usage{
-group.p(group)
+group.p(group, weights=NULL)
 }
 
 \arguments{
   \item{group}{A group variable.}
+  
+  \item{weights}{Vector of weights of same length as the group variable.} 
 }
 
 \details{
@@ -27,7 +29,10 @@ group.p(group)
 
 \examples{
 data(actcal)
+actcal <- actcal[1:100,]
 actcal.seq <- seqdef(actcal[,13:24])
 seqdplot(actcal.seq, group=group.p(actcal$sex))
+
+levels(group.p(actcal$sex, weights=runif(length(actcal$sex))))
 }
 \keyword{util}

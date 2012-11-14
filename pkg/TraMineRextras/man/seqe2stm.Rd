@@ -5,7 +5,7 @@
 Definition of an events to states matrix.
 }
 \description{
-This function creates a matrix specifying for each state (given in row) the new state that results when a given event (given in column) happens.
+This function creates a matrix specifying for each state (given in row) to which state we fall when the event given in column happens.
 }
 \usage{
 seqe2stm(events, dropMatrix = NULL, dropList = NULL, firstState = "None")
@@ -19,7 +19,7 @@ seqe2stm(events, dropMatrix = NULL, dropList = NULL, firstState = "None")
 }
 
 \details{
-This function creates a matrix with in each cell the new state that results when the column event (column name) occurs while we are in the corresponding row state (row name). Such a matrix is required by \code{\link{TSE_to_STS}}.
+This function creates a matrix with in each cell the new state which results when the column event (column name) occurs while we are in the corresponding row state (row name). Such a matrix is required by \code{\link{TSE_to_STS}}.
 By default, a new state is created for each combination of events that already has occurred.
 
 \code{dropMatrix} and \code{dropList} allow to specify which events should be "forgotten" once a given event has occurred.

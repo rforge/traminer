@@ -5,3 +5,4 @@
 Bug Fixes
 
     - dissvar.grp and seqrep.grp now also accept distance object as mdis argument.
+    - group.p: new weights argument

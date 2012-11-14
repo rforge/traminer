@@ -34,7 +34,7 @@ rowmode(v, except = NULL)
 
 \examples{
 data(actcal)
-actcal.seq <- seqdef(actcal[,13:24])
+actcal.seq <- seqdef(actcal[1:10,13:24])
 actcal.mod <- apply(as.matrix(actcal.seq), 1, rowmode)
 head(actcal.mod)
 

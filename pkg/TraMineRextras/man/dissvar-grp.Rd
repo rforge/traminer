@@ -41,15 +41,16 @@ Gilbert Ritschard
 \code{\link{dissvar}}
 }
 \examples{
-data(mvad)
-mvad.shortlab <- c("EM","FE","HE","JL","SC","TR")
-mvad.seq <- seqdef(mvad[, 17:86], states=mvad.shortlab, labels=mvad.shortlab)
-dist <- seqdist(mvad.seq, method="HAM")
+## create the biofam.seq state sequence object from the biofam data.
+data(biofam)
+biofam <- biofam[1:100,]
+biofam.seq <- seqdef(biofam[,10:25])
+dist <- seqdist(biofam.seq, method="HAM")
 
 ## discrepancy based on non-squared dissimilarities
-dissvar.grp(dist, mvad$gcse5eq) 
+dissvar.grp(dist, biofam$plingu02)
 ## square root of discrepancy based on squared dissimilarities
-sqrt(dissvar.grp(dist, mvad$gcse5eq, squared=TRUE))
+sqrt(dissvar.grp(dist, biofam$plingu02, squared=TRUE))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

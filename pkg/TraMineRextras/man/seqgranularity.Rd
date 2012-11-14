@@ -43,10 +43,11 @@ Matthias Studer and Gilbert Ritschard
 ##--	or do  help(data=index)  for the standard data sets.
 
 data(mvad)
+mvad <- mvad[1:100,]
 mvad.seq <- seqdef(mvad[,17:86], xtstep=12)
 mvadg.seq <- seqgranularity(mvad.seq, tspan=6)
 par(mfrow=c(2,1))
-seqdplot(mvad.seq, withlegend=FALSE)
+seqdplot(mvad.seq, withlegend=FALSE, border=NA)
 seqdplot(mvadg.seq, withlegend=FALSE)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

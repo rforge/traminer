@@ -20,7 +20,7 @@ seqauto(seqdata, order = 1, measure = "cv")
         Maximum wanted order of auto-association.
 }
   \item{measure}{
-        Character string. Currently only \code{"cv"} is accepted.
+        Character string. Currently only \code{"cv"} (Cramer's v) is accepted.
 }
 }
 
@@ -49,7 +49,7 @@ A matrix with \code{order} rows and  two columns: the auto-association and its p
 library(TraMineR)
 data(biofam)
 
-biofam.seq <- seqdef(biofam[,10:25])
+biofam.seq <- seqdef(biofam[1:100,10:25])
 aa <- seqauto(biofam.seq, order=5)
 aa
 }

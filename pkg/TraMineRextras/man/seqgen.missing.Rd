@@ -57,21 +57,21 @@ The resulting state sequence object.
  \code{\link{seqdef}}
 }
 \examples{
-## create the mvad.seq state sequence object from the mvad data.
-data(mvad)
-mvad.seq <- seqdef(mvad[,17:86])
+## create the biofam.seq state sequence object from the biofam data.
+data(biofam)
+biofam.seq <- seqdef(biofam[1:100,10:25])
 
 ## Generate missing states within 60% of the sequences.
-mvadm.seq <- seqgen.missing(mvad.seq, p.cases=.6, 
+biofamm.seq <- seqgen.missing(biofam.seq, p.cases=.6, 
       p.left=.4, p.gaps=.2, p.right=.5)
 
 ## compare the rendering of the sequences before and after 
 ##   introducing missing states.
 par(mfrow=c(2,2))
-seqIplot(mvad.seq, sortv="from.end", withlegend=FALSE)
-seqIplot(mvadm.seq, sortv="from.end", withlegend=FALSE)
-seqdplot(mvad.seq, with.missing=TRUE, border=NA, withlegend=FALSE)
-seqdplot(mvadm.seq, with.missing=TRUE, border=NA, withlegend=FALSE)
+seqIplot(biofam.seq, sortv="from.end", withlegend=FALSE)
+seqIplot(biofamm.seq, sortv="from.end", withlegend=FALSE)
+seqdplot(biofam.seq, with.missing=TRUE, border=NA, withlegend=FALSE)
+seqdplot(biofamm.seq, with.missing=TRUE, border=NA, withlegend=FALSE)
 dev.off()
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

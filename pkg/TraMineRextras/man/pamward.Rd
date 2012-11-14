@@ -8,19 +8,19 @@
 
 
 \description{
-Runs a pam clustering (\code{\link[cluster]{agnes}}) from the solution in k groups of a hierarchical clustering (\code{\link[cluster]{agnes}}) .
+Runs a pam clustering (\code{\link[cluster]{pam}}) from the solution in k groups of a hierarchical clustering (\code{\link[cluster]{agnes}}) .
 }
 
 \usage{
-pamward(dist, k=3, method="ward") 
+pamward(dist, k=3, method="ward")
 }
 
 \arguments{
   \item{dist}{A distance matrix or object.}
 
   \item{k}{Number of clusters.}
-  
-  \item{method}{Method for the hierarchical clustering (see \code{\link[cluster]{agnes}})}  
+
+  \item{method}{Method for the hierarchical clustering (see \code{\link[cluster]{agnes}})}
 }
 
 \details{
@@ -28,7 +28,7 @@ pamward(dist, k=3, method="ward")
 }
 
 \value{
-An object of class of class \code{"pam"}. See ?\code{\link[cluster]{pam.object}} for details.   } 
+An object of class \code{"pam"}. See \code{\link[cluster]{pam.object}} for details.   }
 
 \seealso{
 \code{\link[cluster]{agnes}} and \code{\link[cluster]{pam}}.
@@ -37,9 +37,9 @@ An object of class of class \code{"pam"}. See ?\code{\link[cluster]{pam.object}}
 \examples{
 library(cluster)
 data(actcal)
-actcal.seq <- seqdef(actcal[1:300,13:24])
-actcal.lcs <- seqdist(actcal.seq, method = "LCS")
-clust <- pamward(actcal.lcs, k = 4)
+actcal.seq <- seqdef(actcal[1:200,13:24])
+actcal.ham <- seqdist(actcal.seq, method = "HAM")
+clust <- pamward(actcal.ham, k = 4)
 table(clust$clustering)
 }
 

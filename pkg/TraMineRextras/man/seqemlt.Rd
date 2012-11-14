@@ -54,27 +54,26 @@ A situation is defined as a state indexed with time, a sequence a timelines of s
 library(TraMineR)
 
 data(mvad)
-mvad.seq <- seqdef(mvad[, 17:86])
+mvad.seq <- seqdef(mvad[1:100, 17:41])
 alphabet(mvad.seq)
 head(labels(mvad.seq))
 ## Computing distance
 mvad.emlt <- seqemlt(mvad.seq)
 
-## typology1 with kmeans in 8 clusters
-km <- kmeans(mvad.emlt$coord, 8)
+## typology1 with kmeans in 3 clusters
+km <- kmeans(mvad.emlt$coord, 3)
 
 ##Plotting typology1 by clusters
 seqdplot(mvad.seq, group=km$cluster)
 
-## typology2 : with ward criterion in 8 clusters for large data: a two step kmeans-cluster
-km<-kmeans(mvad.emlt$coord,50)
+## typology2 : with ward criterion in 3 clusters for large data: a two step kmeans-cluster
+km<-kmeans(mvad.emlt$coord,25)
 hc<-hclust(dist(km$centers, method="euclidean"), method="ward")
-zz<-cutree(hc, k=8)
+zz<-cutree(hc, k=3)
 
 ##Plotting typology2 by clusters
 
 seqdplot(mvad.seq, group=zz[km$cluster])
-
 
 
 ## Plotting the evolution of the correlation between states
@@ -82,8 +81,5 @@ plot(mvad.emlt, from="employment", to="joblessness",type="cor")
 plot(mvad.emlt, from=c("employment","HE", "school", "FE"), to="joblessness", delay=0, leg=TRUE)
 plot(mvad.emlt, from="joblessness", to="employment", delay=6)
 plot(mvad.emlt, type="pca", cex=0.4, compx=1, compy=2)
-
-
-
 
 }

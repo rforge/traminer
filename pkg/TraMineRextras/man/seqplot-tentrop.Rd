@@ -48,8 +48,8 @@ seqplot.tentrop.m(seqdata.list, title=NULL,
 
   \item{legendpos}{legend position: default is \code{"topright"}. See\code{\link{legend} }.}
   \item{horiz}{logical: Should the legend be displayed horizontally. Set as \code{FALSE} by default, i.e., legend is displayed vertically.}
-  
-  \item{...}{additional plot parameters (see \code{\link{par}}).}  
+
+  \item{...}{additional plot parameters (see \code{\link{par}}).}
 }
 
 \details{
@@ -66,6 +66,7 @@ Use \code{seqplot.tentrop.m} to plot multiple curves of transversal entropies co
 ## Using the biofam data which has sequences from
 ## ages 15 to 30 years in columns 10 to 25
 data(biofam)
+biofam <- biofam[1:200,]
 biofam.seq <- seqdef(biofam[,10:25], xtlab=as.character(15:30), xtstep=3)
 
 ## Plotting transversal entropies by sex
