@@ -60,7 +60,7 @@ seqedplot <- function(seqe, group=NULL, breaks=20, ages=NULL,title=NULL, type="s
 	minage <- NA
 	maxage <- NA
 	for(event in 1:nevent){
-		agematrix <- .Call("tmreventinseq", seqe, as.integer(allevents[event]), PACKAGE="TraMineR")
+		agematrix <- TraMineR:::seqeage(seqe, as.integer(allevents[event]))
 		agematrix[agematrix==-1] <- NA
 		if (!is.null(ages)) {
 			agematrix[agematrix<ages[1]] <- NA
