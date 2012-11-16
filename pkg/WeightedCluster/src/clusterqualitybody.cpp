@@ -4,7 +4,7 @@
 	#error Clustequality version not defined
 #endif
 
-void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, double* stats, int nclusters, double * errors2, KendallTree &kendall){
+void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, double* stats, int nclusters, double * errors2, KendallTree &kendall, int silweight){
 	TMRLOG(2,"Computing statitstics\n");
 	double totweights=0, wxy=0,wxy2=0, wx=0, wy=0, wx2=0, ww, xx, covxy, covx, covy, pearson, xb, yb, xw, xxw;
 	int i, j, ij=0, iclustIndex;
@@ -203,11 +203,20 @@ void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weigh
 			#endif
 			
 			//Avoid division by zero if  (sizes[iclustIndex]==weights[i]) (one observation per cluster)
-			if(sizes[iclustIndex] == weights[i]){
-				aik =0;
-			}
+			if(silweight){
+				if(sizes[iclustIndex] == weights[i]){
+					aik =0;
+				}
+				else {
+					aik /= (sizes[iclustIndex]-weights[i]);
+				} 
+			} 
 			else {
-				aik /= (sizes[iclustIndex]-weights[i]);
+				if(sizes[iclustIndex]<=1.0){
+					aik =0;
+				}else if(sizes[iclustIndex]>1){
+					aik /= (sizes[iclustIndex]-1);
+				}
 			}
 			double bik =DBL_MAX;
 			for (j=0; j<nclusters; j++) {
@@ -231,7 +240,7 @@ void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weigh
 	return;
 }
 
-void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, int nclusters, double * asw){
+void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, int nclusters, double * asw, int silweight){
 	
 	TMRLOG(2,"Computing statitstics\n");
 	int i, j, ij, iclustIndex;
@@ -293,11 +302,20 @@ void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, i
 			}
 		#endif
 		//Avoid division by zero if  (sizes[iclustIndex]==weights[i]) (one observation per cluster)
-		if(sizes[iclustIndex] == weights[i]){
-			aik =0;
-		}
+		if(silweight){
+			if(sizes[iclustIndex] == weights[i]){
+				aik =0;
+			}
+			else {
+				aik /= (sizes[iclustIndex]-weights[i]);
+			} 
+		} 
 		else {
-			aik /= (sizes[iclustIndex]-weights[i]);
+			if(sizes[iclustIndex]<=1.0){
+				aik =0;
+			}else if(sizes[iclustIndex]>1){
+				aik /= (sizes[iclustIndex]-1);
+			}
 		}
 		double bik =DBL_MAX;
 		for (j=0; j<nclusters; j++) {
@@ -343,7 +361,15 @@ void CLUSTERQUALITYSIMPLE_FUNCNAME(double * distmatrix, int * clusterid, double 
 			// To be optimized
 			ij += nelements-i-1;
 		#endif
+		
 		if(weights[i]>0){
+			// Take to not forget the diagonal!!!!
+			ww = weights[i]*weights[i];
+			// i obs is located in the same cluster as i :)
+			wy+=ww;
+			//Distance is 0 by definition
+			totweights+=ww;
+
 			for(j=i+1;j <nelements;j++){
 				if(weights[j]>0){
 					ww = weights[i]*weights[j];

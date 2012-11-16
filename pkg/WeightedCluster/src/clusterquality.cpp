@@ -99,7 +99,7 @@ void resetKendallTree(KendallTree * kendall){
 #undef CLUSTERQUALITY_INCLUDED
 
 extern "C" {
-	SEXP RClusterQual(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP isdist){
+	SEXP RClusterQual(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP isdist, SEXP silweight){
 		int nclusters=INTEGER(numclust)[0];
 		SEXP ans, stats, asw;
 		PROTECT(ans = allocVector(VECSXP, 2));
@@ -109,9 +109,9 @@ extern "C" {
 		SET_VECTOR_ELT(ans, 1, asw);
 		KendallTree kendall;
 		if(INTEGER(isdist)[0]){
-			clusterquality_dist(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), kendall);
+			clusterquality_dist(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), kendall, INTEGER(silweight)[0]);
 		} else {
-			clusterquality(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), kendall);
+			clusterquality(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), kendall, INTEGER(silweight)[0]);
 		}
 		KendallTreeIterator it;
 		for (it = kendall.begin();it != kendall.end();it++) {
@@ -122,14 +122,14 @@ extern "C" {
 		
 	}
 	
-	SEXP RClusterComputeIndivASW(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP isdist){
+	SEXP RClusterComputeIndivASW(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP isdist, SEXP silweight){
 		int nclusters=INTEGER(numclust)[0];
 		SEXP asw;
 		PROTECT(asw = allocVector(REALSXP, length(cluster)));
 		if(INTEGER(isdist)[0]){
-			indiv_asw_dist(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), nclusters, REAL(asw));
+			indiv_asw_dist(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), nclusters, REAL(asw), INTEGER(silweight)[0]);
 		} else {
-			indiv_asw(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), nclusters, REAL(asw));
+			indiv_asw(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), nclusters, REAL(asw), INTEGER(silweight)[0]);
 		}
 		UNPROTECT(1);
 		return asw;
@@ -204,7 +204,7 @@ extern "C" {
 	SEXP RClusterQualInitBoot(){
 		return(kendallFactory(new KendallTree()));
 	}
-	SEXP RClusterQualBoot(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP kendallS, SEXP isdist){
+	SEXP RClusterQualBoot(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP kendallS, SEXP isdist, SEXP silweight){
 		int nclusters=INTEGER(numclust)[0];
 		SEXP ans, stats, asw;
 		PROTECT(ans = allocVector(VECSXP, 2));
@@ -216,9 +216,9 @@ extern "C" {
 		kendall= static_cast<KendallTree *>(R_ExternalPtrAddr(kendallS));
 		resetKendallTree(kendall);
 		if(INTEGER(isdist)[0]){
-			clusterquality_dist(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), (*kendall));
+			clusterquality_dist(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), (*kendall), asInteger(silweight));
 		} else {
-			clusterquality(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), (*kendall));
+			clusterquality(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), (*kendall), asInteger(silweight));
 		}
 		UNPROTECT(3);
 		return ans;
