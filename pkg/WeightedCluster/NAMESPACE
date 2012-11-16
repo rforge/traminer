@@ -30,4 +30,10 @@ S3method(wcAggregateCases, data.frame)
 S3method(wcAggregateCases, matrix)
 
 
-useDynLib(WeightedCluster)
+useDynLib(WeightedCluster,
+wc_RKmedoids=RKmedoids,
+wc_RClusterQualSimple=RClusterQualSimple,
+wc_RClusterQualSimpleBoot=RClusterQualSimpleBoot,
+wc_RClusterQual=RClusterQual,
+wc_RClusterComputeIndivASW=RClusterComputeIndivASW
+)
