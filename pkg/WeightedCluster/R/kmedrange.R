@@ -8,7 +8,7 @@ wcKMedRange <- function(diss, kvals, ...){
 	ret <- list()
 	ret$kvals <- kvals
 	ret$clustering <- matrix(-1, nrow=n, ncol=length(kvals))
-	ret$stats <-  matrix(-1, nrow=length(kvals), ncol=9)
+	ret$stats <-  matrix(-1, nrow=length(kvals), ncol=10)
 	i <- 1
 	for(k in kvals){
 		cl <- wcKMedoids(diss=diss, k=k, ...)
@@ -59,7 +59,7 @@ as.clustrange.default <- function(object, diss, weights=NULL, ...){
 	ret$clustering <- as.data.frame(object)
 	numclust <- ncol(ret$clustering)
 	ret$kvals <- numeric(numclust)
-	ret$stats <-  matrix(-1, nrow=numclust, ncol=9)
+	ret$stats <-  matrix(-1, nrow=numclust, ncol=10)
 	for(i in 1:numclust){
 		ret$kvals[i] <- length(unique(ret$clustering[,i]))
 		cl <- wcClusterQuality(diss, ret$clustering[,i], weights=weights)
@@ -78,6 +78,10 @@ print.clustrange <- function(x, digits=2, ...){
 }
 plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", withlegend=TRUE, lwd=1, ...){
 	kvals <- x$kvals
+	if(any(stat=="ASW")){
+		warning(" [!] You should use ASWi or ASWw, ASW was replaced with ASWi.")
+		stat[stat=="ASW"] <- "ASWi"
+	}
 	if(length(stat)==1){
 		if(stat=="all"){
 			stats <- x$stats
@@ -85,7 +89,7 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 				norm <- "range"
 			}
 		}else if(stat=="noCH"){
-			stats <- x$stats[,c(-5, -7)]
+			stats <- x$stats[,-grep("CH", colnames(x$stats))]
 		}
 		else{
 			stats <- x$stats[,stat]
@@ -117,13 +121,14 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 	}
 	plot(kvals, xlim=range(kvals, finite=TRUE), ylim=ylim, type="n", ylab="Indicators", xlab="N clusters", ...)
 	labels <- character(ncol(stats))
+	cols <- brewer.pal(10, "Set3")
 	for(i in 1:ncol(stats)){
 		ss <- stats[,i]
-		lines(kvals, ss, col=i, lwd=lwd, ...)
+		lines(kvals, ss, col=cols[i], lwd=lwd, ...)
 		labels[i] <- paste(colnames(stats)[i], "(", round(min(stats[,i]), 2),"/", round(max(stats[,i]),2), ")")
 	}
 	if(withlegend) {
-		legend(legendpos, fill=1:ncol(stats), legend=labels)
+		legend(legendpos, fill=cols[1:ncol(stats)], legend=labels)
 	}
 }
 

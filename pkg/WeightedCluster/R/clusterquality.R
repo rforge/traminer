@@ -25,25 +25,33 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 	
 	ncluster <- max(clustering)+1
 	cq <- .Call("RClusterQual", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(0))
-	names(cq[[1]]) <-c("PBC", "HG", "HGSD", "ASW", "CH", "R2", "CHsq", "R2sq", "HC")
-	names(cq[[2]]) <-levels(clusterF)
+	names(cq[[1]]) <-c("PBC", "HG", "HGSD", "ASWi", "ASWw", "CH", "R2", "CHsq", "R2sq", "HC")
+	dim(cq[[2]]) <- c(nlevels(clusterF), 2)
+	
+	rownames(cq[[2]]) <-levels(clusterF)
+	colnames(cq[[2]]) <- c("ASWi", "ASWw")
 	names(cq) <- c("stats", "ASW")
 	if(any(xtabs(weights~clustering)<1)){
-		cq$stats
-		warning(" [!] silhouette can not be computed for clusters with less than one observation. Use silhouette.weight='weight'.\n")
+		cq$ASW[, "ASWi"] <- NA
+		cq$stats["ASWi"] <- NA
+		warning(" [!] ASWi can not be computed because at least one cluster has less than one observation.\n")
 	}
 	return(cq)
-	#define ClusterQualHPG 0
+#define ClusterQualHPG 0
 #define ClusterQualHG 1
 #define ClusterQualHGSD 2
-#define ClusterQualASW 3
-#define ClusterQualF 4
-#define ClusterQualR 5
-#define ClusterQualF2 6
-#define ClusterQualR2 7
+#define ClusterQualASWi 3
+#define ClusterQualASWw 4
+#define ClusterQualF 5
+#define ClusterQualR 6
+#define ClusterQualF2 7
+#define ClusterQualR2 8
+#define ClusterQualHC 9
+#define ClusterQualNumStat 10
+
 }
 
-wcSilhouetteObs <- function(diss, clustering, weights=NULL, silhouette.weight="replicate"){
+wcSilhouetteObs <- function(diss, clustering, weights=NULL){
 	if (inherits(diss, "dist")) {
 		isdist <- TRUE
 		nelements <- attr(diss, "Size")
@@ -75,7 +83,8 @@ wcSilhouetteObs <- function(diss, clustering, weights=NULL, silhouette.weight="r
 	silhouette.weight <- as.integer(silhouette.weight !="replicate")
 	
 	ncluster <- max(clustering)+1
-	asw <- .Call("RClusterComputeIndivASW", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(silhouette.weight))
+	ret <- .Call("RClusterComputeIndivASW", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(silhouette.weight))
+	asw <- data.frame(ASWi=ret[[1]], ASWw=ret[[2]])
 	return(asw)
 	#define ClusterQualHPG 0
 #define ClusterQualHG 1

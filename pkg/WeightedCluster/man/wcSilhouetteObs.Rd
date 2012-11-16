@@ -46,10 +46,10 @@ sil <- wcSilhouetteObs(diss, clust5, weights=aggMvad$aggWeights)
 
 ## If you want to compute the average silhouette width, 
 ## you should take weights into account
-weighted.mean(sil, w=aggMvad$aggWeights)
+weighted.mean(sil[, "ASWw"], w=aggMvad$aggWeights)
 
 ## Plotting sequences ordred by silhouette width, 
 ## best classified are draw on the top.
-seqIplot(mvad.seq, group=clust5, sortv=sil)
+seqIplot(mvad.seq, group=clust5, sortv=sil[, "ASWw"])
 
 }

@@ -73,6 +73,6 @@ wardRange <- as.clustrange(wardCluster, diss=diss,
 plot(wardRange, stat="all", norm="zscoremed", lwd=3)
 
 ## Plot HC, RHC and ASW
-plot(wardRange, stat=c("HC", "RHC", "ASW"), norm="zscore", lwd=3)
+plot(wardRange, stat=c("HC", "RHC", "ASWw"), norm="zscore", lwd=3)
 
 }

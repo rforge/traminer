@@ -4,7 +4,7 @@
 	#error Clustequality version not defined
 #endif
 
-void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, double* stats, int nclusters, double * errors2, KendallTree &kendall, int silweight){
+void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, double* stats, int nclusters, double * errors2, KendallTree &kendall){
 	TMRLOG(2,"Computing statitstics\n");
 	double totweights=0, wxy=0,wxy2=0, wx=0, wy=0, wx2=0, ww, xx, covxy, covx, covy, pearson, xb, yb, xw, xxw;
 	int i, j, ij=0, iclustIndex;
@@ -152,15 +152,19 @@ void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weigh
 	
 	//Computing ASW
 	TMRLOG(2,"ASW statitstics\n");
-	double asw=0;
+	double asw_i=0;
+	double asw_w=0;
 	for (j=0;j<nclusters;j++) {
 		errors2[j]=0.0;
+		errors2[j+nclusters]=0.0;
 	}
 	for(i=0; i <nelements; i++) {
 		if(weights[i]>0){
 			iclustIndex = clusterid[i];
 			double aik =0;
-			double sik;
+			double aik_w =0;
+			double sik_i;
+			double sik_w;
 			for (j=0;j<nclusters;j++) {
 				errors[j]=0.0;
 			}
@@ -202,22 +206,6 @@ void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weigh
 				}
 			#endif
 			
-			//Avoid division by zero if  (sizes[iclustIndex]==weights[i]) (one observation per cluster)
-			if(silweight){
-				if(sizes[iclustIndex] == weights[i]){
-					aik =0;
-				}
-				else {
-					aik /= (sizes[iclustIndex]-weights[i]);
-				} 
-			} 
-			else {
-				if(sizes[iclustIndex]<=1.0){
-					aik =0;
-				}else if(sizes[iclustIndex]>1){
-					aik /= (sizes[iclustIndex]-1);
-				}
-			}
 			double bik =DBL_MAX;
 			for (j=0; j<nclusters; j++) {
 				if(j!=iclustIndex){
@@ -226,22 +214,33 @@ void CLUSTERQUALITY_FUNCNAME(double * distmatrix, int * clusterid, double *weigh
 					}
 				}
 			}
+			//Avoid division by zero if  (sizes[iclustIndex]==weights[i]) (one observation per cluster)
+			aik_w = aik/(sizes[iclustIndex]); 
+			if(sizes[iclustIndex]<=1.0){
+				aik =0;
+			} else {
+				aik /= (sizes[iclustIndex]-1);
+			}
 			
-			sik=weights[i]*((bik-aik)/fmax2(aik,bik));
+			sik_i = weights[i] * ((bik - aik)/fmax2(aik, bik));
+			sik_w = weights[i] * ((bik - aik_w)/fmax2(aik_w, bik));
 			//REprintf("aik %f, bik %f, sik %f\n", aik, bik, sik/weights[i]);
-			errors2[iclustIndex]+=sik;
-			asw+=sik;
+			errors2[iclustIndex]+=sik_i;
+			errors2[iclustIndex+nclusters]+=sik_w;
+			asw_i+=sik_i;
+			asw_w+=sik_w;
 		}
 	}
 	for (j=0;j<nclusters;j++) {
-		errors2[j]=errors2[j]/sizes[j];
+		errors2[j]/=sizes[j];
+		errors2[j+nclusters]/=sizes[j];
 	}
-	stats[ClusterQualASW] = asw/totweights; //R2
+	stats[ClusterQualASWi] = asw_i/totweights; //R2
+	stats[ClusterQualASWw] = asw_w/totweights; //R2
 	return;
 }
 
-void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, int nclusters, double * asw, int silweight){
-	
+void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, int nelements, int nclusters, double * asw_i, double * asw_w){
 	TMRLOG(2,"Computing statitstics\n");
 	int i, j, ij, iclustIndex;
 	double *othergroups = (double*) R_alloc(nclusters, sizeof(double));
@@ -260,6 +259,7 @@ void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, i
 	for(i=0; i <nelements; i++) {
 		iclustIndex = clusterid[i];
 		double aik =0;
+		double aik_w =0;
 		for (j=0;j<nclusters;j++) {
 			othergroups[j]=0.0;
 		}
@@ -301,22 +301,6 @@ void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, i
 				}
 			}
 		#endif
-		//Avoid division by zero if  (sizes[iclustIndex]==weights[i]) (one observation per cluster)
-		if(silweight){
-			if(sizes[iclustIndex] == weights[i]){
-				aik =0;
-			}
-			else {
-				aik /= (sizes[iclustIndex]-weights[i]);
-			} 
-		} 
-		else {
-			if(sizes[iclustIndex]<=1.0){
-				aik =0;
-			}else if(sizes[iclustIndex]>1){
-				aik /= (sizes[iclustIndex]-1);
-			}
-		}
 		double bik =DBL_MAX;
 		for (j=0; j<nclusters; j++) {
 			if(j!=iclustIndex){
@@ -325,8 +309,15 @@ void INDIV_ASW_FUNCNAME(double * distmatrix, int * clusterid, double *weights, i
 				}
 			}
 		}
-			
-		asw[i]=((bik-aik)/fmax2(aik, bik));
+		aik_w = aik/ (sizes[iclustIndex]); 
+		if(sizes[iclustIndex]<=1.0){
+			aik =0;
+		} else {
+			aik /= (sizes[iclustIndex]-1);
+		}
+		
+		asw_i[i] = ((bik - aik)/fmax2(aik, bik));
+		asw_w[i] = ((bik - aik_w)/fmax2(aik_w, bik));
 	}
 }
 
