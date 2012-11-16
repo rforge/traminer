@@ -1,4 +1,4 @@
-              CHANGES IN WeightedCluster VERSION 0.9.xx-xx
+              CHANGES IN WeightedCluster VERSION 0.9-xx
 
 NEW FEATURES
   o seqclustname: automatic labeling of clusters using sequence medoids.
@@ -8,8 +8,10 @@ NEW FEATURES
 
 BUG FIXES
 
+  o PBC, HG, HC, where computed only on the lower triangular part of the distance matrix (instead on the whole one).
   o Corrected citation informations
   o Many grammar and spelling corrections in the WeightedClusterPreview vignette (thanks to Nevena Zhelyazkova).
+  
   
 			             WeightedCluster VERSION 0.9
 
