@@ -7,6 +7,9 @@ Bug fixes:
 	were not computed properly when more than one 
     representative selected (since version 1.8-2).
 
+User invisible changes:
+  - Added an internal function to fix an issue when an internal C level function is called from other packages.
+
 ## =========
 Version 1.8-3 
 
