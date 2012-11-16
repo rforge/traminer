@@ -22,11 +22,16 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 	if(length(clustering)!=nelements|| length(weights)!=nelements){
 		stop("[!] different number of elements in diss, clustering and/or weights arguments.")
 	}
+	
 	ncluster <- max(clustering)+1
-	cq <- .Call("RClusterQual", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist))
+	cq <- .Call("RClusterQual", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(0))
 	names(cq[[1]]) <-c("PBC", "HG", "HGSD", "ASW", "CH", "R2", "CHsq", "R2sq", "HC")
 	names(cq[[2]]) <-levels(clusterF)
 	names(cq) <- c("stats", "ASW")
+	if(any(xtabs(weights~clustering)<1)){
+		cq$stats
+		warning(" [!] silhouette can not be computed for clusters with less than one observation. Use silhouette.weight='weight'.\n")
+	}
 	return(cq)
 	#define ClusterQualHPG 0
 #define ClusterQualHG 1
@@ -38,7 +43,7 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 #define ClusterQualR2 7
 }
 
-wcSilhouetteObs <- function(diss, clustering, weights=NULL){
+wcSilhouetteObs <- function(diss, clustering, weights=NULL, silhouette.weight="replicate"){
 	if (inherits(diss, "dist")) {
 		isdist <- TRUE
 		nelements <- attr(diss, "Size")
@@ -62,8 +67,15 @@ wcSilhouetteObs <- function(diss, clustering, weights=NULL){
 	if(length(clustering)!=nelements|| length(weights)!=nelements){
 		stop("[!] different number of elements in diss, clustering and/or weights arguments.")
 	}
+	if(silhouette.weight != "replicate"){
+		if(any(xtabs(weights~clustering)<1)){
+			stop(" [!] silhouette can not be computed for clusters with less than one observation. Use silhouette.weight='weight'.\n")
+		}
+	}
+	silhouette.weight <- as.integer(silhouette.weight !="replicate")
+	
 	ncluster <- max(clustering)+1
-	asw <- .Call("RClusterComputeIndivASW", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist))
+	asw <- .Call("RClusterComputeIndivASW", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(silhouette.weight))
 	return(asw)
 	#define ClusterQualHPG 0
 #define ClusterQualHG 1

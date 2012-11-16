@@ -47,11 +47,11 @@ as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, ...){
 		pred[, paste("Split", p, sep="")] <- factor(cutree(object, p))
 	}
 	object <- pred
-	as.clustrange(object, diss, weights, ...)
+	as.clustrange(object, diss=diss, weights=weights, ...)
 }
 
 as.clustrange.twins <- function(object, diss, weights=NULL, ncluster, ...) {
-	return(as.clustrange.hclust(object, diss=diss, weights=weights, ncluster=ncluster,...))
+	return(as.clustrange.hclust(object, diss=diss, weights=weights, ncluster=ncluster, ...))
 }
 
 as.clustrange.default <- function(object, diss, weights=NULL, ...){
