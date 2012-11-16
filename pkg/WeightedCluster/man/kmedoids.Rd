@@ -21,6 +21,7 @@ K-Medoids or PAM clustering of weighted data.
   \item{method}{Character. One of "KMedoids", "PAM" or "PAMonce" (default). See details.}
   \item{cluster.only}{Logical. If \code{FALSE}, the quality of the retained solution is computed.}
   \item{debuglevel}{Integer. If greater than zero, print some debugging messages.}
+  \item{weight.replicate}{Logical. If \code{TRUE}, weights are considered as replicated and 0 distances between }
 }
 \details{
 	K-Medoïds algorithms aim at finding the best partition of the data in a k predefined number of groups. 
