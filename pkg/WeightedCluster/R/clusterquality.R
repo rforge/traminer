@@ -24,7 +24,7 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 	}
 	
 	ncluster <- max(clustering)+1
-	cq <- .Call("RClusterQual", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(0))
+	cq <- .Call(wc_RClusterQual, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(0))
 	names(cq[[1]]) <-c("PBC", "HG", "HGSD", "ASWi", "ASWw", "CH", "R2", "CHsq", "R2sq", "HC")
 	dim(cq[[2]]) <- c(nlevels(clusterF), 2)
 	
@@ -51,7 +51,10 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 
 }
 
-wcSilhouetteObs <- function(diss, clustering, weights=NULL){
+wcSilhouetteObs <- function(diss, clustering, weights=NULL, measure="ASWi"){
+	if(!measure %in% c("ASWi", "ASWw")){
+		stop(" [!] Unknow silhouette measure. It should be 'ASWi' or 'ASWw'")
+	}
 	if (inherits(diss, "dist")) {
 		isdist <- TRUE
 		nelements <- attr(diss, "Size")
@@ -75,17 +78,13 @@ wcSilhouetteObs <- function(diss, clustering, weights=NULL){
 	if(length(clustering)!=nelements|| length(weights)!=nelements){
 		stop("[!] different number of elements in diss, clustering and/or weights arguments.")
 	}
-	if(silhouette.weight != "replicate"){
-		if(any(xtabs(weights~clustering)<1)){
-			stop(" [!] silhouette can not be computed for clusters with less than one observation. Use silhouette.weight='weight'.\n")
-		}
+	if(measure=="ASWi" && any(xtabs(weights~clustering)<1)){
+		stop(" [!] ASWi can not be computed because at least one cluster has less than one observation. Use measure='ASWw'.")
 	}
-	silhouette.weight <- as.integer(silhouette.weight !="replicate")
-	
 	ncluster <- max(clustering)+1
-	ret <- .Call("RClusterComputeIndivASW", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(silhouette.weight))
+	ret <- .Call(wc_RClusterComputeIndivASW, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist))
 	asw <- data.frame(ASWi=ret[[1]], ASWw=ret[[2]])
-	return(asw)
+	return(asw[, measure])
 	#define ClusterQualHPG 0
 #define ClusterQualHG 1
 #define ClusterQualHGSD 2
@@ -131,7 +130,7 @@ clusterqualitySimpleBoot <- function(diss, clustering, weights=NULL, R=999, repl
 		internalsample <- function(){
 			return(as.integer(sample.int(nelements, size=sampleint, replace=TRUE, prob=prob)-1L))
 		}
-		t <- .Call("RClusterQualSimpleBoot", diss, clustering, as.double(weights), as.integer(ncluster), as.integer(R),  quote(internalsample()), environment(), sampleint)
+		t <- .Call(wc_RClusterQualSimpleBoot, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(R),  quote(internalsample()), environment(), sampleint)
 		colnames(t) <-c("PBC", "CH", "R2", "CHsq", "R2sq")
 		t0 <- t[1,]
 		bts <- list(t0=t0, t=t)
@@ -143,7 +142,7 @@ clusterqualitySimpleBoot <- function(diss, clustering, weights=NULL, R=999, repl
 			}else{
 				w <- as.double(w*totweights)
 			}
-			cq <- .Call("RClusterQualSimple", diss, clustering, w, as.integer(ncluster))
+			cq <- .Call(wc_RClusterQualSimple, diss, clustering, w, as.integer(ncluster))
 			names(cq) <-c("PBC", "HG", "HGSD", "ASW", "CH", "R2", "CHsq", "R2sq", "HC")
 			return(cq[c(1, 5:8)])
 		}
