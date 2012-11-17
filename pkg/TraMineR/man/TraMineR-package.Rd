@@ -25,8 +25,8 @@ sequences and vice versa.
 \details{
 \tabular{ll}{
 Package: \tab TraMineR\cr
-Version: \tab 1.9-3\cr
-Date: \tab 2012-10-16\cr
+Version: \tab 1.9-4\cr
+Date: \tab 2012-11-17\cr
 Depends: \tab R (>= 2.8.1), RColorBrewer, boot\cr
 Suggests: \tab cluster, xtable\cr
 License: \tab GPL (>= 2)\cr
@@ -161,8 +161,9 @@ Further information is available in the following vignettes:
 }
 }
 \author{
-Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. Müller <nsmuller@gmail.com>, Gilbert Ritschard <gilbert.ritschard@unige.ch> and contributions from Reto Bürgin <reto.buergin@unige.ch>.
-Maintainer: TraMineR Team <traminer-team@unige.ch>
+Alexis Gabadinho <alexis.gabadinho@unige.ch>, Matthias Studer <matthias.studer@unige.ch>, Nicolas S. Müller <nsmuller@gmail.com>, Reto Bürgin <reto.buergin@unige.ch> and Gilbert Ritschard <gilbert.ritschard@unige.ch>.
+\cr
+Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
 }
 
 \references{
