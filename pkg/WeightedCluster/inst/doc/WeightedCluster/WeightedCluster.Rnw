@@ -12,29 +12,30 @@
 
 \documentclass[article, nojss, a4paper, shortnames]{jss}
 
-\usepackage[frenchb]{babel}
+\usepackage[english]{babel}
 \usepackage{thumbpdf}
 \usepackage{a4}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \author{Matthias Studer\\  Institute for Demographic and Life Course Studies\\ University of Geneva}
-\title{Le manuel de la librairie \pkg{WeightedCluster}\\{\large Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec \proglang{R}}}
+\title{\pkg{WeightedCluster} Library Manual\\{\large A practical guide to creating typologies of trajectories in the social sciences with \proglang{R}}}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Matthias Studer} %% comma-separated
-\Plaintitle{Le manuel de la librairie WeightedCluster: un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R} %% without formatting
-\Shorttitle{Un guide pratique pour la création de typologies de trajectoires avec \proglang{R}} %% a short title (if necessary)
+\Plaintitle{WeightedCluster Library Manual: A practical guide to creating typologies of trajectories in the social sciences with R} %% without formatting
+\Shorttitle{\pkg{WeightedCluster} Library Manual} %% a short title (if necessary)
 
 %% an abstract and keywords
 \Abstract{
-Ce manuel poursuit un double but: présenter la librairie \pkg{WeightedCluster} et proposer un guide pas à pas à la création de typologie de séquences pour les sciences sociales. Cette librairie permet notamment de représenter graphiquement les résultats d'une analyse en clusters hiérarchique, de regrouper les séquences identiques afin d'analyser un nombre de séquences plus important, de calculer un ensemble de mesure de qualité d'une partition, ainsi qu'un algorithme PAM optimisé prenant en compte les pondérations. La libraire offre également des procédures pour faciliter le choix d'une solution de clustering particulière et définir le nombre de groupes.
- 
-Outre les méthodes, nous discutons également de la construction de typologie de séquences en sciences sociales et des hypothèses sous-jacentes à cette démarche. Nous clarifions notamment la place que l'on devrait donner à la construction de typologie en analyse de séquences. Nous montrons ainsi que ces méthodes offrent un point de vue descriptif important sur les séquences en faisant ressortir des patterns récurrents. Toutefois, elles ne devraient pas être utilisées dans une optique confirmatoire, car elles peuvent conduire à des conclusions trompeuses.
+This manual has a twofold aim: to present the \pkg{WeightedCluster} library and offer a step-by-step guide to creating typologies of sequences for the social sciences. In particular, this library makes it possible to represent graphically the results of a hierarchical cluster analysis, to group identical sequences in order to analyse a larger number of sequences, to compute a set of measures of partition quality and also an optimized PAM algorithm taking account of weightings. The library also offers procedures to facilitate the choice of a particular clustering solution and to choose the optimal number of groups.
+
+In addition to the methods, we also discuss the building of typologies of sequences in the social sciences and the assumptions underlying this operation. In particular we clarify the place that should be given to the creation of typologies in the analysis of sequences. We thus show that these methods offer an important descriptive point of view on sequences by bringing to light recurrent patterns. However, they should not be used in a confirmatory analysis, since they can point to misleading conclusions.
+
 }
 
-\Keywords{Analyse de séquences, trajectoire, parcours de vie, optimal matching, distance, cluster, typologie, pondération, mesure de qualité d'une partition, \proglang{R}}
-\Plainkeywords{Analyse de séquences, trajectoire, parcours de vie, optimal matching, distance, cluster, typologie, pondération, mesure de qualité d'une partition, R}
+\Keywords{ Analysis of sequences, trajectory, life course, optimal matching, distance, cluster, typology, weighting, cluster quality measure, \proglang{R}}
+\Plainkeywords{ Analysis of sequences, trajectory, life course, optimal matching, distance, cluster, typology, weighting, cluster quality measure, R}
 
 \Address{
   Matthias Studer\\
@@ -62,7 +63,7 @@ Outre les méthodes, nous discutons également de la construction de typologie de 
 
 \usepackage[absolute,overlay]{textpos}
 \usepackage{tikz}
-\usepackage{xcolor}
+%\usepackage{xcolor}
 \usepackage{calc}
 
 \newcommand{\Com}[1]{\code{#1}}
@@ -95,15 +96,29 @@ Outre les méthodes, nous discutons également de la construction de typologie de 
 options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
+hook_setwidth <- local({
+    default.width <- 0
+	function(before, options, envir){
+		if(before) {
+            default.width <<- getOption("width")
+			options(width = options$setwidth)
+		} else{
+			options(width = default.width)
+            print(getOption("width"))
+		}
+		return(NULL)
+	}
+})
+
+knit_hooks$set(setwidth =hook_setwidth)
 
 knit_hooks$set(crop = hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
 })
 opts_knit$set(concordance=TRUE)
+opts_chunk$set(message=FALSE, prompt=TRUE, echo=TRUE, comment=NA, crop=TRUE, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth")
 @
-
-\SweaveOpts{message=FALSE, prompt=TRUE, echo=TRUE, comment=NA, crop=TRUE, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth", concordance=TRUE} % sets the prefix for figure files generated par Sweave
 
 \begin{document}
 
@@ -111,56 +126,51 @@ opts_knit$set(concordance=TRUE)
 
 
 \begin{center}
-Pour citer ce document ou la librairie \pkg{WeightedCluster}, merci d'utiliser:\\~\\
+To cite this document or the \pkg{WeightedCluster} library, please use:\\~\\
 \end{center}
 Studer, Matthias (2012).\textit{\'Etude des inégalités de genre en début de carrière académique
 à l'aide de méthodes innovatrices d'analyse de données séquentielles}, Chapitre: Le
 manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R. Thèse SES 777, Faculté des sciences économiques et sociales, Université de Genève.
 
 \section{Introduction}
-Ce manuel poursuit un double but. Il présente les fonctionnalités offertes par la librairie \pkg{WeightedCluster} pour la construction et la validation de clustering de données pondérées dans \proglang{R}. En même temps, nous appliquons, tout au long de ce manuel, les méthodes présentées à l'analyse de séquences en sciences sociales, ce qui en fait également un guide pas à pas de la construction de typologie de séquences. Nous discutons également des implications et des hypothèses sociologiques sous-jacentes à ces analyses.
 
-%La librairie \pkg{WeightedCluster} offre des fonctionnalités pour l'analyse en cluster à partir d'une matrice de dissimilarités. A l'heure actuelle, hormis la fonction \code{hclust} de la librairie \guil{base} que nous présentons ici, les méthodes disponibles dans \proglang{R} ne permettent pas de réalisés des analyses en cluster sur des données pondérées.
+This manual has a twofold aim. It presents the functionalities offered by the \pkg{WeightedCluster} library for the construction and validation of weighted data clustering in \proglang{R}. At the same time, throughout this manual, we apply the methods presented to the analysis of sequences in the social sciences, so that it is also a step-by-step guide to building typologies of sequences. We also discuss some sociological implications and assumptions underlying these analyses.
 
-D'une manière générale, l'analyse en clusters a pour but de construire un regroupement d'un ensemble d'objets de telle manière que les groupes obtenus soient les plus homogènes possible et les plus différents possible les uns des autres. Il existe beaucoup de méthodes différentes pour réaliser cette opération dont la pertinence dépend notamment des objets analysés. Les méthodes présentées dans ce manuel et disponibles dans la librairie \pkg{WeightedCluster} se basent sur une mesure de dissimilarité entre les objets, ce qui permet de \textit{comparer} les objets en quantifiant leur similarité.
+In a general way, cluster analysis aims to construct a grouping of a set of objects in such a way that the groups obtained are as homogeneous as possible and as different from one another as possible. There are many different methods for performing this task, whose pertinence depends in particular on the objects analysed. The methods presented in this manual and available in the \pkg{WeightedCluster} library are based on a measure of dissimilarity between the objects, which makes it possible to \textit{compare} two objects by quantifying their similarity.
 
-Nous présentons deux étapes de l'analyse en clusters basée sur des dissimilarités: les algorithmes de regroupement des objets avant d'aborder la mesure de la qualité des résultats obtenus. Cette dernière étape est essentielle puisque toutes les analyses en cluster présentées produisent des résultats que celui-ci soit pertinent ou non \citep{Levine2000}. Ces mesures fournissent également une aide précieuse pour choisir le meilleur regroupement parmi les solutions issues de différents algorithmes ou pour sélectionner le nombre de groupes optimal. Pour ce faire, nous utilisons ici les méthodes offertes par la librairie \pkg{WeightedCluster} telle qu'un algorithme PAM hautement optimisé ou encore le calcul et la visualisation de la qualité d'un ensemble de solutions de clustering.
+We present two stages of cluster analysis based on dissimilarities: first the algorithms for grouping the objects and then the measure of the quality of the results obtained. This second stage is essential, since all the cluster analyses presented produce results, whether they are pertinent or not \citep{Levine2000}. These measures also provide valuable help in choosing the best grouping from among the solutions resulting from different algorithms or in selecting the optimal number of groups. To do so, we use here the methods offered by the \pkg{WeightedCluster} library, such as a highly optimized PAM algorithm or computation and visualization of the quality of a set of clustering solutions.
 
-La particularité de la librairie \pkg{WeightedCluster} est la prise en compte de la pondération des observations dans les deux phases de l'analyse décrites précédemment. Il y a aux moins deux cas de figure où l'utilisation de pondération se révèle indispensable. Premièrement, la pondération permet de regrouper les cas identiques, ce qui réduit considérablement la mémoire et le temps de calcul utilisé. La section~\ref{sec_aggregate} présente en détail les fonctionnalités proposées par la librairie \pkg{WeightedCluster} pour automatiser ce regroupement. Deuxièmement, les données d'enquête sont souvent pondérées pour  corriger les biais de représentativités. Dans ces cas de figure, il est essentiel d'utiliser les poids dans les procédures de clustering pour que les résultats ne soient pas biaisés. La librairie \pkg{WeightedCluster} offre des fonctions pour inclure les pondérations uniquement pour les analyses où il n'existe pas, à l'heure actuelle et à notre connaissance, d'autres librairies qui le font déjà. Si ceci devait être le cas, comme pour les procédures de clustering hiérarchiques, nous présentons les solutions existantes.
 
-Comme mentionné précédemment, ce manuel se veut également un guide pas à pas pour la construction de typologie de trajectoires dans \proglang{R}. En tant que tel, ce manuel se destine à un public large, c'est pourquoi nous avons mis en annexe les parties plus techniques ou plus avancées\footnote{Toutefois, une connaissance des bases de l'analyse de séquences est supposée connue. Dans le cas contraire, une introduction à leurs mise en pratique avec \pkg{TraMineR} est disponible dans \citet{GabadinhoRitschardMullerStuder2011JSS}.}. Cette optique nous amènera également à discuter des implications et des hypothèses sociologiques sous-jacentes à l'analyse en clusters.
+The particularity of the \pkg{WeightedCluster} library is that it takes account of the weighting of the observations in the two phases of the analysis previously described. There are at least two situations in which the use of weighting proves indispensable. Firstly, weighting makes it possible to group the identical cases, which considerably reduces the memory and computing time used. Section~\ref{sec_aggregate} presents in detail the functionalities offered by the \pkg{WeightedCluster} library to automate this grouping. Secondly, survey data are often weighted to correct representativity bias. In such cases, it is essential to use the weights in the clustering procedures so that the results are not biased. The \pkg{WeightedCluster} library offers functions to include weightings only for analyses for which, so far as we know, there are currently no other libraries which already do it. If this were to be the case, as for the hierarchical clustering procedures, we present the existing solutions.
 
-Dans ce manuel, nous illustrons les méthodes présentées à l'aide des données issues de l'étude de \citet{McVicarAnyadike2002JRSSa} qui sont disponibles dans \pkg{TraMineR} \citep{GabadinhoRitschardMullerStuder2011JSS} ce qui permettra au lecteur de reproduire l'ensemble des analyses présentées. Ces données décrivent sous forme de séquences de statuts mensuels la transition vers l'emploi de jeunes nord-irlandais ayant terminé l'école obligatoire. Le but original de l'étude était d'\guil{identify the `at-risk' young people at age 16 years and to characterize their post-school career trajectories}. Ce jeu de donnée est pondéré pour corriger les biais de représentativité.
+As previously mentioned, this manual also aims to be a step-by-step guide to constructing of typologies of trajectories in \proglang{R}. As such, it is intended for a wide audience, and for this reason the most technical or most advanced parts are reserved for an appendix. \footnote{However, a knowledge of the basic operations of sequence analysis is assumed. If this is not the case, an introduction to their practical implementation with \pkg{TraMineR} is available in \citet{GabadinhoRitschardMullerStuder2011JSS}.} This approach will also lead us to discuss the sociological implications and assumptions underlying cluster analysis.
 
-La suite de ce manuel est organisée de la manière suivante. Nous commençons par présenter les enjeux théoriques de la construction de typologie de séquences en sciences sociales avant d'aborder les méthodes d'analyse en clusters à proprement parler. Nous reviendrons ensuite brièvement sur les différentes étapes de l'analyse en clusters avant de présenter plusieurs algorithmes de clustering disponibles dans \proglang{R} pour les données pondérées. Nous présentons ensuite plusieurs mesures de la qualité d'un clustering et les principales utilisations que l'on peut en faire. Finalement, nous discutons des enjeux de l'interprétation de l'analyse en clusters et des risques que cela comporte lorsque l'on analyse les liens entre types de trajectoires et des facteurs explicatifs, une pratique courante en sciences sociales.
+
+In this manual, we illustrate the methods presented with the aid of data from the study by \citet{McVicarAnyadike2002JRSSa}, available in \pkg{TraMineR} \citep{GabadinhoRitschardMullerStuder2011JSS}, which will enable the reader to reproduce the set of analyses presented. These data describe the transition from school to work of young people in Northern Ireland, in the form of sequences of monthly statuses. The original aim of the study was to ``identify young people `at-risk' at age 16 and characterize their post-school career trajectories''. This data set is weighted to correct representativity bias.
+
+This manual is organized as follows. We start by presenting the theoretical issues raised by the construction of sequence typologies in the social sciences before turning to the cluster analysis methods as such. We then briefly summarize the different stages of cluster analysis before presenting several clustering algorithms available in \proglang{R} for weighted data. We then present several measures of the quality of a clustering and the main uses that can be made of them. Finally, we discuss the issues in the interpretation of cluster analysis and the risks that are entailed when one analyses the links between types of trajectories and explanatory factors, which is a common practice in the social sciences.
+
 
 %\begin{shadowblock}{\linewidth}
-\section{Typologie de séquences en sciences sociales}
-La création d'une typologie est la méthode la plus utilisée pour analyser des séquences~\citep{Hollister2009, AisenbreyFasang2010, AbbottTsay2000}. Cette procédure a pour but d'identifier les patterns récurrents dans les séquences ou, en d'autres termes, les successions d'états typiques par lesquelles passent les trajectoires. Les séquences individuelles se distinguent les une des autres par une multitude de petites différences. La construction d'une typologie des séquences a pour but de gommer ces petites différences afin d'identifier des types de trajectoires homogènes et distincts les uns des autres.
+\section{Typology of sequences in the social sciences}
 
-Cette analyse doit faire ressortir des patterns récurrents et/ou des \guil{séquences idéales-typiques} \citep{AbbottHrycak1990}. Ces patterns peuvent également s'interpréter comme des interdépendances entre différents moments de la trajectoire. La recherche de tels patterns est ainsi une question importante dans plusieurs problématiques de sciences sociales \citep{Abbott1995}. Elle permet notamment de mettre en lumière les contraintes légales, économiques ou sociales qui encadrent la construction des parcours individuels. Comme le notent \citet{AbbottHrycak1990}, si les séquences types peuvent résulter de contrainte que l'on redécouvre, ces séquences typiques peuvent également agir sur la réalité en servant de modèles aux acteurs qui anticipent leur propre futur. Ces différentes possibilités d'interprétations font de la création de typologie un outil puissant. Dans l'étude de \citet{McVicarAnyadike2002JRSSa} par exemple, une telle analyse devrait permettre d'identifier les successions d'états qui mènent à des situations `at-risk', c'est-à-dire marquées par un fort taux de chômage.
+The creation of a typology is the method most used to analyse sequences~\citep{Hollister2009, AisenbreyFasang2010, AbbottTsay2000}. This procedure aims to identify the recurrent patterns in the sequences or, in other words, the typical successions of states through which the trajectories run. The individual sequences are distinguished from one another by a multitude of small differences. The construction of a typology of sequences aims to efface these small differences so as to identify types of trajectories that are homogeneous and distinct from one another.
 
-%Par la suite, les types de trajectoires identifiés sont souvent assimilés à des trajectoires types, c'est-à-dire des modèles de trajectoire, plus ou moins suivis par les individus.
+This analysis seeks to bring out recurrent patterns and/or \guil{ideal-typical sequences}  \citep{AbbottHrycak1990}. These patterns can also be interpreted as interdependences between different moments in the trajectory. The search for such patterns is thus an important question in several issues in the social sciences \citep{Abbott1995}. In particular it makes it possible to bring to light the legal, economic or social constraints that shape the construction of individual life courses. As \citet{AbbottHrycak1990} note, while typical sequences can result from constraints, these typical sequences can also act on reality by serving as models for the actors, who anticipate their own future. These different possibilities of interpretation make the creation of typologies a powerful tool. In the study by \citet{McVicarAnyadike2002JRSSa} for example, such an analysis should make it possible to identify the successions of states that lead to \guil{at-risk} situations i.e. ones marked by a high rate of unemployment.
 
-Cette procédure de regroupement repose sur une \textit{simplification} des données. Elle offre ainsi un point de vue descriptif et exploratoire sur les trajectoires. En simplifiant l'information, on peut identifier les principales caractéristiques et les motifs des séquences. Toutefois, il existe un risque que cette \textit{simplification} soit \textit{abusive} et ne corresponde pas à une réalité des données. En d'autres termes, il est possible que les types identifiés ne soient pas clairement séparés les uns des autres ou qu'ils ne soient pas suffisamment homogènes. Ce risque a souvent été négligé dans la littérature. Comme le fait remarquer \citet{Levine2000} notamment, toutes les analyses en cluster produisent un résultat, que celui-ci soit pertinent ou non. Il est donc toujours possible d'interpréter les résultats et d'en faire une théorie qui se proclame souvent \guil{sans hypothèses préalables} ou \guil{issue des données}, alors que cette typologie peut également être le fruit d'un artifice statistique.
+This grouping procedure is based on a \textit{simplification} of the data. It thus offers a descriptive and exploratory point of view on the trajectories. By simplifying the information, one can identify the main characteristics and patterns of the sequences. However, there is a risk that this \textit{simplification} is \textit{unjustified} and does not correspond to the reality of the data. In other words, it is possible that the types identified are not clearly separated from one another or that they are not sufficiently homogeneous. This risk has often been neglected in the literature. As \citet{Levine2000} in particular points out, all cluster analyses produce a result, whether it is pertinent or not. It is therefore always possible to interpret the results and make a theory out of them which often declares itself \guil{without preliminary assumptions} or \guil{flowing from the data}, although this typology may also be the produce of a statistical artefact.
 
-Selon \citet{Shalizi2009}, la pertinence d'une typologie dépend notamment de trois conditions. Premièrement, et c'est la plus importante, la typologie ne doit pas être dépendante de l'échantillonnage, ce qui signifie qu'elle doit être généralisable à d'autres observations. Deuxièmement, une typologie devrait s'étendre à d'autres propriétés. Finalement, la typologie obtenue devrait également être fondée par une théorie du domaine analysé. \citet{Shalizi2009} cite deux exemples pour illustrer ses propos. La classification des espèces animales, créées sur la base de caractéristiques physiques, s'applique également à d'autres caractéristiques telles que le chant d'un oiseau. Par contre, la classification des étoiles en constellations a permis de construire des théories sans fondements.
+According to \citet{Shalizi2009}, the pertinence of a typology depends on three conditions. First, and this is the most important, the typology must not be dependent on the sampling, which means it must be generalizable to other observations. Secondly, a typology should extend to other properties. Finally, the typology obtained should also be grounded by a theory of the domain analysed. \citet{Shalizi2009} gives two examples to illustrate his remarks. The classification of animal species, created on the basis of physical characteristics, also applies to other characteristics such as the song of a bird. By contrast, the classification of the stars into constellations made it possible to construct ungrounded theories.
 
-À notre connaissance, il n'existe pas de méthode pour \textit{attester} de la pertinence théorique d'une typologie. Toutefois, nous présentons ici plusieurs indices pour mesurer la qualité statistique d'une partition obtenue à l'aide d'une procédure de regroupement automatique. L'utilisation de telles mesures est à notre sens une étape essentielle pour valider les résultats et, d'une manière plus générale, rendre les résultats de l'analyse de séquences utilisant le clustering plus crédibles.
+So far as we are aware, there is no method to \textit{confirm unequivocally} the theoretical pertinence of a typology. However, we present here several indexes to measure the statistical quality of a partition obtained using an automatic grouping procedure. In our view, the use of such measures is an essential stage in validating the results and, in a more general way, of making the results of sequence analysis using clustering more credible.
 
-Maintenant que nous avons présenté les enjeux théoriques de l'analyse en clusters, nous passons à la pratique en présentant les différentes étapes de l'analyse en clusters.
-%\end{shadowblock}
+Having presented the theoretical issues around cluster analysis, we turn to the practice, by presenting the different stages of cluster analysis.
 
 
 
-%The \pkg{WeightedCluster} library provides functions to cluster states sequences and more generally weighted data. These functionalities include finding duplicated cases, a weighted PAM algorithm, function computing cluster quality measures for a range of clustering solutions and miscellaneous functions to plot clustering solutions of state sequences.
-%
-%There are at least two reasons to use weighted data. First, some states sequences, or more generally some objects, may be equals. Regrouping those cases may improve algorithm efficiency. Most of all, regrouping duplicate case may also dramatically reduce the memory needed to store the dissimilarity matrix. Second, in the social sciences observations are often weighted to correct for response bias in surveys.
+\section{Installation and loading}
 
-
-\section{Installation et chargement}
-
-Pour utiliser la librairie \pkg{WeightedCluster}, il est nécessaire de l'installer et de la charger. Il suffit de l'installer une seule fois, mais elle devra être rechargée avec la commande \code{library} à chaque fois que \proglang{R} est lancé. Ces deux étapes sont réalisées de la manière suivante.
+To use the \pkg{WeightedCluster} library, it has to be installed and loaded. It only has to be installed once, but it has to be reloaded with the \code{library} command each time \proglang{R} is started. These two stages are performed in the following way:
 
 
 %% preliminary R commands
@@ -169,17 +179,20 @@ install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
 library(WeightedCluster)
 @
 
-\section{Étapes de l'analyse en clusters}
+\section{Stages of cluster analysis}
 
-D'une manière générale, l'analyse en clusters se déroule en quatre étapes sur lesquelles nous reviendrons plus en détail. On commence par calculer les \textit{dissimilarités} entre séquences. On utilise ensuite ces dissimilarités pour regrouper les séquences similaires en types les plus homogènes possible et les plus différents possible les uns des autres. On teste généralement plusieurs algorithmes et nombres de groupes différents. On calcule ensuite pour chacun des regroupements obtenus des mesures de qualité. Ces mesures permettent de guider le choix d'une solution particulière et de la valider. Finalement, on interprète les résultats de l'analyse avant de mesurer éventuellement l'association entre le regroupement obtenu et d'autres variables d'intérêt.
 
-Dans ce manuel, nous discuterons des trois dernières étapes de l'analyse. Nous n'offrons ici qu'une introduction au calcul de dissimilarités entre séquences. Rappelons notamment qu'une mesure de dissimilarité est une quantification de l'éloignement de deux séquences, ou d'une manière plus générale, de deux objets. Cette quantification permet ensuite de \textit{comparer} les séquences. Dans l'analyse en clusters par exemple, cette information est nécessaire pour regrouper les séquences les plus similaires. On utilise généralement une matrice de dissimilarités qui contient l'ensemble des dissimilarités deux à deux ou, en d'autres termes, la quantification de toutes les comparaisons possibles.
+In a general way, cluster analysis takes place in four stages which we shall examine in more detail. First the \textit{dissimilarities} are computed. These are then used to \textit{group similar sequences} into types that are as homogeneous as possible and as different as possible from one another. Generally several different algorithms and different numbers of groups are tested. For each of the groupings obtained, the \textit{quality of the clustering} is then computed. These measures make it possible to guide the choice of a particular solution and validate it. Finally, the results of the analysis are \textit{interpreted} and, as appropriate, the association between the grouping obtained and other variables of interest is computed.
 
-Le choix de la mesure de dissimilarité utilisée pour quantifier les différences entre séquences est une question importante, mais qui dépasse le cadre de ce manuel. Plusieurs articles adressent cette question \citep{AisenbreyFasang2010,Hollister2009,Lesnard-2010}. Ici, nous utilisons la distance d'optimal matching en utilisant les coûts utilisés dans l'article original de \citet{McVicarAnyadike2002JRSSa}.
 
-Dans \proglang{R}, les distances entre séquences d'états peuvent être calculées à l'aide de la librairie \pkg{TraMineR} \citep{GabadinhoRitschardMullerStuder2011JSS}. Pour calculer ces distances, il faut premièrement créer un objet \guil{séquence d'états} à l'aide de la fonction \code{seqdef}. On calcule ensuite les distances avec la fonction \code{seqdist}. L'article \citet{GabadinhoRitschardMullerStuder2011JSS} présente en détail ces différentes étapes.
+In this manual, we shall discuss the last three stages of the analysis. We offer here only an introduction to computation of the dissimilarities between sequences. In particular it should be noted that a dissimilarity measure is a quantification of the distance between two sequences or, more generally, between two objects. This quantification then makes it possible to \textit{compare} the sequences. In cluster analysis for example, this information is necessary in order to group the most similar sequences. A matrix of dissimilarities containing the set of dissimilarities two by two, or in other words the quantification of all the possible comparisons, is generally used.
 
-Ici, nous commençons par charger le fichier de donnée exemple avec la commande \code{data}. Nous construisons ensuite l'objet séquence en spécifiant les colonnes qui contiennent les données (17 à 86) ainsi que la variable de pondération des observations. La fonction \code{seqdist} calcule la matrice des distances entre séquences.
+The choice of the measure of dissimilarity used to quantify the differences between sequences is an important question, but beyond the scope of this manual. Several articles address this issue \citep{AisenbreyFasang2010,Hollister2009,Lesnard-2010}. Here, we use the optimal matching distance adopting the costs used in the original article by \citet{McVicarAnyadike2002JRSSa}.
+
+In R, the distances between state sequences can be computed with the aid of the \pkg{TraMineR} library \citep{GabadinhoRitschardMullerStuder2011JSS}. To compute these distances, one first has to create a state sequence object using the \code{seqdef} function. The distances are then computed with the \code{seqdist} function. \citet{GabadinhoRitschardMullerStuder2011JSS} presents these different stages in detail.
+
+
+Here, we start by loading the example data set with the \code{data} command. We then build the sequence object by specifying the columns containing the data (17 to 86) and the weighting of the observations. The \code{seqdist} function computes the matrix of distances between sequences.
 
 %% preliminary R commands
 <<distcompute, tidy=FALSE>>=
@@ -189,8 +202,9 @@ mvad.alphabet <- c("employment", "FE", "HE", "joblessness", "school",
 mvad.labels <- c("Employment", "Further Education", "Higher Education",
     "Joblessness", "School", "Training")
 mvad.scodes <- c("EM", "FE", "HE", "JL", "SC", "TR")
-mvadseq <- seqdef(mvad[, 17:86], alphabet = mvad.alphabet, states = mvad.scodes,
-    labels = mvad.labels, weights=mvad$weight, xtstep=6)
+mvadseq <- seqdef(mvad[, 17:86], alphabet = mvad.alphabet,
+    states = mvad.scodes, labels = mvad.labels,
+    weights = mvad$weight, xtstep = 6)
 ## Defining the custom cost matrix
 subm.custom <- matrix(
       c(0, 1, 1, 2, 1, 1,
@@ -201,47 +215,35 @@ subm.custom <- matrix(
         1, 2, 2, 1, 2, 0),
       nrow = 6, ncol = 6, byrow = TRUE)
 ## Computing the OM dissimilarities
-mvaddist <- seqdist(mvadseq, method="OM", indel=1.5, sm=subm.custom)
+mvaddist <- seqdist(mvadseq, method = "OM", indel = 1.5, sm = subm.custom)
 @
 
-% Plan
-% Analyse de séquences et clustering
-% Critiques et autres types d'analyses.
-% Clustering de séquences en pratiques
-%   % Procédures hiérarchiques
-%   % Procédures partition
-%   % Qualité du clustering
-% Regroupement des séquences identiques
-%
-% Conclusion
-%
 
-La suite de ce manuel traite des trois étapes suivantes. Nous commençons par discuter des méthodes de clustering disponibles pour les données pondérées. Nous présenterons ensuite les mesures de la qualité d'un clustering offert par la librairie \pkg{WeightedCluster}. Ces mesures nous permettront de choisir une solution particulière et de mesurer sa validité. Finalement, nous discuterons des problèmes d'interprétation des résultats de l'analyse en clusters et du calcul des liens entre typologies et d'autres variables d'intérêts.
+The remainder of this manual covers the three following stages. We shall first discuss the clustering methods available for the weighted data. We shall then present the measures of the quality of a clustering offered by the \pkg{WeightedCluster} library. These measures will enable us to choose a particular solution and measure its validity. Finally, we shall discuss the problems of interpreting the results of cluster analysis and computing the relationship between typologies and other variables of interest.
 
 
-\section{Le clustering}
+\section{Clustering}
 
-Il existe beaucoup d'algorithmes de clustering différents. Nous présentons ici des méthodes issues de deux logiques différentes: les méthodes de regroupement hiérarchique et celles de partitionnement en un nombre prédéfini de groupes. Nous concluons sur les interactions possibles entre ces types d'algorithmes.
+There are many different clustering algorithms. We present here some methods derived from two different logics: hierarchical clustering methods and those of partitioning into a predefined number of groups. We conclude by discussing the possible interactions between these types of algorithms.
 
-\subsection{Clustering hiérarchique}
+\subsection{Hierarchical clustering}
 
-Nous présentons ici les procédures de regroupements hiérarchiques ascendantes qui fonctionnent ainsi. On part des observations, chacune d'entre elles étant considérée comme un groupe. À chaque itération, on regroupe les deux groupes (ou observations au départ) les plus proches, jusqu'à ce que toutes les observations ne forment plus qu'un seul groupe. Le schéma agglomératif, c'est-à-dire la succession des regroupements effectués, représente la procédure de clustering sous la forme d'un arbre que l'on appelle dendrogramme. Une fois le schéma agglomératif construit, on sélectionne le nombre de groupes. La partition retenue est obtenue en \guil{coupant} l'arbre de regroupement au niveau correspondant\footnote{Il existe également des procédures dites descendantes (ou divises) qui procèdent de la même manière, mais en sens inverse. Au lieu de démarrer des observations que l'on considère comme des groupes, la procédure divise à chaque pas un des groupes jusqu'à ce que chaque observation corresponde à un groupe. Un algorithme est disponible dans \proglang{R} avec la fonction \code{diana} de la librairie \code{cluster}. Tout ce que nous présentons ici est également compatible avec l'objet retourné par cette fonction.}.
+We present here the procedures for hierarchical agglomerative clustering, which function as follows. One starts out from the observations, each of them being considered as a group. On each iteration, the two closest groups (or initially observations) are grouped, until all the observations form a single group. The agglomeration schedule, i.e. the succession of groupings performed, represents the clustering procedure in the form of a tree which is called a dendrogram. When the agglomeration schedule has been constructed, one selects the number of groups. The partition selected is obtained by \guil{cutting} the grouping tree at the corresponding level.\footnote{There are also so-called descendant (or divisive) procedures which run in the same way, but in the opposite direction. Instead of starting out from the observations that are regarded as groups, the procedure divides one of the groups at each step until each observation corresponds to a group. An algorithm is available in \proglang{R} with the \code{diana} function of the \pkg{cluster} library. Everything presented here is also compatible with the object returned by this function.}
 
-
-Dans \proglang{R}, le schéma agglomératif (la succession des regroupements effectués) est créé avec la fonction \code{hclust}\footnote{d'autres possibilités existent.}. Cette fonction prend les paramètres suivants: la matrice de distances, la méthode (ici \guil{ward}, nous y reviendrons) ainsi que le vecteur de poids \code{members}.
+In \proglang{R}, the agglomeration schedule (the succession of groupings performed) is created with the \code{hclust} function.\footnote{Other possibilities exist.} This function takes the following parameters: the distance matrix (as a \code{dist} object), the method (here \guil{Ward}, we shall return to this) and the weight vector \code{members}.
 
 %% preliminary R commands
-<<hclustcompute>>=
+<<hclustcompute, setwidth=50>>=
 wardCluster <- hclust(as.dist(mvaddist), method="ward", members=mvad$weight)
 @
 
-Une fois le schéma agglomératif créé, on peut visualiser les dernières étapes de ce schéma à l'aide de la librairie \pkg{WeightedCluster}. Pour ce faire, on procède en deux temps. On commence par construire un arbre de séquences à partir du schéma agglomératif avec la commande \code{as.seqtree}. Cette fonction prend les arguments suivant: la procédure de clustering (\code{wardCluster} dans notre cas), l'objet séquence (argument \code{seqdata}), la matrice de distance (argument \code{diss}) et le nombre maximum de regroupements à représenter (\code{ncluster}).
+When the agglomeration schedule has been created, the final stages of this schedule can be visualized with the aid of the \pkg{WeightedCluster} library. This is done in two stages. One starts by constructing a tree of sequences from the agglomerative schema with the command \code{as.seqtree}. This function takes the following arguments: the clustering procedure (\code{wardCluster} in our case), the sequence object (\code{seqdata} argument), the distance matrix (\code{diss} argument) and maximum number of groupings to be represented (\code{ncluster}).
 
 <<as.seqtreecompute>>=
 wardTree <- as.seqtree(wardCluster, seqdata=mvadseq, diss=mvaddist, ncluster=6)
 @
 
-Une fois l'arbre construit, la fonction \code{seqtreedisplay} de la librairie \pkg{TraMineR} \citep{StuderRitschardGabadinhoMuller2011SMR} permet de le représenter graphiquement. L'option \code{showdepth=TRUE} affiche les niveaux des regroupements sur la droite du graphique.
+Once the tree is constructed, the \code{seqtreedisplay} function of the \pkg{TraMineR} library \citep{StuderRitschardGabadinhoMuller2011SMR} makes it possible to represent it graphically. The option \code{showdepth=TRUE} displays the levels of the groupings on the right of the graph.
 
 <<seqtreedisplay, echo=FALSE, results="hide", eval=FALSE>>=
 seqtreedisplay(wardTree, type="d", border=NA, filename="wardtree.png", showdepth=TRUE, showtree=FALSE)
@@ -254,205 +256,201 @@ seqtreedisplay(wardTree, type="d", border=NA, showdepth=TRUE)
 %\begin{figure}[htb]
 \begin{center}
   \includegraphics[width=.5\linewidth]{wardtree}
-%\caption{Arbre des derniers regroupements, critère \guil{Ward}.}
-%\label{fg_wardseqtree}
 \end{center}
 %\end{figure}
 \afterpage{\clearpage}
 
-Cette figure présente le résultat de cette procédure et permet de visualiser les logiques de regroupement des séquences. La première distinction, censée être la plus importante, sépare les jeunes irlandais qui se dirigent vers l'école supérieure des autres. Les distinctions qui se font lorsque l'on passe de quatre à cinq groupes nous permettent toutefois de mettre en lumière que ce groupe amalgame deux logiques: ceux qui vont vers l'école supérieure et ceux qui vont vers la \guil{Further Education}. Ce graphique fournit une aide importante pour identifier les distinctions pertinentes pour l'analyse. Ainsi, si l'on retient une solution en quatre groupes, on ne fera plus de distinction entre les deux logiques (\guil{École supérieure} et \guil{Further Education}). Par contre, la distinction en cinq groupes permet de l'identifier.
+This graphic presents the result of this procedure and makes it possible to visualize the grouping logics of the sequences. The first distinction, considered to be the most important, separates the Northern Irish young people who go into tertiary education from the others. The distinctions that are made when one moves from four to five groups enable us, however, to bring to light the fact that this group amalgamates two logics: those who go into \guil{Higher Education} and those who go into \guil{Further Education}. This graphic provides an important aid for identifying the distinctions pertinent for the analysis. Thus, if one opts for a four-group solution, no further will be made between entre the two logics (\guil{Higher Education} and \guil{Further Education}). By contrast, the distinction into five groups enables this to be identified.
 
-Cet exemple illustre la \textit{simplification} des données effectuées par les procédures de clustering. En ne retenant que quatre groupes, on amalgame deux logiques qui pourraient (ou non) être pertinentes pour l'analyse. Notons qu'en ne retenant que cinq groupes, on amalgame les distinctions qui se font à un niveau inférieur. On effectue ainsi toujours une simplification.
+This example illustrates the \textit{simplification} of the data effected by the clustering procedures. Opting for only four groups, one amalgamates two logics which may (or may not) be pertinent for the analysis. It should be noted that in opting for only five groups, one amalgamates the distinctions that are made at a lower level. One is thus always performing a simplification.
 
-Pour obtenir un regroupement en un nombre de groupes particulier, on coupe l'arbre à un niveau donné. Ceci signifie que l'on garde tous les n\oe uds terminaux si l'arbre s'arrêtait au niveau présenter sur la droite. Dans \proglang{R}, on récupère cette information à l'aide de la fonction \code{cutree}. Par exemple, pour utiliser le regroupement en $4$ classes distinctes.
-
+To obtain a grouping in a particular number of groups, one cuts the tree at a given level. This means that one keeps all the terminal nodes if the growing of the tree is stopped at the level presented on the right. In \proglang{R}, this information is recovered with the aid of the \code{cutree} function. For example, to use the grouping in four distinct classes:
 
 <<cutreecompute>>=
 clust4 <- cutree(wardCluster, k=4)
 @
 
-On peut ensuite utiliser cette information dans d'autres analyses, par exemple, pour représenter les types obtenus à l'aide d'un chronogramme. Sans surprise, les graphiques obtenus correspondent aux n{\oe}uds terminaux de l'arbre au niveau quatre.
+This information can then be used in other analyses, for example, to represent the types obtained with the aid of a chronogram. Not surprisingly, the graphics obtained correspond to the terminal nodes of the tree at level four.
 
 <<seqdplot-clust4, fig.width=7, fig.height=5>>=
 seqdplot(mvadseq, group=clust4, border=NA)
 @
 
+As previously mentioned, the \code{hclust} function offers seven different hierarchical algorithms which are specified with the argument method. The \pkg{fastcluster} library provides an optimized version of this function \citep{Mullner2011}. The hierarchical algorithms \code{diana} \citet[divisive algorithm, see][]{Kaufman1990} and beta-flexible clustering with the \code{agnes} function are available in the \pkg{cluster} library \citep{RClusterPackage}.\footnote{If these functions are used, it is necessary to specify the argument \code{diss=TRUE}, in order for the algorithm to use the distance matrix passed as an argument.} Table~\ref{tb_hclustmethods} lists these algorithms, giving the name of the function to be used, the allowance for weightings (\guil{Indep} means that the algorithm is insensitive to weightings) and the interpretation of the clustering logic. A more detailed presentation of these algorithms is available in \citet{Mullner2011} and \citet{Kaufman1990}.
 
-Comme nous l'avons mentionné, la fonction \code{hclust} propose sept algorithmes hiérarchiques différents que l'on spécifie avec l'argument \code{method}. La librairie \pkg{fastcluster}  fournit une version optimisée de cette fonction \citep{Mullner2011}. Les algorithmes hiérarchiques  \code{diana} \citet[procédure descendante voir][]{Kaufman1990} et le bêta-flexible clustering avec la fonction \code{agnes} sont disponibles dans la librairie \pkg{cluster} \citep{RClusterPackage}\footnote{Si l'on utilise ces fonctions, il est nécessaire de spécifier l'argument \code{diss=TRUE}, pour que l'algorithme utilise la matrice de distance passée en argument.}. Le tableau~\ref{tb_hclustmethods} liste ces algorithmes en précisant le nom de la fonction à utiliser, la prise en compte des pondérations (l'entrée \guil{Indep} signifie que l'algorithme est insensible aux pondérations) et l'interprétation de la logique de clustering. Une présentation plus détaillée de ces algorithmes est disponible dans \citet{Mullner2011} et \citet{Kaufman1990}.
+
 
 \begin{table}[htb]
-\caption{Algorithmes de regroupements hiérarchiques.}
+\caption{Hierarchical clustering algorithms.}
 \label{tb_hclustmethods}
 \begin{center}
 {\scriptsize
 \renewcommand\arraystretch{1.5}
 \begin{tabular}{lllp{7.5cm}}
 \toprule
-Nom   & Fonction & Poids& Interprétation et notes. \\
+Name &Function &Weight &Interpretation and notes. \\
 \midrule
-single & hclust & Indep &  Fusion des groupes avec les observations les plus proches.\\
-complete & hclust & Indep  & Minimisation du diamètre de chaque nouveau groupe (très sensible aux données atypiques). \\
-average (ou UPGMA) & hclust & Oui &  Moyenne des distances. \\
-McQuitty (ou WPGMA) & hclust & Indep & Dépend des fusions précédentes. \\
-centroid & hclust & Oui & Minimisation des distances entre médoïdes. \\
-median & hclust & Indep & Dépend des fusions précédentes.  \\
-ward & hclust & Oui & Minimisation de la variance résiduelle. \\
-beta-flexible & agnes & Non & Pour une valeur de $\beta$ proche de $-0.25$, utiliser \code{par.method=0.625}.\\
+single &\code{hclust} &Indep &Merging of the groups with closest observations. \\
+complete &\code{hclust} &Indep &Minimization of diameter of each new group (very sensitive to atypical data). \\
+average (or UPGMA) &\code{hclust} &Yes &Average of distances. \\
+McQuitty (or WPGMA) &\code{hclust} &Indep &Depends on previous mergings. \\
+centroid &\code{hclust} &Yes &Minimization of distances between medoids. \\
+median &\code{hclust} &Indep &Depends on previous mergings.\\
+ward &\code{hclust} &Yes &Minimization of residual variance. \\
+beta-flexible &\code{agnes} &No & For a value of $\beta$ close to $-0.25$, set the argument \code{par.method=0.625}.\\
 \bottomrule
 \end{tabular}%
 }
 \end{center}
 \end{table}
-
-Dans leur article, \citet{MilliganEtAl1987} reprennent les résultats de différentes simulations effectuées afin d'évaluer les performances de certains de ces algorithmes. Notons que ces simulations ont été réalisées avec des données numériques et la mesure de distance euclidienne. L'extension de ces résultats à d'autres types de distances est sujette à discussion. Ils reportent ainsi des résultats plutôt mauvais pour les méthodes \guil{single}, \guil{complete}, \guil{centroid} et \guil{median}. La méthode \guil{Ward} fait en général assez bien sauf en présence de données extrêmes qui biaisent les résultats. Ils reportent des résultats très variables pour la méthode \guil{average}. Finalement, la méthode \guil{beta-flexible} avec une valeur de bêta proche de $-0.25$ donne de bons résultats en présence de différentes formes d'erreur dans les données \citep{Milligan1989}. Les meilleurs résultats sont obtenus par l'algorithme \guil{flexible UPGMA} qui n'est pas disponible à l'heure actuelle dans \proglang{R} \citep{BelbinEtAl1992}.
-
-
-Plusieurs critiques peuvent être adressées aux procédures hiérarchiques. Premièrement, et c'est la plus importante, la fusion de deux groupes se fait en maximisant un critère local. Ces procédures optimisent un critère local, c'est-à-dire qu'on estime localement la perte d'information due à un regroupement. Or, ces choix locaux peuvent mener à de grandes différences à des niveaux plus élevés et il n'est pas garanti qu'il soit les meilleurs d'un point de vue global. En d'autres termes, il arrive souvent qu'un choix bon au niveau local conduise à des résultats médiocres à un niveau de regroupement supérieur. Deuxièmement, les procédures ascendantes ne sont pas déterministes en particulier lorsque la mesure de distance ne prend que peu de valeurs différentes donnant lieu a des égalités entre lesquelles il faut trancher, ce qui peut notamment être le cas avec l'appariement optimal ou la distance de Hamming. Bien qu'une version particulière de cet algorithme produise généralement le même dendrogramme à chaque analyse\footnote{les algorithmes font généralement un choix qui dépend de l'ordre des observations, ce qui le rend reproductible pour autant que l'ordre soit inchangé.}, plusieurs versions de ce même algorithme peuvent conduire à des résultats divergents. De plus, ce cas de figure peut pénaliser la procédure qui n'a pas de critère pour effectuer un choix \citep{FernandezGomez2008}. Nous présentons à présent l'algorithme PAM qui a l'avantage de chercher à maximiser un critère global.
+In their article, \citet{MilliganEtAl1987} examine the results of different simulations in order to evaluate the performances of some of these algorithms. It should be noted that these simulations were carried out with numerical data and the Euclidian distance measure. The extension of these results to other types of distances is subject to debate. They thus report rather poor results for the \guil{single}, \guil{complete}, \guil{centroid} and \guil{median} methods. The \guil{Ward} method generally performs fairly well except in the presence of outliers which bias the results. They report very variable results for the \guil{average} method. Finally, the \guil{beta-flexible} method with a value of beta close to $-0.25$ gives good results in the presence of various forms of error in the data \citep{Milligan1989}. The best results are obtained with the \guil{flexible UPGMA} algorithm, which is not currently available in \proglang{R} \citep{BelbinEtAl1992}.
 
 
-\subsection{Partitionning Around Medoids}
+Hierarchical procedures are open to several criticisms. First, and most importantly, the merging of two groups is done by maximizing a local criterion. These procedures optimize a local criterion, i.e. the loss of information due to a grouping is estimated locally. These local choices can lead to great differences at higher levels and it is not guaranteed that a local choice is the best one from a global point of view. In other words, it can often happen that a good choice at the local level leads to mediocre results at a higher level of grouping. Secondly, agglomerative procedures are non-deterministic, particularly when the distance measure takes only a few different values, giving rise to ties between which one has to decide; in particular this can be the case with optimal matching or the Hamming distance. Although a particular version of this algorithm generally produces the same dendrogram in each analysis\footnote{The algorithms generally make a choice which depends on the order of the observations, which makes it replicable so long as the order remains unchanged.}, several versions of this same algorithm can lead to divergent results. Moreover, this occurrence can penalize the procedure, which has no criterion to make a choice \citep{FernandezGomez2008}. We now present the PAM algorithm, which has the advantage of seeking to maximize a global criterion.
 
 
-L'algorithme PAM pour \guil{Partioning Around Medoids} suit une autre logique que les algorithmes hiérarchiques~\citep{Kaufman1990}. Il vise à obtenir la meilleure partition d'un ensemble de données en un nombre $k$ prédéfini de groupes. Par rapport aux autres algorithmes présentés, cet algorithme a l'avantage de maximiser un critère global et non uniquement un critère local.
+\subsection{Partitioning Around Medoids}
 
-Le but de l'algorithme est d'identifier les $k$ meilleurs représentants de groupes, appelés médoïdes. Plus précisément, un médoïde correspond à l'observation d'un groupe ayant la plus petite somme pondérée des distances aux autres observations de ce groupe. Cet algorithme cherche ainsi à minimiser la somme pondérée des distances au médoïde.
+The PAM (for \guil{Partitioning Around Medoids}) algorithm follows a different logic from hierarchical algorithms~\citep{Kaufman1990}. It aims to obtain the best partitioning of a data set into a predefined number $k$ of groups. Compared to the other algorithms presented, this algorithm has the advantage of maximizing a global criterion and not only a local criterion.
 
-Brièvement, on peut décrire le fonctionnement de cet algorithme en deux phases. Dans un premier temps, on initialise l'algorithme en cherchant les observations qui diminuent le plus la somme pondérée des distances aux médoïdes existants, en choisissant le médoïde de l'ensemble des données au départ. Une fois la solution initiale construite, la deuxième phase de l'algorithme, appelée \guil{échange}, commence. Pour chaque observation, on calcule le gain potentiel si l'on remplaçait l'un des médoïdes existants par cette observation. Le gain est calculé au niveau global et en fonction des distances pondérées aux médoïdes les plus proches. On remplace ensuite le médoïde par l'observation qui conduit au plus grand gain possible. On répète ces opérations jusqu'à ce qu'il ne soit plus possible d'améliorer la solution courante.
+The aim of the algorithm is to identify the $k$ best representatives of groups, called medoids. More precisely, a medoid is defined as the observation of a group having the smallest weighted sum of distances from the other observations de this group. This algorithm thus seeks to minimize the weighted sum of distances from the medoid.
 
-L'algorithme est disponible dans la librairie R \pkg{cluster} \citep{RClusterPackage, StruyfHubertRousseeuw1997}, mais il ne permet pas d'utiliser des données pondérées. Basée en partie sur le code disponible dans la librairie \pkg{cluster}, la fonction \code{wcKMedoids} de librairie \pkg{WeightedCluster} prend en compte les pondérations et implémente également les optimisations proposées par \citet{Reynolds2006}, ce qui la rend plus rapide. Cette fonction consomme également deux fois moins de mémoire ce qui la rend adéquate pour analyser de très grands ensembles de données. L'annexe~\ref{annexe_optim} présente plus en détail les gains en temps de calcul.
+In brief, the functioning of this algorithm can be described in two phases. In a first stage, one initializes the algorithm, seeking the observations that most diminish the weighted sum of the distances from the existing medoids, having chosen the medoid from the whole data set at the start. When the initial solution has been constructed, the second phase of the algorithm, called \guil{swapping}, starts. For each observation, one computes the potential gain that would be realized if one of the existing medoids were replaced this observation. The gain is computed at the global level and in terms of the weighted distances from the closest medoids. The medoid is then replaced by the observation that leads to the greatest possible gain. These operations are repeated until it is no longer possible to improve the current solution.
+
+The algorithm is available in the library \proglang{R} \pkg{cluster} \citep{RClusterPackage, StruyfHubertRousseeuw1997}, but does not make it possible to use weighted data. The \code{wcKMedoids} function in the \pkg{WeightedCluster} library, partly based on the code available in the \pkg{cluster} library, takes weightings into account and also implements the optimizations suggested by  \citet{Reynolds2006}, which make it faster. This function also consumes only half as much memory, which makes it adequate for analysing very large data sets. Annex~\ref{annexe_optim} presents the gains in computing time in more detail.
+
 
 <<wcKMedoids-compute4>>=
 pamclust4 <- wcKMedoids(mvaddist, k=4, weights=mvad$weight)
 @
 
-L'élément \code{clustering} contient l'appartenance aux clusters de chaque observation. On peut, par exemple, utiliser cette information pour représenter les séquences à l'aide d'un chronogramme.
+
+The \code{clustering} element contains the cluster membership of each observation. This information can then be used, for example to represent the sequences with the aid of a chronogram.
 
 <<pamclust4-plot, fig.width=7, fig.height=5>>=
 seqdplot(mvadseq, group=pamclust4$clustering, border=NA)
 @
 
-Le numéro assigné au groupe correspond à l'index du médoïde de ce groupe. On peut ainsi récupérer les médoïdes en utilisant la commande \code{unique(pamclust4\$clustering)}. La commande suivante utilise cette possibilité pour afficher les séquences médoïdes de chaque groupe.
+The number assigned to each group corresponds to the index of the medoid of this group. The medoids can thus be recovered by using the command \code{unique(pamclust4\$clustering)}. The following command uses this possibility to display the medoid sequences of each group:
 
 <<wcKMedoids-print4>>=
 print(mvadseq[unique(pamclust4$clustering), ], format="SPS")
 @
 
-L'algorithme PAM a plusieurs désavantages. Le premier est de créer des groupes \guil{sphériques}\footnote{Ce qui est également le cas du critère de \guil{Ward} dans les procédures hiérarchiques.} centrés autour de leur médoïde, ce qui ne correspond pas nécessairement à la réalité des données. Deuxièmement, il est nécessaire de spécifier le nombre $k$ de groupes au préalable. En testant plusieurs tailles $k$ de partition, on n'est pas assurés que les types obtenus s'emboîtent comme dans le cas des procédures hiérarchiques et le temps de calcul peut être conséquent. Finalement, l'algorithme est dépendant du choix des médoïdes de départs qui n'est pas toujours effectué de manière optimale.
 
-\section{Combiner les algorithmes}
+The PAM algorithm has several disadvantages. The first is that it creates \guil{spherical} groups\footnote{Which is also the case for the \guil{Ward} criterion in hierarchical procedures.} centred on their medoid, which does not necessarily correspond to the reality of the data. Secondly, it is necessary to specify in advance the number $k$ of groups. When testing several sizes $k$ of partition, one cannot be sure that the types obtained interlock as in the case of hierarchical procedures, and the computing time can be correspondingly long. Finally, the algorithm is dependent on the initial choice of medoids, which is not always optimal.
 
-Les deux procédures de clustering peuvent être combinées, ce qui produit parfois de meilleurs résultats. Pour ce faire, on spécifie comme point de départ de la fonction \code{wcKMedoids} le clustering obtenu par la méthode hiérarchique (l'argument \code{initialclust=wardCluster}).
+
+\subsection{Combining the algorithms}
+
+The two clustering procedures can be combined, and this sometimes produces better results. To do this, the clustering obtained by the hierarchical method (the argument \code{initialclust=wardCluster}) is specified as the starting point of the \code{wcKMedoids} function.
 
 <<wcKMedoids-compute4-ward>>=
 pamwardclust4 <- wcKMedoids(mvaddist, k=4, weights=mvad$weight, initialclust=wardCluster)
 @
 
-Ceci aboutit ici à une solution légèrement différente, mais avec une meilleure qualité.
+This leads here to a slightly different solution, but with better quality.
 
 <<pamwardclust4-plot-ward, fig.width=7, fig.height=5>>=
 seqdplot(mvadseq, group=pamwardclust4$clustering, border=NA)
 @
 
+We have presented several types of cluster analyses, which have led us to different solutions. How does one choose among these solutions? This question is all the more important since we could also have selected different numbers of groups for each procedure, which would have led us to a large number of possibilities. The measures of quality of a partition that we now present assist in this choice by offering a basis for comparing these different solutions.
 
-Nous avons présenté plusieurs types d'analyses en cluster qui nous ont conduits à des solutions différentes. Comment faire un choix entre ces solutions? Cette question est d'autant plus importante que nous aurions également pu sélectionner des nombres de groupes différents pour chaque procédure, ce qui nous amènerait à un grand nombre de possibilités. Les mesures de la qualité d'une partition que nous présentons maintenant aident à réaliser ce choix en offrant une base de comparaison de ces différentes solutions.
-
-
-\section{Mesurer la qualité d'une partition}
-
-Les mesures de la qualité d'une partition ont deux objectifs. Premièrement, certaines d'entre elles donnent une idée de la qualité statistique de la partition. Deuxièmement, ces mesures aident au choix de la meilleure partition d'un point de vue statistique. Elles sont ainsi d'une aide précieuse pour sélectionner le nombre de groupes ou le meilleur algorithme.
+\section{Measuring the quality of a partition}
 
 
-\subsection{Présentation des mesures}
+Measures of the quality of a partition have two objectives. First, some of them give an idea of the statistical quality of the partition. Secondly, these measures assist in the choice of the best partition from a statistical standpoint. They are a valuable aid in selecting the number of groups or the best algorithm.
 
-La libraire \pkg{WeightedCluster} propose plusieurs mesures de la qualité d'une partition qui sont listées dans le tableau~\ref{tb_wcquality}. Le choix de ces mesures est largement inspiré par \citet{Hennig2010} que nous avons complété avec le \guil{C-index} qui figurait parmi les meilleurs indices selon \citet{MilliganCooper1985}. La présentation que nous faisons ici se centre sur les concepts. Le lecteur intéressé pourra toutefois se référer à l'annexe~\ref{annexe_clustqual} qui présente les détails mathématiques de ces mesures ainsi que les ajustements effectués pour prendre en compte la pondération des observations. Outre le nom des mesures de qualités, le tableau~\ref{tb_wcquality} présente leurs principales caractéristiques à l'aide des informations suivantes:
+
+\subsection{Presentation of measures}
+
+
+The \pkg{WeightedCluster} library offers several measures of partition quality, which are listed in Table~\ref{tb_wcquality}. The choice of these measures is mainly inspired by \citet{Hennig2010}, together with the \guil{C-index} which figured among the best indexes according to \citet{MilliganCooper1985}. The presentation we make here is centred on the concepts. The interested reader can however refer to Annex~\ref{annexe_clustqual}, which presents the mathematical details of these measures and the adjustments made to take account of the weighting of the observations. Alongside the names of the quality measures, Table~\ref{tb_wcquality}  presents their main characteristics with the aid of the following information:
 \begin{itemize}
-  \item Abrv: abréviation utilisée dans la librairie \pkg{WeightedCluster}.
-  \item Étendu: intervalle des valeurs possibles.
-  \item Min/Max: Est-ce qu'une bonne partition minimise ou maximise cette mesure?
-  \item Interprétation de la valeur.
+    \item Abrv: abbreviation used in the WeightedCluster library.
+    \item Range: interval of the possible values.
+    \item Min/Max: Does a good partition minimize or maximize this measure?
+    \item Interpretation of the value.
 \end{itemize}
 
 
 \begin{table}[htb]
-\caption{Mesures de la qualité d'un regroupement.}
+\caption{Measures of the quality of a partition.}
 \label{tb_wcquality}
 \begin{center}
 {\scriptsize
 \renewcommand\arraystretch{1.5}
 \begin{tabular}{llllp{6.5cm}}
 \toprule
-Nom   & Abrv. & Étendue & Min/Max & Interprétation\\
+Name &Abrv. &Range &Min/Max &Interpretation \\
 \midrule
-Point Biserial Correlation & PBC & $[-1;1]$ & Max & Mesure de la capacité du clustering à reproduire les distances.\\
-Hubert's Gamma & HG & $[-1;1]$ & Max & Mesure de la capacité du clustering à reproduire les distances (ordre de grandeur).\\
-Hubert's Somers D & HGSD & $[-1;1]$ & Max & Mesure de la capacité du clustering à reproduire les distances (ordre de grandeur) avec prise en compte des égalités sur les distances.\\
-Hubert's C & HC & $[0;1]$ & \textbf{Min} & Écart entre la partition obtenue et la meilleure partition qu'il serait théoriquement possible d'obtenir avec ce nombre de groupes et ces distances.\\
-Average Silhouette Width & ASW & $[-1;1]$ & Max & Cohérence des assignations. Une cohérence élevée indique des distances inter-groupes élevées et une forte homogénéité intragroupe.\\
-Calinski-Harabasz index & CH & $[0;+\infty[$ & Max & Pseudo F calculé à partir des distances.\\
-Calinski-Harabasz index & CHsq& $[0;+\infty[$ & Max & Idem que précédant, mais en utilisant les distances \textit{au carré}.\\
-Pseudo $R^2$ & R2 & $[0;1]$ & Max & Part de la dispersion expliquée par la solution de clustering (uniquement pour comparer des partitions avec nombre de groupes identiques).\\
-Pseudo $R^2$ & R2sq & $[0;1]$ & Max & Idem que précédant, mais en utilisant les distances \textit{au carré}.\\
+Point Biserial Correlation &PBC &$[-1; 1]$ &Max &Measure of the capacity of the clustering to reproduce the distances. \\
+Hubert's Gamma &HG &$[-1; 1]$ &Max &Measure of the capacity of the clustering to reproduce the distances (order of magnitude). \\
+Hubert's Somers' D &HGSD &$[-1; 1]$ &Max &Measure of the capacity of the clustering to reproduce the distances (order of magnitude) taking into account ties in distances. \\
+Hubert's C &HC &$[0; 1]$ &\textbf{Min} &Gap between the partition obtained and the best partition theoretically possible with this number of groups and these distances. \\
+Average Silhouette Width &ASW &$[-1; 1]$ &Max &Coherence of assignments. High coherence indicates high between-group distances and strong within-group homogeneity. \\
+Calinski-Harabasz index &CH &$[0;+\infty[$ &Max &Pseudo F computed from the distances. \\
+Calinski-Harabasz index &CHsq &$[0;+\infty[$ &Max &As previous, but using \textit{squared} distances. \\
+Pseudo $R^2$ &R2 &$[0; 1]$ &Max &Share of the discrepancy explained by the clustering solution (only to compare partitions with identical number of groups). \\
+Pseudo $R^2$ &R2sq &$[0; 1]$ &Max &As previous, but using \textit{squared} distances. \\
 \bottomrule
 \end{tabular}%
 }
 \end{center}
 \end{table}
 
-Les trois premières mesures, à savoir \guil{Point Biserial Correlation} \citep{MilliganCooper1985, Hennig2010}, \guil{Hubert's Gamma} et \guil{Hubert's Somers D} \citep{Hubert1985}, suivent la même logique. Elles mesurent la capacité d'une partition des données à reproduire la matrice des distances. Si la première mesure la capacité à reproduire la valeur exacte des distances, les deux suivantes se basent sur les concordances. Ceci implique que, selon ces deux derniers indices, une partition est bonne si les distances entre les groupes sont plus grandes que celles à l'intérieur des groupes. Techniquement, on mesure cette capacité en calculant l'association entre la matrice de distance et une deuxième mesure de distance qui prend la valeur $0$ pour les observations qui sont dans le même groupe et $1$ sinon. On utilise la corrélation de Pearson (\guil{Point Biserial Correlation}), Gamma de Goodman et Kruskal (\guil{Hubert's Gamma}) ou le D de Somers (\guil{Hubert's Somers D}).
+The first three measures, namely \guil{Point Biserial Correlation} \citep{MilliganCooper1985, Hennig2010}, \guil{Hubert's Gamma} and \guil{Hubert's Somers' D} \citep{Hubert1985}, follow the same logic. They measure the capacity of a partition of the data to reproduce the distance matrix. Whereas the first measures the capacity to reproduce the exact value of the distances, the other two are based on the concordances. This implies that, according to the latter two indexes, a partition is valid if the distances between the groups are greater than those within the groups. Technically, this capacity is measured by computing the association between the distance matrix and a second measure of distance which takes the value $0$ for observations that are in the same group and $1$ otherwise. Pearson's correlation (\guil{Point Biserial Correlation}), Goodman and Kruskal's Gamma (\guil{Hubert's Gamma}) or Somers' D (\guil{Hubert's Somers' D}) is used.
 
 
-L'indice \guil{Hubert's C} met en parallèle la partition obtenue et la meilleure partition que l'on aurait pu obtenir avec ce nombre de groupe et cette matrice de distance. Contrairement aux autres indices, une petite valeur indique une bonne partition des données.
+The \guil{Hubert's C} index compares the partition obtained with the best partition that could have been obtained with this number of groups and this distance matrix. In contrast to the other indexes, a small value indicates a good partition of the data.
 
-Les indices de Calinski-Harabasz \citep{CalinskiHarabasz1974} se basent sur la statistique $F$ de l'analyse de variance. Cette mesure a donné de très bons résultats dans les simulations de \citet{MilliganCooper1985}. Toutefois, son extension à des données non numériques est sujette à discussion \citep{Hennig2010}. On peut discuter de sa pertinence si la mesure de distance est euclidienne (ou euclidienne au carré) auquel cas, cette mesure revient à utiliser la statistique $F$ sur les coordonnées que l'on peut associer aux observations, par exemple avec une analyse en coordonnées principales. Pour ce cas de figure, la librairie \pkg{WeightedCluster} fournit cette statistique en utilisant les carrés des distances lorsque la distance est euclidienne ou la distance elle-même lorsque la mesure est déjà une distance euclidienne au carré, comme la distance de Hamming par exemple.
+The Calinski-Harabasz indexes  \citep{CalinskiHarabasz1974} are based on the statistic $F$ of the analysis of variance. This measure gave very good results in the simulations of \citet{MilliganCooper1985}. However, its extension to non Euclidean distance (such as optimal matching) is subject to debate. One may question its pertinence if the measure of distance is Euclidian (or squared Euclidean), in which case this measure amounts to using the statistic $F$ on the coordinates that can be associated with the observations, for example with a principal coordinate analysis \citep{StuderRitschardGabadinhoMuller2011SMR}. For this case the \pkg{WeightedCluster} library provides this statistic using the squared distances when the distance is Euclidian or the distance itself when the measure is already a squared Euclidian distance, such as the Hamming distance.
 
-Le \guil{R-square} calcule la part de la dispersion expliquée par une partition \citep{StuderRitschardGabadinhoMuller2011SMR}. Cette mesure n'est pertinente que pour comparer des partitions comportant le même nombre de groupe, car elle ne pénalise pas la complexité.
+R-squared calculates the share of discrepancy explained by a partition \citep{StuderRitschardGabadinhoMuller2011SMR}. This measure is only pertinent to compare partitions containing the same number of groups, since it does not penalize complexity.
 
-Finalement, la mesure \guil{Average Silhouette Width} proposée par \citet{Kaufman1990} est particulièrement intéressante. Elle se base sur la cohérence de l'assignation d'une observation à un groupe donné en mettant en parallèle la distance moyenne pondérée d'une observation aux autres membres de son groupe et la distance moyenne pondérée au groupe le plus proche. Une valeur est calculée pour chaque observation, mais on regarde plutôt la silhouette moyenne. Si celle-ci est faible, cela signifie que les groupes ne sont pas clairement séparés les uns des autres ou que l'homogénéité des groupes est faible. De manière intéressante, \citet{Kaufman1990} proposent des ordres de grandeur pour interpréter cette mesure que nous reproduisons dans le tableau~\ref{tab_kaufman_asw}.
+Finally, the measure \guil{Average Silhouette Width} proposed by \citet{Kaufman1990} is particularly interesting. It is based on the coherence of the assignment of an observation to a given group, comparing the average weighted distance of an observation from the other members of its group and its average weighted distance from the closest group. A value is calculated for each observation, but more attention is paid to the average silhouette. If this is weak, it means that the groups are not clearly separated or that the homogeneity of the groups is low. Interestingly, \citet{Kaufman1990} put forward orders of magnitude for interpreting this measure, which are reproduced in Table~\ref{tab_kaufman_asw}.
+
 
 \begin{table}[htb]
-\caption{Ordres de grandeur pour interpréter la mesure $ASW$}
+\caption{Orders of magnitude for interpreting the $ASW$ measure}
 \label{tab_kaufman_asw}
 \begin{center}
 \begin{tabular}{ll}
     \toprule
-        $ASW$ & Interprétation proposée\\
+        $ASW$ & Interpretation proposed\\
     \midrule
-    0.71-1.00 & Structure forte identifiée.\\
-    0.51-0.70 & Structure raisonnable identifiée.\\
-    0.26-0.50 & La structure est faible et pourrait être artificielle.\\
-              & Essayer d'autres algorithmes.\\
-    $\leq 0.25$& Aucune structure.\\
+$0.71-1.00$ &Strong structure identified. \\
+$0.51-0.70$ &Reasonable structure identified.\\
+$0.26-0.50$ &Structure is weak and could be artificial. \\
+&Try other algorithms. \\
+$\leq 0.25$ &No structure. \\
     \bottomrule
 \end{tabular}
 \end{center}
 \end{table}
 
-Ces mesures sont calculées avec la fonction \code{wcClusterQuality}. La valeur retournée par la fonction est une liste qui comprend deux éléments. L'élément \code{stats} contient les valeurs des mesures de qualité.
 
-<<wcClusterQuality-compute9-option, echo=FALSE, results="hide">>=
+These measures are calculated with the \code{wcClusterQuality} function. The value returned by the function is a list comprising two elements. The \code{stats} element contains the values of the measures of quality.
+
+<<wcClusterQuality-compute9, echo=2:3, setwidth=70>>=
 options(digits=2)
-@
-<<wcClusterQuality-compute9>>=
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
-@
-<<wcClusterQuality-compute9-optionend, echo=FALSE, results="hide">>=
 options(digits=3)
 @
 
+According to the measure \code{ASW=\Sexpr{round(clustqual4$stats["ASW"], 2)}}, the solution in four groups obtained using the Ward criterion could be a statistical artefact, since it is less than $0.25$.
 
-Selon la mesure \code{ASW=\Sexpr{round(clustqual4$stats["ASW"], 2)}}, la solution en quatre groupes obtenue avec le critère de Ward pourrait être un artifice statistique, puisqu'elle est inférieure à 0.25.
-
-
-L'élément \code{ASW} de l'objet \code{clustqual4} contient la silhouette moyenne de chaque groupe pris séparément. Selon cette mesure, le groupe 3 est ci particulièrement mal défini puisque sa silhouette moyenne est négative.
+The \code{ASW} element of the object \code{clustqual4} contains the average silhouette of each group taken separately. According to this measure, group $3$ is particularly ill-defined since its average silhouette is negative.
 
 <<wcClusterQuality-computeasw>>=
 clustqual4$ASW
 @
 
-\subsection{Utiliser la silhouette pour représenter les clusters}
+\subsection{Use the silhouette to represent the clusters}
 
-La silhouette peut être calculée séparément pour chaque séquence, ce qui permet d'identifier les séquences caractéristiques d'un regroupement (silhouette proche de un). La fonction \code{wcSilhouetteObs} calcule ces valeurs. Dans l'exemple ci-dessous, nous utilisons les silhouettes pour ordonner les séquences dans des index-plots.
+The silhouette can be computed separately for each sequence, which makes it possible to identify the sequences most characteristic of a grouping (sequences with a silhouette width close to one). The \code{wcSilhouetteObs} function computes these values. In the example below, we use the silhouettes to order the sequences in index plots.
 
 <<silhouette-indexplot, echo=2:3, dev="png", dpi=600, fig.width=7, fig.height=5>>=
 par(mar=c(2.1, 4.1, 4.1, 1.1))
@@ -460,117 +458,87 @@ sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight)
 seqIplot(mvadseq, group=clust4, sortv=sil)
 @
 
-%<<silhouette-indexplot, echo=FALSE, results="hide">>=
-%sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight)
-%png(file=paste(graphdir,"png_mvad_seqIplot-sil.png",sep=""), unit="px", width=1600, height=1000, pointsize=30)
-%par(mar=c(2.1, 4.1, 4.1, 1.1))
-%seqIplot(mvadseq, group=clust4, sortv=sil)
-%dev.off()
-%@
-%
-%\includegraphics{png_mvad_seqIplot-sil}
-
-Les séquences les plus caractéristiques de chaque cluster sont représentées en haut de chaque graphique. Selon la définition de la silhouette, les séquences que nous appelons \guil{caractéristiques} sont celles qui sont proches du centre de leur groupe tout en étant éloignées du groupe le plus proche. Dans le groupe 1 par exemple, la séquence caractéristique est d'accéder à l'emploi après deux ans d'apprentissage. Au contraire, les séquences au bas de chaque graphique sont mal représentées et/ou mal assignées. Ainsi, dans le groupe 3 par exemple, les séquences \guil{école -- apprentissage -- emploi} sont plus proches d'un autre groupe (le 1 vraisemblablement) que de son propre groupe.
+The most characteristic sequences of each cluster are represented at the top of each graphic. According to the definition of the silhouette, the sequences we call \guil{characteristic} are those that are close to the centre of their group but distant from the closest group. In group 1, for example, the characteristic sequence is to enter employment after two years of apprenticeship. By contrast, the sequences at the bottom of each graphic are poorly represented and/or poorly assigned. Thus, in group 3, for example, the sequences \guil{school -- apprenticeship -- employment} are closer to another group (most likely no. 1) than their own group.
 
 
-\subsection{Choix d'une partition}
 
-Les mesures de la qualité d'une partition facilitent le choix de la meilleure partition parmi un ensemble de possibilités. On peut ainsi les utiliser pour identifier l'algorithme qui donne les meilleurs résultats. La fonction \code{wcKmedoids} utilisée pour PAM calcule directement ces valeurs qui sont stockées dans les éléments \code{stats} et \code{ASW} comme précédemment. Le code suivant affiche les mesures de qualités pour la partition identifiée à l'aide de PAM. Cette partition semble ainsi meilleure que celle obtenue avec Ward.
+\subsection{Choice of a partition}
 
-<<wcClusterQuality-compute91-option, echo=FALSE, results="hide">>=
+The measures of the quality of a partition facilitate the choice of the best partition among a set de possibilities. They can thus be used to identify the algorithm that gives the best results. The \code{wcKmedoids} function used for PAM directly computes these values, which are stored in the elements \code{stats} and \code{ASW} as previously. The following code displays the quality measures for the partition identified with the aid of PAM. This partition thus seems better than that obtained with Ward.
+
+<<wcClusterQuality-compute9-clustqual4pam, echo=2>>=
 options(digits=1)
-@
-
-<<wcClusterQuality-compute9-clustqual4pam>>=
 pamclust4$stats
-@
-
-<<wcClusterQuality-compute91-option-end, echo=FALSE, results="hide">>=
 options(digits=3)
 @
 
-Ces mesures permettent également de comparer des partitions avec un nombre de groupes différents. Seul le pseudo $R^2$ ne devrait pas être utilisé dans ce but, car il ne pénalise pas pour la complexité. Le calcul de la qualité de toutes ces différentes possibilités s'avère vite laborieux. La fonction \code{as.clustrange} de la librairie \pkg{WeightedCluster} calcule automatiquement ces valeurs pour un ensemble de nombres de groupes issus d'une même procédure de regroupement hiérarchique (\code{wardCluster} dans notre exemple). Cette fonction requiert les arguments suivants: la matrice des dissimilarités (\code{diss}), les pondérations (optionnel, argument \code{weights}) ainsi que le nombre maximum de cluster que l'on entend conserver (\code{ncluster}). Dans l'exemple suivant, nous estimons la qualité de clustering pour les regroupements en $2, 3, \ldots, \mbox{ncluster}=20$ groupes.
 
-<<wcRange-compute9>>=
+These measures also make it possible to compare partitions with different numbers of groups. Only pseudo $R^2$ should not be used for this purpose, since it does not penalize for complexity. Computing the quality of all these different possibilities soon becomes laborious. The as.clustrange function in the \pkg{WeightedCluster} library automatically computes these values for a set of numbers of groups derived from one hierarchical clustering procedure (\code{wardCluster} in our example). This function requires the following arguments: the matrix of dissimilarities (\code{diss}), the weightings (optional, \code{weights} argument) and the maximum number of cluster that one wants to retain (\code{ncluster}). In the following example, we estimate the clustering quality for groupings in $2, 3, \ldots, \mbox{ncluster}=20$ groups.
+
+
+<<wcRange-compute9, setwidth=50>>=
 wardRange <- as.clustrange(wardCluster, diss=mvaddist, weights=mvad$weight, ncluster=20)
 summary(wardRange, max.rank=2)
 @
 
-La fonction \code{summary} présente le meilleur nombre de groupes selon chaque mesure de qualité ainsi que la valeur de ces statistiques. L'argument \code{max.rank} spécifie le nombre de partitions à afficher. Selon la mesure \guil{Point Biserial Correlation} (PBC), la partition en six groupes est la meilleure des partitions, alors que pour l'indice \guil{ASW} une solution en deux groupes parait préférable. La valeur maximale identifiée pour ce dernier indice indique qu'il s'agit peut-être d'artifices statistiques (voir tableau~\ref{tab_kaufman_asw}). Rappelons que le pseudo-$R^2$ et sa version basée sur les distances élevées aux carrés donneront toujours un maximum pour le nombre de groupes le plus élevé, car ces statistiques ne peuvent pas diminuer.
 
-La présentation offerte par \code{summary} est utile pour comparer les résultats de deux procédures (voir ci-dessous). Toutefois, elle ne présente que deux ou trois solutions et il est souvent utile d'observer l'évolution de ces mesures pour identifier les points de décrochages et les partitions qui offrent le meilleur compromis entre plusieurs mesures. La fonction \code{plot} associée à l'objet retourné par \code{as.clustrange} représente graphiquement cette évolution. Au besoin, l'argument \code{stat} spécifie la liste des mesures à afficher (\code{"all"} les affiches toutes).
+The \code{summary} function presents the best number of groups according to each quality measure and the value of these statistics. The \code{max.rank} argument specifies the number of partitions to be displayed. According to the \guil{Point Biserial Correlation} (PBC) measure, partitioning in six groups is the best partition, whereas for the \guil{ASW} index a solution in two groups seems preferable. The maximum value identified for this latter index indicates that we may be dealing with statistical artefacts (see Table~\ref{tab_kaufman_asw}). It should be noted that pseudo-$R^2$ and its version based on the high squared distances will always give a maximum for the highest number de groups, since these statistics cannot diminish.
+
+The presentation offered by \code{summary} is useful for comparing the results of two procedures (see below). However, it only presents two or three solutions and is often useful to observe the changes in these measures so as to identify breaking points and the partitions that offer the best compromise among several measures. The \code{plot} function associated with the object returned by \code{as.clustrange} represents this change graphically. If required, the \code{stat} argument specifies the list of measures to be displayed (\code{"all"} displays all of them).
+
 
 <<wcRange-plot, fig.width=8, fig.height=3.5>>=
 plot(wardRange, stat=c("ASW", "HG", "PBC", "HC"))
 @
 
-La solution en six groupes est ici un maximum local pour les mesures \guil{HC}, \guil{PBC} et \guil{HG}, ce qui en fait une bonne si l'on souhaite garder un nombre de groupe restreint. La lecture du graphique est parfois un peu difficile, car les valeurs moyennes de chaque mesure diffèrent. Pour pallier ce problème, l'argument \code{norm="zscore"} standardise les valeurs, ce qui permet de mieux identifier les maximums et minimums\footnote{on peut utiliser \code{norm="zscoremed"} pour une standardisation plus robuste basée sur la médiane.}. La figure ci-dessous facilite l'identification des partitions qui donnent de bons résultats. Les solutions en six et en 17 groupes paraissent bonnes dans notre cas de figure.
+The solution in six groups is here a local maximum for the measures \guil{HC}, \guil{PBC} and \guil{HG}, which makes it a good one if one wants to keep a limited number of groups. The graphic is sometimes somewhat difficult to read, because the average values of each measure differ. To palliate this problem, the argument \code{norm="zscore"} standardizes the values, which makes it easier to identify the maxima and minima.\footnote{For a more robust standardization based on the median, \code{norm="zscoremed"} can be used.} The command below facilitates the identification of the partitions that give good results. The solutions in six and 17 groups appear to be good in the present case.
 
 <<wcRange-plot2, fig.width=8, fig.height=3.5>>=
 plot(wardRange, stat=c("ASW", "HG", "PBC", "HC"), norm="zscore")
 @
 
-L'objet retourné par la fonction \code{as.clustrange} contient également un \code{data.frame} contenant toutes les partitions testées dans l'élément \code{clustering}. On peut ainsi utiliser directement \code{as.clustrange} plutôt que \code{cutree}. La solution en six groupes peut être affichée de la manière suivante.
+The object returned by the \code{as.clustrange} function also contains a \code{data.frame} called \code{clustering} containing all the partitions tested. One can thus use \code{as.clustrange} directly rather than \code{cutree}. The solution in six groups can be displayed in the following way:
 
 <<wardClust6-plot, fig.width=7, fig.height=6>>=
 seqdplot(mvadseq, group=wardRange$clustering$cluster6, border=NA)
 @
 
-La fonction \code{as.clustrange} accepte divers types d'arguments, dont l'ensemble des procédures de clustering disponibles dans la librairie \pkg{cluster}, même si ces dernières n'acceptent pas de pondération. Toutefois, il n'est pas possible de l'utiliser directement avec les algorithmes non hiérarchiques tels que PAM. Pour ce faire, on utilise la fonction \code{wcKMedRange} qui calcule automatiquement les partitions pour une série de valeurs de $k$ (nombre de groupes). L'objet retourné est le même que celui présenté précédemment pour les procédures de regroupements hiérarchiques et l'on peut donc utilisé les mêmes présentations que précédemment. Cette fonction prend en paramètre une matrice de distance, \code{kvals} un vecteur contenant le nombre de groupes des différentes partitions à créer, et un vecteur de poids. Les arguments supplémentaires sont passés à \code{wcKMedoids}.
+The \code{as.clustrange} function accepts several types of arguments, including the set of clustering procedures available in the \pkg{cluster} library, even if the latter do not accept weighting. However, it is not possible to use it directly with non-hierarchical algorithms such as PAM. To do this, we use the \code{wcKMedRange} function, which automatically computes the partitions for a series of values of $k$ (number of groups). The object returned is the same as that previously presented for the hierarchical clustering procedures and the same presentations can be used as previously. This function takes as a parameter a distance matrix, \code{kvals}, a vector containing the number of groups of the different partitions to be created, and a vector of \code{weights}. The supplementary arguments are passed to \code{wcKMedoids}.
+
 
 <<wcKMedRange-compute, echo=TRUE>>=
 pamRange <- wcKMedRange(mvaddist, kvals=2:20, weights=mvad$weight)
 summary(pamRange, max.rank=2)
 @
 
-La présentation offerte par la fonction \code{summary} est particulièrement utile pour comparer les solutions de différentes procédures de clustering. On peut ainsi remarquer que les résultats de PAM sont généralement plus performants. Outre la solution en deux groupes, peut-être un peu trop simplificatrice, celle en quatre groupes parait ici adaptée. Remarquons tout de même que ces partitions pourraient toujours être le fruit d'un artifice statistique puisque l'\code{ASW} est inférieur à $0.5$.
+The presentation offered by the \code{summary} function is particularly useful for comparing the solutions of different clustering procedures. It can thus be noted that the PAM results generally have a higher quality. Alongside the solution in two groups, which may somewhat oversimplify, the solution in four groups seems appropriate here. It should be pointed out, however, that these partitions could still be statistical artefacts since the \guil{ASW} is less than $0.5$.
 
-Les différents outils que nous avons présentés nous ont permis de construire une typologie des séquences. Pour ce faire, nous avons testé divers algorithmes et nombres de groupes avant de retenir une partition en quatre groupes créer à l'aide de la méthode PAM. D'une manière générale, nous suggérons aux lecteurs de tester un plus grand nombre d'algorithmes que ce que nous avons fait ici. \citet{lesnard2006} suggère par exemple d'utiliser la méthode \guil{average} ou la méthode \guil{flexible} (voir tableau~\ref{tb_hclustmethods}). Les outils présentés permettent de faire ces comparaisons.
+The various tools that we have presented have enabled us to construct a typology of sequences. To do so, we have tested various algorithms and numbers of groups before opting for a partition in four groups created using the PAM method. In a general way, we suggest that readers test a larger number of algorithms than have been tested here. \citet{lesnard2006} suggests for example using the \guil{average} method or the \guil{flexible} method (see Table~\ref{tb_hclustmethods}). The tools presented make it possible to make these comparisons.
 
-\subsection{Nommer les clusters}
+\subsection{Naming the clusters}
 
-Une fois la typologie créée, il est d'usage de nommer les types obtenus afin de rendre leur interprétation plus facile. La fonction \code{factor} permet de créer une variable catégorielle. Pour ce faire, on spécifie la variable des types (ici \code{pamclust4\$clustering}), les valeurs que prend cette variable avec l'argument \code{levels} (on peut retrouver ces valeurs dans les graphiques précédents), ainsi que les labels que l'on souhaite attribuer à chacun de ces types avec l'argument \code{labels}. Les \code{labels} doivent être spécifiés dans le même ordre que l'argument \code{levels} de sorte que la première entrée de \code{levels} (ici 66) corresponde à la première entrée de \code{labels} (ici \guil{Apprentissage-Emploi}).
+Once the typology has been created, it is customary to name the types obtained so as to make them easier to interpret. The factor function makes it possible to create a categorial variable. To do so, one specifies the variable of the types (here \code{pamclust4\$clustering}), the values that this variable takes with the \code{levels} argument (these values can be found in the previous graphics), and the labels that one wants to assign to each of these types with the \code{labels} argument. The \code{labels} must be specified in the same order as the levels argument so that first item of \code{levels} (here $66$) corresponds to the first item of \code{labels} (here \guil{Training -- Employment}).
+
 
 <<cluster-naming, echo=TRUE>>=
-mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c("Appr.-Emploi", "Ecole-Emploi", "Ecole sup.", "Sans emploi"))
-table(mvad$pam4)
+mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c("Train-Empl", "School-Empl", "High Ed", "Unempl"))
 @
 
+It is also possible to automatically label the clusters using the medoid sequence of each cluster. The \code{seqclustname} function can be used for this purpose. One needs to specify the sequence object (\code{seqdata} argument), the clustering (\code{group} argument), the distance matrix (diss argument). If \code{weighted=TRUE} (default), then the weights of the \code{seqdata} object are used to find the medoids. Finally, on can set \code{perc=TRUE} to add the percentage of observation in each groups to the labels.
 
-Une fois les clusters nommés, la typologie est construite. Avant de conclure, nous revenons plus en détail sur la question de la simplification induite par l'analyse en clusters et les biais que celle-ci peut introduire dans l'analyse. Nous illustrons cette question en présentant le calcul des liens entre typologie et facteurs explicatifs et en montrant comment ceci peut biaiser les résultats.
+<<auto-cluster-naming, echo=TRUE>>=
+mvad$pam4.auto <- seqclustname(mvadseq, pamclust4$clustering, mvaddist)
+table( mvad$pam4.auto, mvad$pam4)
+@
 
-%
-%
-%
-%\section{Algorithmes K-Medoïds}
-%
-%K-Medoïds algorithms aim at finding the best partition of the data in a $k$ predefined number of groups. Based on a dissimilarity matrix, those algorithms seeks to minimize the (weighted) sum of distance to the medoïd of each group. The medoïd is defined as the observation that minimize the sum of distance to the other observations of this group.
-%
-%The \pkg{WeightedCluster} library provides two different algorithms: k-medoïd~\citep{Hoon2010} and PAM~\citep{RClusterPackage, StruyfHubertRousseeuw1997}. The K-Medoïd use the following strategy:
-%
-%\begin{enumerate}
-%    \item Take $k$ random observations as the starting medoïds.
-%    \item Assign each observations to the closest medoïd.
-%    \item Recompute the new medoïd of each group defined in the previous step.
-%    \item Repeat step (2) et (3) until a stable solution is found.
-%\end{enumerate}
-%
-%This algorithm may be attracted by a local minimum and the solution depend on the original medoïds used. For this reason, it is usually recommended to launch the algorithm several times and to keep the best solution found.
+Once the clusters have been named, the typology is constructed. Before concluding, we return in more detail to the question of the simplification induced by cluster analysis and the bias this can introduce into the analysis. We illustrate this question by presenting the computation of the links between typology and explanatory factors and showing how this can bias the results.
 
+\section{Linking trajectory types and explanatory factors}
 
-%
-%L'algorithme peut tendre vers un minimum local et la partition identifiée peut varier en fortement selon les médoïdes choisis au départ. Pour cette raison, il est conseillé de relancer la procédure un grand nombre de fois et de retenir la meilleure solution~\citep{Hoon2010}.
+Many research questions in the social sciences connect trajectories (or sequences) with explanatory factors. For example, one may want to know whether the occupational trajectories of men differ significantly from those of women. Similarly, \citet{WidmerEtAll2003} seek to bring to light the appearance of new trajectories in the construction of family life. To do so, one generally correlates a typology of family sequences with the cohort of individuals with the aid of a chi-square test or logistic regression \citep{AbbottTsay2000}. In this section, we present this technique and also the dangers it implies for the analysis.
 
+Suppose one seeks to measure the links between the variable \code{test} that we have created for our purposes\footnote{The detail of the creation of this variable is given in Annex~\ref{annexe_vartest}.} and our trajectories. This variable takes two modalities, \guil{test} and \guil{non-test}, and groups the sequences in the following way:
 
-
-
-
-
-\section{Mettre en lien trajectoires-types et facteurs explicatifs}
-
-Beaucoup de questions de recherche des sciences sociales mettent en lien des trajectoires (ou des séquences) avec des facteurs explicatifs. Ainsi, on peut se demander si les trajectoires professionnelles des hommes diffèrent significativement de celles des femmes. De manière similaire, \citet{WidmerEtAll2003} cherchent à mettre en évidence l'apparition de nouvelles trajectoires de construction de la vie familiale. Pour ce faire, on met généralement en lien une typologie des séquences familiales avec la cohorte des individus à l'aide de test du khi-carré ou de régression logistique \citep{AbbottTsay2000}. Dans cette section, nous présentons cette technique ainsi que les dangers qu'elle comporte pour l'analyse.
-
-Supposons que l'on cherche à mesurer les liens entre la variable \code{test} que nous avons créée pour l'occasion\footnote{Le détail de la création de cette variable est donné dans l'annexe~\ref{annexe_vartest}.} et nos trajectoires. Cette variable prend deux modalités, \guil{test} et \guil{non-test}, et regroupe les séquences de la manière suivante.
 
 <<mds-compute, echo=FALSE, results="hide", message=FALSE>>=
 library(vegan)
@@ -596,40 +564,32 @@ mvad$test <- factor(mvad$test, levels=0:1, labels=c("non-test", "test"))
 seqdplot(mvadseq, group=mvad$test, border=NA)
 @
 
-Les individus \guil{non-test} semblent notamment avoir une plus forte probabilité de connaître une période sans emploi. Est-ce que cette différence est significative? On peut faire un test du khi-carré entre la variable test et pam4 (qui reprend nos types) de la manière suivante pour des données pondérées. On commence par construire un tableau croisé avec la fonction \code{xtabs}\footnote{Pour des données non pondérées, on peut utiliser la fonction \code{table}.}. Cette fonction prend en paramètre une formule, dont le côté gauche de l'équation fait référence aux pondérations et le côté droit liste les facteurs qui forment le tableau croisé. L'argument \code{data} spécifie où il faut chercher les variables qui apparaissent dans la formule. On calcule ensuite un test du khi-carré sur ce tableau.
+The \guil{non-test} individuals seem in particular to have a strong probability of undergoing a period of unemployment. Is this difference significant? One can run a chi-square test between the variable \code{test} and \code{pam4} (which covers our types) in the following way for weighted data. One starts by constructing a crossed table with the \code{xtabs} function.\footnote{For unweighted data, the \code{table} function can be used.} This function takes as a parameter a formula in which the left side of the equation refers to the weightings and the right side lists the factors that form the crossed table. The \code{data} argument specifies where variables that appear in the formula are to be found. One then runs a chi-square test on this table.
 
 <<testiplot-chisq>>=
 tb <- xtabs(weight~test+pam4, data=mvad)
 chisq.test(tb)
 @
 
-Le résultat est non significatif, ce qui signifie que selon cette procédure les trajectoires ne diffèrent pas selon la variable \code{test}. Quel est le problème? Est-ce vraiment le cas? Non, le problème vient de la simplification de l'analyse en clusters. En utilisant la typologie dans le test du khi-carré, on fait implicitement l'hypothèse que cette typologie est suffisante pour décrire la complexité des trajectoires, or ce n'est pas le cas ici. En effet, la variable test explique la variation des trajectoires \textit{au sein des types}. À titre d'exemple, le graphique suivant montre les différences de trajectoires selon la variable test pour les individus classés dans le type \guil{École-Emploi}. Les individus \guil{non-test} semblent ainsi avoir un risque plus élevé de connaître un épisode \guil{Sans emploi}. La variabilité au sein de ce type ne semble donc pas négligeable.
+The result is non-significant, which means that according to this procedure the trajectories do not differ in terms of the variable \code{test}. What is the problem? Is this really the case? No, the problem arises from the simplification effected by cluster analysis. By using the typology in the chi-square test, one implicitly makes the assumption that this typology is sufficient to describe the complexity of the trajectories, which is not case here. In fact the \code{test} variable explains the variation of the trajectories \textit{within the types}. As an example, the following graphic shows the differences in trajectories according to the \code{test} variable for the individuals classified in the type \guil{School-Employment}. The \guil{non-test} individuals thus seem to have a greater risk of undergoing a period of \guil{Unemployment}. Hence the variability within this type does not seem to be negligible.
+
 
 <<testdplot-EE, fig.width=10, fig.height=4.5>>=
-EcoleEmploi <- mvad$pam4=="Ecole-Emploi"
-seqdplot(mvadseq[EcoleEmploi, ], group=mvad$test[EcoleEmploi], border=NA)
+SchoolEmpl <- mvad$pam4=="School-Empl"
+seqdplot(mvadseq[SchoolEmpl, ], group=mvad$test[SchoolEmpl], border=NA)
 @
 
-Revenons sur l'hypothèse sous-jacente dont nous avons parlé et tâchons de l'expliciter. En utilisant la typologie, on assigne à chaque séquence son type. On ignore ainsi l'écart entre la trajectoire réellement suivie par un individu et son type. Une des justifications possibles de cette opération serait de dire que les types obtenus correspondent aux modèles qui ont effectivement généré les trajectoires. Les écarts entre les trajectoires suivies et ces modèles (c'est-à-dire les types) seraient ainsi assimilables à une forme de terme d'erreur aléatoire ne contenant aucune information pertinente. Cette méthode revient donc à faire l'hypothèse que les trajectoires sont générées par des modèles établis et clairement distincts les uns des autres. De plus, nous faisons implicitement l'hypothèse que nous avons effectivement réussi à retrouver les vrais modèles à l'aide de l'analyse en clusters.
+Let us return to the underlying assumptions already mentioned and attempt to explain it. In using the typology, one assigns its type to each sequence. One thus ignores the gap between the trajectory really followed by an individual and its type. One possible justification for this operation would be to say that the types obtained correspond to the models that have actually generated the trajectories. The gaps between the trajectories followed and these models (i.e. the types) could thus be assimilated to a kind of random error term containing no pertinent information. This therefore amounts to make the assumption that the trajectories are generated by well established models that are clearly distinct from one another. Moreover, we are implicitly making the assumption that we have actually succeeded in finding the true models with the aid of cluster analysis.
 
-Parallèlement, on fait également une deuxième hypothèse, à savoir que les types obtenus sont également différents les uns des autres\footnote{Les cartes de Kohonen permettent de visualiser ces distances entre types de trajectoires \citep{RoussetGiret2007}.}. Or, ce n'est pas le cas. Les types \guil{Apprentissage-Emploi} et \guil{Ecole-Emploi} sont plus proches, car ils partagent une fin de trajectoires identiques. Quant à eux, les types \guil{école supérieure} et \guil{sans emploi} sont particulièrement éloignés.
-%
-%<<testplot-scatter, fig=TRUE, width=10, height=5.5>>=
-%par(mfrow=c(1,2))
-%plot(worsq, col=as.integer(mvad$pam4), pch=as.integer(mvad$pam4), main="Clustering", xlab="Dim 1", ylab="Dim 2")
-%legend("bottomleft", legend=levels(mvad$pam4), fill=1:4)
-%plot(worsq, col=(mvad$test+5), pch=(mvad$test+5), xlab="Dim 1", ylab="Dim 2")
-%legend("bottomleft", legend=c("0", "1"), fill=5:6)
-%@
+In parallel, a second assumption is also being made, namely that the types obtained are equally different from one another.\footnote{Kohonen maps make it possible to visualize these distances between types of trajectories \citep{RoussetGiret2007}.} But this is not the case. The \guil{Apprenticeship-Employment} and \guil{School-Employment} types are closer, because they have the same trajectory endpoint. By contrast, the \guil{Higher Education} and \guil{unemployed} types are particularly distant from each other.
 
-Ces deux hypothèses sont des hypothèses fortes. On postule l'existence de modèles qui ont effectivement généré les trajectoires, ce qui est discutable d'un point de vue sociologique. Dans la lignée du paradigme des parcours de vie, on peut ainsi penser que les individus sont soumis à des influences et des contraintes diverses qui participent, chacune à leur manière, à la construction de la trajectoire (ou d'une partie de la trajectoire). On est bien loin de la recherche de modèles de trajectoires.
+These two assumptions are strong ones. One postulates the existence of models that have actually generated the trajectories, which is debatable from a sociological standpoint. In accordance with the life course paradigm, one can thus suppose that the individuals are subject to various influences and constraints which, each in their own way, contribute to the construction of the trajectory (or part of it). This is a long way from the search for clearly defined models of trajectory.
 
-Encore une fois, ces hypothèses peuvent s'avérer pertinentes si les groupes obtenus sont très homogènes et très différents les uns des autres. Une situation où la silhouette moyenne devrait être relativement élevée ($ASW>0.7$ par exemple). Mais ce n'est pas le cas ici, puisque la silhouette moyenne est inférieure à $0.5$.
+Once again, these assumptions may prove pertinent if the groups obtained are very homogeneous and very different from one another --- a situation in which the average silhouette should be relatively high ($ASW > 0.7$, for example). But this is not the case here, since the average silhouette is less than $0.5$.
 
-La solution à ce problème consiste à utiliser l'analyse de dispersion \citep{StuderRitschardGabadinhoMuller2011SMR}. Ce type d'analyse permet de mesurer la force du lien en fournissant un pseudo-$R^2$, c'est-à-dire la part de la variation expliquée par une variable, ainsi que la significativité de l'association. On s'affranchit ainsi de l'hypothèse des modèles de trajectoires en calculant directement le lien, sans clustering préalable. On trouvera dans \citet{StuderRitschardGabadinhoMuller2011SMR} une introduction à sa mise en pratique dans \proglang{R} ainsi qu'une présentation générale de la méthode. Nous n'offrons donc ici qu'un survol destiné à étayer notre propos.
+The solution to this problem consists in using discrepancy analysis \citep{StuderRitschardGabadinhoMuller2011SMR}. This type of analysis makes it possible to measure the strength of the link by providing a pseudo-$R^2$, i.e. the share of the variation of the sequences explained by a variable, and also the significance of the association. One is thus freed from the assumption of trajectory models by directly computing the link, without preliminary clustering. \citet{StuderRitschardGabadinhoMuller2011SMR} gives an introduction to its implementation in \proglang{R} as well as a general presentation of the method. Only a brief overview is therefore offered here to support the argument.
 
-Brièvement, un test bivarié de l'association entre les séquences et la variable \code{test} peut être calculé avec la fonction \code{dissassoc} disponible dans la librairie \pkg{TraMineR}. On lit les résultats qui nous intéressent ici sur la ligne Pseudo $R^2$. On remarque ainsi que la variable test permet d'expliquer 3.6\% de la variabilité des trajectoires et la $p$-valeur est largement significative.
-
+Briefly, a bivariate test of the association between the sequences and the variable \code{test} can be computed with the \code{dissassoc} function available in the \pkg{TraMineR} library. The results that interest us here can be read on the line Pseudo $R^2$. It can thus be observed that the \code{test} variable explains 3.6\% of the variability of the trajectories and the $p$-value is highly significant.
 
 <<testiplot-dissassoc>>=
 set.seed(1)
@@ -637,119 +597,91 @@ dsa <- dissassoc(mvaddist, mvad$test, weights=mvad$weight, weight.permutation="d
 print(dsa$stat)
 @
 
-L'analyse de dispersion conduit à un changement de paradigme et à s'affranchir du concept de modèle de trajectoire. Plutôt que de se baser sur la recherche de modèles, nous considérons que les trajectoires s'insèrent dans un contexte qui influence à sa manière la construction de la trajectoire. En d'autres termes, nous cherchons à comprendre dans quelle mesure la variabilité interindividuelle est expliquée par un contexte tout en rendant compte de la diversité des chemins empruntés. D'un point de vue conceptuel, les hypothèses sous-jacentes aux méthodes à l'analyse de dispersion sont très proches des principes mis en avant par le paradigme des parcours de vie. \citet{Elder1999} insiste ainsi sur la nécessité d'insérer les parcours dans des temps et des lieux (le contexte) tout en préservant la variabilité interindividuelle et l'internationalité des acteurs.
+Discrepancy analysis leads to a change of paradigm and frees us from the concept of clearly defined models of trajectories. Rather than relying on the search for models, we consider that the trajectories are set in a context which influences the construction of the trajectory in its own way. In other words, we seek to understand to what extent interindividual variability is explained by a context, while accounting for the diversity of the paths followed. From a conceptual standpoint, the assumptions underlying discrepancy analysis are very close to the principles put forward by the life course paradigm. \citet{Elder1999} thus stresses the need to analyse the life course in times and places (the context) while preserving the interindividual variability and the agency of the actors.
 
-À notre sens, la construction de typologie de séquence est une méthode puissante qui a l'avantage d'offrir un point de vue descriptif sur les séquences en réduisant la complexité de l'analyse. Toutefois, son utilisation en lien avec des méthodes inférentielles doit être faite avec prudence, puisqu'elle peut conduire à des conclusions trompeuses, comme illustré avec la variable \code{test}.
+In our view, building sequence typologies is a powerful method which has the advantage offering a descriptive point of view on the sequences while reducing the complexity of the analysis. However, its use in combination with inferential methods should be conducted with caution, since it can lead to misleading conclusions, as shown with the \code{test} variable.
 
 \section{Conclusion}
 
-Ce manuel poursuivait un double but: présenter la librairie \pkg{WeightedCluster} et proposer un guide pas à pas à la création de typologie de séquences pour les sciences sociales. Cette librairie permet notamment de représenter graphiquement les résultats d'une analyse en clusters hiérarchique, de regrouper les séquences identiques afin d'analyser un nombre de séquences plus important\footnote{Le détails de cette procédure est explicité dans l'annexe~\ref{sec_aggregate}.}, de calculer un ensemble de mesure de qualité d'une partition ainsi qu'une version optimisée de l'algorithme PAM prenant en compte les pondérations. La libraire offre également des procédures pour faciliter le choix d'une solution de clustering particulière et définir le nombre de groupes.
+This aim of this manual has been twofold: to present the \pkg{WeightedCluster} library and offer a step-by-step guide to building typologies of sequences for the social sciences. This library makes it possible, in particular, to represent graphically the results of a hierarchical cluster analysis, to group identical sequences in order to analyse a larger number of sequences,\footnote{The detail of this procedure is set out in Annex~\ref{sec_aggregate}.} to compute a set of measures of the quality of a partition, and also an optimized version of the PAM algorithm taking account of weightings. The library also offers procedures for facilitating the choice of a particular clustering solution and defining the number of groups.
 
+In addition to the methods, we have also discussed the construction of sequence typologies in the social sciences. We argue that these methods offer an important descriptive viewpoint on sequences. Cluster analysis makes it possible to bring out recurrent patterns and/or \guil{ideal-typical sequences} \citep{AbbottHrycak1990}. The search for patterns is an important issue in several problem areas of the social sciences \citep{Abbott1995}. In particular it makes it possible to bring to light the legal, economic or social constraints that frame the construction of individual courses. As \citet{AbbottHrycak1990} note, while typical sequences may result from constraints that are found recurrently,  these typical sequences can also act on reality by serving as models for the actors, who anticipate their own future. These different possibilities of interpretation make the creation of typologies a powerful tool.
 
-Outre les méthodes, nous avons également discuté de la construction de typologie de séquences en sciences sociales. Nous avons ainsi argumenté que ces méthodes offrent un point de vue descriptif important sur les séquences. L'analyse en clusters permet de faire ressortir des patterns récurrents et/ou des \guil{séquences idéales-typiques} \citep{AbbottHrycak1990}. La recherche de tels patterns est une question importante dans plusieurs problématiques de sciences sociales \citep{Abbott1995}. Elle permet notamment de mettre en lumière les contraintes légales, économiques ou sociales qui encadrent la construction des parcours individuels. Comme le notent \citet{AbbottHrycak1990}, si les séquences types peuvent résulter de contrainte que l'on redécouvre, ces séquences typiques peuvent également agir sur la réalité en servant de modèles aux acteurs qui anticipent leur propre futur. Ces différentes possibilités d'interprétations font de la création de typologie un outil puissant.
+All cluster analyses produce results, whatever their pertinence \citep{Levine2000}. It is therefore necessary to discuss their quality so as to specify the scope of the results and not make unwarranted generalizations. In our view, this stage is too often absent from cluster analyses. In our case, this quality was low, as often happens in sequence analysis. With a higher quality (i.e. $ASW > 0.7$ for example), one can be more affirmative, since the partition probably reflects a strong structure identified in the data.
 
-Toutes les analyses en cluster produisent des résultats, quelle qu'en soit la pertinence \citep{Levine2000}. Il est donc nécessaire de discuter de sa qualité afin de préciser la portée des résultats et de ne pas faire de généralisation abusive. À notre sens, cette étape est trop souvent absente des analyses en cluster. Dans notre cas, cette qualité était faible, ce qui est courant en analyse de séquences. Avec une qualité plus élevée (c'est-à-dire $ASW>0.7$ par exemple), on pourra se montrer plus affirmatif, car la partition est vraisemblablement le reflet d'une structure forte identifiée dans les données.
+This is a powerful but also risky tool. In giving a unique name to each group, one tends to remove from the analysis the diversity of the situations found within each group. By way of an example, we noted that the length of the periods of unemployment varies significantly within the group that we named \guil{Unemployed} and that this state is also found in other groups. This simplification makes sense if the aim is to bring out the recurrent patterns for descriptive purposes.
 
-Si l'outil est puissant, il est également risqué. En donnant un nom unique à chaque groupe, on tend à supprimer de l'analyse la diversité des situations rencontrées à l'intérieur de chaque groupe. À titre d'exemple, nous avions noté que la durée des périodes sans emploi varie sensiblement au sein du groupe que nous avons nommé \guil{Sans emploi} et que l'état se rencontre également dans d'autres groupes. Cette simplification fait sens si le but est de faire émerger les patterns récurrents dans une optique descriptive.
-
-Toutefois, les typologies ne devraient pas être utilisées dans une démarche explicative. En effet, ceci revient à postuler l'existence de modèles clairement définis qui auraient effectivement généré les trajectoires et que l'on aurait identifiés grâce à l'analyse en clusters. Outre le fait que cette démarche peut conduire à des conclusions trompeuses si ces hypothèses ne se vérifient pas, ces hypothèses sont discutables d'un point de vue sociologique. Dans la lignée du paradigme des parcours de vie, on peut penser que les individus sont soumis à des influences et des contraintes diverses qui participent, chacune à leur manière, à la construction de la trajectoire (ou d'une partie de la trajectoire). On est ainsi bien loin de la recherche de modèles de trajectoires clairement définis.
-
-
+However, the typologies should not be used in an explanatory procedure. That would amount to postulating the existence of clearly defined models that actually generated the trajectories and have been identified through cluster analysis. Not only can this procedure result in misleading conclusions if these assumptions are not verified, but the assumptions are debatable from a sociological viewpoint. In accordance with the life course paradigm, one can suppose that the individuals are subject to various influences and constraints which, each in their own way, contribute to the construction of the trajectory (or part of it). We are thus a long way from the search for clearly defined trajectory models.
 
 \bibliography{manual}
 
+
 \appendix
 
-\section{Agréger les séquences identiques}
+\section{Aggregating identical sequences}
 \label{sec_aggregate}
-Les algorithmes que nous avons présentés prennent tous en compte la pondération des observations. Ceci permet de regrouper les observations identiques en leur donnant une pondération plus élevée. On peut ensuite effectuer l'analyse en clusters sur ces données regroupées, ce qui diminue considérablement temps de calcul et la mémoire utilisée\footnote{La quantité de mémoire nécessaire évolue de manière quadratique.}. On termine l'analyse en \guil{désagrégeant} les données afin de réintégrer la typologie dans les données initiales.
 
-Ces différentes opérations sont réalisées aisément avec la fonction \code{wcAggregateCases} de la libraire \pkg{WeightedCluster}. Cette fonction identifie les cas identiques afin de les regrouper. Dans un deuxième temps, l'objet retourné permet également de réaliser l'opération inverse, c'est-à-dire de désagréger les données.
+The algorithms that we have presented all take into account the weighting of observations. This makes it possible to group identical observations by giving them a higher weighting. One can then perform cluster analysis on these grouped data, which considerably reduces the computing time and the memory used.\footnote{The quantity of memory required increases quadratically.} The analysis is completed by \guil{disaggregating} so as to reintegrate the typology into the initial data.
 
-Reprenons l'exemple que nous avons utilisé depuis le début de ce manuel. Le code suivant permet d'identifier les séquences identiques. La fonction \code{wcAggregateCases} prend deux paramètres: un \code{data.frame} (ou une matrice) qui contient les cas à agréger ainsi qu'un vecteur de poids optionnel.
+These different operations are performed easily with the \code{wcAggregateCases} function in the \pkg{WeightedCluster} library. This function identifies the identical cases in order to group them. In a second stage, the object returned also makes it possible to perform the reverse operation, i.e. to disaggregate the data.
+
+
+Let us return to the example that we have used from the start of this manual. The following code makes it possible to identify the identical sequences. The \code{wcAggregateCases} function takes two parameters: \code{a data.frame} (or a matrix) which contains the cases to be aggregated, and an optional vector of \code{weights}.
 
 <<wcAggregateCases, echo=TRUE>>=
 ac <- wcAggregateCases(mvad[, 17:86], weights=mvad$weight)
 ac
 @
 
-L'objet renvoyé par la fonction \code{wcAggregateCases} (\code{ac} ici) donne quelques informations de base sur le regroupement. On peut ainsi noter que le jeu de donnée initial comporte 712 observations, mais seulement 490 séquences différentes. L'objet retourné contient trois éléments particulièrement intéressants.
+The object returned by the \code{wcAggregateCases} function (here \code{ac}) gives some basic information on the grouping. It can be seen that initial data set contains 712 observations, but only 490 different sequences. The object returned contains three particularly interesting elements.
+
 \begin{itemize}
-    \item \code{aggIndex}: index des objets uniques.
-    \item \code{aggWeights}: Nombre de fois (éventuellement pondéré) que chaque objet unique de \code{aggIndex} apparaît dans les données.
-    \item \code{disaggIndex}: index des objets initiaux dans la liste des objets uniques. Cette information permet de désagréger les données. On donnera plus tard un exemple d'utilisation.
+    \item \code{aggIndex}: index of unique objects.
+    \item \code{aggWeights}: Number of times (weighted if necessary) that each unique object of \code{aggIndex} appears in the data.
+    \item \code{disaggIndex}: index of initial objects in the list of unique objects. This information makes it possible to disaggregate the data. An example of its use will be given later.
 \end{itemize}
 
-À l'aide de ces informations, nous pouvons créer un objet \code{uniqueSeq} des séquences uniques pondérées par le nombre de fois qu'elles apparaissent dans les données. Dans le code suivant, \code{ac\$aggIndex} permet de sélectionner les séquences uniques et le vecteur \code{ac\$aggWeights} contient la pondération de chacune de ces séquences.
+
+With this information, we can create an object \code{uniqueSeq} of the unique sequences weighted by the number of times they appear in the data. In the following code, \code{ac\$aggIndex} makes it possible to select the unique sequences and the vector \code{ac\$aggWeights} contains the weighting of each of these sequences.
+
 
 <<wcAggregateCases-seqdef, echo=TRUE>>=
-uniqueSec <- seqdef(mvad[ac$aggIndex, 17:86], weights=ac$aggWeights)
+uniqueSeq <- seqdef(mvad[ac$aggIndex, 17:86], alphabet = mvad.alphabet,
+    states = mvad.scodes, labels = mvad.labels, weights=ac$aggWeights)
 @
 
-À partir de là, nous pouvons calculer différentes solutions de clustering. Ici, nous calculons la matrice des distances avant d'utiliser cette information pour la fonction \code{wcKMedoids}. Comme précédemment, nous utilisons ici le vecteur \code{ac\$aggWeights} pour utiliser les pondérations.
+We can then compute different clustering solutions. Here, we compute the distance matrix before using this information for the \code{wcKMedoids} function. As before, we use here the vector \code{ac\$aggWeights} to apply the weightings.
 
 <<wcAggregateCases-wckmedoids, echo=TRUE>>=
-mvaddist2 <- seqdist(uniqueSec, method="OM", indel=1.5, sm=subm.custom)
+mvaddist2 <- seqdist(uniqueSeq, method="OM", indel=1.5, sm=subm.custom)
 pamclust4ac <- wcKMedoids(mvaddist2, k=4, weights=ac$aggWeights)
 @
-
-Une fois le clustering réalisé, l'information contenue dans \code{ac\$disaggIndex} permet de revenir en arrière. On peut par exemple ajouter la typologie dans le \code{data.frame} original (non agrégé) à l'aide du code suivant. Le vecteur \code{pamclust4ac\$clustering} contient l'appartenance de chaque séquence unique aux clusters. En utilisant l'indice \code{ac\$disaggIndex}, on revient au jeu de donnée original, c'est-à-dire que l'on obtient l'appartenance de chaque séquence (non unique) aux clusters.
+Now that the clustering has been done, the information contained in \code{ac\$disaggIndex} makes it possible to move back. For example, the typology in the original (non-aggregated) \code{data.frame} can be added with the aid of the following code. The vector \code{pamclust4ac\$clustering} contains the membership of each unique sequence in the clusters. Using the index \code{ac\$disaggIndex}, we return to the original data set, i.e. we obtain the membership of each (non-unique) sequence in the clusters.
 
 <<wcAggregateCases-wckmedoids-back, echo=TRUE>>=
 mvad$acpam4 <- pamclust4ac$clustering[ac$disaggIndex]
 @
 
-Le tableau suivant donne la répartition des cas originaux entre la typologie que nous avions obtenue à partir des cas désagrégés (variable \code{pam4}) et celle obtenue à partir des données agrégées (variable \code{acpam4}). On remarquera que les deux solutions contiennent les mêmes cas, seuls les labels diffèrent.
+The following table gives the distribution of the original cases between the typology we obtained from the disaggregated cases (variable \code{pam4}) and the one obtained from the aggregated data (variable \code{acpam4}). It can be seen that the two solutions contain the same cases; only the labels differ.
 
 <<wcAggregateCases-wckmedoids-table, echo=TRUE>>=
 table(mvad$pam4, mvad$acpam4)
 @
 
-L'agrégation de cas identiques est une fonctionnalité très utile pour les grands jeux de données. Il est fréquent que l'on ne puisse pas calculer l'ensemble des distances pour cause de mémoire insuffisante. Dans de tels cas, l'utilisation de \code{wcAggregateCases} pourrait bien résoudre le problème.
+The aggregation of identical cases is a very useful functionality for large data sets. It is often not possible to compute the set of distances because of insufficient memory. In such cases, the use of \code{wcAggregateCases} could solve the problem.
 
-%\appendix
-%\section{Aggregating and disaggregating cases}
-%
-%The \pkg{WeightedCluster} library provides some utilities to aggregate identical cases with the \code{wcAggregateCases} function. It returns a \code{wcAggregateCases} object that may be used to aggregate or disaggregate cases. Lets take an example. We may aggregate our sequence object using \code{wcAggregateCases}. The sequence data are located in columns 17 to 86. We may also provide an optional case weights vector.
-%
-%<<wcAggregateCases, echo=TRUE>>=
-%library(WeightedCluster)
-%data(mvad)
-%ac <- wcAggregateCases(mvad[, 17:86], weights=mvad$weight)
-%ac
-%@
-%
-%We may then use the returned \code{wcAggregateCases} object to regroup similar case. The index of unique object is stored in the \code{aggIndex} element and the number of time this unique object was found is stored in the \code{aggWeights}.
-%
-%<<seqdef-aggregated, echo=TRUE>>=
-%mvadseq <- seqdef(mvad[ac$aggIndex, 17:86], weights=ac$aggWeights)
-%@
-%
-%We may also use the returned object to go back and disaggregate previously aggregated data. Suppose we wish to compute state sequence complexity of our sequence and compute an anova with the father unemployment status (not used to aggregate data). We may compute the complexity.
-%
-%<<seqici-aggregated, echo=TRUE>>=
-%complx <- seqici(mvadseq)
-%@
-%
-%Add the complexity in our original data set.
-%
-%<<seqici-disaggregated, echo=TRUE>>=
-%mvad$complx <- complx[ac$disaggIndex]
-%@
-%
 
-\section{Notes sur les performances}
+\section{Notes on performances}
 \label{annexe_optim}
-Les algorithmes de partitionnement autour de centres mobiles disponibles dans la librairie \pkg{WeightedCluster} sont hautement optimisés. En interne, la librairie propose plusieurs variantes de l'algorithme PAM. Le choix entre ces variantes dépend du type de l'objet distance passé à la fonction ainsi que de l'argument méthode.
+The algorithms for partitioning around medoids available in the \pkg{WeightedCluster} library are highly optimized. Internally, the library offers several variants of the PAM algorithm. The choice among these variants depends on the type of the distance object passed to the function and on the \code{method} argument.
 
-L'argument \code{diss} peut être une matrice de distance ou un objet \code{dist}. Dans le premier cas, chaque distance est enregistrée à double ce qui peut rapidement poser des problèmes de quantité de mémoire disponible, mais l'algorithme est généralement plus rapide (voir les comparaisons de performances ci-dessous). Si l'argument est de type \code{dist}, seul le triangle inférieur de la matrice de distance est stocké en mémoire, mais ce gain se fait au détriment de la rapidité de l'algorithme.
+The \code{diss} argument may be a distance matrix or a \code{dist} object. In the first case, each distance is registered twice, which can rapidly give rise to problems of available memory, but the algorithm is generally faster (see the performance comparisons below). If the argument is of the \code{dist} type, only the lower triangle of the distance matrix is stored in memory, but this gain comes at the expense of the speed of the algorithm.
 
-Contrairement à l'algorithme PAM disponible dans la librairie \pkg{cluster}, la matrice des distances n'est pas copiée en interne, il est donc possible de réaliser un clustering d'un nombre nettement plus important d'objets avant d'atteindre les limites mémoires de la machine.
+In contrast to the PAM algorithm available in the \pkg{cluster} library, the distance matrix is not copied internally, making it possible to perform a clustering of a considerably larger number objects before reaching the memory limits of the machine.
 
-L'argument \code{method} spécifie l'algorithme utilisé. Deux versions sont disponibles: la version originale de l'algorithme PAM et PAMonce. L'algorithme \guil{PAMonce} implémente les optimisations proposées par \citet{Reynolds2006} qui consiste à n'évaluer qu'une seule fois (plutôt que $n$ fois dans la version originale) le coût de la suppression d'un médoïde. Nous avons également inclus dans cet algorithme une deuxième optimisation qui consiste à ne pas évaluer le gain du remplacement d'un médoïde par un objet donné si la distance entre ceux-ci est nulle. Cette optimisation est cohérente avec la définition mathématique d'une mesure de distance selon laquelle deux objets sont identiques si, et seulement si, leur distance est nulle. Cette optimisation ne fait sens que dans la mesure où les objets à regrouper contiennent des doublons et surtout si la mesure de dissimilarité utilisée respecte cette condition. Notons que les mesures de dissimilarités la respectent généralement.
+The \code{method} argument specifies the algorithm used. Two versions are available: the original version of the PAM algorithm and \guil{PAMonce}. The \guil{PAMonce} algorithm implements the optimizations proposed by \citet{Reynolds2006}, which consist in evaluating the cost of the suppression of a medoid only once (rather than $n$ times in the original version). We have also included in this algorithm a second optimization which consists in not evaluating the gain from replacing a medoid by a given object if the distance between them is zero. This optimization is consistent with the mathematical definition of a measure of distance, whereby two objects are identical if, and only if, their distance is zero. This optimization only makes sense insofar as the objects to be grouped contain duplicates and in particular only so long as the measure of dissimilarity used respects this condition. It should be noted that measures of dissimilarity generally do respect it.
 
-Afin de mesurer l'impact sur les performances de ces optimisations, nous avons conduit plusieurs simulations. Dans celles-ci, il s'agissait de regrouper en $k \in (2, 8, 16, 24, 32, 48, 64, 96, 128)$ groupes un ensemble de $n \in (200, 500, 1000, 2000)$ observations dont les coordonnées $x$ et $y$ ont été générées aléatoirement selon une distribution uniforme. La figure~\ref{perf-nbyk-plot-time} présente l'évolution du temps de calcul (sur une échelle logarithmique) en fonction des valeurs de $n$ et $k$. Quant à elle, la figure~\ref{perf-nbyk-plot} présente l'évolution du temps total relatif, c'est-à-dire divisé par le temps mis par l'algorithme le plus rapide pour cette solution, en fonction des mêmes paramètres.
-
+To measure the impact of these optimizations on performance, we ran several simulations. They grouped in $k \in (2, 8, 16, 24, 32, 48, 64, 96, 128)$ groups a set of $n \in (200, 500, 1000, 2000)$  observations whose $x$ and $y$ coordinates were randomly generated with a uniform distribution. Figure~\ref{perf-nbyk-plot-time} shows the changes in computing time (on a logarithmic scale) according to the values of $n$ and $k$. Figure~\ref{perf-nbyk-plot} shows the changes in total relative time, i.e. divided by the time taken by the fastest algorithm for this solution, with the same parameters.
 
 <<perf-loadsimul, echo=FALSE, results="hide", message=FALSE>>=
 load(file="randB.RData")
@@ -760,58 +692,57 @@ library(lattice)
 
 \begin{figure}[htb]
 \centering
-\caption{Évolution du temps de calcul en fonction de $n$ et $k$}
+\caption{Changes in computing time according to $n$ and $k$}
 \label{perf-nbyk-plot-time}
 <<perf-nbyk-plot-time, fig.width=8, fig.height=3.5, echo=FALSE>>=
-print(xyplot(ClusterTime~k|nnn, data=randB, groups=test, type="l", auto.key = list(points=F, lines=T,corner = c(0, 0.8), cex=.9, size=2), scales=list(y = list(log = TRUE)), ylab="Temps de calcul", xlab="Nombre de groupes"))
+print(xyplot(ClusterTime~k|nnn, data=randB, groups=test, type="l", auto.key = list(points=F, lines=T,corner = c(0, 0.8), cex=.9, size=2), scales=list(y = list(log = TRUE)), ylab="Computing time", xlab="Number of groups"))
 @
 \end{figure}
 
 
 \begin{figure}[htb]
 \centering
-\caption{Évolution du temps relatif en fonction de $n$ et $k$}
+\caption{Changes in relative time according to $n$ and $k$}
 \label{perf-nbyk-plot}
 <<perf-nbyk-plot, fig.width=8, fig.height=3.5, echo=FALSE>>=
-print(xyplot(relative.tot~k|nnn, data=randB, groups=test, type="l", auto.key = list(points=F, lines=T,corner = c(0, 0.8), size=2, cex=.9), ylab="Temps relatif", xlab="Nombre de groupes"))
+print(xyplot(relative.tot~k|nnn, data=randB, groups=test, type="l", auto.key = list(points=F, lines=T,corner = c(0, 0.8), size=2, cex=.9), ylab="Computing time", xlab="Number of groups"))
 @
 \end{figure}
 
-Les solutions proposées par \pkg{WeightedCluster} sont plus rapides et les différences augmentent à mesure que $k$ et $n$ augmentent. L'utilisation d'une matrice de distances plutôt que l'objet \code{dist} permet d'accélérer les temps de calcul. Le gain de mémoire se fait donc bien au détriment du temps de calcul. Il en va de même pour les optimisations de \guil{PAMonce} qui apporte un gain significatif. Par rapport à la librairie \pkg{cluster}, les gains sont particulièrement important (15 fois environ) lorsque $n$ est plus grand que 1'000 et que $k$ est grand.
+The solutions proposed by \pkg{WeightedCluster} are faster and the differences increase as $k$ and $n$ increase. The use of a distance matrix rather than the \code{dist} object  makes it possible to reduce the computing time. The gain in memory is thus indeed achieved at the expense of computing time. The same is true for the optimizations of \guil{PAMonce}, which brings a significant gain. Relative to the cluster library, the gains are particularly great (around a factor of $15$) when $n$ is greater than $1000$ and $k$ is large.
+
+It should also be noted that if the data contain identical cases, the gains are potentially still greater, since these cases can grouped by using \code{wcAggregateCases}. This operation considerably reduces the memory requirement and the computing time.
 
 
-Rappelons encore que, si les données contiennent des cas identiques, les gains sont potentiellement encore plus importants, car ces cas peuvent être regroupés en utilisant \code{wcAggregateCases}. Cette opération réduit considérablement la mémoire nécessaire et le temps de calcul.
-
-\section{Détails des mesures de qualité}
+\section{Details of quality measures}
 \label{annexe_clustqual}
 \subsection{Average Silhouette Width (ASW)}
-Originellement proposée par \citet{Kaufman1990}, cet indice se base sur une notion de cohérence de l'assignation d'une observation à un groupe donné qui est mesurée en mettant en parallèle la distance moyenne pondérée, notée $a_i$, d'une observation $i$ aux autres membres de son groupe et la distance moyenne pondérée au groupe le plus proche, notée $b_i$.
 
-Formellement, ces distances moyennes sont définies de la manière suivante. Soit $k$ le groupe de l'observation $i$, $W_k$ la somme des pondérations des observations appartenant au groupe $k$, $w_i$ le poids de l'observation $i$ et $\ell$ un des autres groupes, la silhouette d'une observation se calcule de la manière suivante.
+Originally proposed by \citet{Kaufman1990}, this index is based on a notion of coherence of the assignment of an observation to a given group, which is measured by comparing the average weighted distance, labelled $a_i$, of an observation $i$ with the other members of its group and the average weighted distance from the closest group, labelled $b_i$.
 
+The silhouette is dependent on the weighting unit, because it is defined for one observation (that has a weight of one). It is indefinite if the total weight of one of the groups is lower than one. Formally, these average distances are defined as follows. Let $k$ be the group of observation $i$, $W_k$ the sum of the weightings of the observations belonging to group $k$, $w_i$ the weight of observation $i$ and $\ell$ one of the other groups; the silhouette of an observation is computed as follows:
 
 \begin{eqnarray}
-    a_i&=&\frac{1}{W_k-w_i}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asw_ai}\\
+    a_i&=&\frac{1}{W_k-1}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asw_ai}\\
     b_i&=&\min_{\ell} \frac{1}{W_\ell}\sum_{j \in \ell} w_j d_{ij}\\
     s_i&=&\frac{b_i - a_i}{\max(a_i, b_i)}\label{eq_clustqual_asw}
 \end{eqnarray}
 
-L'indice finalement utilisé correspond à la moyenne pondérée des silhouettes $s_i$. Cette valeur est retournée dans l'élément \code{stats}. La moyenne pondérée des silhouettes de chaque groupe est donnée dans l'élément \code{ASW} et mesure séparément la cohérence de chaque groupe.
+The index finally used corresponds to the weighted average of the silhouettes $s_i$. This value is returned in the \code{stats} element. The weighted average of the silhouettes of each group is given in the \code{ASW} element and measures separately the coherence of each group.
 
 \subsection{C index (HC)}
-
-Développé par \citet{HubertLevin1976}, cet indice met en parallèle la partition obtenue et la meilleure partition que l'on aurait pu obtenir avec ce nombre de groupe et cette matrice de distance. L'indice varie entre 0 et 1, une petite valeur indiquant une bonne partition des données. Plus formellement, il est défini de la manière suivante. Soit $S$ la somme des distances intragroupes pondérée par le produit des poids de chaque observation, $W$ la somme des poids des distances intragroupes, $S_{min}$ la somme pondérée des $W$ plus petites distances, et $S_{max}$ la somme pondérée des $W$ plus grandes distances:
+Developed by \citet{HubertLevin1976}, this index compares the partition obtained with the best partition that could be obtained with this number of groups and this distance matrix. The index ranges between $0$ and $1$, with a small value indicating a good partition of the data. More formally, it is defined as follows. Let $S$ be the sum of the within-group distances weighted by the product of the weights of each observation, $W$ the sum of the weights of the within-group distances, $S_{min}$ the weighted sum of the $W$ smallest distances, and $S_{max}$ the weighted sum of the $W$ greatest distances:
 
 \begin{equation}
     C_{index}=\frac{S-S_{min}}{S_{max}-S_{min}}
 \end{equation}
 
 
-\subsection{\guil{Hubert's Gamma} (HG, HGSD) et \guil{Point Biserial Correlation} (PBC)}
+\subsection{\guil{Hubert's Gamma} (HG, HGSD) and \guil{Point Biserial Correlation} (PBC)}
 
-Ces indices mesurent la capacité d'une partition à reproduire la matrice des distances en calculant l'association entre la distance originale $d$ et une deuxième matrice $d_{bin}$ prenant la valeur $0$ pour les observations classées dans la même partition et $1$ sinon. Pour utiliser les pondérations, nous utilisons $W^{mat}$ la matrice du produit des pondérations $W^{mat}_{ij}=w_i\cdot w_j$.
+These indexes measure the capacity of a partition to reproduce the distance matrix by computing the association between the original distance $d$ and a second matrix $d_{bin}$ taking the value $0$ for observations classified in the same partition and $1$ otherwise. To use the weightings, we use $W^{mat}$, the matrix of the product of the weightings $W^{mat}_{ij} = w_i \cdot w_j$.
 
-\citet{Hubert1985} proposent de mesurer cette association en utilisant le Gamma de Goodman et Kruskal (HG) ou le D de Somers (HGSD) afin de tenir compte des égalités dans la matrice des distances. \pkg{WeightedCluster} utilise les formules suivantes basées sur le fait que $d_{bin}$ ne prend que deux valeurs différentes. Soit $T$ le tableau croisé pondéré entre les valeurs de $d$ en ligne ($\ell$ lignes) et de $d_{bin}$ en deux colonnes (0 ou 1) calculé en utilisation les pondérations $W^{mat}$, le nombre de paires concordantes $C$, celui de paires discordantes $D$, celui des égalités sur $d$ $E$ sont définis de la manière suivante:
+\citet{Hubert1985} suggest measuring this association by Goodman and Kruskal's Gamma (HG) or Somers' D (HGSD) to take account of the ties in the distance matrix. \pkg{WeightedCluster} uses the following formulae based on the fact that $d_{bin}$ takes only two different values. Let $T$ be the weighted cross table between the values of $d$ in rows ($\ell$ rows) and of $d_{bin}$ in two columns (0 or 1) computed by using the weightings $W^mat$; the number of concordant pairs $C$, the number of discordant pairs $D$ and the number of ties on $d$ $E$ are defined as follows:
 
 \begin{align}
   C&=\sum_{i=1}^\ell\sum_{i'=1}^{i-1}T_{i'0} &
@@ -821,8 +752,7 @@ Ces indices mesurent la capacité d'une partition à reproduire la matrice des dis
   HGSD&=\frac{C-D}{C+D+E}\nonumber%\label{eq_hgsd}
 \end{align}
 
-
- \citet{Hennig2010} proposent d'utiliser la corrélation de Pearson plutôt, solution également connue sous le nom de \guil{Point Biserial Correlation} (PBC équation \ref{eq_pbc}) \citep{MilliganCooper1985}. Soit $s_d$ et $s_{d_bin}$ l'écart-type pondéré par $W^{mat}$ de $d$ et $d_bin$ respectivement, $s_{d, d_{bin}}$ la covariance pondérée par $W^{mat}$ entre $d$ et $d_{bin}$, cette corrélation est calculée de la manière suivante:
+\citet{Hennig2010} suggest using Pearson's correlation instead, a solution also known as \guil{Point Biserial Correlation} (PBC equation \ref{eq_pbc}) \citep{MilliganCooper1985}. Let $s_d$ and $s_{d_bin}$ be the standard deviation weighted by $W^{mat}$ of $d$ and $d_{bin}$ respectively, $s_{d, d_{bin}}$ the covariance weighted by $W^mat$ between $d$ and $d_{bin}$; this correlation is computed as follows:
 
 \begin{equation}
   PBC=\frac{s_{d, d_{bin}}}{s_{d_{bin}}\cdot s_{d_{bin}}}\label{eq_pbc}
@@ -831,20 +761,20 @@ Ces indices mesurent la capacité d'une partition à reproduire la matrice des dis
 
 \subsection{CH index (CH, CHsq, R2, R2sq)}
 
-\citet{CalinskiHarabasz1974} proposent d'utiliser la statistique $F$ de l'analyse de variance en le calculant à partir des distances euclidiennes aux carrés. Sur les mêmes bases, on peut calculer un pseudo $R^2$, soit la part de la variabilité expliquée par une partition. \citet{StuderRitschardGabadinhoMuller2011SMR} proposent une extension aux données pondérées de ces mesures.
+\citet{CalinskiHarabasz1974} suggest using the statistic $F$ of the analysis of variance by computing it based on the squared Euclidean distances. On the same bases, one can compute a pseudo $R^2$, i.e. the share of variability explained by a partition. \citet{StuderRitschardGabadinhoMuller2011SMR} suggest an extension of these measures to the weighted data.
 
 \section{Construction de la variable test}
 \label{annexe_vartest}
-La variable \code{test} est construite de façon à expliquer la variabilité à l'intérieur des clusters. Pour ce faire, on utilise un MDS pour données pondérées \citep{OksanenEtAl2012}.
+The \code{test} variable is constructed to explain the variability within the clusters. To do so, we use an MDS for weighted data  \citep{OksanenEtAl2012}.
 
 <<mds-compute-annexe, echo=TRUE, results="hide">>=
 library(vegan)
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 @
 
-L'analyse en clusters explique principalement les différences sur le premier axe. On crée donc la variable test en fonction du deuxième axe. Afin que le test du khi-carré soit proche de zéro, il faut que les proportions de \guil{test} et de \guil{non-test} soient équivalentes dans chaque groupe. Pour satisfaire ces deux contraintes, on utilise la médiane du deuxième axe du MDS dans chaque groupe comme point de séparation.
+Cluster analysis mainly explains the differences on the first axis. So we create the variable test according to the second axis. In order for the chi-square test to be close to zero, the proportions of \guil{test} and \guil{non-test} must be equivalent in each group. To satisfy these two constraints, we use the median of the second axis of the MDS in each group as a separation point.
 
-<<mds-compute-annexe2, echo=TRUE, results="hide">>=
+<<mds-compute-annexe2, echo=TRUE, results="hide", setwidth=50>>=
 library(isotone)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){
@@ -854,6 +784,7 @@ for(clust in unique(pamclust4$clustering)){
 }
 mvad$test <- factor(mvad$test, levels=0:1, labels=c("non-test", "test"))
 @
+
 
 
 \end{document}

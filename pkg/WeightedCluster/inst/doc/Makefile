@@ -1,16 +1,18 @@
 
 
 RSCRIPT="$(R_HOME)/bin/Rscript"
+RSCRIPT="Rscript"
 
 
-all: pdfclean rotateFiles WeightedCluster.pdf WeightedClusterPreview.pdf clean
+all: pdfclean rotateFiles WeightedCluster.pdf WeightedCluster-fr.pdf WeightedClusterPreview.pdf clean
 
 pdfclean:
-	rm -f WeightedCluster.pdf WeightedClusterPreview.pdf
+	rm -f WeightedCluster-fr.pdf WeightedCluster.pdf WeightedClusterPreview.pdf
 
 
 rotateFiles:
 	cp -f ./WeightedCluster/WeightedCluster-fake.Rnw WeightedCluster.Rnw
+	cp -f ./WeightedCluster/WeightedCluster-fake.Rnw WeightedCluster-fr.Rnw
 	cp -f ./WeightedClusterPreview/WeightedClusterPreview-fake.Rnw WeightedClusterPreview.Rnw
 
 clean:
@@ -30,11 +32,17 @@ WeightedCluster.pdf: WeightedCluster/WeightedCluster.Rnw
 	cp -f WeightedCluster/randB.RData .
 	cp -f WeightedCluster/wardtree.png .
 	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedCluster.Rnw')"
-	## $(RSCRIPT) --vanilla -e "tools::texi2dvi( 'WeightedCluster.tex', pdf = TRUE, clean = FALSE )"
-	## bibtex WeightedCluster
-	## $(RSCRIPT) -e "tools::texi2dvi( 'WeightedCluster.tex', pdf = TRUE, clean = TRUE )"
 	rm -f randB.RData wardtree.png
 	cp -f WeightedCluster/WeightedCluster-fake.Rnw WeightedCluster.Rnw
 
-compactPDF:  WeightedCluster.pdf WeightedClusterPreview.pdf
+WeightedCluster-fr.pdf: WeightedCluster/WeightedCluster-fr.Rnw
+	cp -f WeightedCluster/WeightedCluster-fr.Rnw .
+	cp -f WeightedCluster/randB.RData .
+	cp -f WeightedCluster/wardtree.png .
+	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedCluster-fr.Rnw')"
+	rm -f randB.RData wardtree.png
+	cp -f WeightedCluster/WeightedCluster-fake.Rnw WeightedCluster-fr.Rnw
+
+	
+compactPDF:  WeightedCluster-fr.pdf  WeightedCluster.pdf WeightedClusterPreview.pdf
 	$(RSCRIPT) --vanilla -e "library(tools); compactPDF('./', gs_quality='ebook')"
