@@ -78,10 +78,6 @@ print.clustrange <- function(x, digits=2, ...){
 }
 plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", withlegend=TRUE, lwd=1, ...){
 	kvals <- x$kvals
-	if(any(stat=="ASW")){
-		warning(" [!] You should use ASWi or ASWw, ASW was replaced with ASWi.")
-		stat[stat=="ASW"] <- "ASWi"
-	}
 	if(length(stat)==1){
 		if(stat=="all"){
 			stats <- x$stats

@@ -25,7 +25,7 @@ A list with two elements \code{stats} and \code{ASW}:
 			\item{PBC}{Point Biserial Correlation. Correlation between the given distance matrice and a distance which equal to zero for individuals in the same cluster and one otherwise.}
 			\item{HG}{Hubert's Gamma. Same as previous but using Kendall's Gamma coefficient.}
 			\item{HGSD}{Hubert's Gamma (Somers'D). Same as previous but using Somers' D coefficient.}
-			\item{ASWi}{Average Silhouette width (observation).}
+			\item{ASW}{Average Silhouette width (observation).}
 			\item{ASWw}{Average Silhouette width (weighted).}
 			\item{CH}{Calinski-Harabasz index (Pseudo F statistics computed from distances).}
 			\item{R2}{Share of the discrepancy explained by the clustering solution.}

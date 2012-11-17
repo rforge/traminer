@@ -25,16 +25,16 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 	
 	ncluster <- max(clustering)+1
 	cq <- .Call(wc_RClusterQual, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(0))
-	names(cq[[1]]) <-c("PBC", "HG", "HGSD", "ASWi", "ASWw", "CH", "R2", "CHsq", "R2sq", "HC")
+	names(cq[[1]]) <-c("PBC", "HG", "HGSD", "ASW", "ASWw", "CH", "R2", "CHsq", "R2sq", "HC")
 	dim(cq[[2]]) <- c(nlevels(clusterF), 2)
 	
 	rownames(cq[[2]]) <-levels(clusterF)
-	colnames(cq[[2]]) <- c("ASWi", "ASWw")
+	colnames(cq[[2]]) <- c("ASW", "ASWw")
 	names(cq) <- c("stats", "ASW")
 	if(any(xtabs(weights~clustering)<1)){
-		cq$ASW[, "ASWi"] <- NA
-		cq$stats["ASWi"] <- NA
-		warning(" [!] ASWi can not be computed because at least one cluster has less than one observation.\n")
+		cq$ASW[, "ASW"] <- NA
+		cq$stats["ASW"] <- NA
+		warning(" [!] ASW can not be computed because at least one cluster has less than one observation.\n")
 	}
 	return(cq)
 #define ClusterQualHPG 0
@@ -51,9 +51,9 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 
 }
 
-wcSilhouetteObs <- function(diss, clustering, weights=NULL, measure="ASWi"){
-	if(!measure %in% c("ASWi", "ASWw")){
-		stop(" [!] Unknow silhouette measure. It should be 'ASWi' or 'ASWw'")
+wcSilhouetteObs <- function(diss, clustering, weights=NULL, measure="ASW"){
+	if(!all(measure %in% c("ASW", "ASWw"))){
+		stop(" [!] Unknow silhouette measure. It should be one of 'ASW', 'ASWw'.")
 	}
 	if (inherits(diss, "dist")) {
 		isdist <- TRUE
@@ -78,12 +78,16 @@ wcSilhouetteObs <- function(diss, clustering, weights=NULL, measure="ASWi"){
 	if(length(clustering)!=nelements|| length(weights)!=nelements){
 		stop("[!] different number of elements in diss, clustering and/or weights arguments.")
 	}
-	if(measure=="ASWi" && any(xtabs(weights~clustering)<1)){
-		stop(" [!] ASWi can not be computed because at least one cluster has less than one observation. Use measure='ASWw'.")
+	if(any(measure=="ASW") && any(xtabs(weights~clustering)<1)){
+		if(length(measure)==1){
+			stop(" [!] ASW can not be computed because at least one cluster has less than one observation. Use measure='ASWw'.")
+		}
+		warning(" [!] ASW can not be computed because at least one cluster has less than one observation. Only 'ASWw' is computed.")
+		measure <- "ASWw"
 	}
 	ncluster <- max(clustering)+1
 	ret <- .Call(wc_RClusterComputeIndivASW, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist))
-	asw <- data.frame(ASWi=ret[[1]], ASWw=ret[[2]])
+	asw <- data.frame(ASW=ret[[1]], ASWw=ret[[2]])
 	return(asw[, measure])
 	#define ClusterQualHPG 0
 #define ClusterQualHG 1
