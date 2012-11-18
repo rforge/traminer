@@ -491,13 +491,13 @@ La fonction \code{summary} présente le meilleur nombre de groupes selon chaque m
 La présentation offerte par \code{summary} est utile pour comparer les résultats de deux procédures (voir ci-dessous). Toutefois, elle ne présente que deux ou trois solutions et il est souvent utile d'observer l'évolution de ces mesures pour identifier les points de décrochages et les partitions qui offrent le meilleur compromis entre plusieurs mesures. La fonction \code{plot} associée à l'objet retourné par \code{as.clustrange} représente graphiquement cette évolution. Au besoin, l'argument \code{stat} spécifie la liste des mesures à afficher (\code{"all"} les affiches toutes).
 
 <<wcRange-plot, fig.width=8, fig.height=3.5>>=
-plot(wardRange, stat=c("ASW", "HG", "PBC", "HC"))
+plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"))
 @
 
 La solution en six groupes est ici un maximum local pour les mesures \guil{HC}, \guil{PBC} et \guil{HG}, ce qui en fait une bonne si l'on souhaite garder un nombre de groupe restreint. La lecture du graphique est parfois un peu difficile, car les valeurs moyennes de chaque mesure diffèrent. Pour pallier ce problème, l'argument \code{norm="zscore"} standardise les valeurs, ce qui permet de mieux identifier les maximums et minimums\footnote{on peut utiliser \code{norm="zscoremed"} pour une standardisation plus robuste basée sur la médiane.}. La figure ci-dessous facilite l'identification des partitions qui donnent de bons résultats. Les solutions en six et en 17 groupes paraissent bonnes dans notre cas de figure.
 
 <<wcRange-plot2, fig.width=8, fig.height=3.5>>=
-plot(wardRange, stat=c("ASW", "HG", "PBC", "HC"), norm="zscore")
+plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"), norm="zscore")
 @
 
 L'objet retourné par la fonction \code{as.clustrange} contient également un \code{data.frame} contenant toutes les partitions testées dans l'élément \code{clustering}. On peut ainsi utiliser directement \code{as.clustrange} plutôt que \code{cutree}. La solution en six groupes peut être affichée de la manière suivante.
