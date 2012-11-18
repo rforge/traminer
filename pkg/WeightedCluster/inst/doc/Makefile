@@ -1,7 +1,7 @@
 
 
 RSCRIPT="$(R_HOME)/bin/Rscript"
-RSCRIPT="Rscript"
+
 
 
 all: pdfclean rotateFiles WeightedCluster.pdf WeightedCluster-fr.pdf WeightedClusterPreview.pdf clean

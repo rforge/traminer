@@ -388,6 +388,7 @@ Hubert's Gamma & HG & $[-1;1]$ & Max & Mesure de la capacité du clustering à rep
 Hubert's Somers D & HGSD & $[-1;1]$ & Max & Mesure de la capacité du clustering à reproduire les distances (ordre de grandeur) avec prise en compte des égalités sur les distances.\\
 Hubert's C & HC & $[0;1]$ & \textbf{Min} & Écart entre la partition obtenue et la meilleure partition qu'il serait théoriquement possible d'obtenir avec ce nombre de groupes et ces distances.\\
 Average Silhouette Width & ASW & $[-1;1]$ & Max & Cohérence des assignations. Une cohérence élevée indique des distances inter-groupes élevées et une forte homogénéité intragroupe.\\
+Average Silhouette Width (weighted) & ASWw & $[-1;1]$ & Max & Idem que précédant, si l'unité des poids n'a pas un sens explicite.\\
 Calinski-Harabasz index & CH & $[0;+\infty[$ & Max & Pseudo F calculé à partir des distances.\\
 Calinski-Harabasz index & CHsq& $[0;+\infty[$ & Max & Idem que précédant, mais en utilisant les distances \textit{au carré}.\\
 Pseudo $R^2$ & R2 & $[0;1]$ & Max & Part de la dispersion expliquée par la solution de clustering (uniquement pour comparer des partitions avec nombre de groupes identiques).\\
@@ -407,7 +408,7 @@ Les indices de Calinski-Harabasz \citep{CalinskiHarabasz1974} se basent sur la s
 
 Le \guil{R-square} calcule la part de la dispersion expliquée par une partition \citep{StuderRitschardGabadinhoMuller2011SMR}. Cette mesure n'est pertinente que pour comparer des partitions comportant le même nombre de groupe, car elle ne pénalise pas la complexité.
 
-Finalement, la mesure \guil{Average Silhouette Width} proposée par \citet{Kaufman1990} est particulièrement intéressante. Elle se base sur la cohérence de l'assignation d'une observation à un groupe donné en mettant en parallèle la distance moyenne pondérée d'une observation aux autres membres de son groupe et la distance moyenne pondérée au groupe le plus proche. Une valeur est calculée pour chaque observation, mais on regarde plutôt la silhouette moyenne. Si celle-ci est faible, cela signifie que les groupes ne sont pas clairement séparés les uns des autres ou que l'homogénéité des groupes est faible. De manière intéressante, \citet{Kaufman1990} proposent des ordres de grandeur pour interpréter cette mesure que nous reproduisons dans le tableau~\ref{tab_kaufman_asw}.
+Finalement, la mesure \guil{Average Silhouette Width} proposée par \citet{Kaufman1990} est particulièrement intéressante. Elle se base sur la cohérence de l'assignation d'une observation à un groupe donné en mettant deux éléments en parallèle: la distance moyenne pondérée d'une observation aux autres membres de son groupe et la distance moyenne pondérée au groupe le plus proche. Une valeur de silhouette est calculée pour chaque observation. Si cette valeur est négative, l'observation est mal classée, car elle est plus proche d'un autre groupe que du sien. Au contraire, une valeur proche de 1 signifie que l'observation est proche de son groupe et loin de tous les autres. Généralement, on regarde plutôt la silhouette moyenne. Si celle-ci est faible, cela signifie que les groupes ne sont pas clairement séparés les uns des autres ou que l'homogénéité des groupes est faible. De manière intéressante, \citet{Kaufman1990} proposent des ordres de grandeur pour interpréter cette mesure que nous reproduisons dans le tableau~\ref{tab_kaufman_asw}.
 
 \begin{table}[htb]
 \caption{Ordres de grandeur pour interpréter la mesure $ASW$}
@@ -427,24 +428,23 @@ Finalement, la mesure \guil{Average Silhouette Width} proposée par \citet{Kaufma
 \end{center}
 \end{table}
 
+
+La formulation originale de \citet{Kaufman1990} suppose que l'unité des pondérations corresponde à une observation, ce qui est le cas si les pondérations résultent d'agrégation (voir l'annexe~\ref{sec_aggregate}) ou si les données ne sont pas pondérées. Pour le cas où les pondérations visent à corriger la représentativité de données d'enquêtes (comme c'est le cas ici), nous proposons une variante de cette mesure appelée ``ASWw'' détaillée dans l'annexe~\ref{annexe_asw}. D'une manière générale, les résultats entre ces deux variantes sont très similaires, ``ASWw'' tendant à attribuer une qualité légèrement plus élevée.
+
 Ces mesures sont calculées avec la fonction \code{wcClusterQuality}. La valeur retournée par la fonction est une liste qui comprend deux éléments. L'élément \code{stats} contient les valeurs des mesures de qualité.
 
-<<wcClusterQuality-compute9-option, echo=FALSE, results="hide">>=
+<<wcClusterQuality-compute9, echo=2:3>>=
 options(digits=2)
-@
-<<wcClusterQuality-compute9>>=
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
-@
-<<wcClusterQuality-compute9-optionend, echo=FALSE, results="hide">>=
 options(digits=3)
 @
 
 
-Selon la mesure \code{ASW=\Sexpr{round(clustqual4$stats["ASW"], 2)}}, la solution en quatre groupes obtenue avec le critère de Ward pourrait être un artifice statistique, puisqu'elle est inférieure à 0.25.
+Selon la mesure \code{ASWw=\Sexpr{round(clustqual4$stats["ASWw"], 2)}}, la solution en quatre groupes obtenue avec le critère de Ward pourrait être un artifice statistique, puisqu'elle est inférieure à 0.25.
 
 
-L'élément \code{ASW} de l'objet \code{clustqual4} contient la silhouette moyenne de chaque groupe pris séparément. Selon cette mesure, le groupe 3 est ci particulièrement mal défini puisque sa silhouette moyenne est négative.
+L'élément \code{ASW} de l'objet \code{clustqual4} contient les deux variantes de la silhouette moyenne de chaque groupe pris séparément. Selon ces mesures, le groupe 3 est particulièrement mal défini puisque sa silhouette moyenne est négative.
 
 <<wcClusterQuality-computeasw>>=
 clustqual4$ASW
@@ -452,23 +452,13 @@ clustqual4$ASW
 
 \subsection{Utiliser la silhouette pour représenter les clusters}
 
-La silhouette peut être calculée séparément pour chaque séquence, ce qui permet d'identifier les séquences caractéristiques d'un regroupement (silhouette proche de un). La fonction \code{wcSilhouetteObs} calcule ces valeurs. Dans l'exemple ci-dessous, nous utilisons les silhouettes pour ordonner les séquences dans des index-plots.
+La silhouette peut être calculée séparément pour chaque séquence, ce qui permet d'identifier les séquences caractéristiques d'un regroupement (silhouette proche de un). La fonction \code{wcSilhouetteObs} calcule ces valeurs. Dans l'exemple ci-dessous, nous utilisons les silhouettes (avec la méthode \code{"ASWw"}) pour ordonner les séquences dans des index-plots.
 
 <<silhouette-indexplot, echo=2:3, dev="png", dpi=600, fig.width=7, fig.height=5>>=
 par(mar=c(2.1, 4.1, 4.1, 1.1))
-sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight)
+sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight, method="ASWw")
 seqIplot(mvadseq, group=clust4, sortv=sil)
 @
-
-%<<silhouette-indexplot, echo=FALSE, results="hide">>=
-%sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight)
-%png(file=paste(graphdir,"png_mvad_seqIplot-sil.png",sep=""), unit="px", width=1600, height=1000, pointsize=30)
-%par(mar=c(2.1, 4.1, 4.1, 1.1))
-%seqIplot(mvadseq, group=clust4, sortv=sil)
-%dev.off()
-%@
-%
-%\includegraphics{png_mvad_seqIplot-sil}
 
 Les séquences les plus caractéristiques de chaque cluster sont représentées en haut de chaque graphique. Selon la définition de la silhouette, les séquences que nous appelons \guil{caractéristiques} sont celles qui sont proches du centre de leur groupe tout en étant éloignées du groupe le plus proche. Dans le groupe 1 par exemple, la séquence caractéristique est d'accéder à l'emploi après deux ans d'apprentissage. Au contraire, les séquences au bas de chaque graphique sont mal représentées et/ou mal assignées. Ainsi, dans le groupe 3 par exemple, les séquences \guil{école -- apprentissage -- emploi} sont plus proches d'un autre groupe (le 1 vraisemblablement) que de son propre groupe.
 
@@ -538,31 +528,6 @@ table(mvad$pam4)
 
 
 Une fois les clusters nommés, la typologie est construite. Avant de conclure, nous revenons plus en détail sur la question de la simplification induite par l'analyse en clusters et les biais que celle-ci peut introduire dans l'analyse. Nous illustrons cette question en présentant le calcul des liens entre typologie et facteurs explicatifs et en montrant comment ceci peut biaiser les résultats.
-
-%
-%
-%
-%\section{Algorithmes K-Medoïds}
-%
-%K-Medoïds algorithms aim at finding the best partition of the data in a $k$ predefined number of groups. Based on a dissimilarity matrix, those algorithms seeks to minimize the (weighted) sum of distance to the medoïd of each group. The medoïd is defined as the observation that minimize the sum of distance to the other observations of this group.
-%
-%The \pkg{WeightedCluster} library provides two different algorithms: k-medoïd~\citep{Hoon2010} and PAM~\citep{RClusterPackage, StruyfHubertRousseeuw1997}. The K-Medoïd use the following strategy:
-%
-%\begin{enumerate}
-%    \item Take $k$ random observations as the starting medoïds.
-%    \item Assign each observations to the closest medoïd.
-%    \item Recompute the new medoïd of each group defined in the previous step.
-%    \item Repeat step (2) et (3) until a stable solution is found.
-%\end{enumerate}
-%
-%This algorithm may be attracted by a local minimum and the solution depend on the original medoïds used. For this reason, it is usually recommended to launch the algorithm several times and to keep the best solution found.
-
-
-%
-%L'algorithme peut tendre vers un minimum local et la partition identifiée peut varier en fortement selon les médoïdes choisis au départ. Pour cette raison, il est conseillé de relancer la procédure un grand nombre de fois et de retenir la meilleure solution~\citep{Hoon2010}.
-
-
-
 
 
 
@@ -786,6 +751,7 @@ Rappelons encore que, si les données contiennent des cas identiques, les gains s
 \section{Détails des mesures de qualité}
 \label{annexe_clustqual}
 \subsection{Average Silhouette Width (ASW)}
+\label{annexe_asw}
 Originellement proposée par \citet{Kaufman1990}, cet indice se base sur une notion de cohérence de l'assignation d'une observation à un groupe donné qui est mesurée en mettant en parallèle la distance moyenne pondérée, notée $a_i$, d'une observation $i$ aux autres membres de son groupe et la distance moyenne pondérée au groupe le plus proche, notée $b_i$.
 
 La silhouette est dépendante de l'unité des pondérations puisqu'elle est définie pour une observation (c'est-à-dire un poids de un). Elle est indéfinie si le poids total de l'un des groupes est inférieur à un. Formellement, ces distances moyennes sont définies de la manière suivante. Soit $k$ le groupe de l'observation $i$, $W_k$ la somme des pondérations des observations appartenant au groupe $k$, $w_i$ le poids de l'observation $i$ et $\ell$ un des autres groupes, la silhouette d'une observation se calcule de la manière suivante.
@@ -796,6 +762,14 @@ La silhouette est dépendante de l'unité des pondérations puisqu'elle est définie
     b_i&=&\min_{\ell} \frac{1}{W_\ell}\sum_{j \in \ell} w_j d_{ij}\\
     s_i&=&\frac{b_i - a_i}{\max(a_i, b_i)}\label{eq_clustqual_asw}
 \end{eqnarray}
+
+L'équation~\ref{eq_clustqual_asw_ai} suppose que l'unité des pondérations corresponde à une observation. Cette hypothèse découle de l'utilisation de $W_k-1$ dans l'équation~\ref{eq_clustqual_asw_ai}. Cette hypothèse ne pose aucun problème quand les pondérations résultent d'agrégation (voir l'annexe~\ref{sec_aggregate}) ou si les données ne sont pas pondérées. Lorsque certains $w_i$ ou si $W_k$ sont inférieurs à un cependant, les valeurs $a_i$ sont indéfinies et la silhouette ne peut donc être interprétée. Ces cas de figure sont fréquents quand lorsque les pondérations visent à corriger la représentativité de données d'enquêtes (comme c'est le cas dans notre base de donnée example). Pour pallier ce problème, nous proposons de remplacer $a_i$ par $aw_i$ qui se calcule de la manière suivante:
+
+\begin{equation}
+  a_i&=&\frac{1}{W_k}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asww_ai}\\
+\end{equation}
+
+On peut donner deux interprétation de la valeur $aw_i$. Elle correspond à la distance entre l'observation et son propre groupe, en considérant que toute les observations du groupes doivent être utilisée pour définir le groupe. Dans la formulation originale, l'observation est retirée du groupe pour calculer cette distance. La deuxième interprétation consiste à dire que l'unité des pondérations est aussi petite que possible, c'est-à-dire qu'elle tend vers zéro.
 
 L'indice finalement utilisé correspond à la moyenne pondérée des silhouettes $s_i$. Cette valeur est retournée dans l'élément \code{stats}. La moyenne pondérée des silhouettes de chaque groupe est donnée dans l'élément \code{ASW} et mesure séparément la cohérence de chaque groupe.
 
