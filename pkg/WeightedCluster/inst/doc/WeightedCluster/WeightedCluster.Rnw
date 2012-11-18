@@ -381,7 +381,7 @@ The \pkg{WeightedCluster} library offers several measures of partition quality, 
 \begin{center}
 {\scriptsize
 \renewcommand\arraystretch{1.5}
-\begin{tabular}{llllp{6.5cm}}
+\begin{tabular}{p{3.5cm}lllp{6.5cm}}
 \toprule
 Name &Abrv. &Range &Min/Max &Interpretation \\
 \midrule
@@ -390,6 +390,7 @@ Hubert's Gamma &HG &$[-1; 1]$ &Max &Measure of the capacity of the clustering to
 Hubert's Somers' D &HGSD &$[-1; 1]$ &Max &Measure of the capacity of the clustering to reproduce the distances (order of magnitude) taking into account ties in distances. \\
 Hubert's C &HC &$[0; 1]$ &\textbf{Min} &Gap between the partition obtained and the best partition theoretically possible with this number of groups and these distances. \\
 Average Silhouette Width &ASW &$[-1; 1]$ &Max &Coherence of assignments. High coherence indicates high between-group distances and strong within-group homogeneity. \\
+Average Silhouette Width (weighted) &ASWw &$[-1; 1]$ &Max &As previous, for floating point weights. \\
 Calinski-Harabasz index &CH &$[0;+\infty[$ &Max &Pseudo F computed from the distances. \\
 Calinski-Harabasz index &CHsq &$[0;+\infty[$ &Max &As previous, but using \textit{squared} distances. \\
 Pseudo $R^2$ &R2 &$[0; 1]$ &Max &Share of the discrepancy explained by the clustering solution (only to compare partitions with identical number of groups). \\
@@ -430,6 +431,8 @@ $\leq 0.25$ &No structure. \\
 \end{center}
 \end{table}
 
+The original formulation of \citet{Kaufman1990} supposes that one weighting unit is equivalent to one observation. This is the case if the weighting results from aggregation (see Annex~\ref{sec_aggregate}) or if the data are not weighted. When the weights aim at correcting representativity bias (as it is the case here), we propose a variant of this measure called ``ASWw''. The details are given in Annex~\ref{annexe_asw}. Generally, the measures gives very similar results, ``ASWw'' tends to be a little higher.
+
 
 These measures are calculated with the \code{wcClusterQuality} function. The value returned by the function is a list comprising two elements. The \code{stats} element contains the values of the measures of quality.
 
@@ -440,9 +443,9 @@ clustqual4$stats
 options(digits=3)
 @
 
-According to the measure \code{ASW=\Sexpr{round(clustqual4$stats["ASW"], 2)}}, the solution in four groups obtained using the Ward criterion could be a statistical artefact, since it is less than $0.25$.
+According to the measure \code{ASWw=\Sexpr{round(clustqual4$stats["ASWw"], 2)}}, the solution in four groups obtained using the Ward criterion could be a statistical artefact, since it is less than $0.25$.
 
-The \code{ASW} element of the object \code{clustqual4} contains the average silhouette of each group taken separately. According to this measure, group $3$ is particularly ill-defined since its average silhouette is negative.
+The \code{ASW} element of the object \code{clustqual4} contains the two variant of the average silhouette of each group taken separately. According to this measure, group $3$ is particularly ill-defined since its average silhouette is negative.
 
 <<wcClusterQuality-computeasw>>=
 clustqual4$ASW
@@ -454,7 +457,7 @@ The silhouette can be computed separately for each sequence, which makes it poss
 
 <<silhouette-indexplot, echo=2:3, dev="png", dpi=600, fig.width=7, fig.height=5>>=
 par(mar=c(2.1, 4.1, 4.1, 1.1))
-sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight)
+sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight, measure="ASWw")
 seqIplot(mvadseq, group=clust4, sortv=sil)
 @
 
@@ -488,13 +491,13 @@ The presentation offered by \code{summary} is useful for comparing the results o
 
 
 <<wcRange-plot, fig.width=8, fig.height=3.5>>=
-plot(wardRange, stat=c("ASW", "HG", "PBC", "HC"))
+plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"))
 @
 
 The solution in six groups is here a local maximum for the measures \guil{HC}, \guil{PBC} and \guil{HG}, which makes it a good one if one wants to keep a limited number of groups. The graphic is sometimes somewhat difficult to read, because the average values of each measure differ. To palliate this problem, the argument \code{norm="zscore"} standardizes the values, which makes it easier to identify the maxima and minima.\footnote{For a more robust standardization based on the median, \code{norm="zscoremed"} can be used.} The command below facilitates the identification of the partitions that give good results. The solutions in six and 17 groups appear to be good in the present case.
 
 <<wcRange-plot2, fig.width=8, fig.height=3.5>>=
-plot(wardRange, stat=c("ASW", "HG", "PBC", "HC"), norm="zscore")
+plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"), norm="zscore")
 @
 
 The object returned by the \code{as.clustrange} function also contains a \code{data.frame} called \code{clustering} containing all the partitions tested. One can thus use \code{as.clustrange} directly rather than \code{cutree}. The solution in six groups can be displayed in the following way:
@@ -596,6 +599,29 @@ set.seed(1)
 dsa <- dissassoc(mvaddist, mvad$test, weights=mvad$weight, weight.permutation="diss", R=5000)
 print(dsa$stat)
 @
+
+We may include several covariates by using sequence regression trees\citep{StuderRitschardGabadinhoMuller2011SMR} \footnote{The previous approach can also be extended to the multifactor case.} and the \code{seqtree} function.  Cette analyse met en evidence les variables les plus importantes ainsi que leurs interactions. Ici, la variable \code{gcse5eq} (bon résultats à la fin de l'école obligatoire) à l'effet le plus important. Pour ceux qui ont eu de bon résultats, avoir suivi une école obligatoire de type \code{Grammar} favorise l'accès à l'école supérieure. Par contre, pour ceux qui ont eu de mauvais résultats, c'est d'avoir un père au chômage qui est le plus significatif. On semble alors avoir plus de chance de se retrouver au sans emploi.
+
+<<seqtree-link-covar, echo=FALSE, results="hide", eval=FALSE>>=
+set.seed(1)
+tree <- seqtree(mvadseq~gcse5eq+Grammar+funemp, data=mvad, diss=mvaddist, weight.permutation="diss")
+seqtreedisplay(tree, type="d", border=NA, filename="seqtree.png", showtree=FALSE)
+@
+
+<<seqtree-link-covar-fake, eval=FALSE, echo=TRUE, results="hide">>=
+tree <- seqtree(mvadseq~gcse5eq+Grammar+funemp, data=mvad, diss=mvaddist, weight.permutation="diss")
+seqtreedisplay(tree, type="d", border=NA)
+@
+
+\begin{center}
+  \includegraphics[width=.9\linewidth]{seqtree}
+%\caption{Arbre des derniers regroupements, critère \guil{Ward}.}
+%\label{fg_wardseqtree}
+\end{center}
+%\end{figure}
+\afterpage{\clearpage}
+
+
 
 Discrepancy analysis leads to a change of paradigm and frees us from the concept of clearly defined models of trajectories. Rather than relying on the search for models, we consider that the trajectories are set in a context which influences the construction of the trajectory in its own way. In other words, we seek to understand to what extent interindividual variability is explained by a context, while accounting for the diversity of the paths followed. From a conceptual standpoint, the assumptions underlying discrepancy analysis are very close to the principles put forward by the life course paradigm. \citet{Elder1999} thus stresses the need to analyse the life course in times and places (the context) while preserving the interindividual variability and the agency of the actors.
 
@@ -717,6 +743,7 @@ It should also be noted that if the data contain identical cases, the gains are 
 \section{Details of quality measures}
 \label{annexe_clustqual}
 \subsection{Average Silhouette Width (ASW)}
+\label{annexe_asw}
 
 Originally proposed by \citet{Kaufman1990}, this index is based on a notion of coherence of the assignment of an observation to a given group, which is measured by comparing the average weighted distance, labelled $a_i$, of an observation $i$ with the other members of its group and the average weighted distance from the closest group, labelled $b_i$.
 
@@ -728,7 +755,17 @@ The silhouette is dependent on the weighting unit, because it is defined for one
     s_i&=&\frac{b_i - a_i}{\max(a_i, b_i)}\label{eq_clustqual_asw}
 \end{eqnarray}
 
-The index finally used corresponds to the weighted average of the silhouettes $s_i$. This value is returned in the \code{stats} element. The weighted average of the silhouettes of each group is given in the \code{ASW} element and measures separately the coherence of each group.
+
+L'équation~\ref{eq_clustqual_asw_ai} suppose que l'unité des pondérations corresponde à une observation. Cette hypothèse découle de l'utilisation de $W_k-1$ dans l'équation~\ref{eq_clustqual_asw_ai}. Cette hypothèse ne pose aucun problème quand les pondérations résultent d'agrégation (voir l'annexe~\ref{sec_aggregate}) ou si les données ne sont pas pondérées. Lorsque certains $w_i$ ou si $W_k$ sont inférieurs à un cependant, les valeurs $a_i$ sont indéfinies et la silhouette ne peut donc être interprétée. Ces cas de figure sont fréquents quand lorsque les pondérations visent à corriger la représentativité de données d'enquêtes (comme c'est le cas dans notre base de donnée example). Pour pallier ce problème, nous proposons de remplacer $a_i$ par $aw_i$ qui se calcule de la manière suivante:
+
+\begin{equation}
+  aw_i=\frac{1}{W_k}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asww_ai}\\
+\end{equation}
+
+la valeur $aw_i$ peut s'interpréter de deux manières. Elle correspond à la distance entre l'observation et son propre groupe, en considérant que toute les observations du groupes doivent être utilisée pour définir le groupe. Dans la formulation originale, l'observation est retirée du groupe pour calculer cette distance. La deuxième interprétation consiste à dire que l'unité des pondérations est aussi petite que possible, c'est-à-dire qu'elle tend vers zéro.
+
+
+In both cases, the index finally used corresponds to the weighted average of the silhouettes $s_i$. This value is returned in the \code{stats} element. The weighted average of the silhouettes of each group is given in the \code{ASW} element and measures separately the coherence of each group.
 
 \subsection{C index (HC)}
 Developed by \citet{HubertLevin1976}, this index compares the partition obtained with the best partition that could be obtained with this number of groups and this distance matrix. The index ranges between $0$ and $1$, with a small value indicating a good partition of the data. More formally, it is defined as follows. Let $S$ be the sum of the within-group distances weighted by the product of the weights of each observation, $W$ the sum of the weights of the within-group distances, $S_{min}$ the weighted sum of the $W$ smallest distances, and $S_{max}$ the weighted sum of the $W$ greatest distances:

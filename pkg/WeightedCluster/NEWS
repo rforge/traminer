@@ -1,8 +1,10 @@
               CHANGES IN WeightedCluster VERSION 0.9-xx
 
+
 NEW FEATURES
+  o The manual has been translated in English.
   o seqclustname: automatic labeling of clusters using sequence medoids.
-  o Added the WeightedCluster vignette
+  o Added the WeightedCluster vignette (in French).
   o It is now possible to plot the "RHC" statistic computed as 1-HC. This way all statistics should be maximized (Requested by Gilbert Ritschard).
   o Now testing for correct input in "as.clustrange".
 

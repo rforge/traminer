@@ -379,7 +379,7 @@ La libraire \pkg{WeightedCluster} propose plusieurs mesures de la qualité d'une 
 \begin{center}
 {\scriptsize
 \renewcommand\arraystretch{1.5}
-\begin{tabular}{llllp{6.5cm}}
+\begin{tabular}{p{3.5cm}lllp{6.5cm}}
 \toprule
 Nom   & Abrv. & Étendue & Min/Max & Interprétation\\
 \midrule
