@@ -782,7 +782,7 @@ Rappelons encore que, si les données contiennent des cas identiques, les gains s
 \label{annexe_asw}
 Originellement proposée par \citet{Kaufman1990}, cet indice se base sur une notion de cohérence de l'assignation d'une observation à un groupe donné qui est mesurée en mettant en parallèle la distance moyenne pondérée, notée $a_i$, d'une observation $i$ aux autres membres de son groupe et la distance moyenne pondérée au groupe le plus proche, notée $b_i$.
 
-La silhouette est dépendante de l'unité des pondérations puisqu'elle est définie pour une observation (c'est-à-dire un poids de un). Elle est indéfinie si le poids total de l'un des groupes est inférieur à un. Formellement, ces distances moyennes sont définies de la manière suivante. Soit $k$ le groupe de l'observation $i$, $W_k$ la somme des pondérations des observations appartenant au groupe $k$, $w_i$ le poids de l'observation $i$ et $\ell$ un des autres groupes, la silhouette d'une observation se calcule de la manière suivante.
+Formellement, ces distances moyennes sont définies de la manière suivante. Soit $k$ le groupe de l'observation $i$, $W_k$ la somme des pondérations des observations appartenant au groupe $k$, $w_i$ le poids de l'observation $i$ et $\ell$ un des autres groupes, la silhouette d'une observation se calcule de la manière suivante.
 
 
 \begin{eqnarray}

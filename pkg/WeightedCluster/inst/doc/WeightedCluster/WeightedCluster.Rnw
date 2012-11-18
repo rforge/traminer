@@ -600,7 +600,7 @@ dsa <- dissassoc(mvaddist, mvad$test, weights=mvad$weight, weight.permutation="d
 print(dsa$stat)
 @
 
-We may include several covariates by using sequence regression trees\citep{StuderRitschardGabadinhoMuller2011SMR} \footnote{The previous approach can also be extended to the multifactor case.} and the \code{seqtree} function.  Cette analyse met en evidence les variables les plus importantes ainsi que leurs interactions. Ici, la variable \code{gcse5eq} (bon résultats à la fin de l'école obligatoire) à l'effet le plus important. Pour ceux qui ont eu de bon résultats, avoir suivi une école obligatoire de type \code{Grammar} favorise l'accès à l'école supérieure. Par contre, pour ceux qui ont eu de mauvais résultats, c'est d'avoir un père au chômage qui est le plus significatif. On semble alors avoir plus de chance de se retrouver au sans emploi.
+We may include several covariates by building a sequence regression trees with the \code{seqtree} function \citep{StuderRitschardGabadinhoMuller2011SMR}.\footnote{The previous approach can also be extended to the multifactor case.}
 
 <<seqtree-link-covar, echo=FALSE, results="hide", eval=FALSE>>=
 set.seed(1)
@@ -621,6 +621,7 @@ seqtreedisplay(tree, type="d", border=NA)
 %\end{figure}
 \afterpage{\clearpage}
 
+This analysis highlights the main effect as well as the interactions between covariates and the sequences. Here, the \code{gcse5eq} covariate (having good results at the end of compulsory schooling) has the most important effect. For those with good results, the most explanatory covariate is having been in a \code{Grammar} school. On the contrary, for those with poor results, the most important covariate is having an unemployed father.
 
 
 Discrepancy analysis leads to a change of paradigm and frees us from the concept of clearly defined models of trajectories. Rather than relying on the search for models, we consider that the trajectories are set in a context which influences the construction of the trajectory in its own way. In other words, we seek to understand to what extent interindividual variability is explained by a context, while accounting for the diversity of the paths followed. From a conceptual standpoint, the assumptions underlying discrepancy analysis are very close to the principles put forward by the life course paradigm. \citet{Elder1999} thus stresses the need to analyse the life course in times and places (the context) while preserving the interindividual variability and the agency of the actors.
@@ -747,7 +748,7 @@ It should also be noted that if the data contain identical cases, the gains are 
 
 Originally proposed by \citet{Kaufman1990}, this index is based on a notion of coherence of the assignment of an observation to a given group, which is measured by comparing the average weighted distance, labelled $a_i$, of an observation $i$ with the other members of its group and the average weighted distance from the closest group, labelled $b_i$.
 
-The silhouette is dependent on the weighting unit, because it is defined for one observation (that has a weight of one). It is indefinite if the total weight of one of the groups is lower than one. Formally, these average distances are defined as follows. Let $k$ be the group of observation $i$, $W_k$ the sum of the weightings of the observations belonging to group $k$, $w_i$ the weight of observation $i$ and $\ell$ one of the other groups; the silhouette of an observation is computed as follows:
+Let $k$ be the group of observation $i$, $W_k$ the sum of the weightings of the observations belonging to group $k$, $w_i$ the weight of observation $i$ and $\ell$ one of the other groups; the silhouette of an observation is computed as follows:
 
 \begin{eqnarray}
     a_i&=&\frac{1}{W_k-1}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asw_ai}\\
@@ -755,17 +756,15 @@ The silhouette is dependent on the weighting unit, because it is defined for one
     s_i&=&\frac{b_i - a_i}{\max(a_i, b_i)}\label{eq_clustqual_asw}
 \end{eqnarray}
 
-
-L'équation~\ref{eq_clustqual_asw_ai} suppose que l'unité des pondérations corresponde à une observation. Cette hypothèse découle de l'utilisation de $W_k-1$ dans l'équation~\ref{eq_clustqual_asw_ai}. Cette hypothèse ne pose aucun problème quand les pondérations résultent d'agrégation (voir l'annexe~\ref{sec_aggregate}) ou si les données ne sont pas pondérées. Lorsque certains $w_i$ ou si $W_k$ sont inférieurs à un cependant, les valeurs $a_i$ sont indéfinies et la silhouette ne peut donc être interprétée. Ces cas de figure sont fréquents quand lorsque les pondérations visent à corriger la représentativité de données d'enquêtes (comme c'est le cas dans notre base de donnée example). Pour pallier ce problème, nous proposons de remplacer $a_i$ par $aw_i$ qui se calcule de la manière suivante:
+Equation~\ref{eq_clustqual_asw_ai} supposes that the weighting unit is equivalent to one observation, because the weighted sum of distances is divided by $W_k-1$. This assumption is not problematic when the weights are computed from an aggregation of identical cases (see Annex~\ref{sec_aggregate}) or when the data are not weighted. However, when some of the $w_i$ or some of the $W_k$ are lower than one, the $a_i$ are undefined and the value of the silhouette cannot be interpreted. Those situations are quite frequent, when the weights aim at correcting the sample representativeness (as it was the case in our example). To address this issue, we propose to use $aw_i$ instead of $a_i$ when computing the silhouette. This $aw_i$ value is computed as follows.
 
 \begin{equation}
   aw_i=\frac{1}{W_k}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asww_ai}\\
 \end{equation}
 
-la valeur $aw_i$ peut s'interpréter de deux manières. Elle correspond à la distance entre l'observation et son propre groupe, en considérant que toute les observations du groupes doivent être utilisée pour définir le groupe. Dans la formulation originale, l'observation est retirée du groupe pour calculer cette distance. La deuxième interprétation consiste à dire que l'unité des pondérations est aussi petite que possible, c'est-à-dire qu'elle tend vers zéro.
+There are two interpretations for the $aw_i$  value. First, it is the distance between the observation and its own group, when all the observations of the group are used to define the group. In the original formulation, the observation is removed from the group before computing the $a_i$ value. Second, the $aw_i$ value can be interpreted as the $a_i$ value when the weighting unit is as small as possible, i.e. when it tends to zero.
 
-
-In both cases, the index finally used corresponds to the weighted average of the silhouettes $s_i$. This value is returned in the \code{stats} element. The weighted average of the silhouettes of each group is given in the \code{ASW} element and measures separately the coherence of each group.
+For both variant, the index finally used corresponds to the weighted average of the silhouettes $s_i$. This value is returned in the \code{stats} element. The weighted average of the silhouettes of each group is given in the \code{ASW} element and measures separately the coherence of each group.
 
 \subsection{C index (HC)}
 Developed by \citet{HubertLevin1976}, this index compares the partition obtained with the best partition that could be obtained with this number of groups and this distance matrix. The index ranges between $0$ and $1$, with a small value indicating a good partition of the data. More formally, it is defined as follows. Let $S$ be the sum of the within-group distances weighted by the product of the weights of each observation, $W$ the sum of the weights of the within-group distances, $S_{min}$ the weighted sum of the $W$ smallest distances, and $S_{max}$ the weighted sum of the $W$ greatest distances:
