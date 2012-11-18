@@ -452,11 +452,11 @@ clustqual4$ASW
 
 \subsection{Utiliser la silhouette pour représenter les clusters}
 
-La silhouette peut être calculée séparément pour chaque séquence, ce qui permet d'identifier les séquences caractéristiques d'un regroupement (silhouette proche de un). La fonction \code{wcSilhouetteObs} calcule ces valeurs. Dans l'exemple ci-dessous, nous utilisons les silhouettes (avec la méthode \code{"ASWw"}) pour ordonner les séquences dans des index-plots.
+La silhouette peut être calculée séparément pour chaque séquence, ce qui permet d'identifier les séquences caractéristiques d'un regroupement (silhouette proche de un). La fonction \code{wcSilhouetteObs} calcule ces valeurs. Dans l'exemple ci-dessous, nous utilisons les silhouettes (avec la variante \code{measure="ASWw"}) pour ordonner les séquences dans des index-plots.
 
 <<silhouette-indexplot, echo=2:3, dev="png", dpi=600, fig.width=7, fig.height=5>>=
 par(mar=c(2.1, 4.1, 4.1, 1.1))
-sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight, method="ASWw")
+sil <- wcSilhouetteObs(mvaddist, clust4, weights=mvad$weight, measure="ASWw")
 seqIplot(mvadseq, group=clust4, sortv=sil)
 @
 
@@ -521,9 +521,16 @@ Les différents outils que nous avons présentés nous ont permis de construire une
 
 Une fois la typologie créée, il est d'usage de nommer les types obtenus afin de rendre leur interprétation plus facile. La fonction \code{factor} permet de créer une variable catégorielle. Pour ce faire, on spécifie la variable des types (ici \code{pamclust4\$clustering}), les valeurs que prend cette variable avec l'argument \code{levels} (on peut retrouver ces valeurs dans les graphiques précédents), ainsi que les labels que l'on souhaite attribuer à chacun de ces types avec l'argument \code{labels}. Les \code{labels} doivent être spécifiés dans le même ordre que l'argument \code{levels} de sorte que la première entrée de \code{levels} (ici 66) corresponde à la première entrée de \code{labels} (ici \guil{Apprentissage-Emploi}).
 
+
 <<cluster-naming, echo=TRUE>>=
-mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c("Appr.-Emploi", "Ecole-Emploi", "Ecole sup.", "Sans emploi"))
-table(mvad$pam4)
+mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c("Appr.-Empl.", "Ecole-Empl.", "Ecole sup.", "Sans empl."))
+@
+
+La fonction \code{seqclustname} permet de nommer automatiquement les groupes en utilisant leur médoïde. On doit spécifier l'objet séquence (agument \code{seqdata}), le clustering (argument \code{group}), la matrice de distance (argument \code{diss}). Si \code{weighted=TRUE} (par défaut), les poids de l'objet \code{seqdata} sont utilisés pour trouver les médoïdes. Finalement, l'option \code{perc=TRUE} ajoute le pourcentage d'observation dans chaque groupe aux labels.
+
+<<auto-cluster-naming, echo=TRUE>>=
+mvad$pam4.auto <- seqclustname(mvadseq, pamclust4$clustering, mvaddist)
+table( mvad$pam4.auto, mvad$pam4)
 @
 
 
@@ -571,7 +578,7 @@ chisq.test(tb)
 Le résultat est non significatif, ce qui signifie que selon cette procédure les trajectoires ne diffèrent pas selon la variable \code{test}. Quel est le problème? Est-ce vraiment le cas? Non, le problème vient de la simplification de l'analyse en clusters. En utilisant la typologie dans le test du khi-carré, on fait implicitement l'hypothèse que cette typologie est suffisante pour décrire la complexité des trajectoires, or ce n'est pas le cas ici. En effet, la variable test explique la variation des trajectoires \textit{au sein des types}. À titre d'exemple, le graphique suivant montre les différences de trajectoires selon la variable test pour les individus classés dans le type \guil{École-Emploi}. Les individus \guil{non-test} semblent ainsi avoir un risque plus élevé de connaître un épisode \guil{Sans emploi}. La variabilité au sein de ce type ne semble donc pas négligeable.
 
 <<testdplot-EE, fig.width=10, fig.height=4.5>>=
-EcoleEmploi <- mvad$pam4=="Ecole-Emploi"
+EcoleEmploi <- mvad$pam4=="Ecole-Empl."
 seqdplot(mvadseq[EcoleEmploi, ], group=mvad$test[EcoleEmploi], border=NA)
 @
 
@@ -601,6 +608,27 @@ set.seed(1)
 dsa <- dissassoc(mvaddist, mvad$test, weights=mvad$weight, weight.permutation="diss", R=5000)
 print(dsa$stat)
 @
+
+On peut inclure plusieurs variables dans l'analyse à l'aide d'un arbre de régression sur les séquences\footnote{Il est également possible d'analyser les effets conjoints avec une approche multifacteur.}. Pour ce faire, on utilise la fonction \code{seqtree}. Cette analyse met en evidence les variables les plus importantes ainsi que leurs interactions. Ici, la variable \code{gcse5eq} (bon résultats à la fin de l'école obligatoire) à l'effet le plus important. Pour ceux qui ont eu de bon résultats, avoir suivi une école obligatoire de type \code{Grammar} favorise l'accès à l'école supérieure. Par contre, pour ceux qui ont eu de mauvais résultats, c'est d'avoir un père au chômage qui est le plus significatif. On semble alors avoir plus de chance de se retrouver au sans emploi.
+
+<<seqtree-link-covar, echo=FALSE, results="hide", eval=FALSE>>=
+set.seed(1)
+tree <- seqtree(mvadseq~gcse5eq+Grammar+funemp, data=mvad, diss=mvaddist, weight.permutation="diss")
+seqtreedisplay(tree, type="d", border=NA, filename="seqtree.png", showtree=FALSE)
+@
+
+<<seqtree-link-covar-fake, eval=FALSE, echo=TRUE, results="hide">>=
+tree <- seqtree(mvadseq~gcse5eq+Grammar+funemp, data=mvad, diss=mvaddist, weight.permutation="diss")
+seqtreedisplay(tree, type="d", border=NA)
+@
+
+\begin{center}
+  \includegraphics[width=.9\linewidth]{seqtree}
+%\caption{Arbre des derniers regroupements, critère \guil{Ward}.}
+%\label{fg_wardseqtree}
+\end{center}
+%\end{figure}
+\afterpage{\clearpage}
 
 L'analyse de dispersion conduit à un changement de paradigme et à s'affranchir du concept de modèle de trajectoire. Plutôt que de se baser sur la recherche de modèles, nous considérons que les trajectoires s'insèrent dans un contexte qui influence à sa manière la construction de la trajectoire. En d'autres termes, nous cherchons à comprendre dans quelle mesure la variabilité interindividuelle est expliquée par un contexte tout en rendant compte de la diversité des chemins empruntés. D'un point de vue conceptuel, les hypothèses sous-jacentes aux méthodes à l'analyse de dispersion sont très proches des principes mis en avant par le paradigme des parcours de vie. \citet{Elder1999} insiste ainsi sur la nécessité d'insérer les parcours dans des temps et des lieux (le contexte) tout en préservant la variabilité interindividuelle et l'internationalité des acteurs.
 
@@ -766,12 +794,12 @@ La silhouette est dépendante de l'unité des pondérations puisqu'elle est définie
 L'équation~\ref{eq_clustqual_asw_ai} suppose que l'unité des pondérations corresponde à une observation. Cette hypothèse découle de l'utilisation de $W_k-1$ dans l'équation~\ref{eq_clustqual_asw_ai}. Cette hypothèse ne pose aucun problème quand les pondérations résultent d'agrégation (voir l'annexe~\ref{sec_aggregate}) ou si les données ne sont pas pondérées. Lorsque certains $w_i$ ou si $W_k$ sont inférieurs à un cependant, les valeurs $a_i$ sont indéfinies et la silhouette ne peut donc être interprétée. Ces cas de figure sont fréquents quand lorsque les pondérations visent à corriger la représentativité de données d'enquêtes (comme c'est le cas dans notre base de donnée example). Pour pallier ce problème, nous proposons de remplacer $a_i$ par $aw_i$ qui se calcule de la manière suivante:
 
 \begin{equation}
-  a_i&=&\frac{1}{W_k}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asww_ai}\\
+  aw_i=\frac{1}{W_k}\sum_{j \in k} w_j d_{ij}\label{eq_clustqual_asww_ai}\\
 \end{equation}
 
-On peut donner deux interprétation de la valeur $aw_i$. Elle correspond à la distance entre l'observation et son propre groupe, en considérant que toute les observations du groupes doivent être utilisée pour définir le groupe. Dans la formulation originale, l'observation est retirée du groupe pour calculer cette distance. La deuxième interprétation consiste à dire que l'unité des pondérations est aussi petite que possible, c'est-à-dire qu'elle tend vers zéro.
+la valeur $aw_i$ peut s'interpréter de deux manières. Elle correspond à la distance entre l'observation et son propre groupe, en considérant que toute les observations du groupes doivent être utilisée pour définir le groupe. Dans la formulation originale, l'observation est retirée du groupe pour calculer cette distance. La deuxième interprétation consiste à dire que l'unité des pondérations est aussi petite que possible, c'est-à-dire qu'elle tend vers zéro.
 
-L'indice finalement utilisé correspond à la moyenne pondérée des silhouettes $s_i$. Cette valeur est retournée dans l'élément \code{stats}. La moyenne pondérée des silhouettes de chaque groupe est donnée dans l'élément \code{ASW} et mesure séparément la cohérence de chaque groupe.
+Dans les deux cas de figure, l'indice finalement utilisé correspond à la moyenne pondérée des silhouettes $s_i$. Cette valeur est retournée dans l'élément \code{stats}. La moyenne pondérée des silhouettes de chaque groupe est donnée dans l'élément \code{ASW} et mesure séparément la cohérence de chaque groupe.
 
 \subsection{C index (HC)}
 

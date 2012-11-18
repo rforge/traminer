@@ -1,4 +1,4 @@
 \documentclass[10pt]{article}
-%\VignetteIndexEntry{WeightedCluster}
+%\VignetteIndexEntry{WeightedCluster Manual}
 \begin{document}
-\end{document} 
+\end{document}

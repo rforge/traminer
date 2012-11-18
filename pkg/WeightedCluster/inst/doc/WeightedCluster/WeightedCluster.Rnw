@@ -524,7 +524,7 @@ Once the typology has been created, it is customary to name the types obtained s
 mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c("Train-Empl", "School-Empl", "High Ed", "Unempl"))
 @
 
-It is also possible to automatically label the clusters using the medoid sequence of each cluster. The \code{seqclustname} function can be used for this purpose. One needs to specify the sequence object (\code{seqdata} argument), the clustering (\code{group} argument), the distance matrix (diss argument). If \code{weighted=TRUE} (default), then the weights of the \code{seqdata} object are used to find the medoids. Finally, on can set \code{perc=TRUE} to add the percentage of observation in each groups to the labels.
+It is also possible to automatically label the clusters using the medoid sequence of each cluster. The \code{seqclustname} function can be used for this purpose. One needs to specify the sequence object (\code{seqdata} argument), the clustering (\code{group} argument), the distance matrix (\code{diss} argument). If \code{weighted=TRUE} (default), then the weights of the \code{seqdata} object are used to find the medoids. Finally, on can set \code{perc=TRUE} to add the percentage of observation in each groups to the labels.
 
 <<auto-cluster-naming, echo=TRUE>>=
 mvad$pam4.auto <- seqclustname(mvadseq, pamclust4$clustering, mvaddist)

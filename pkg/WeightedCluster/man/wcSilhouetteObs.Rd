@@ -7,13 +7,14 @@ Compute the silhouette of each object using weighted data.
 	Compute the silhouette of each object using weighted data.
 }
 \usage{
-wcSilhouetteObs(diss, clustering, weights = NULL)
+wcSilhouetteObs(diss, clustering, weights = NULL, measure="ASW")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{diss}{A dissimilarity matrix or a dist object (see \code{\link{dist}})}
   \item{clustering}{Factor. A vector of clustering membership.}
   \item{weights}{optional numerical vector containing weights.}
+  \item{measure}{"ASW" or "ASWw", the measure of the silhouette. See the WeigthedCluster vignettes.}
 }
 \details{
 See the \code{\link[cluster]{silhouette}} function in the \code{\link{cluster}} package for a detailed explanation of the silhouette.
