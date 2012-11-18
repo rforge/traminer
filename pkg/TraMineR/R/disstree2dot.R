@@ -143,7 +143,7 @@ seqtreedisplay <- function(tree, filename=NULL, seqdata=tree$info$object, imgLea
 	disstreedisplayInternal(tree=tree, filename=filename, tmpdisstree=tmpdisstree, imagedata=NULL, imagefunc=DTNseqplot, 
 							imgLeafOnly=imgLeafOnly, title.cex=title.cex, imageformat=imageformat, withquality=withquality, 
 							quality.fontsize=quality.fontsize, legendtext=legendtext, showtree=showtree, showdepth=showdepth, legendimage=legendimage, 
-							seqdata=seqdata, sortv=sortv, dist.matrix=dist.matrix, axes=axes, withlegend=FALSE, ...)
+							seqdata=seqdata, sortv=sortv, dist.matrix=as.matrix(dist.matrix), axes=axes, withlegend=FALSE, ...)
 	setwd(actualdir)
 	if(!is.null(filename)){
 		file.copy(file.path(tmpdir, paste(tmpdisstree, imageformat, sep=".")), filename, overwrite=TRUE)
@@ -159,7 +159,7 @@ seqtree2dot <- function(tree, filename, seqdata=tree$info$object, imgLeafOnly=FA
 	legendimage <- DTNseqlegend(filename=filename, seqdata=seqdata, legend.fontsize=legend.fontsize, withlegend=withlegend, ...)
 	
 	disstree2dotp(tree, filename, imagedata=NULL, imgLeafOnly=imgLeafOnly, seqdata=seqdata, title.cex=title.cex,
-			sortv=sortv,dist.matrix=dist.matrix, imagefunc=DTNseqplot, withlegend=FALSE, axes=axes,
+			sortv=sortv,dist.matrix=as.matrix(dist.matrix), imagefunc=DTNseqplot, withlegend=FALSE, axes=axes,
 			legendimage=legendimage, withquality=withquality, quality.fontsize=quality.fontsize, ...)
 }
 
