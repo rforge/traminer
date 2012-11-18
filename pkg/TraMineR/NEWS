@@ -1,10 +1,19 @@
 ## =========
-Version 1.9-4 (Development version)
+Version 1.9-5 (Development version)
+
+Bug fixes:
+	- seqtreedisplay: corrected a bug when using representative sequences and 
+	   a "dist" object was passed to the "dist.matrix" argument (reported by 
+	   Emanuela Struffolino).
+
+## =========
+Version 1.8-4
 
 Bug fixes:
   - seqrep(), dissrep(), seqrplot(): wrong (unweighted) "na" values were returned;
-    also quality measures "MD" (mean distance to representative) and "V" (discrepancy) were not computed properly when more than one
-    representative selected (since version 1.8-2).
+    also quality measures "MD" (mean distance to representative) and "V" 
+	(discrepancy) were not computed properly when more than one representative 
+	selected (since version 1.8-2).
 
 User invisible changes:
   - Added an internal function to fix an issue with an internal C level 
