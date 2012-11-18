@@ -1,0 +1,4 @@
+\documentclass[10pt]{article}
+%\VignetteIndexEntry{Manuel de la librairie WeightedCluster}
+\begin{document}
+\end{document}
