@@ -75,10 +75,10 @@ seqeordplot <- function(seqe,group=NULL,weighted=TRUE,weights=NULL,
     }
 
     if (!is.null(alphabet)) {
-      if (length(intersect(alphabet,levels(y)))==length(alphabet)) {
-        y <- factor(y,levels=alphabet)
-      } else {
+      if (sum(levels(y) %in% alphabet) != nlevels(y)) {
         stop("[!] invalid alphabet.")
+      } else {
+        y <- factor(y,levels=alphabet)
       }
     }
 
