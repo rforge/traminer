@@ -103,7 +103,7 @@ data(biofam)
 lab <- c("Parent","Left","Married",
          "Left+Marr","Child","Left+Child",
          "Left+Marr+Child","Divorced")
-biofam.seq <- seqdef(data=biofam,var=10:25,labels=lab)
+biofam.seq <- seqdef(data=biofam[,10:25], alphabet=0:7, labels=lab)
 ## For this example, we consider only a sample of 200 cases
 ##set.seed(23653)
 ##sple <- sample(1:nrow(biofam.seq), size=200)
