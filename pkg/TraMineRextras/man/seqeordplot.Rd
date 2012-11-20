@@ -105,8 +105,10 @@ lab <- c("Parent","Left","Married",
          "Left+Marr+Child","Divorced")
 biofam.seq <- seqdef(data=biofam,var=10:25,labels=lab)
 ## For this example, we consider only a sample of 200 cases
-set.seed(23653)
-sple <- sample(1:nrow(biofam.seq), size=200)
+##set.seed(23653)
+##sple <- sample(1:nrow(biofam.seq), size=200)
+sple <- 500:700  ## need a sample with all elements of the alphabet
+##seqstatl(biofam[sple,10:25])         
 biofam <- biofam[sple,]
 biofam.seq <- biofam.seq[sple,]
 bf.seqestate <- seqecreate(biofam.seq, tevent = "state")
