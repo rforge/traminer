@@ -799,7 +799,7 @@ These indexes measure the capacity of a partition to reproduce the distance matr
 
 \citet{CalinskiHarabasz1974} suggest using the statistic $F$ of the analysis of variance by computing it based on the squared Euclidean distances. On the same bases, one can compute a pseudo $R^2$, i.e. the share of variability explained by a partition. \citet{StuderRitschardGabadinhoMuller2011SMR} suggest an extension of these measures to the weighted data.
 
-\section{Construction of the \code{test} variable}
+\section{Construction of the \texttt{test} variable}
 \label{annexe_vartest}
 The \code{test} variable is constructed to explain the variability within the clusters. To do so, we use an MDS for weighted data  \citep{OksanenEtAl2012}.
 

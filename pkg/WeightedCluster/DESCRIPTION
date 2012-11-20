@@ -1,6 +1,6 @@
 Package: WeightedCluster
-Version: 0.9-6
-Date: 2012-11-16
+Version: 0.9-8
+Date: 2012-11-20
 Title: Clustering of Weighted Data
 Authors@R:person("Matthias", "Studer", email = "matthias.studer@unige.ch", role = c("aut", "cre"))
 Author: Matthias Studer <matthias.studer@unige.ch>
