@@ -136,7 +136,7 @@ extern "C" {
 		} else {
 			indiv_asw(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), nclusters, REAL(asw_i), REAL(asw_w));
 		}
-		UNPROTECT(1);
+		UNPROTECT(3);
 		return ans;
 		
 	}
