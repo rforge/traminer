@@ -10,7 +10,8 @@
 	builtDate <- strsplit(strsplit(descr$Built, ";")[[1]][3], " ")[[1]][2]
 	packageStartupMessage("This is WeightedCluster ", state, " version ", descr$Version, " (Built: ", builtDate, ")")
 	packageStartupMessage('\nTo get the manuals, please run:')
-	packageStartupMessage('   vignette("WeightedCluster") ## Complete manual in French')
+	packageStartupMessage('   vignette("WeightedCluster") ## Complete manual in English')
+	packageStartupMessage('   vignette("WeightedCluster-fr") ## Complete manual in French')
 	packageStartupMessage('   vignette("WeightedClusterPreview") ## Short preview in English')
 	packageStartupMessage("\nTo cite WeightedCluster in publications please use:")
 	packageStartupMessage("Studer, Matthias (2012). \u00c9tude des in\u00e9galit\u00e9s de genre en d\u00e9but de carri\u00e8re")
