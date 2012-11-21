@@ -5,6 +5,8 @@ Bug fixes:
 	- seqtreedisplay: corrected a bug when using representative sequences and 
 	   a "dist" object was passed to the "dist.matrix" argument (reported by 
 	   Emanuela Struffolino).
+	- seqLLCS and seqLLCP: added a check on the argument. Both sequences should
+	  have the same alphabet.
 
 ## =========
 Version 1.8-4
