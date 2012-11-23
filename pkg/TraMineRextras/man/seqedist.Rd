@@ -12,8 +12,8 @@ seqedist(seqe, idcost, vparam, interval="No", norm="YujianBo")
   \item{seqe}{an event sequence object as defined by the \code{\link{seqecreate}} function.}
   \item{idcost}{Insertion/deletion cost of the different type of event (one entry per event type).}
   \item{vparam}{The cost of moving an event of one time unit.}
-  \item{norm}{Character. One of "YujianBo" (respect triangle inequality), "max" (maximum distance) or "none".}
-  \item{interval}{Character. One of "No" (absolute ages), "previous" (time spent since previous event) or "next" (time spent until next event.).}
+  \item{norm}{Character. One of \code{"YujianBo"} (respects triangle inequality), \code{"max"} (maximum distance) or \code{"none"}.}
+  \item{interval}{Character. One of \code{"No"} (absolute ages), \code{"previous"} (time spent since previous event) or \code{"next"} (time spent until next event.).}
 }
 \value{a distance matrix.}
 
