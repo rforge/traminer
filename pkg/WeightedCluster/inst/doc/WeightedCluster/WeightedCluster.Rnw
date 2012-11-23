@@ -43,7 +43,7 @@ In addition to the methods, we also discuss the building of typologies of sequen
   University of Geneva\\
   CH-1211 Geneva 4, Switzerland\\
   E-mail: \email{matthias.studer@unige.ch}\\
-  URL: \url{http://mephisto.unige.ch/}
+  URL: \url{http://mephisto.unige.ch/weightedcluster/}
 }
 
 \usepackage[latin1]{inputenc}
