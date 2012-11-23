@@ -16,5 +16,6 @@ seqedist <- function(seqe, idcost, vparam, interval="No", norm="YujianBo"){
 		stop(" [!] unknow normalization method ", norm, ".  It should be one of: 'none', 'max' or 'YujianBo' (default).")
 	}
 	norm <- as.integer(norm-1)
-    TraMineR:::seqedist(seqe, as.double(idcost), as.double(vparam), norm, interval);
+    TraMineR:::seqedist(seqe, idcost=as.double(idcost), vparam=as.double(vparam), norm=norm, interval=interval);
+	## seqedist <- function(seqe, idcost, vparam, interval=TRUE, norm=TRUE)
 }
