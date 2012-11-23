@@ -118,6 +118,9 @@ knit_hooks$set(small.mar = function(before, options, envir) {
 })
 opts_knit$set(concordance=TRUE)
 opts_chunk$set(message=FALSE, prompt=TRUE, echo=TRUE, comment=NA, crop=TRUE, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth")
+knit_hooks$set(error = function(x, options) stop(x))
+knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
+
 @
 
 \begin{document}
