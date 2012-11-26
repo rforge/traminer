@@ -13,12 +13,12 @@ Functions to plot, in a same frame, transversal-entropy curves by group or multi
 seqplot.tentrop(seqdata, group, title=NULL,
     col=NULL, lty=NULL, lwd=3.5, ylim=NULL, xtlab=NULL,
     xtstep=NULL, withlegend=TRUE, glabels=NULL,
-    legendpos="topright", horiz=FALSE, ...)
+    legendpos="topright", horiz=FALSE, cex.legend=1, ...)
 
 seqplot.tentrop.m(seqdata.list, title=NULL,
     col=NULL, lty=NULL, lwd=3.5, ylim=NULL, xtlab=NULL,
     xtstep=NULL, withlegend=TRUE, glabels=NULL,
-    legendpos="topright", horiz=FALSE, ...)
+    legendpos="topright", horiz=FALSE, cex.legend=1, ...)
 }
 
 \arguments{
@@ -47,7 +47,10 @@ seqplot.tentrop.m(seqdata.list, title=NULL,
   \item{withlegend}{logical: Should the legend be plotted. Default is \code{TRUE}.}
 
   \item{legendpos}{legend position: default is \code{"topright"}. See\code{\link{legend} }.}
+  
   \item{horiz}{logical: Should the legend be displayed horizontally. Set as \code{FALSE} by default, i.e., legend is displayed vertically.}
+  
+  \item{cex.legend}{Scale factor for the legend.} 
 
   \item{...}{additional plot parameters (see \code{\link{par}}).}
 }

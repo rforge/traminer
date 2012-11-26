@@ -108,7 +108,7 @@ biofam.seq <- seqdef(data=biofam[,10:25], alphabet=0:7, labels=lab)
 ##set.seed(23653)
 ##sple <- sample(1:nrow(biofam.seq), size=200)
 sple <- 500:700  ## need a sample with all elements of the alphabet
-##seqstatl(biofam[sple,10:25])         
+##seqstatl(biofam[sple,10:25])
 biofam <- biofam[sple,]
 biofam.seq <- biofam.seq[sple,]
 bf.seqestate <- seqecreate(biofam.seq, tevent = "state")
@@ -119,6 +119,7 @@ head(bf.seqestate)
 
 ## distinctive event sequences
 
+\dontrun{
 par(mar=c(4,8,2,2))
 seqeordplot(seqe=bf.seqestate,alphabet=lab)
 
@@ -148,7 +149,7 @@ seqeordplot(seqe=bf.seqestate,alphabet=lab,
 par(mar=c(4,8,2,2)) # gender differences
 seqeordplot(seqe=bf.seqestate,group=biofam$sex,show=c(0.05,1),
                        alphabet=lab)
-
+}
 }
 
 \keyword{plot}

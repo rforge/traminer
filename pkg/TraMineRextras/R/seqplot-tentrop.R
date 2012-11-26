@@ -1,10 +1,11 @@
 ## plot superposed transversal entropies
 ## author: Gilbert Ritschard
 
-seqplot.tentrop <- function(seqdata, group, 
-     title=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL, 
-     xtlab=NULL, xtstep=NULL, 
-     withlegend=TRUE, glabels=NULL, legendpos="topright", horiz=FALSE, ...) {
+seqplot.tentrop <- function(seqdata, group,
+     title=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL,
+     xtlab=NULL, xtstep=NULL,
+     withlegend=TRUE, glabels=NULL, legendpos="topright",
+     horiz=FALSE, cex.legend=1, ...) {
 
   group <- factor(group)
   if(is.null(title)) {
@@ -69,7 +70,7 @@ seqplot.tentrop <- function(seqdata, group,
   axis(1,labels=xtlab[seq(from=1, to=npos, by=xtstep)],at=seq(from=1, to=npos, by=xtstep))
   axis(2)
   if(withlegend){
-    legend(legendpos, legend=glabels,  lwd=lwd, lty=lty[1:k], col=col[1:k], horiz=horiz)
+    legend(legendpos, legend=glabels,  lwd=lwd, lty=lty[1:k], col=col[1:k], horiz=horiz, cex=cex.legend)
   }
 
   return(k)
@@ -80,10 +81,11 @@ seqplot.tentrop <- function(seqdata, group,
 
 ##
 
-seqplot.tentrop.m <- function(seqdata.list, 
+seqplot.tentrop.m <- function(seqdata.list,
      title=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL,
      xtlab=NULL, xtstep=NULL,
-     withlegend=TRUE, glabels=NULL, legendpos="topright", horiz=FALSE, ...) {
+     withlegend=TRUE, glabels=NULL, legendpos="topright",
+     horiz=FALSE, cex.legend=1, ...) {
 
   ncurve <- length(seqdata.list)
   warn <- FALSE
@@ -153,7 +155,7 @@ seqplot.tentrop.m <- function(seqdata.list,
   axis(1,labels=xtlab[seq(from=1, to=npos, by=xtstep)],at=seq(from=1, to=npos, by=xtstep))
   axis(2)
   if(withlegend){
-    legend(legendpos, legend=glabels,  lwd=lwd, lty=lty[1:k], col=col[1:k], ...)
+    legend(legendpos, legend=glabels,  lwd=lwd, lty=lty[1:k], col=col[1:k], horiz=horiz, cex=cex.legend)
   }
 
   return(k)
