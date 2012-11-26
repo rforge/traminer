@@ -1,10 +1,14 @@
-﻿Changes in version 0.2 [2012-11-17]
+﻿Changes in version 0.2 [2012-11-24]
 
     - First release on CRAN
 
 Changes in existing functions
     
-    - dissvar.grp and seqrep.grp now also accept distance object as mdis argument.
+    - seqentrans(): new option avg.occ; when set as TRUE the table is completed with
+        average number of occurrences of the subsequences in each sequence. 
+        The latter differs from the support for counting methods other than COBJ.
+        Requires TraMineR 1.8.5 or higher.
+    - dissvar.grp() and seqrep.grp() now also accept distance object as mdis argument.
     - group.p has now a weights argument.
 
 Bug Fixes
