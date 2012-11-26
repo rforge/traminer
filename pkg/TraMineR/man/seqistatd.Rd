@@ -32,4 +32,7 @@ seqistatd(ex1.seq)
 seqistatd(ex1.seq, with.missing=TRUE)
 
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{univar}

@@ -198,4 +198,7 @@ ex1.seq <- seqdef(ex1, 1:13, weights=ex1$weights)
 ## weighted sequence frequencies
 seqtab(ex1.seq)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{manip}

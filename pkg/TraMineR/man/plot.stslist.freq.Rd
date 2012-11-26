@@ -40,6 +40,8 @@ Plot method for output produced by the \code{seqtab} function, i.e objects of cl
 This method is called by the generic \code{\link{seqplot}} function (if \code{type="f"}) that produces more sophisticated plots, allowing grouping and automatic display of the state color legend. The \code{seqfplot} function is a shortcut for calling \code{seqplot} with \code{type="f"}.
 }
 
+\author{Alexis Gabadinho}
+
 \examples{
 ## Loading the 'actcal' example data set
 data(actcal)

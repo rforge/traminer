@@ -16,4 +16,7 @@ The function will first search for separators '-' or ':' in the sequences in ord
 \value{a vector with the number of sequences and the maximum sequence length.} 
 %\seealso{}
 %\examples{}
+
+\author{Alexis Gabadinho}
+
 \keyword{attribute}

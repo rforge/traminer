@@ -54,4 +54,7 @@ seqtab(ex1.seq, weighted=FALSE)
 ## Weighted frequencies
 seqtab(ex1.seq, weighted=TRUE)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{univar}

@@ -44,4 +44,7 @@ seqfplot(actcal.seq, pbarw=TRUE, withlegend=FALSE)
 seqdplot(actcal.seq, withlegend=FALSE)
 seqlegend(actcal.seq)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{hplot}

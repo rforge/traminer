@@ -227,4 +227,7 @@ seqplot(actcal.seq, type="mt", group=actcal$sex)
 seqmtplot(biofam.seq, group=biofam$sex)
 
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{hplot}

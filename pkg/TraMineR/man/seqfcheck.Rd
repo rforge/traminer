@@ -36,4 +36,7 @@ data(famform)
 famform
 seqfcheck(famform)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{internal}

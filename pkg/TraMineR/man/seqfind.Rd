@@ -27,4 +27,7 @@ seqfind(mvad.seq[176,],mvad.seq)
 ## Finding occurrences of sequence 1 to 8 in mvad.seq
 seqfind(mvad.seq[1:8,],mvad.seq)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{misc}

@@ -44,6 +44,9 @@ seqstatf(ex1.seq, weighted=FALSE)
 ## Weighted
 seqstatf(ex1.seq, weighted=TRUE)
 }
+
+\author{Alexis Gabadinho}
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{univar}

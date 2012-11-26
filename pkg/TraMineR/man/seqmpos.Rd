@@ -32,4 +32,7 @@ seqmpos(ex1.seq[1,], ex1.seq[2,])
 seqmpos(ex1.seq[1,], ex1.seq[2,], with.missing=TRUE)
 
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{misc}

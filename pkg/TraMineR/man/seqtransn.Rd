@@ -60,4 +60,7 @@ ex1.seq <- seqdef(ex1, 1:13)
 seqtransn(ex1.seq)
 seqtransn(ex1.seq, with.missing=TRUE)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{attribute}

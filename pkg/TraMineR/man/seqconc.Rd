@@ -22,6 +22,8 @@ seqconc(data, var=NULL, sep="-", vname="Sequence", void=NA)
 }
 \value{a vector of character strings, one for each row in the input data.}
 
+\author{Alexis Gabadinho}
+
 \references{
 Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2008). Mining Sequence Data in \code{R} with the \code{TraMineR} package: A user's guide. \emph{Department of Econometrics and Laboratory of Demography, University of Geneva}.
 }

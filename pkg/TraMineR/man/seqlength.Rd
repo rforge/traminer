@@ -25,4 +25,6 @@ ff.seq <- seqdef(famform)
 ## in the ff.seq sequence object
 seqlength(ff.seq)
 }
+
+\author{Alexis Gabadinho}
 \keyword{attribute}

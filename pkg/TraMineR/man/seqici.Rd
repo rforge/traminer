@@ -82,4 +82,7 @@ ex1.seq <- seqdef(ex1, 1:13)
 seqici(ex1.seq)
 seqici(ex1.seq, with.missing=TRUE)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{univar}

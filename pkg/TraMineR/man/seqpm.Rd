@@ -35,4 +35,6 @@ actcal.seq[daad$MIndex,]
 ## (full time work-no work)
 seqpm(actcal.seq,"AD")
 }
+
+\author{Alexis Gabadinho}
 \keyword{misc}

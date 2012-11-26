@@ -154,6 +154,8 @@ biofam.rep
 summary(biofam.rep)
 plot(biofam.rep)
 }
+
+\author{Alexis Gabadinho}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{misc}

@@ -28,4 +28,7 @@ Laboratory of Demography, University of Geneva.
 data(actcal)
 seqstatl(actcal,13:24)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{misc}

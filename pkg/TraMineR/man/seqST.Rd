@@ -61,4 +61,7 @@ The function searches for missing states in the sequences and if found, adds the
   ## Histogram for the turbulence
   hist(turb)
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{univar}

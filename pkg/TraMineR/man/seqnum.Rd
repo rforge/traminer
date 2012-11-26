@@ -36,4 +36,7 @@ seqnum(actcal.seq[1:10,])
 ## states A,B,C,D are now coded 0,1,2,3
 alphabet(seqnum(actcal.seq))
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{manip}
