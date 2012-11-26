@@ -34,4 +34,7 @@ alphabet(actcal.seq)
 ## Setting the alphabet
 alphabet(actcal.seq) <- c("FT", "PT", "LT", "NO")
 }
+
+\author{Alexis Gabadinho}
+
 \keyword{attribute}
