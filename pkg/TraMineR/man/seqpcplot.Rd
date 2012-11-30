@@ -13,6 +13,9 @@
   method for \code{seqe} and \code{seqelist} objects.
 }
 
+\author{Reto Bürgin (with Gilbert Ritschard for the help page)}
+
+
 \usage{
 
 seqpcplot(seqdata, group = NULL, weights = NULL,
@@ -266,4 +269,5 @@ seqpcplot(seqdata = biofam.seqe,
 
 }
 
-\keyword{hplot}
+
+\keyword{Plot}
