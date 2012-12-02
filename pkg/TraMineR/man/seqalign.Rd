@@ -74,5 +74,4 @@ plot(sa)
 \author{Alexis Gabadinho (plot.seqalign) and Matthias Studer (seqalign) (with Gilbert Ritschard for the help page)}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{states sequences}
 \keyword{Dissimilarity-based}
