@@ -36,3 +36,8 @@ Plot the result of \code{\link{seqecmpgroup}}
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
 \seealso{\code{\link{seqecmpgroup}}}
+
+\author{Matthias Studer (with Gilbert Ritschard for the help page)}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{event sequences}

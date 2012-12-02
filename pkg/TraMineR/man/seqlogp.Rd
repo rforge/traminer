@@ -61,3 +61,5 @@ cohort <- biofam$birthyr>1940
 boxplot(biofam.prob~cohort)
 
 }
+
+\author{Matthias Studer and Alexis Gabadinho (with Gilbert Ritschard for the help page)}

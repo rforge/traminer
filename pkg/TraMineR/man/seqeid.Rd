@@ -17,3 +17,8 @@ actcal.seqe <- seqecreate(actcal.tse)
 seqeid(actcal.seqe)
 }
 \keyword{attribute}
+
+\author{Matthias Studer (with Gilbert Ritschard for the help page)}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{Event Sequences}

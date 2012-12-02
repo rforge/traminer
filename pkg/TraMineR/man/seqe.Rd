@@ -35,3 +35,8 @@ is.seqelist(s)
 \seealso{\code{\link{str.seqelist}}, \code{\link{str.seqe}},\code{\link{as.character.seqelist}} and \code{\link{as.character.seqe}} to convert sequences from an event sequence object into character strings}
 %\examples{}
 \keyword{internal}
+
+\author{Matthias Studer (with Gilbert Ritschard for the help page)}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{event sequences}

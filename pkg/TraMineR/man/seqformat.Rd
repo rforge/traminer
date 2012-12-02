@@ -151,3 +151,6 @@ head(actcal.DSS)
 }
 
 \keyword{manip}
+
+
+\author{Alexis Gabadinho, Nicolas S. Müller and Matthias Studer (with Gilbert Ritschard for the help page)}

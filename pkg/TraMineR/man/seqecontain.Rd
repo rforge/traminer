@@ -39,3 +39,8 @@ seqecontain(fsubseq,c("FullTime"))
 % R documentation directory.
 \keyword{attribute}
 %\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+\author{Matthias Studer (with Gilbert Ritschard for the help page)}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{Event Sequences}

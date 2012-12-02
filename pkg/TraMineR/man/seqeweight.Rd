@@ -43,3 +43,7 @@ discr <- seqecmpgroup(fsubseq, group=biofam$birthyr>=1940)
 plot(discr[1:15])
 
 }
+\author{Matthias Studer (with Gilbert Ritschard for the help page)}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{Event Sequences}

@@ -54,3 +54,8 @@ Conversion to image formats other than "jpeg" or "png" is done using ImageMagick
 \seealso{
 See \code{\link{seqtree}} and \code{\link{disstree}} for examples, and \code{\link{disstree2dot}} for generating "dot" files.
 }
+
+\author{Matthias Studer (with Gilbert Ritschard for the help page)}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{Dissimilarity-based}
