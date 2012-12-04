@@ -6,8 +6,11 @@ Bug fixes:
   - seqtreedisplay(): corrected a bug when using representative sequences and
     a "dist" object was passed to the "dist.matrix" argument (reported by
     Emanuela Struffolino).
-  - seqLLCS() and seqLLCP(): added a check on the argument. Both sequences 
+  - seqLLCS() and seqLLCP(): added a check on the argument. Both sequences
     should belong to state sequence objects with a common alphabet.
+
+Help pages:
+  - help pages updated with author and keyword fields.
 
 ## =========
 Version 1.8-4
