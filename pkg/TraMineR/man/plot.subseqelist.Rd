@@ -40,9 +40,8 @@ plot(fsubseq[1:10], cex=2)
 plot(fsubseq[1:10])
 
 }
-\keyword{hplot}
-
 \author{Matthias Studer (with Gilbert Ritschard for the help page)}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{event sequences}
+\keyword{Event sequences}
+\keyword{Plot}

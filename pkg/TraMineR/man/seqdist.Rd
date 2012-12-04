@@ -92,4 +92,4 @@ ex1.om <- seqdist(ex1.seq, method="OM", sm=subm, with.missing=TRUE)
 \author{Matthias Studer, Alexis Gabadinho and Nicolas S. Müller (first version) (with Gilbert Ritschard for the help page)}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{Dissimilarity-based}
+\keyword{Dissimilarity measures}

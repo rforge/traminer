@@ -34,4 +34,4 @@ actcal.dur[1:10,]
 
 \author{Alexis Gabadinho}
 
-\keyword{attribute}
+\keyword{Longitudinal characteristics}

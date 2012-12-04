@@ -25,8 +25,8 @@ sequences and vice versa.
 \details{
 \tabular{ll}{
 Package: \tab TraMineR\cr
-Version: \tab 1.9-4\cr
-Date: \tab 2012-11-17\cr
+Version: \tab 1.9-5\cr
+Date: \tab 2012-12-4\cr
 Depends: \tab R (>= 2.8.1), RColorBrewer, boot\cr
 Suggests: \tab cluster, xtable\cr
 License: \tab GPL (>= 2)\cr
@@ -194,5 +194,5 @@ seqdplot(mvad.seq, group=mvad$male, border=NA)
 mvad.lcs <- seqdist(mvad.seq[1:10,], method="LCS")
 }
 
-\keyword{ package }
+\keyword{package}
 

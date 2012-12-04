@@ -47,10 +47,10 @@ seqplot.tentrop.m(seqdata.list, title=NULL,
   \item{withlegend}{logical: Should the legend be plotted. Default is \code{TRUE}.}
 
   \item{legendpos}{legend position: default is \code{"topright"}. See\code{\link{legend} }.}
-  
+
   \item{horiz}{logical: Should the legend be displayed horizontally. Set as \code{FALSE} by default, i.e., legend is displayed vertically.}
-  
-  \item{cex.legend}{Scale factor for the legend.} 
+
+  \item{cex.legend}{Scale factor for the legend.}
 
   \item{...}{additional plot parameters (see \code{\link{par}}).}
 }
@@ -82,4 +82,5 @@ seqplot.tentrop(biofam.seq[biofam$sex=="woman",], group=group,
     title="Women, by father's social status", legendpos="bottomright")
 
 }
-\keyword{plot}
+\keyword{Plot}
+\keyword{Transversal characteristics}

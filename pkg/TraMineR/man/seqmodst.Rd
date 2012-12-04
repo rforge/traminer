@@ -56,4 +56,5 @@ seqmodst(ex1.seq, weighted=FALSE, with.missing=TRUE)
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{univar}
+\keyword{Transversal characteristics}
+ 

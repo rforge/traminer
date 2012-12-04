@@ -65,4 +65,4 @@ plot(actcal.freq2, main="Sequence frequencies - actcal data set",
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{hplot}
+\keyword{Plot}

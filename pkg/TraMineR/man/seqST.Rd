@@ -2,7 +2,7 @@
 \alias{seqST}
 \title{Sequences turbulence}
 \description{
-  Computes the turbulence for each sequence in a sequence data set using the measure proposed by Elzinga.
+  Computes Elzinga's turbulence for each sequence in a sequence data set.
 }
 
 \details{
@@ -62,6 +62,6 @@ The function searches for missing states in the sequences and if found, adds the
   hist(turb)
 }
 
-\author{Alexis Gabadinho}
+\author{Alexis Gabadinho (with Gilbert Ritschard for the help page)}
 
-\keyword{univar}
+\keyword{Longitudinal characteristics}

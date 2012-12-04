@@ -58,4 +58,5 @@ seqient(ex1.seq, with.missing=TRUE)
 
 \author{Alexis Gabadinho}
 
-\keyword{univar}
+\keyword{Longitudinal characteristics}
+\keyword{State sequences}

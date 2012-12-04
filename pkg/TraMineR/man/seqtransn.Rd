@@ -61,6 +61,6 @@ seqtransn(ex1.seq)
 seqtransn(ex1.seq, with.missing=TRUE)
 }
 
-\author{Alexis Gabadinho}
+\author{Alexis Gabadinho (with Gilbert Ritschard for the help page)}
 
-\keyword{attribute}
+\keyword{Longitudinal characteristics}

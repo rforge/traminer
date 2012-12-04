@@ -46,7 +46,7 @@ plots with group splits and automatic display of the color legend. The \code{\li
 calling \code{seqplot} with \code{type="r"}.
 }
 
-\author{Alexis Gabadinho}
+\author{Alexis Gabadinho (with Gilbert Ritschard for the help page)}
 
 \examples{
 ## Loading the mvad data set and creating a sequence object

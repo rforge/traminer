@@ -1,12 +1,12 @@
 \encoding{latin1}
 \name{seqrep}
 \alias{seqrep}
-\alias{seqrplot} 
+\alias{seqrplot}
 \title{Extracting sets of representative sequences}
 
-\description{ 
-Returns either an as small as possible set of non redundant representatives covering (having in their neighborhood) a desired percentage of all sequences, or a given number of patterns with highest coverage. Special cases are single representatives such as the medoid or the sequence pattern with densest neighborhood. See \code{\link{plot.stslist.rep}} for the plot method and \code{\link{seqplot}} for other plot options. 
-} 
+\description{
+Returns either an as small as possible set of non redundant representatives covering (having in their neighborhood) a desired percentage of all sequences, or a given number of patterns with highest coverage. Special cases are single representatives such as the medoid or the sequence pattern with densest neighborhood. See \code{\link{plot.stslist.rep}} for the plot method and \code{\link{seqplot}} for other plot options.
+}
 
 %
 %attempts to find an optimal (as small as
@@ -42,7 +42,7 @@ Returns either an as small as possible set of non redundant representatives cove
 
   \item{tsim}{neighborhood
 radius as a percentage of the maximum (theoretical)
-distance \code{dmax}. Defaults to 0.1 (10\%). Sequence \eqn{y} is 
+distance \code{dmax}. Defaults to 0.1 (10\%). Sequence \eqn{y} is
 redundant to sequence \eqn{x} when it is in the neighborhood of \eqn{x}, i.e., within a distance
 \code{tsim*dmax} from \eqn{x}.}
 
@@ -70,7 +70,7 @@ With the \emph{sequence frequency} criterion, the more frequent a
 sequence the more representative it is supposed to be. Therefore, sequences are sorted in decreasing frequency order.
 
 The \emph{neighborhood density} is the
-number---density---of sequences in the neighborhood of the 
+number---density---of sequences in the neighborhood of the
 sequence. This requires to set the neighborhood radius
 \code{tsim}.  Sequences are
 sorted in decreasing density order.
@@ -161,4 +161,4 @@ plot(biofam.rep)
 \author{Alexis Gabadinho (with Gilbert Ritschard for the help page)}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{Dissimilarity-based}
+\keyword{Dissimilarity-based analysis}

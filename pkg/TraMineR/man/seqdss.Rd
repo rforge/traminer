@@ -41,4 +41,4 @@ seqdss(ex1.seq, with.missing=TRUE)
 }
 \author{Alexis Gabadinho}
 
-\keyword{attribute}
+\keyword{Longitudinal characteristics}

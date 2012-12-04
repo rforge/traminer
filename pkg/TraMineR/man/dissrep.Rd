@@ -43,7 +43,7 @@ representative set.}
 
   \item{tsim}{neighborhood
 radius as a percentage of the maximum (theoretical)
-distance  \code{dmax}. Defaults to 0.1 (10\%). Object \eqn{y} is 
+distance  \code{dmax}. Defaults to 0.1 (10\%). Object \eqn{y} is
 redundant to object \eqn{x} when it is in the neighborhood of \eqn{x}, i.e., within a distance
 \code{tsim*dmax} from \eqn{x}.}
 
@@ -55,7 +55,7 @@ redundant to object \eqn{x} when it is in the neighborhood of \eqn{x}, i.e., wit
 \details{
  The representative set is obtained by an heuristic. Representatives are selected by successively extracting from  the sequences sorted by their representativeness score those which are not redundant with already retained representatives. The selection stops when either the desired coverage or the wanted number of representatives is reached. Objects are sorted either by the values provided as \code{score} argument, or by specifying one of the following as \code{criterion} argument: \code{"freq"} (\emph{sequence frequency}), \code{"density"}
 (\emph{neighborhood density}), \code{"dist"}
-(\emph{centrality}). 
+(\emph{centrality}).
 
 The \emph{frequency} criterion uses the frequencies as
 representativeness score. The frequency of an object in the data is
@@ -119,4 +119,4 @@ summary(biofam.rep)
 
 \author{Alexis Gabadinho (with Gilbert Ritschard for the help page)}
 
-\keyword{Dissimilarity-based}
+\keyword{Dissimilarity-based analysis}

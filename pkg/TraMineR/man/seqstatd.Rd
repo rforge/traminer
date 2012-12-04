@@ -69,6 +69,6 @@ seqstatd(ex1.seq, weighted=FALSE)
 seqstatd(ex1.seq, weighted=TRUE)
 }
 
-\author{Alexis Gabadinho}
+\author{Alexis Gabadinho (with Gilbert Ritschard for the help page)}
 
-\keyword{univar}
+\keyword{Transversal characteristics}

@@ -199,6 +199,7 @@ ex1.seq <- seqdef(ex1, 1:13, weights=ex1$weights)
 seqtab(ex1.seq)
 }
 
-\author{Alexis Gabadinho}
+\author{Alexis Gabadinho (with Gilbert Ritschard for help page)}
 
-\keyword{manip}
+\keyword{Data handling}
+\keyword{State sequences} 

@@ -13,8 +13,6 @@
   method for \code{seqe} and \code{seqelist} objects.
 }
 
-\author{Reto Bürgin (with Gilbert Ritschard for the help page)}
-
 
 \usage{
 
@@ -269,5 +267,7 @@ seqpcplot(seqdata = biofam.seqe,
 
 }
 
+\author{Reto Bürgin (with Gilbert Ritschard for the help page)}
 
 \keyword{Plot}
+\keyword{Event sequences} 

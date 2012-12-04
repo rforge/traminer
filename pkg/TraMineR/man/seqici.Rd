@@ -85,3 +85,4 @@ seqici(ex1.seq, with.missing=TRUE)
 \author{Alexis Gabadinho (with Gilbert Ritschard for the help page)}
 
 \keyword{Longitudinal characteristics}
+\keyword{State sequences} 

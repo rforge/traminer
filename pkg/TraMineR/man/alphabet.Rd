@@ -18,12 +18,12 @@ alphabet(seqdata) <- value
 \value{For '\code{alphabet}' a character vector containing the alphabet.
 
 For '\code{alphabet <-}' the updated sequence object.
-} 
+}
 \seealso{
  \code{\link{seqdef}}
 }
 \examples{
-## Creating a sequence object with the columns 13 to 24 
+## Creating a sequence object with the columns 13 to 24
 ## in the 'actcal' example data set
 data(actcal)
 actcal.seq <- seqdef(actcal,13:24)
@@ -37,4 +37,4 @@ alphabet(actcal.seq) <- c("FT", "PT", "LT", "NO")
 
 \author{Alexis Gabadinho}
 
-\keyword{attribute}
+\keyword{Sequence-object attributes}

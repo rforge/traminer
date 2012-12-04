@@ -37,4 +37,4 @@ seqpm(actcal.seq,"AD")
 }
 
 \author{Alexis Gabadinho}
-\keyword{misc}
+\keyword{State sequences}

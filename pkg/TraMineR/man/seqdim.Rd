@@ -13,10 +13,10 @@ The function will first search for separators '-' or ':' in the sequences in ord
 \arguments{
   \item{seqdata}{a set of sequences.}
 }
-\value{a vector with the number of sequences and the maximum sequence length.} 
+\value{a vector with the number of sequences and the maximum sequence length.}
 %\seealso{}
 %\examples{}
 
 \author{Alexis Gabadinho}
 
-\keyword{attribute}
+\keyword{Sequence-object attributes}

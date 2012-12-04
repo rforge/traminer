@@ -24,4 +24,4 @@ seqfpos(biofam.seq,"1")
 
 \author{Alexis Gabadinho}
 
-\keyword{attribute}
+\keyword{Longitudinal characteristics}

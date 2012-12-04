@@ -40,4 +40,4 @@ seqiplot(actcal.seq)
 
 \author{Alexis Gabadinho}
 
-\keyword{attribute}
+\keyword{Sequence-object attributes}

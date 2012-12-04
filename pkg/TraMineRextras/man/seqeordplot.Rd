@@ -152,4 +152,4 @@ seqeordplot(seqe=bf.seqestate,group=biofam$sex,show=c(0.05,1),
 }
 }
 
-\keyword{plot}
+\keyword{Plot}
