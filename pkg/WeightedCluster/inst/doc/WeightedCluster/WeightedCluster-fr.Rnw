@@ -49,21 +49,12 @@ Outre les méthodes, nous discutons également de la construction de typologie de 
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{rotating}
-\usepackage{varioref}
-\usepackage{array}
-\usepackage{subfigure}
 \usepackage{afterpage}
 \usepackage{booktabs}
-\usepackage[svgnames]{xcolor}
 \usepackage{natbib}
 \usepackage[T1]{fontenc}
-\usepackage{ae}
+\usepackage{lmodern}
 
-\usepackage[absolute,overlay]{textpos}
-\usepackage{tikz}
-\usepackage{xcolor}
-\usepackage{calc}
 
 \newcommand{\Com}[1]{\code{#1}}
 \newcommand{\Comt}[1]{\code{#1}}
