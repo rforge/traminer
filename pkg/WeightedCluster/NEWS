@@ -1,21 +1,17 @@
-              CHANGES IN WeightedCluster VERSION 0.9-xx
-
+              CHANGES IN WeightedCluster VERSION 0.9-8
 
 NEW FEATURES
-  o The manual has been translated in English.
+  o The vignette (manual) has been translated in English.
   o seqclustname: automatic labeling of clusters using sequence medoids.
   o Added the WeightedCluster vignette (in French).
   o It is now possible to plot the "RHC" statistic computed as 1-HC. This way all statistics should be maximized (Requested by Gilbert Ritschard).
   o Now testing for correct input in "as.clustrange".
 
 BUG FIXES
-
   o PBC, HG, HC, where computed only on the lower triangular part of the distance matrix (instead on the whole one).
   o Corrected citation informations
   o Many grammar and spelling corrections in the WeightedClusterPreview vignette (thanks to Nevena Zhelyazkova).
   
-  
-			             WeightedCluster VERSION 0.9
+			  CHANGES IN WeightedCluster VERSION 0.9
 
-			
   o First release
