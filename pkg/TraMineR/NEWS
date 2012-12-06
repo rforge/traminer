@@ -1,5 +1,8 @@
 ## =========
-Version 1.9-5 (Development version)
+Version 1.9-6 (Development version)
+
+## =========
+Version 1.8-5 (Development version)
 
 Bug fixes:
   - seqefsub(): reported support did not properly account for weights.
@@ -8,6 +11,7 @@ Bug fixes:
     Emanuela Struffolino).
   - seqLLCS() and seqLLCP(): added a check on the argument. Both sequences
     should belong to state sequence objects with a common alphabet.
+  - seqpcplot(): small change in default lower ylim. 
 
 Help pages:
   - help pages updated with author and keyword fields.
