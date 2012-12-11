@@ -40,7 +40,7 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
                              title = NULL, xlab = NULL, ylab = NULL,
                              xlim, ylim,
                              alphabet = NULL, alphabet.optim = FALSE,
-                             R = 1000, order.align = NULL,
+                             R = 1000, order.align = NULL, maxit = 300,
                              xtlab = xtlab, 
                              xaxis = TRUE, yaxis = TRUE, axes = "all",
                              cex.plot = 1, rows = NA, cols = NA,
@@ -484,14 +484,13 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
       data$xpos <- data$ypos <- NA      
       potpos <- c()
       blacklist <- c()
-      maxcount <- 200
       
       ## the algorithm
       for (i in 1:length(trajord)) {
         subscripts <- data$traj == trajord[i]
         count <- 0
         found <- FALSE
-        while ((!found)&(count <= maxcount)) {
+        while ((!found)&(count <= maxit)) {
           if ((i > 1) & (count == 0)) {
             if (sl[trajord[i]] < sl[trajord[i-1]]) {
               potpos <- c()
@@ -519,7 +518,7 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
             potpos <- potpos[!potpos %in% blacklist]
             count2 <- count2+1
           }     
-          xpotpos <- floor(potpos / ngrid)+1
+          xpotpos <- floor(potpos / ngrid) + 1
           ypotpos <- potpos %% ngrid
           ypotpos[ypotpos == 0] <- ngrid
           posind <- sample(1:length(potpos), 1) # random assignement
@@ -539,10 +538,10 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
             blacklist <- c(blacklist, pos)
             potpos <- potpos[-posind]
           }
-          if (count == maxcount) {
+          if (count == maxit) {
             TMP1 <- data[data$traj == i,]
             TMP2 <- createstring(y = TMP$y1, x = TMP$x1)
-            warning(paste(" [!] found no grid position for trajectory: ", TMP2 ,", omit!",sep=""))
+            stop(paste(" [!] found no grid position for trajectory: ", TMP2 ,". Please retry by setting the maxit argument", sep = ""))
           }
         }
       }
