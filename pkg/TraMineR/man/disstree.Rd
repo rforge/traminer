@@ -15,7 +15,7 @@ disstree(formula, data = NULL, weights = NULL, minSize = 0.05,
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{Formula with a dissimilarity matrix as left hand side and the candidate partitioning variables on the right side.}
-  \item{data}{Data frame where variables in formula will be searched}
+  \item{data}{Data frame where variables in formula will be searched for.}
   \item{weights}{Optional numerical vector of weights.}
   \item{minSize}{Minimum number of cases in a node, will be treated as a proportion if less than 1.}
   \item{maxdepth}{Maximum depth of the tree}
