@@ -1,6 +1,11 @@
 ## =========
 Version 1.9-6 (Development version)
 
+Bug fixes:
+  - seqpcplot: replaced a warning message by an error message at
+    failures in finding plot positions for sequences. The error
+    message advices to modify the (currently hidden) maxit argument.  
+
 ## =========
 Version 1.8-5 (Development version)
 
