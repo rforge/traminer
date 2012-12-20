@@ -76,7 +76,7 @@ print.clustrange <- function(x, digits=2, ...){
 	x <- round(x$stats, digits)
 	print(x, ...)
 }
-plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", withlegend=TRUE, lwd=1, ...){
+plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", withlegend=TRUE, lwd=1, col=NULL, ...){
 	kvals <- x$kvals
 	if(length(stat)==1){
 		if(stat=="all"){
@@ -92,11 +92,11 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 		}
 	}else{
 		if("RHC" %in% stat){
-			stats <- x$stat[ , stat[stat != "RHC"]]
-			stats[, "RHC"] <- 1 - x$stat[ , "HC"]
+			stats <- x$stats[ , stat[stat != "RHC"]]
+			stats[, "RHC"] <- 1 - x$stats[ , "HC"]
 		}
 		else{
-			stats <- x$stat[, stat]
+			stats <- x$stats[, stat]
 		}
 	}
 	ylim <- c(0,1)
@@ -117,7 +117,17 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 	}
 	plot(kvals, xlim=range(kvals, finite=TRUE), ylim=ylim, type="n", ylab="Indicators", xlab="N clusters", ...)
 	labels <- character(ncol(stats))
-	cols <- brewer.pal(10, "Set3")
+	if(is.null(col)){
+		allnames <- colnames(x$stats)
+		cols <- brewer.pal(length(allnames), "Set3")
+		cols["RHC"] <- cols["HC"]
+		cols <- cols[colnames(stats)]
+	} else {
+		if(length(col) < ncol(stats)){
+			stop(" [!] You should specify at least one color per quality measure to plot.")
+		}
+		cols <- col
+	}
 	for(i in 1:ncol(stats)){
 		ss <- stats[,i]
 		lines(kvals, ss, col=cols[i], lwd=lwd, ...)

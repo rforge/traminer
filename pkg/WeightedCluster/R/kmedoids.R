@@ -78,14 +78,3 @@ print.kmedoids <- function(x, ...){
 	print(as.data.frame(t(x$ASW)), row.names = FALSE, ...)
 }
 
-wcKMedoidsCBI <- function(diss, k, ...){
-
-	ret <- list(nc=k, clustermethod="wcKMedoids")
-	ret$result <- wcKMedoids(diss=diss, k=k, ...)
-	ret$partition <- as.integer(factor(ret$result$clustering))
-	ret$clusterlist <- list()
-	for(i in 1:k){
-		ret$clusterlist[[i]] <- ret$partition == i
-	}
-	return(ret)
-}

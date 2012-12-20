@@ -15,7 +15,7 @@ as.clustrange(object, diss, weights=NULL, ...)
 \method{as.clustrange}{twins}(object, diss, weights=NULL, ncluster, ...) 
 \method{as.clustrange}{hclust}(object, diss, weights=NULL, ncluster, ...) 
 \method{plot}{clustrange}(x, stat="noCH", legendpos="bottomright", 
-    norm="none", withlegend=TRUE, lwd=1, ...)
+    norm="none", withlegend=TRUE, lwd=1, col=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -29,6 +29,7 @@ as.clustrange(object, diss, weights=NULL, ...)
   \item{norm}{Character. Normalization method of the statistics can be one of "none" (no normalization), "range" (given as (value -min)/(max-min), "zscore" (adjusted by mean and standard deviation) or "zscoremed" (adjusted by median and median of the difference to the median).}
   \item{withlegend}{Logical. If \code{FALSE}, the legend is not plotted.}
   \item{lwd}{Numeric. Line width, see \code{\link{par}}.}
+  \item{col}{A vector of line colors, see \code{\link{par}}. If \code{NULL}, a default set of color is used.}
   \item{\dots}{Additionnal parameters passed to/from methods.}
 }
 \details{
