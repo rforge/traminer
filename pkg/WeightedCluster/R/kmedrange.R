@@ -119,7 +119,7 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 	labels <- character(ncol(stats))
 	if(is.null(col)){
 		allnames <- colnames(x$stats)
-		cols <- brewer.pal(length(allnames), "Set3")
+		cols <- brewer.pal(length(allnames)+1, "Set3")[-2]
 		names(cols) <- allnames
 		cols["RHC"] <- cols["HC"]
 		cols <- cols[colnames(stats)]
