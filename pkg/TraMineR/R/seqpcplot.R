@@ -75,9 +75,13 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
     }
 
     mtext <- NULL
-    if (!is.null(filter) && filter$type == "function" && is.character(filter$value) && filter$value %in% c("minfreq", "cumfreq")) { # text below the title
-          mtext <- "colored: "
-        }
+    if (is.null(title) &&
+        !is.null(filter) && # text below the title
+        filter$type == "function" &&
+        is.character(filter$value) &&
+        filter$value %in% c("minfreq", "cumfreq")) {
+      mtext <- "colored: "
+    }
     
     if (!is.null(filter)) {
       filter <- construct.filter(x = filter)
@@ -163,7 +167,7 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
     if (order.align %in% c("first", "last")) {
       x <- unlist(tapply(X = as.integer(x), INDEX = list(id), FUN = ordering, align = order.align))
       x <- factor(x)
-      if (!is.null(xlab)) xlab <- "Position"
+      if (is.null(xlab)) xlab <- "Position"
     }
   
     ## y (state or event categories) must be categorical
