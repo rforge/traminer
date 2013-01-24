@@ -791,10 +791,18 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
   if (output) return(x)
 }
 
-plot.seqpcplot <- function(x, add, ...) {
+plot.seqpcplot <- function(x, add, which, ...) {
   
   if (!missing(add)) x$add <- add; rm(add)
 
+  if (!missing(which)) {
+    if (is.character(which)) {
+      x$which <- which(x$grouplev %in% which)
+    } else {
+      x$which <- which
+    }
+  }
+  
   if (x$ngroup != length(x$which)) x$use.layout <- FALSE
   
   if (x$use.layout & !((x$nxl == 1) & (x$nyl == 1))) {
