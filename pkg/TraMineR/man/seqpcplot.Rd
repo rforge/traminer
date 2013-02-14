@@ -138,7 +138,7 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
   example.
 
   Type \code{function}: colors the patterns depending on the values
-  returned by a [0,1] valued function on the frequency x of the
+  returned by a [0,1] valued function of the frequency x of the
   pattern. Two native functions can be used: \code{"minfreq"} and
   \code{"cumfreq"}. Use \code{filter = list(type = "function", value =
   "minfreq", level = 0.05)} to color patterns with a support of at least
@@ -270,4 +270,4 @@ seqpcplot(seqdata = biofam.seqe,
 \author{Reto Bürgin (with Gilbert Ritschard for the help page)}
 
 \keyword{Plot}
-\keyword{Event sequences} 
+\keyword{Event sequences}
