@@ -2,11 +2,12 @@
 Version 1.9-6 (Development version)
 
 Bug fixes:
+  - seqpcplot(): fixed issues with arguments xlab and title.
   - seqpcplot(): replaced a warning message by an error message at
     failures in finding plot positions for sequences. The error
     message advices to modify the (currently hidden) maxit argument.
     Additionally, automatically generated subtitles are now hidden
-    when the argument title is used.  
+    when the argument title is used.
 
 ## =========
 Version 1.8-5 (Development version)
@@ -18,7 +19,7 @@ Bug fixes:
     Emanuela Struffolino).
   - seqLLCS() and seqLLCP(): added a check on the argument. Both sequences
     should belong to state sequence objects with a common alphabet.
-  - seqpcplot(): small change in default lower ylim. 
+  - seqpcplot(): small change in default lower ylim.
 
 Help pages:
   - help pages updated with author and keyword fields.
