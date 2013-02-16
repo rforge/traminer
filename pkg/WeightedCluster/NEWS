@@ -1,11 +1,10 @@
-              CHANGES IN WeightedCluster VERSION 0.9-9
+              CHANGES IN WeightedCluster VERSION 0.9-99
 
 NEW FEATURES
   o The vignette (manual) has been translated in English.
   o seqclustname: automatic labeling of clusters using sequence medoids.
   o Added the WeightedCluster vignette (in French).
   o It is now possible to plot the "RHC" statistic computed as 1-HC. This way all statistics should be maximized (Requested by Gilbert Ritschard).
-  o It is now possible to specify the colors used by plot.clustrange (Requested by Sandra Ham).
   o It is now possible to specify the colors used by plot.clustrange (Requested by Sandra Ham).
   o Now testing for correct input in "as.clustrange".
 
@@ -16,4 +15,4 @@ BUG FIXES
   
 			  CHANGES IN WeightedCluster VERSION 0.9
 
-  o First release
+  o First development release

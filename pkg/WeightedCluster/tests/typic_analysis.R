@@ -29,6 +29,7 @@ print(summary(wardClustQual, max.rank=3), digits=2)
 print(summary(kmedClustQual, max.rank=3), digits=2)
 print(summary(kmedwardClustQual, max.rank=3), digits=2)
 
+plot(wardClustQual, stat = c("ASWw", "HG", "PBC", "HC"))
 avg4Medoids <- disscenter(diss, group=avgClustQual$clustering$cluster4, weights=aggMvad$aggWeights, medoids.index="first")
 
 final <- wcKMedoids(diss, k=4, weights=aggMvad$aggWeights, initialclust=avgClustQual$clustering$cluster4)

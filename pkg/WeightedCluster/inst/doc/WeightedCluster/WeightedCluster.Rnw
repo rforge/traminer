@@ -28,7 +28,7 @@
 
 %% an abstract and keywords
 \Abstract{
-This manual has a twofold aim: to present the \pkg{WeightedCluster} library and offer a step-by-step guide to creating typologies of sequences for the social sciences. In particular, this library makes it possible to represent graphically the results of a hierarchical cluster analysis, to group identical sequences in order to analyse a larger number of sequences, to compute a set of measures of partition quality and also an optimized PAM algorithm taking account of weightings. The library also offers procedures to facilitate the choice of a particular clustering solution and to choose the optimal number of groups.
+This manual has a twofold aim: to present the \pkg{WeightedCluster} library and offer a step-by-step guide to creating typologies of sequences for the social sciences. In particular, this library makes it possible to represent graphically the results of a hierarchical cluster analysis, to group identical sequences in order to analyse a larger number of sequences, to compute a set of measures of partition quality and also an optimized PAM (Partitioning Around Medoids) algorithm taking account of weightings. The library also offers procedures to facilitate the choice of a particular clustering solution and to choose the optimal number of groups.
 
 In addition to the methods, we also discuss the building of typologies of sequences in the social sciences and the assumptions underlying this operation. In particular we clarify the place that should be given to the creation of typologies in the analysis of sequences. We thus show that these methods offer an important descriptive point of view on sequences by bringing to light recurrent patterns. However, they should not be used in a confirmatory analysis, since they can point to misleading conclusions.
 
@@ -131,15 +131,15 @@ This manual has a twofold aim. It presents the functionalities offered by the \p
 
 In a general way, cluster analysis aims to construct a grouping of a set of objects in such a way that the groups obtained are as homogeneous as possible and as different from one another as possible. There are many different methods for performing this task, whose pertinence depends in particular on the objects analysed. The methods presented in this manual and available in the \pkg{WeightedCluster} library are based on a measure of dissimilarity between the objects, which makes it possible to \textit{compare} two objects by quantifying their similarity.
 
-We present two stages of cluster analysis based on dissimilarities: first the algorithms for grouping the objects and then the measure of the quality of the results obtained. This second stage is essential, since all the cluster analyses presented produce results, whether they are pertinent or not \citep{Levine2000}. These measures also provide valuable help in choosing the best grouping from among the solutions resulting from different algorithms or in selecting the optimal number of groups. To do so, we use here the methods offered by the \pkg{WeightedCluster} library, such as a highly optimized PAM algorithm or computation and visualization of the quality of a set of clustering solutions.
+We present two stages of cluster analysis based on dissimilarities: first the algorithms for grouping the objects and then the measure of the quality of the results obtained. This second stage is essential, since all the cluster analyses presented produce results, whether they are pertinent or not \citep{Levine2000}. These measures also provide valuable help in choosing the best grouping from among the solutions resulting from different algorithms or in selecting the optimal number of groups. To do so, we use here the methods offered by the \pkg{WeightedCluster} library, such as a highly optimized PAM (Partitioning Around Medoids) algorithm or computation and visualization of the quality of a set of clustering solutions.
 
 
-The particularity of the \pkg{WeightedCluster} library is that it takes account of the weighting of the observations in the two phases of the analysis previously described. There are at least two situations in which the use of weighting proves indispensable. Firstly, weighting makes it possible to group the identical cases, which considerably reduces the memory and computing time used. Section~\ref{sec_aggregate} presents in detail the functionalities offered by the \pkg{WeightedCluster} library to automate this grouping. Secondly, survey data are often weighted to correct representativity bias. In such cases, it is essential to use the weights in the clustering procedures so that the results are not biased. The \pkg{WeightedCluster} library offers functions to include weightings only for analyses for which, so far as we know, there are currently no other libraries which already do it. If this were to be the case, as for the hierarchical clustering procedures, we present the existing solutions.
+The particularity of the \pkg{WeightedCluster} library is that it takes account of the weighting of the observations in the two phases of the analysis previously described. There are at least two situations in which the use of weighting proves indispensable. Firstly, survey data are often weighted to correct representativity bias. In such cases, it is essential to use the weights in the clustering procedures so that the results are not biased. Secondly, weighting makes it possible to group the identical cases, which considerably reduces the memory and computing time used. Section~\ref{sec_aggregate} presents in detail the functionalities offered by the \pkg{WeightedCluster} library to automate this grouping. The \pkg{WeightedCluster} library offers functions to include weightings only for analyses for which, so far as we know, there are currently no other libraries which already do it. If this were to be the case, as for the hierarchical clustering procedures, we present the existing solutions.
 
 As previously mentioned, this manual also aims to be a step-by-step guide to constructing of typologies of trajectories in \proglang{R}. As such, it is intended for a wide audience, and for this reason the most technical or most advanced parts are reserved for an appendix. \footnote{However, a knowledge of the basic operations of sequence analysis is assumed. If this is not the case, an introduction to their practical implementation with \pkg{TraMineR} is available in \citet{GabadinhoRitschardMullerStuder2011JSS}.} This approach will also lead us to discuss the sociological implications and assumptions underlying cluster analysis.
 
 
-In this manual, we illustrate the methods presented with the aid of data from the study by \citet{McVicarAnyadike2002JRSSa}, available in \pkg{TraMineR} \citep{GabadinhoRitschardMullerStuder2011JSS}, which will enable the reader to reproduce the set of analyses presented. These data describe the transition from school to work of young people in Northern Ireland, in the form of sequences of monthly statuses. The original aim of the study was to ``identify young people `at-risk' at age 16 and characterize their post-school career trajectories''. This data set is weighted to correct representativity bias.
+In this manual, we illustrate the methods presented with the aid of data from the study by \citet{McVicarAnyadike2002JRSSa}, available in \pkg{TraMineR} \citep{GabadinhoRitschardMullerStuder2011JSS}, which will enable the reader to reproduce the set of analyses presented. These data describe the transition from school to work of young people in Northern Ireland, in the form of sequences of monthly statuses. The original aim of the study was to ``identify young people `at-risk' at age 16 and characterize their post-school career trajectories''. This data set provides weights to correct representativity bias.
 
 This manual is organized as follows. We start by presenting the theoretical issues raised by the construction of sequence typologies in the social sciences before turning to the cluster analysis methods as such. We then briefly summarize the different stages of cluster analysis before presenting several clustering algorithms available in \proglang{R} for weighted data. We then present several measures of the quality of a clustering and the main uses that can be made of them. Finally, we discuss the issues in the interpretation of cluster analysis and the risks that are entailed when one analyses the links between types of trajectories and explanatory factors, which is a common practice in the social sciences.
 
@@ -155,7 +155,11 @@ This grouping procedure is based on a \textit{simplification} of the data. It th
 
 According to \citet{Shalizi2009}, the pertinence of a typology depends on three conditions. First, and this is the most important, the typology must not be dependent on the sampling, which means it must be generalizable to other observations. Secondly, a typology should extend to other properties. Finally, the typology obtained should also be grounded by a theory of the domain analysed. \citet{Shalizi2009} gives two examples to illustrate his remarks. The classification of animal species, created on the basis of physical characteristics, also applies to other characteristics such as the song of a bird. By contrast, the classification of the stars into constellations made it possible to construct ungrounded theories.
 
-So far as we are aware, there is no method to \textit{confirm unequivocally} the theoretical pertinence of a typology. However, we present here several indexes to measure the statistical quality of a partition obtained using an automatic grouping procedure. In our view, the use of such measures is an essential stage in validating the results and, in a more general way, of making the results of sequence analysis using clustering more credible.
+For all the previously mentioned reasons, the \pkg{WeightedCluster} package provides several indexes to measure the quality of a partition obtained using an automatic grouping procedure. In our view, the use of such measures is an essential stage in validating the results and, in a more general way, of making the results of sequence analysis using clustering more credible.
+
+
+%% FIXME %% So far as we are aware, there is no method to \textit{confirm unequivocally} the theoretical pertinence of a typology. However, we present here several indexes to measure the statistical quality of a partition obtained using an automatic grouping procedure. In our view, the use of such measures is an essential stage in validating the results and, in a more general way, of making the results of sequence analysis using clustering more credible.
+
 
 Having presented the theoretical issues around cluster analysis, we turn to the practice, by presenting the different stages of cluster analysis.
 
@@ -167,8 +171,9 @@ To use the \pkg{WeightedCluster} library, it has to be installed and loaded. It 
 
 
 %% preliminary R commands
+%% install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
 <<WCload, eval=FALSE>>=
-install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
+install.packages("WeightedCluster")
 library(WeightedCluster)
 @
 
@@ -236,7 +241,7 @@ When the agglomeration schedule has been created, the final stages of this sched
 wardTree <- as.seqtree(wardCluster, seqdata=mvadseq, diss=mvaddist, ncluster=6)
 @
 
-Once the tree is constructed, the \code{seqtreedisplay} function of the \pkg{TraMineR} library \citep{StuderRitschardGabadinhoMuller2011SMR} makes it possible to represent it graphically. The option \code{showdepth=TRUE} displays the levels of the groupings on the right of the graph.
+Once the tree is constructed, the \code{seqtreedisplay} function of the \pkg{TraMineR} library \citep{StuderRitschardGabadinhoMuller2011SMR} makes it possible to represent it graphically. The free GraphViz software \citep{Gansner99anopen} must be installed and accessible for the function to work properly.\footnote{The program can be downloaded from \url{http://www.graphviz.org/}.} The option \code{showdepth=TRUE} displays the levels of the groupings on the right of the graph.
 
 <<seqtreedisplay, echo=FALSE, results="hide", eval=FALSE>>=
 seqtreedisplay(wardTree, type="d", border=NA, filename="wardtree.png", showdepth=TRUE, showtree=FALSE)
@@ -253,7 +258,7 @@ seqtreedisplay(wardTree, type="d", border=NA, showdepth=TRUE)
 %\end{figure}
 \afterpage{\clearpage}
 
-This graphic presents the result of this procedure and makes it possible to visualize the grouping logics of the sequences. The first distinction, considered to be the most important, separates the Northern Irish young people who go into tertiary education from the others. The distinctions that are made when one moves from four to five groups enable us, however, to bring to light the fact that this group amalgamates two logics: those who go into \guil{Higher Education} and those who go into \guil{Further Education}. This graphic provides an important aid for identifying the distinctions pertinent for the analysis. Thus, if one opts for a four-group solution, no further will be made between entre the two logics (\guil{Higher Education} and \guil{Further Education}). By contrast, the distinction into five groups enables this to be identified.
+This graphic presents the result of this procedure and makes it possible to visualize the grouping logics of the sequences. The first distinction, considered to be the most important, separates the individuals who go into tertiary education from the others. The distinctions that are made when one moves from four to five groups enable us, however, to bring to light the fact that this group amalgamates two logics: those who go into \guil{Higher Education} and those who go into \guil{Further Education}. This graphic provides an important aid for identifying the distinctions pertinent for the analysis. Thus, if one opts for a four-group solution, no further distinctions will be made between between the two logics (\guil{Higher Education} and \guil{Further Education}). By contrast, the distinction into five groups enables this to be identified.
 
 This example illustrates the \textit{simplification} of the data effected by the clustering procedures. Opting for only four groups, one amalgamates two logics which may (or may not) be pertinent for the analysis. It should be noted that in opting for only five groups, one amalgamates the distinctions that are made at a lower level. One is thus always performing a simplification.
 
@@ -269,7 +274,7 @@ This information can then be used in other analyses, for example, to represent t
 seqdplot(mvadseq, group=clust4, border=NA)
 @
 
-As previously mentioned, the \code{hclust} function offers seven different hierarchical algorithms which are specified with the argument method. The \pkg{fastcluster} library provides an optimized version of this function \citep{Mullner2011}. The hierarchical algorithms \code{diana} \citet[divisive algorithm, see][]{Kaufman1990} and beta-flexible clustering with the \code{agnes} function are available in the \pkg{cluster} library \citep{RClusterPackage}.\footnote{If these functions are used, it is necessary to specify the argument \code{diss=TRUE}, in order for the algorithm to use the distance matrix passed as an argument.} Table~\ref{tb_hclustmethods} lists these algorithms, giving the name of the function to be used, the allowance for weightings (\guil{Indep} means that the algorithm is insensitive to weightings) and the interpretation of the clustering logic. A more detailed presentation of these algorithms is available in \citet{Mullner2011} and \citet{Kaufman1990}.
+As previously mentioned, the \code{hclust} function offers seven different hierarchical algorithms which are specified with the argument method. The \pkg{fastcluster} library provides an optimized version of this function \citep{Mullner2011}. The hierarchical algorithms \code{diana} \citep[divisive algorithm, see][]{Kaufman1990} and beta-flexible clustering with the \code{agnes} function are available in the \pkg{cluster} library \citep{RClusterPackage}.\footnote{If these functions are used, it is necessary to specify the argument \code{diss=TRUE}, in order for the algorithm to use the distance matrix passed as an argument.} Table~\ref{tb_hclustmethods} lists these algorithms, giving the name of the function to be used, the allowance for weightings (\guil{Indep} means that the algorithm is insensitive to weightings) and the interpretation of the clustering logic. A more detailed presentation of these algorithms is available in \citet{Mullner2011} and \citet{Kaufman1990}.
 
 
 
@@ -331,12 +336,12 @@ print(mvadseq[unique(pamclust4$clustering), ], format="SPS")
 @
 
 
-The PAM algorithm has several disadvantages. The first is that it creates \guil{spherical} groups\footnote{Which is also the case for the \guil{Ward} criterion in hierarchical procedures.} centred on their medoid, which does not necessarily correspond to the reality of the data. Secondly, it is necessary to specify in advance the number $k$ of groups. When testing several sizes $k$ of partition, one cannot be sure that the types obtained interlock as in the case of hierarchical procedures, and the computing time can be correspondingly long. Finally, the algorithm is dependent on the initial choice of medoids, which is not always optimal.
+The PAM algorithm has several disadvantages. First, it is necessary to specify in advance the number $k$ of groups. When testing several sizes $k$ of partition, one cannot be sure that the types obtained interlock as in the case of hierarchical procedures, and the computing time can be correspondingly long. Secondly, the PAM algorithm always creates \guil{spherical} groups\footnote{Which is also the case for the \guil{Ward} criterion in hierarchical procedures.} centred on their medoid, and this structure does not necessarily correspond to the reality of the data.\footnote{For instance, the algorithm might fail to recognize the \textit{true} structure if the data are organized in squares.} But most importantly, the algorithm is dependent on the initial choice of medoids, which is not always optimal.
 
 
 \subsection{Combining the algorithms}
 
-The two clustering procedures can be combined, and this sometimes produces better results. To do this, the clustering obtained by the hierarchical method (the argument \code{initialclust=wardCluster}) is specified as the starting point of the \code{wcKMedoids} function.
+The PAM algorithm has the advantage of optimizing a global criterion, but the algorithm is dependent on the initial choice of medoids, which is not always optimal. To overcome this limitation, we can try to initialize the PAM algorithm using the result of the hierarchical clustering procedure. To do this, the clustering obtained by the hierarchical method (the argument \code{initialclust=wardCluster}) is specified as the starting point of the \code{wcKMedoids} function (or the \code{wcKMedRange} function, see section~\ref{sec_choice_part}).
 
 <<wcKMedoids-compute4-ward>>=
 pamwardclust4 <- wcKMedoids(mvaddist, k=4, weights=mvad$weight, initialclust=wardCluster)
@@ -458,9 +463,9 @@ The most characteristic sequences of each cluster are represented at the top of 
 
 
 
-\subsection{Choice of a partition}
+\subsection{Choice of a partition}\label{sec_choice_part}
 
-The measures of the quality of a partition facilitate the choice of the best partition among a set de possibilities. They can thus be used to identify the algorithm that gives the best results. The \code{wcKmedoids} function used for PAM directly computes these values, which are stored in the elements \code{stats} and \code{ASW} as previously. The following code displays the quality measures for the partition identified with the aid of PAM. This partition thus seems better than that obtained with Ward.
+The measures of the quality of a partition facilitate the choice of the best partition among a set of possibilities. They can thus be used to identify the algorithm that gives the best results. The \code{wcKmedoids} function used for PAM directly computes these values, which are stored in the elements \code{stats} and \code{ASW} as previously. The following code displays the quality measures for the partition identified with the aid of PAM. This partition thus seems better than that obtained with Ward.
 
 <<wcClusterQuality-compute9-clustqual4pam, echo=2>>=
 options(digits=1)
@@ -593,7 +598,7 @@ dsa <- dissassoc(mvaddist, mvad$test, weights=mvad$weight, weight.permutation="d
 print(dsa$stat)
 @
 
-We may include several covariates by building a sequence regression trees with the \code{seqtree} function \citep{StuderRitschardGabadinhoMuller2011SMR}.\footnote{The previous approach can also be extended to the multifactor case.}
+We may include several covariates by building a sequence regression trees with the \code{seqtree} and \code{seqtreedisplay}\footnote{The free GraphViz software \citep{Gansner99anopen} must be installed and accessible for the function to work properly. It can be downloaded from \url{http://www.graphviz.org/}.} functions \citep{StuderRitschardGabadinhoMuller2011SMR}.\footnote{The ANOVA approach can also be extended to the multifactor case using the \code{dissmfacw} function.}
 
 <<seqtree-link-covar, echo=FALSE, results="hide", eval=FALSE>>=
 set.seed(1)
