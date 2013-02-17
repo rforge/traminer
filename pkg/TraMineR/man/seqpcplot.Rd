@@ -77,10 +77,9 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
     appear on the y-axis. This argument is solely relevant for
     \code{seqelist} objects.}
 
-  \item{order.align}{Method for converting timestamps to individual
-  order positions. Either \code{"first"} (default) or
+  \item{order.align}{Aligning method. For aligning on order positions use either \code{"first"} (default) or
   \code{"last"}. \code{"first"} numbers the positions from the beginning
-  while \code{"last"} numbers them from the end.}
+  while \code{"last"} numbers them from the end. With \code{order.align = "time"}, the elements in the sequences are aligned on their rounded timestamps.}
 
   \item{title}{title for the graphic.}
   \item{xlab}{label for the x axis}
