@@ -120,10 +120,10 @@ knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
 
 \begin{center}
 To cite this document or the \pkg{WeightedCluster} library, please use:\\~\\
-\end{center}
-Studer, Matthias (2012).\textit{\'Etude des inégalités de genre en début de carrière académique
-à l'aide de méthodes innovatrices d'analyse de données séquentielles}, Chapitre: Le
-manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R. Thèse SES 777, Faculté des sciences économiques et sociales, Université de Genève.
+\end{center} 
+Studer, Matthias (2012).\textit{\'Etude des in\'{e}galit\'{e}s de genre en d\'{e}but de carri\`{e}re acad\'{e}mique
+\`{a} l'aide de m\'{e}thodes innovatrices d'analyse de donn\'{e}es s\'{e}quentielles}, Chapitre: Le
+manuel de la librairie WeightedCluster : Un guide pratique pour la cr\'{e}ation de typologies de trajectoires en sciences sociales avec R. Th\`{e}se SES 777, Facult\'{e} des sciences \'{e}conomiques et sociales, Universit\'{e} de Gen\`{e}ve. 
 
 \section{Introduction}
 
@@ -613,7 +613,7 @@ seqtreedisplay(tree, type="d", border=NA)
 
 \begin{center}
   \includegraphics[width=.9\linewidth]{seqtree}
-%\caption{Arbre des derniers regroupements, critère \guil{Ward}.}
+%\caption{Arbre des derniers regroupements, crit\`{e}re \guil{Ward}.}
 %\label{fg_wardseqtree}
 \end{center}
 %\end{figure}
