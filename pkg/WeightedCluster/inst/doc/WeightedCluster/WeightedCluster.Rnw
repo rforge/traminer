@@ -117,13 +117,13 @@ knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
 
 %\setkeys{Gin}{width=.9\linewidth}
 
-%
-%\begin{center}
-%To cite this document or the \pkg{WeightedCluster} library, please use:\\~\\
-%\end{center}
-%Studer, Matthias (2012).\textit{\'Etude des inégalités de genre en début de carrière académique
-%à l'aide de méthodes innovatrices d'analyse de données séquentielles}, Chapitre: Le
-%manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R. Thèse SES 777, Faculté des sciences économiques et sociales, Université de Genève.
+
+\begin{center}
+To cite this document or the \pkg{WeightedCluster} library, please use:\\~\\
+\end{center}
+Studer, Matthias (2012).\textit{\'Etude des inégalités de genre en début de carrière académique
+à l'aide de méthodes innovatrices d'analyse de données séquentielles}, Chapitre: Le
+manuel de la librairie WeightedCluster : Un guide pratique pour la création de typologies de trajectoires en sciences sociales avec R. Thèse SES 777, Faculté des sciences économiques et sociales, Université de Genève.
 
 \section{Introduction}
 
