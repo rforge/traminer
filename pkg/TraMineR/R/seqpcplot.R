@@ -791,11 +791,11 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
   if (output) return(x)
 }
 
-plot.seqpcplot <- function(x, add, which, ...) {
+plot.seqpcplot <- function(x, add = NULL, which = NULL, ...) {
   
-  if (!missing(add)) x$add <- add; rm(add)
+  if (!is.null(add)) x$add <- add; rm(add)
 
-  if (!missing(which)) {
+  if (!is.null(which)) {
     if (is.character(which)) {
       x$which <- which(x$grouplev %in% which)
     } else {
@@ -869,6 +869,11 @@ plot.seqpcplot <- function(x, add, which, ...) {
       if (sum(SUBSp) > 0) {
         rect(xleft = (x$pts$x + xf * (- 0.5 + x$pts$xjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2) - c(x$pts[, x$wdtcols[i]]) / 2 * xf * x$cex)[SUBSp], ybottom = (x$pts$y + yf * (- 0.5 + x$pts$yjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2) - c(x$pts[, x$wdtcols[i]]) / 2 * yf * x$cex)[SUBSp], xright = (x$pts$x + xf * (- 0.5 + x$pts$xjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2) + c(x$pts[, x$wdtcols[i]]) / 2 * xf * x$cex)[SUBSp], ytop = (x$pts$y + yf * (- 0.5 + x$pts$yjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2) + c(x$pts[, x$wdtcols[i]]) / 2 * yf * x$cex)[SUBSp], col = x$pts[SUBSp, x$colcols[i]], border = if (!is.null(x$border)) x$border else x$pts[SUBSp, x$colcols[i]], lwd = x$border.lwd)
       }
+
+      ## draw the lines
+      if (sum(SUBSl) > 0) {
+        segments(x0 = (x$lns$x0 + xf * (- 0.5 + x$lns$x0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], y0 = (x$lns$y0 + yf * (- 0.5 + x$lns$y0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], x1 = (x$lns$x1 + xf * (- 0.5 + x$lns$x0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], y1 = (x$lns$y1 + yf * (- 0.5 + x$lns$y0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], lwd = x$lns[SUBSl, x$lwdcols[i]], col = x$lns[SUBSl, x$colcols[i]], lend = 0)
+      }
       
       ## draw the flowers
       if (sum(SUBSd) > 0) {
@@ -887,11 +892,6 @@ plot.seqpcplot <- function(x, add, which, ...) {
         segments(x0 = (x$pts$x + xf * (- 0.5 + x$pts$xjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2))[i.rep], y0 = (x$pts$y + yf * (- 0.5 + x$pts$yjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2))[i.rep], x1 = (x$pts$x + xf * (- 0.5 + x$pts$xjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2))[i.rep] + xr * sin(deg), y1 = (x$pts$y + yf * (- 0.5 + x$pts$yjitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$pts$traj] / 2))[i.rep] + yr * cos(deg))
       }
       
-      ## draw the lines
-
-      if (sum(SUBSl) > 0) {
-        segments(x0 = (x$lns$x0 + xf * (- 0.5 + x$lns$x0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], y0 = (x$lns$y0 + yf * (- 0.5 + x$lns$y0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], x1 = (x$lns$x1 + xf * (- 0.5 + x$lns$x0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], y1 = (x$lns$y1 + yf * (- 0.5 + x$lns$y0jitter * sqrt(x$grid.scale) + 1/2 * (1 - sqrt(x$grid.scale)) + c(sqrt(x$propid.use.max) * sqrt(x$grid.scale) * x$cex * x$ngrid0 / x$ngrid)[x$lns$traj] / 2))[SUBSl], lwd = x$lns[SUBSl, x$lwdcols[i]], col = x$lns[SUBSl, x$colcols[i]], lend = 0)
-      }
     }
     if (!x$add) {
       box()

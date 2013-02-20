@@ -2,6 +2,7 @@
 Version 1.9-6 (Development version)
 
 Bug fixes:
+  - seqpcplot(): fixed issues with 'which' argument of 'plot.seqpcplot'.
   - seqpcplot(): fixed issues with arguments xlab and title.
   - seqpcplot(): replaced a warning message by an error message at
     failures in finding plot positions for sequences. The error
