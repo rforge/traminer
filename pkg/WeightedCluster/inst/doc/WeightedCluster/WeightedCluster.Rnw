@@ -24,6 +24,7 @@
 \Plaintitle{WeightedCluster Library Manual: A practical guide to creating typologies of trajectories in the social sciences with R} %% without formatting
 \Shorttitle{\pkg{WeightedCluster} Library Manual} %% a short title (if necessary)
 
+
 %% an abstract and keywords
 \Abstract{
 This manual has a twofold aim: to present the \pkg{WeightedCluster} library and offer a step-by-step guide to creating typologies of sequences for the social sciences. In particular, this library makes it possible to represent graphically the results of a hierarchical cluster analysis, to group identical sequences in order to analyse a larger number of sequences, to compute a set of measures of partition quality and also an optimized PAM (Partitioning Around Medoids) algorithm taking account of weightings. The library also offers procedures to facilitate the choice of a particular clustering solution and to choose the optimal number of groups.
