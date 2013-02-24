@@ -121,7 +121,7 @@ knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
 \begin{center}
 To cite this document or the \pkg{WeightedCluster} library, please use:\\~\\
 \end{center}
-Studer, Matthias (2013).WeightedCluster Library Manual: A practical guide to creating typologies of trajectories in the social sciences with R. \textit{LIVES Working Papers}, 24. {DOI}: \url{http://dx.doi.org/10.12682/lives.2296-1658.2013.24}.
+Studer, Matthias (2013). WeightedCluster Library Manual: A practical guide to creating typologies of trajectories in the social sciences with R. \textit{LIVES Working Papers}, 24. {DOI}: \url{http://dx.doi.org/10.12682/lives.2296-1658.2013.24}.
 
 \section{Introduction}
 

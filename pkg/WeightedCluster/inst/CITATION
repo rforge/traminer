@@ -1,12 +1,10 @@
 citHeader("To cite WeightedCluster in publications please use:")
 
-citEntry(entry="inbook",
+citEntry(entry="TechReport",
 		author = person("Matthias", "Studer", email = "matthias.studer@unige.ch"),
-		chapter = "Le manuel de la librairie WeightedCluster : Un guide pratique pour la cr\u00e9ation de typologies de trajectoires en sciences sociales avec R",
-		title = "\u00c9tude des in\u00e9galit\u00e9s de genre en d\u00e9but de carri\u00e8re acad\u00e9mique \u00e0 l\'aide de m\u00e9thodes innovatrices d\'analyse de donn\u00e9es s\u00e9quentielles",
-		year = "2012",
-		isbn="978-2-88903-013-2",
-		publisher="Th\u00e8se SES 777, Facult\u00E9 des sciences \u00E9conomiques et sociales, Universit\u00e9 de Gen\u00e8ve",
-		textVersion="Studer, Matthias (2012). \u00c9tude des in\u00e9galit\u00e9s de genre en d\u00e9but de carri\u00e8re acad\u00e9mique \u00e0 l\'aide de m\u00e9thodes innovatrices d\u2019analyse de donn\u00e9es s\u00e9quentielles, Chapitre: Le
-manuel de la librairie WeightedCluster : Un guide pratique pour la cr\u00e9ation de typologies de trajectoires en sciences sociales avec R. Th\u00e8se SES 777, Facult\u00E9 des sciences \u00E9conomiques et sociales, Universit\u00e9 de Gen\u00e8ve."
+		title = "WeightedCluster Library Manual: A practical guide to creating typologies of trajectories in the social sciences with R",
+		year = "2013",
+		institution="LIVES Working Papers 24",
+		note="DOI: 10.12682/lives.2296-1658.2013.24",
+		textVersion="Studer, Matthias (2013). WeightedCluster Library Manual: A practical guide to creating typologies of trajectories in the social sciences with R. LIVES Working Papers, 24. DOI: 10.12682/lives.2296-1658.2013.24."
 )
