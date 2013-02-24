@@ -5,11 +5,8 @@
 %input "C:\Users\Matthias-Util\AppData\Local\MiKTeX\2.9\bibtex\bib\bibliomat.bib"
 
 
-%\VignetteIndexEntry{Clustering}
-%\VignetteIndexEntry{Weights}
-%\VignetteIndexEntry{state sequences}
-%\VignetteIndexEntry{Optimal matching}
-
+%\VignetteIndexEntry{WeightedCluster Preview}
+%\VignetteKeywords{Clustering, Weights, state sequences, Optimal matching}
 \documentclass[a4paper]{article}
 \usepackage{thumbpdf}
 \usepackage{a4}
@@ -129,7 +126,7 @@ Some functions of WeightedCluster require the free GraphViz program \citep{Gansn
 The \pkg{WeightedCluster} library can be installed and loaded using the following commands:
 
 <<install, echo=TRUE, results="hide", eval=FALSE>>=
-install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
+install.packages("WeightedCluster")
 library(WeightedCluster)
 @
 

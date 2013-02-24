@@ -5,10 +5,8 @@
 %input "C:\Users\Matthias-Util\AppData\Local\MiKTeX\2.9\bibtex\bib\bibliomat.bib"
 
 
-%\VignetteIndexEntry{Clustering}
-%\VignetteIndexEntry{Weights}
-%\VignetteIndexEntry{state sequences}
-%\VignetteIndexEntry{Optimal matching}
+%\VignetteIndexEntry{WeightedCluster Library Manual: A practical guide to creating typologies of trajectories in the social sciences with R}
+%\VignetteKeywords{Clustering, Weights, state sequences, Optimal matching}
 
 \documentclass[article, nojss, a4paper, shortnames]{jss}
 

@@ -5,10 +5,8 @@
 %input "C:\Users\Matthias-Util\AppData\Local\MiKTeX\2.9\bibtex\bib\bibliomat.bib"
 
 
-%\VignetteIndexEntry{Clustering}
-%\VignetteIndexEntry{Weights}
-%\VignetteIndexEntry{state sequences}
-%\VignetteIndexEntry{Optimal matching}
+%\VignetteIndexEntry{Le manuel de la librairie WeightedCluster: un guide pratique pour la cr\'{e}ation de typologies de trajectoires en sciences sociales avec R}
+%\VignetteKeywords{Clustering, Weights, state sequences, Optimal matching}
 
 \documentclass[article, nojss, a4paper, shortnames]{jss}
 
@@ -23,7 +21,7 @@
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Matthias Studer} %% comma-separated
-\Plaintitle{Le manuel de la librairie WeightedCluster: un guide pratique pour la cr\'{e}ation de typologies de trajectoires en sciences sociales avec R} %% without formatting 
+\Plaintitle{Le manuel de la librairie WeightedCluster: un guide pratique pour la cr\'{e}ation de typologies de trajectoires en sciences sociales avec R} %% without formatting
 \Shorttitle{Un guide pratique pour la cr\'{e}ation de typologies de trajectoires avec \proglang{R}} %% a short title (if necessary)
 
 %% an abstract and keywords
@@ -158,7 +156,7 @@ Pour utiliser la librairie \pkg{WeightedCluster}, il est n\'{e}cessaire de l'ins
 
 %% preliminary R commands
 <<WCload, eval=FALSE>>=
-install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
+install.packages("WeightedCluster")
 library(WeightedCluster)
 @
 
