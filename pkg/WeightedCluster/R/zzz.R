@@ -7,8 +7,12 @@
 	else {
 		state <- "development"
 	}
-	builtDate <- strsplit(strsplit(descr$Built, ";")[[1]][3], " ")[[1]][2]
-	packageStartupMessage("This is WeightedCluster ", state, " version ", descr$Version, " (Built: ", builtDate, ")")
+	if(!is.null(descr$Built)){
+		builtDate <- paste(" (Built: ", strsplit(strsplit(descr$Built, ";")[[1]][3], " ")[[1]][2], ")", sep="")
+	}else{
+		builtDate <- ""
+	}
+	packageStartupMessage("This is WeightedCluster ", state, " version ", descr$Version, builtDate)
 	packageStartupMessage('\nTo get the manuals, please run:')
 	packageStartupMessage('   vignette("WeightedCluster") ## Complete manual in English')
 	packageStartupMessage('   vignette("WeightedCluster-fr") ## Complete manual in French')
