@@ -9,6 +9,7 @@
 %\VignetteKeywords{Clustering, Weights, state sequences, Optimal matching}
 \documentclass[a4paper]{article}
 \usepackage{thumbpdf}
+\usepackage{hyperref}
 \usepackage{a4}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

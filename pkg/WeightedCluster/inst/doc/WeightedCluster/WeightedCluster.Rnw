@@ -554,7 +554,6 @@ for(clust in unique(pamclust4$clustering)){
     mvad$test[cond] <- as.integer(values > weighted.median(values, w=mvad$weight[cond]))
 }
 mvad$test <- factor(mvad$test, levels=0:1, labels=c("non-test", "test"))
-
 @
 
 

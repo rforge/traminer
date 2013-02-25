@@ -5,7 +5,7 @@
 %input "C:\Users\Matthias-Util\AppData\Local\MiKTeX\2.9\bibtex\bib\bibliomat.bib"
 
 
-%\VignetteIndexEntry{Le manuel de la librairie WeightedCluster: un guide pratique pour la cr\'{e}ation de typologies de trajectoires en sciences sociales avec R}
+%\VignetteIndexEntry{Le manuel de la librairie WeightedCluster: un guide pratique pour la creation de typologies de trajectoires en sciences sociales avec R}
 %\VignetteKeywords{Clustering, Weights, state sequences, Optimal matching}
 
 \documentclass[article, nojss, a4paper, shortnames]{jss}
