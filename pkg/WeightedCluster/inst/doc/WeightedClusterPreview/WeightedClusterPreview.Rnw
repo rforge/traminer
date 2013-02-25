@@ -218,6 +218,7 @@ It is usually easier to choose the number of groups based on standardized scores
 
 <<avgqualplotnorm, echo=TRUE, fig.height=3, fig.width=9>>=
 plot(avgClustQual, norm="zscore")
+dev.off()
 @
 
 Alternatively, we can retrieve the two best solutions according to each quality measure:
@@ -244,10 +245,10 @@ summary(pamClustRange, max.rank=2)
 
 The objets returned by \code{as.clustrange} or \code{wcKMedRange} contain a \code{data.frame} with cluster membership (named \code{clustering}). For instance, we can plot the sequences according to PAM clustering in 5 groups using:
 
-<<pam5plot, echo=TRUE, fig.height=6, fig.width=9>>=
+<<mppamplot, fig.height=6, fig.width=9>>=
+dev.off()
 seqdplot(mvad.seq, group=pamClustRange$clustering$cluster5, border=NA)
 @
-
 
 \section{Disaggregating data}
 

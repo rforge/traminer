@@ -12,7 +12,7 @@ wcAggregateCasesInternal <- function(x, weights=NULL){
 		x[, i] <- factor(x[ ,i])
 		levels(x[, i]) <- as.character(1:nlevels(x[, i])) 
 	}
-	ids <- apply(x, 1, paste, collapse="@")
+	ids <- apply(x, 1, paste, collapse="@@@WC_SEP@@")
 	FuncEnv <- environment()
 	mcorr <- rep(NA, lx)
 	myfunction <- function(x){

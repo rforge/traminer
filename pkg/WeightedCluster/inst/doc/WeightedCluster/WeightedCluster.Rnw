@@ -85,6 +85,8 @@ In addition to the methods, we also discuss the building of typologies of sequen
 options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
+library(vegan)
+library(isotone)
 hook_setwidth <- local({
     default.width <- 0
 	function(before, options, envir){
@@ -537,19 +539,8 @@ Many research questions in the social sciences connect trajectories (or sequence
 
 Suppose one seeks to measure the links between the variable \code{test} that we have created for our purposes\footnote{The detail of the creation of this variable is given in Annex~\ref{annexe_vartest}.} and our trajectories. This variable takes two modalities, \guil{test} and \guil{non-test}, and groups the sequences in the following way:
 
-
-<<mds-compute, echo=FALSE, results="hide", message=FALSE>>=
-library(vegan)
-@
-<<mds-compute11, echo=FALSE, results="hide", message=FALSE>>=
-library(isotone)
-@
-
-<<mds-compute2, echo=FALSE, results="hide">>=
+<<mds-compute, echo=FALSE>>=
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
-@
-
-<<mds-compute3, echo=FALSE, results="hide">>=
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){
     cond <- pamclust4$clustering == clust

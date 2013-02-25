@@ -84,7 +84,8 @@ Outre les m\'{e}thodes, nous discutons \'{e}galement de la construction de typol
 options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
-
+library(vegan)
+library(isotone)
 knit_hooks$set(crop = hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
@@ -458,15 +459,9 @@ Les s\'{e}quences les plus caract\'{e}ristiques de chaque cluster sont repr\'{e}
 
 Les mesures de la qualit\'{e} d'une partition facilitent le choix de la meilleure partition parmi un ensemble de possibilit\'{e}s. On peut ainsi les utiliser pour identifier l'algorithme qui donne les meilleurs r\'{e}sultats. La fonction \code{wcKmedoids} utilis\'{e}e pour PAM calcule directement ces valeurs qui sont stock\'{e}es dans les \'{e}l\'{e}ments \code{stats} et \code{ASW} comme pr\'{e}c\'{e}demment. Le code suivant affiche les mesures de qualit\'{e}s pour la partition identifi\'{e}e \`{a} l'aide de PAM. Cette partition semble ainsi meilleure que celle obtenue avec Ward.
 
-<<wcClusterQuality-compute91-option, echo=FALSE, results="hide">>=
+<<wcClusterQuality-compute9-clustqual4pam, echo=2>>=
 options(digits=1)
-@
-
-<<wcClusterQuality-compute9-clustqual4pam>>=
 pamclust4$stats
-@
-
-<<wcClusterQuality-compute91-option-end, echo=FALSE, results="hide">>=
 options(digits=3)
 @
 
@@ -535,15 +530,8 @@ Beaucoup de questions de recherche des sciences sociales mettent en lien des tra
 
 Supposons que l'on cherche \`{a} mesurer les liens entre la variable \code{test} que nous avons cr\'{e}\'{e}e pour l'occasion\footnote{Le d\'{e}tail de la cr\'{e}ation de cette variable est donn\'{e} dans l'annexe~\ref{annexe_vartest}.} et nos trajectoires. Cette variable prend deux modalit\'{e}s, \guil{test} et \guil{non-test}, et regroupe les s\'{e}quences de la mani\`{e}re suivante.
 
-<<mds-compute, echo=FALSE, results="hide", message=FALSE>>=
-library(vegan)
-library(isotone)
-@
 <<mds-compute2, echo=FALSE, results="hide">>=
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
-@
-
-<<mds-compute3, echo=FALSE, results="hide">>=
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){
     cond <- pamclust4$clustering == clust
@@ -551,7 +539,6 @@ for(clust in unique(pamclust4$clustering)){
     mvad$test[cond] <- as.integer(values > weighted.median(values, w=mvad$weight[cond]))
 }
 mvad$test <- factor(mvad$test, levels=0:1, labels=c("non-test", "test"))
-
 @
 
 
