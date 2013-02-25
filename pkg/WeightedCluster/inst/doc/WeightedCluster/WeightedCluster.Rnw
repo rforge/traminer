@@ -540,8 +540,11 @@ Suppose one seeks to measure the links between the variable \code{test} that we 
 
 <<mds-compute, echo=FALSE, results="hide", message=FALSE>>=
 library(vegan)
+@
+<<mds-compute11, echo=FALSE, results="hide", message=FALSE>>=
 library(isotone)
 @
+
 <<mds-compute2, echo=FALSE, results="hide">>=
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 @
