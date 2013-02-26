@@ -33,7 +33,7 @@ WeightedCluster.pdf: rotateFiles WeightedCluster/WeightedCluster.Rnw
 	cp -f WeightedCluster/wardtree.png .
 	cp -f WeightedCluster/seqtree.png .
 	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedCluster.Rnw')"
-	rm -f randB.RData wardtree.png
+	rm -f randB.RData wardtree.png seqtree.png
 	cp -f WeightedCluster/WeightedCluster-fake.Rnw WeightedCluster.Rnw
 
 WeightedCluster-fr.pdf: rotateFiles WeightedCluster/WeightedCluster-fr.Rnw
@@ -42,7 +42,7 @@ WeightedCluster-fr.pdf: rotateFiles WeightedCluster/WeightedCluster-fr.Rnw
 	cp -f WeightedCluster/wardtree.png .
 	cp -f WeightedCluster/seqtree.png .
 	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedCluster-fr.Rnw')"
-	rm -f randB.RData wardtree.png
+	rm -f randB.RData wardtree.png seqtree.png
 	cp -f WeightedCluster/WeightedCluster-fr-fake.Rnw WeightedCluster-fr.Rnw
 
 	

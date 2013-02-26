@@ -1,6 +1,7 @@
-              CHANGES IN WeightedCluster VERSION 0.9-99
+              CHANGES IN WeightedCluster VERSION 1.0
 
 NEW FEATURES
+  o The vignette (English version) has been published in the LIVES Working papers series.
   o The vignette (manual) has been translated in English.
   o seqclustname: automatic labeling of clusters using sequence medoids.
   o Added the WeightedCluster vignette (in French).
