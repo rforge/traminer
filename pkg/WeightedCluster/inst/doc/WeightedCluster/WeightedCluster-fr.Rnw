@@ -91,7 +91,7 @@ knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
 })
 opts_knit$set(concordance=TRUE)
-opts_chunk$set(message=FALSE, prompt=TRUE, echo=TRUE, dev="pdf", comment=NA, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth")
+opts_chunk$set(message=FALSE, prompt=TRUE, echo=TRUE, dev="pdf", comment=NA, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth", size="small")
 knit_hooks$set(error = function(x, options) stop(x))
 knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
 @
@@ -425,7 +425,7 @@ La formulation originale de \citet{Kaufman1990} suppose que l'unit\'{e} des pond
 
 Ces mesures sont calcul\'{e}es avec la fonction \code{wcClusterQuality}. La valeur retourn\'{e}e par la fonction est une liste qui comprend deux \'{e}l\'{e}ments. L'\'{e}l\'{e}ment \code{stats} contient les valeurs des mesures de qualit\'{e}.
 
-<<wcClusterQuality-compute9, echo=2:3>>=
+<<wcClusterQuality-compute9, echo=2:3, setwidth=70>>=
 options(digits=2)
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
