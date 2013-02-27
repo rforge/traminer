@@ -10,4 +10,3 @@ Suggests: RUnit, knitr, isotone, vegan
 Description: The WeightedCluster library provides functions to cluster states sequences and weighted data. These functionalities include aggregating replicated cases, an optimized weighted PAM algorithm, function computing cluster quality measures for a range of clustering solutions and miscellaneous functions to plot clustering solutions of state sequences.
 License: GPL (>= 2)
 URL: http://mephisto.unige.ch/weightedcluster
-Encoding: latin1

@@ -45,7 +45,6 @@ In addition to the methods, we also discuss the building of typologies of sequen
   URL: \url{http://mephisto.unige.ch/weightedcluster/}
 }
 
-\usepackage[latin1]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -82,7 +81,7 @@ In addition to the methods, we also discuss the building of typologies of sequen
 
 %% preliminary R commands
 <<preliminary, echo=FALSE, results="hide", message=FALSE, warning=FALSE>>=
-options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
+options(width=60, prompt="R> ", continue="     ", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
 library(vegan)
@@ -92,7 +91,7 @@ hook_setwidth <- local({
 	function(before, options, envir){
 		if(before) {
             default.width <<- getOption("width")
-			options(width = options$setwidth)
+			options(width = options$consolew)
 		} else{
 			options(width = default.width)
 		}
@@ -100,7 +99,7 @@ hook_setwidth <- local({
 	}
 })
 
-knit_hooks$set(setwidth =hook_setwidth)
+knit_hooks$set(consolew =hook_setwidth)
 
 ##knit_hooks$set(crop = hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
@@ -109,7 +108,7 @@ knit_hooks$set(small.mar = function(before, options, envir) {
 opts_knit$set(concordance=TRUE)
 opts_chunk$set(message=FALSE, prompt=TRUE, dev="pdf", echo=TRUE, comment=NA, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth")
 knit_hooks$set(error = function(x, options) stop(x))
-knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
+##knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
 
 @
 
@@ -229,7 +228,7 @@ We present here the procedures for hierarchical agglomerative clustering, which 
 In \proglang{R}, the agglomeration schedule (the succession of groupings performed) is created with the \code{hclust} function.\footnote{Other possibilities exist.} This function takes the following parameters: the distance matrix (as a \code{dist} object), the method (here \guil{Ward}, we shall return to this) and the weight vector \code{members}.
 
 %% preliminary R commands
-<<hclustcompute, setwidth=50>>=
+<<hclustcompute, consolew=50>>=
 wardCluster <- hclust(as.dist(mvaddist), method="ward", members=mvad$weight)
 @
 
@@ -432,7 +431,7 @@ The original formulation of \citet{Kaufman1990} supposes that one weighting unit
 
 These measures are calculated with the \code{wcClusterQuality} function. The value returned by the function is a list comprising two elements. The \code{stats} element contains the values of the measures of quality.
 
-<<wcClusterQuality-compute9, echo=2:3, setwidth=70>>=
+<<wcClusterQuality-compute9, echo=2:3, consolew=70>>=
 options(digits=2)
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
@@ -475,7 +474,7 @@ options(digits=3)
 These measures also make it possible to compare partitions with different numbers of groups. Only pseudo $R^2$ should not be used for this purpose, since it does not penalize for complexity. Computing the quality of all these different possibilities soon becomes laborious. The as.clustrange function in the \pkg{WeightedCluster} library automatically computes these values for a set of numbers of groups derived from one hierarchical clustering procedure (\code{wardCluster} in our example). This function requires the following arguments: the matrix of dissimilarities (\code{diss}), the weightings (optional, \code{weights} argument) and the maximum number of cluster that one wants to retain (\code{ncluster}). In the following example, we estimate the clustering quality for groupings in $2, 3, \ldots, \mbox{ncluster}=20$ groups.
 
 
-<<wcRange-compute9, setwidth=50>>=
+<<wcRange-compute9, consolew=50>>=
 wardRange <- as.clustrange(wardCluster, diss=mvaddist, weights=mvad$weight, ncluster=20)
 summary(wardRange, max.rank=2)
 @
@@ -798,7 +797,7 @@ worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 
 Cluster analysis mainly explains the differences on the first axis. So we create the variable test according to the second axis. In order for the chi-square test to be close to zero, the proportions of \guil{test} and \guil{non-test} must be equivalent in each group. To satisfy these two constraints, we use the median of the second axis of the MDS in each group as a separation point.
 
-<<mds-compute-annexe2, echo=TRUE, results="hide", setwidth=50>>=
+<<mds-compute-annexe2, echo=TRUE, results="hide", consolew=50>>=
 library(isotone)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){

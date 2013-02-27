@@ -30,17 +30,17 @@ clean: WeightedCluster.pdf WeightedCluster-fr.pdf WeightedClusterPreview.pdf
 	
 WeightedClusterPreview.pdf: rotateFiles WeightedClusterPreview/WeightedClusterPreview.Rnw
 	cp -f WeightedClusterPreview/WeightedClusterPreview.Rnw .
-	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedClusterPreview.Rnw')"
+	$(RSCRIPT) --vanilla -e "library(knitr); knit2pdf('WeightedClusterPreview.Rnw')"
 	cp -f WeightedClusterPreview/WeightedClusterPreview-fake.Rnw WeightedClusterPreview.Rnw
 
 WeightedCluster.pdf: rotateFiles WeightedCluster/WeightedCluster.Rnw
 	cp -f WeightedCluster/WeightedCluster.Rnw .
-	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedCluster.Rnw')"
+	$(RSCRIPT) --vanilla -e "library(knitr); knit2pdf('WeightedCluster.Rnw')"
 	cp -f WeightedCluster/WeightedCluster-fake.Rnw WeightedCluster.Rnw
 
 WeightedCluster-fr.pdf: rotateFiles WeightedCluster/WeightedCluster-fr.Rnw
 	cp -f WeightedCluster/WeightedCluster-fr.Rnw .
-	$(RSCRIPT) --vanilla --encoding="latin1" -e "options('encoding'='latin1');library(knitr); knit2pdf('WeightedCluster-fr.Rnw')"
+	$(RSCRIPT) --vanilla -e "library(knitr); knit2pdf('WeightedCluster-fr.Rnw')"
 	cp -f WeightedCluster/WeightedCluster-fr-fake.Rnw WeightedCluster-fr.Rnw
 
 	

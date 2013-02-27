@@ -23,9 +23,9 @@ K-Medoids or PAM clustering of weighted data.
   \item{debuglevel}{Integer. If greater than zero, print some debugging messages.}
 }
 \details{
-	K-Medoïds algorithms aim at finding the best partition of the data in a k predefined number of groups. 
-	Based on a dissimilarity matrix, those algorithms seeks to minimize the (weighted) sum of distance to the medoïd of each group. 
-	The medoïd is defined as the observation that minimize the sum of distance to the other observations of this group.
+	K-Medoids algorithms aim at finding the best partition of the data in a k predefined number of groups. 
+	Based on a dissimilarity matrix, those algorithms seeks to minimize the (weighted) sum of distance to the medoid of each group. 
+	The medoid is defined as the observation that minimize the sum of distance to the other observations of this group.
 	The function \code{wcKMedoids} support three differents algorithms specified using the \code{method} argument:
 	\describe{
 		\item{"KMedoids"}{Start with a random solution and then iteratively adapt the medoids using an algorithm similar to kmeans. Part of the code is inspired (but completely rewritten) by the C clustering library (see de Hoon et al. 2010). If you use this solution, you should set npass>1 to try several solution.}

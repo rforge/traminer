@@ -81,7 +81,7 @@ Outre les m\'{e}thodes, nous discutons \'{e}galement de la construction de typol
 
 %% preliminary R commands
 <<preliminary, echo=FALSE, results="hide", message=FALSE, warning=FALSE>>=
-options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
+options(width=60, prompt="R> ", continue="     ", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
 library(vegan)
@@ -91,14 +91,14 @@ hook_setwidth <- local({
 	function(before, options, envir){
 		if(before) {
             default.width <<- getOption("width")
-			options(width = options$setwidth)
+			options(width = options$consolew)
 		} else{
 			options(width = default.width)
 		}
 		return(NULL)
 	}
 })
-knit_hooks$set(setwidth =hook_setwidth)
+knit_hooks$set(consolew =hook_setwidth)
 ##knit_hooks$set(crop = hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
@@ -106,7 +106,7 @@ knit_hooks$set(small.mar = function(before, options, envir) {
 opts_knit$set(concordance=TRUE)
 opts_chunk$set(message=FALSE, prompt=TRUE, echo=TRUE, dev="pdf", comment=NA, small.mar=TRUE, fig.align="center", fig.path="graphics/WC-", out.width=".8\\linewidth", size="small")
 knit_hooks$set(error = function(x, options) stop(x))
-knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
+##knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
 @
 
 
@@ -438,7 +438,7 @@ La formulation originale de \citet{Kaufman1990} suppose que l'unit\'{e} des pond
 
 Ces mesures sont calcul\'{e}es avec la fonction \code{wcClusterQuality}. La valeur retourn\'{e}e par la fonction est une liste qui comprend deux \'{e}l\'{e}ments. L'\'{e}l\'{e}ment \code{stats} contient les valeurs des mesures de qualit\'{e}.
 
-<<wcClusterQuality-compute9, echo=2:3, setwidth=70>>=
+<<wcClusterQuality-compute9, echo=2:3, consolew=70>>=
 options(digits=2)
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
@@ -527,7 +527,7 @@ mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c(
 
 La fonction \code{seqclustname} permet de nommer automatiquement les groupes en utilisant leur m\'{e}do\"{\i}de. On doit sp\'{e}cifier l'objet s\'{e}quence (agument \code{seqdata}), le clustering (argument \code{group}), la matrice de distance (argument \code{diss}). Si \code{weighted=TRUE} (par d\'{e}faut), les poids de l'objet \code{seqdata} sont utilis\'{e}s pour trouver les m\'{e}do\"{\i}des. Finalement, l'option \code{perc=TRUE} ajoute le pourcentage d'observation dans chaque groupe aux labels.
 
-<<auto-cluster-naming, echo=TRUE, setwidth=80>>=
+<<auto-cluster-naming, echo=TRUE, consolew=80>>=
 mvad$pam4.auto <- seqclustname(mvadseq, pamclust4$clustering, mvaddist)
 table( mvad$pam4.auto, mvad$pam4)
 @

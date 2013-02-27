@@ -19,8 +19,6 @@
 \author{\pkg{Matthias Studer}\\ Institute for Demographic and Life Course Studies\\ University of Geneva\\matthias.studer@unige.ch}
 \title{\pkg{WeightedCluster} Preview}
 \date{}
-\usepackage[latin1]{inputenc}
-\usepackage{Sweave}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -89,7 +87,7 @@
 
 %% preliminary R commands
 <<preliminary, echo=FALSE, results="hide", message=FALSE>>=
-options(width=60, prompt="R> ", continue="     ", encoding="latin1", useFancyQuotes=FALSE, digits=3)
+options(width=60, prompt="R> ", continue="     ", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
 hook_setwidth <- local({
@@ -97,21 +95,21 @@ hook_setwidth <- local({
 	function(before, options, envir){
 		if(before) {
             default.width <<- getOption("width")
-			options(width = options$setwidth)
+			options(width = options$consolew)
 		} else{
 			options(width = default.width)
 		}
 		return(NULL)
 	}
 })
-knit_hooks$set(setwidth =hook_setwidth)
+knit_hooks$set(consolew =hook_setwidth)
 ## knit_hooks$set(crop =hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
 })
 opts_chunk$set(message=FALSE, prompt=TRUE, dev="pdf", echo=TRUE, comment=NA, small.mar=TRUE, fig.align="center", fig.path="graphics/WCP-", size="small")
 knit_hooks$set(error = function(x, options) stop(x))
-knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
+##knit_hooks$set(warning = function(x, options) stop("Warnings: ", x))
 @
 
 
@@ -160,7 +158,7 @@ diss <- seqdist(mvad.seq, method="HAM")
 \section{Hierarchical clustering}
 We can regroup similar sequences using hierarchical clustering with \code{"average"} method using weights (\code{aggMvad\$aggWeights}) (any method may be used).
 
-<<hierclust, echo=TRUE, setwidth=50>>=
+<<hierclust, echo=TRUE, consolew=50>>=
 averageClust <- hclust(as.dist(diss), method="average", members=aggMvad$aggWeights)
 @
 
@@ -182,7 +180,7 @@ seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE)
 
 \section{Cluster quality}
 We can automatically compute several clustering quality measures (presented in table~\ref{tb_cqm}) for a range of numbers of groups: 2 until ncluster=10.
-<<avgqualcompute, echo=TRUE, setwidth=40>>=
+<<avgqualcompute, echo=TRUE, consolew=40>>=
 avgClustQual <- as.clustrange(averageClust, diss, weights=aggMvad$aggWeights, ncluster=10)
 @
 
@@ -230,7 +228,7 @@ summary(avgClustQual, max.rank=2)
 
 The \pkg{WeightedCluster} library also provides an optimized PAM algorithm. We can automatically compute PAM cluster for a range of numbers of groups using:
 
-<<pamcompute, echo=TRUE, setwidth=40>>=
+<<pamcompute, echo=TRUE, consolew=40>>=
 pamClustRange <- wcKMedRange(diss, kvals=2:10, weights=aggMvad$aggWeights)
 @
 
