@@ -86,6 +86,19 @@ library(WeightedCluster)
 library(TraMineR)
 library(vegan)
 library(isotone)
+hook_setwidth <- local({
+    default.width <- 0
+	function(before, options, envir){
+		if(before) {
+            default.width <<- getOption("width")
+			options(width = options$setwidth)
+		} else{
+			options(width = default.width)
+		}
+		return(NULL)
+	}
+})
+knit_hooks$set(setwidth =hook_setwidth)
 ##knit_hooks$set(crop = hook_pdfcrop)
 knit_hooks$set(small.mar = function(before, options, envir) {
     if (before)  par(mar=c(2.1, 4.1, 4.1, 1.1))  # smaller margin on top and right
@@ -514,7 +527,7 @@ mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c(
 
 La fonction \code{seqclustname} permet de nommer automatiquement les groupes en utilisant leur m\'{e}do\"{\i}de. On doit sp\'{e}cifier l'objet s\'{e}quence (agument \code{seqdata}), le clustering (argument \code{group}), la matrice de distance (argument \code{diss}). Si \code{weighted=TRUE} (par d\'{e}faut), les poids de l'objet \code{seqdata} sont utilis\'{e}s pour trouver les m\'{e}do\"{\i}des. Finalement, l'option \code{perc=TRUE} ajoute le pourcentage d'observation dans chaque groupe aux labels.
 
-<<auto-cluster-naming, echo=TRUE>>=
+<<auto-cluster-naming, echo=TRUE, setwidth=80>>=
 mvad$pam4.auto <- seqclustname(mvadseq, pamclust4$clustering, mvaddist)
 table( mvad$pam4.auto, mvad$pam4)
 @
