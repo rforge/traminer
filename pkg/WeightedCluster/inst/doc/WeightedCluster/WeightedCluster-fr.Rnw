@@ -543,7 +543,7 @@ Beaucoup de questions de recherche des sciences sociales mettent en lien des tra
 
 Supposons que l'on cherche \`{a} mesurer les liens entre la variable \code{test} que nous avons cr\'{e}\'{e}e pour l'occasion\footnote{Le d\'{e}tail de la cr\'{e}ation de cette variable est donn\'{e} dans l'annexe~\ref{annexe_vartest}.} et nos trajectoires. Cette variable prend deux modalit\'{e}s, \guil{test} et \guil{non-test}, et regroupe les s\'{e}quences de la mani\`{e}re suivante.
 
-<<mds-compute2, echo=FALSE, results="hide">>=
+<<mds-compute2, echo=FALSE>>=
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){
