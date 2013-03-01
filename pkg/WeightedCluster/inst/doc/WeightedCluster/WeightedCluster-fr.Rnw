@@ -278,7 +278,7 @@ clust4 <- cutree(wardCluster, k=4)
 
 On peut ensuite utiliser cette information dans d'autres analyses, par exemple, pour repr\'{e}senter les types obtenus \`{a} l'aide d'un chronogramme. Sans surprise, les graphiques obtenus correspondent aux n{\oe}uds terminaux de l'arbre au niveau quatre.
 
-<<seqdplot-clust4, fig.width=7, fig.height=5>>=
+<<seqdplot-4clust, fig.width=7, fig.height=5>>=
 seqdplot(mvadseq, group=clust4, border=NA)
 @
 
@@ -326,7 +326,7 @@ Bri\`{e}vement, on peut d\'{e}crire le fonctionnement de cet algorithme en deux 
 
 L'algorithme est disponible dans la librairie R \pkg{cluster} \citep{RClusterPackage, StruyfHubertRousseeuw1997}, mais il ne permet pas d'utiliser des donn\'{e}es pond\'{e}r\'{e}es. Bas\'{e}e en partie sur le code disponible dans la librairie \pkg{cluster}, la fonction \code{wcKMedoids} de librairie \pkg{WeightedCluster} prend en compte les pond\'{e}rations et impl\'{e}mente \'{e}galement les optimisations propos\'{e}es par \citet{Reynolds2006}, ce qui la rend plus rapide. Cette fonction consomme \'{e}galement deux fois moins de m\'{e}moire ce qui la rend ad\'{e}quate pour analyser de tr\`{e}s grands ensembles de donn\'{e}es. L'annexe~\ref{annexe_optim} pr\'{e}sente plus en d\'{e}tail les gains en temps de calcul.
 
-<<wcKMedoids-compute4>>=
+<<wcKMedoids-compute>>=
 pamclust4 <- wcKMedoids(mvaddist, k=4, weights=mvad$weight)
 @
 
@@ -338,7 +338,7 @@ seqdplot(mvadseq, group=pamclust4$clustering, border=NA)
 
 Le num\'{e}ro assign\'{e} au groupe correspond \`{a} l'index du m\'{e}do\"{\i}de de ce groupe. On peut ainsi r\'{e}cup\'{e}rer les m\'{e}do\"{\i}des en utilisant la commande \code{unique(pamclust4\$clustering)}. La commande suivante utilise cette possibilit\'{e} pour afficher les s\'{e}quences m\'{e}do\"{\i}des de chaque groupe.
 
-<<wcKMedoids-print4>>=
+<<wcKMedoids-print>>=
 print(mvadseq[unique(pamclust4$clustering), ], format="SPS")
 @
 
@@ -438,7 +438,7 @@ La formulation originale de \citet{Kaufman1990} suppose que l'unit\'{e} des pond
 
 Ces mesures sont calcul\'{e}es avec la fonction \code{wcClusterQuality}. La valeur retourn\'{e}e par la fonction est une liste qui comprend deux \'{e}l\'{e}ments. L'\'{e}l\'{e}ment \code{stats} contient les valeurs des mesures de qualit\'{e}.
 
-<<wcClusterQuality-compute9, echo=2:3, consolew=70>>=
+<<wcClusterQuality-compute, echo=2:3, consolew=70>>=
 options(digits=2)
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
@@ -480,7 +480,7 @@ options(digits=3)
 
 Ces mesures permettent \'{e}galement de comparer des partitions avec un nombre de groupes diff\'{e}rents. Seul le pseudo $R^2$ ne devrait pas \^{e}tre utilis\'{e} dans ce but, car il ne p\'{e}nalise pas pour la complexit\'{e}. Le calcul de la qualit\'{e} de toutes ces diff\'{e}rentes possibilit\'{e}s s'av\`{e}re vite laborieux. La fonction \code{as.clustrange} de la librairie \pkg{WeightedCluster} calcule automatiquement ces valeurs pour un ensemble de nombres de groupes issus d'une m\^{e}me proc\'{e}dure de regroupement hi\'{e}rarchique (\code{wardCluster} dans notre exemple). Cette fonction requiert les arguments suivants: la matrice des dissimilarit\'{e}s (\code{diss}), les pond\'{e}rations (optionnel, argument \code{weights}) ainsi que le nombre maximum de cluster que l'on entend conserver (\code{ncluster}). Dans l'exemple suivant, nous estimons la qualit\'{e} de clustering pour les regroupements en $2, 3, \ldots, \mbox{ncluster}=20$ groupes.
 
-<<wcRange-compute9>>=
+<<wcRange-compute>>=
 wardRange <- as.clustrange(wardCluster, diss=mvaddist, weights=mvad$weight, ncluster=20)
 summary(wardRange, max.rank=2)
 @
@@ -495,7 +495,7 @@ plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"))
 
 La solution en six groupes est ici un maximum local pour les mesures \guil{HC}, \guil{PBC} et \guil{HG}, ce qui en fait une bonne si l'on souhaite garder un nombre de groupe restreint. La lecture du graphique est parfois un peu difficile, car les valeurs moyennes de chaque mesure diff\`{e}rent. Pour pallier ce probl\`{e}me, l'argument \code{norm="zscore"} standardise les valeurs, ce qui permet de mieux identifier les maximums et minimums\footnote{on peut utiliser \code{norm="zscoremed"} pour une standardisation plus robuste bas\'{e}e sur la m\'{e}diane.}. La figure ci-dessous facilite l'identification des partitions qui donnent de bons r\'{e}sultats. Les solutions en six et en 17 groupes paraissent bonnes dans notre cas de figure.
 
-<<wcRange-plot2, fig.width=8, fig.height=3.5>>=
+<<wcRange-plotzscore, fig.width=8, fig.height=3.5>>=
 plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"), norm="zscore")
 @
 
@@ -543,7 +543,7 @@ Beaucoup de questions de recherche des sciences sociales mettent en lien des tra
 
 Supposons que l'on cherche \`{a} mesurer les liens entre la variable \code{test} que nous avons cr\'{e}\'{e}e pour l'occasion\footnote{Le d\'{e}tail de la cr\'{e}ation de cette variable est donn\'{e} dans l'annexe~\ref{annexe_vartest}.} et nos trajectoires. Cette variable prend deux modalit\'{e}s, \guil{test} et \guil{non-test}, et regroupe les s\'{e}quences de la mani\`{e}re suivante.
 
-<<mds-compute2, echo=FALSE>>=
+<<mds-compute, echo=FALSE>>=
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){
@@ -838,7 +838,7 @@ worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 
 L'analyse en clusters explique principalement les diff\'{e}rences sur le premier axe. On cr\'{e}e donc la variable test en fonction du deuxi\`{e}me axe. Afin que le test du khi-carr\'{e} soit proche de z\'{e}ro, il faut que les proportions de \guil{test} et de \guil{non-test} soient \'{e}quivalentes dans chaque groupe. Pour satisfaire ces deux contraintes, on utilise la m\'{e}diane du deuxi\`{e}me axe du MDS dans chaque groupe comme point de s\'{e}paration.
 
-<<mds-compute-annexe2, echo=TRUE, results="hide">>=
+<<mds-compute-annexe-second, echo=TRUE, results="hide">>=
 library(isotone)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){

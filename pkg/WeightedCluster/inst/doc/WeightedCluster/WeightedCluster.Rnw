@@ -267,7 +267,7 @@ clust4 <- cutree(wardCluster, k=4)
 
 This information can then be used in other analyses, for example, to represent the types obtained with the aid of a chronogram. Not surprisingly, the graphics obtained correspond to the terminal nodes of the tree at level four.
 
-<<seqdplot-clust4, fig.width=7, fig.height=5>>=
+<<seqdplot-4clust, fig.width=7, fig.height=5>>=
 seqdplot(mvadseq, group=clust4, border=NA)
 @
 
@@ -315,7 +315,7 @@ In brief, the functioning of this algorithm can be described in two phases. In a
 The algorithm is available in the library \proglang{R} \pkg{cluster} \citep{RClusterPackage, StruyfHubertRousseeuw1997}, but does not make it possible to use weighted data. The \code{wcKMedoids} function in the \pkg{WeightedCluster} library, partly based on the code available in the \pkg{cluster} library, takes weightings into account and also implements the optimizations suggested by  \citet{Reynolds2006}, which make it faster. This function also consumes only half as much memory, which makes it adequate for analysing very large data sets. Annex~\ref{annexe_optim} presents the gains in computing time in more detail.
 
 
-<<wcKMedoids-compute4>>=
+<<wcKMedoids-compute>>=
 pamclust4 <- wcKMedoids(mvaddist, k=4, weights=mvad$weight)
 @
 
@@ -328,7 +328,7 @@ seqdplot(mvadseq, group=pamclust4$clustering, border=NA)
 
 The number assigned to each group corresponds to the index of the medoid of this group. The medoids can thus be recovered by using the command \code{unique(pamclust4\$clustering)}. The following command uses this possibility to display the medoid sequences of each group:
 
-<<wcKMedoids-print4>>=
+<<wcKMedoids-print>>=
 print(mvadseq[unique(pamclust4$clustering), ], format="SPS")
 @
 
@@ -431,7 +431,7 @@ The original formulation of \citet{Kaufman1990} supposes that one weighting unit
 
 These measures are calculated with the \code{wcClusterQuality} function. The value returned by the function is a list comprising two elements. The \code{stats} element contains the values of the measures of quality.
 
-<<wcClusterQuality-compute9, echo=2:3, consolew=70>>=
+<<wcClusterQuality-compute, echo=2:3, consolew=70>>=
 options(digits=2)
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
@@ -474,7 +474,7 @@ options(digits=3)
 These measures also make it possible to compare partitions with different numbers of groups. Only pseudo $R^2$ should not be used for this purpose, since it does not penalize for complexity. Computing the quality of all these different possibilities soon becomes laborious. The as.clustrange function in the \pkg{WeightedCluster} library automatically computes these values for a set of numbers of groups derived from one hierarchical clustering procedure (\code{wardCluster} in our example). This function requires the following arguments: the matrix of dissimilarities (\code{diss}), the weightings (optional, \code{weights} argument) and the maximum number of cluster that one wants to retain (\code{ncluster}). In the following example, we estimate the clustering quality for groupings in $2, 3, \ldots, \mbox{ncluster}=20$ groups.
 
 
-<<wcRange-compute9, consolew=50>>=
+<<wcRange-compute, consolew=50>>=
 wardRange <- as.clustrange(wardCluster, diss=mvaddist, weights=mvad$weight, ncluster=20)
 summary(wardRange, max.rank=2)
 @
@@ -491,7 +491,7 @@ plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"))
 
 The solution in six groups is here a local maximum for the measures \guil{HC}, \guil{PBC} and \guil{HG}, which makes it a good one if one wants to keep a limited number of groups. The graphic is sometimes somewhat difficult to read, because the average values of each measure differ. To palliate this problem, the argument \code{norm="zscore"} standardizes the values, which makes it easier to identify the maxima and minima.\footnote{For a more robust standardization based on the median, \code{norm="zscoremed"} can be used.} The command below facilitates the identification of the partitions that give good results. The solutions in six and 17 groups appear to be good in the present case.
 
-<<wcRange-plot2, fig.width=8, fig.height=3.5>>=
+<<wcRange-plot-zscore, fig.width=8, fig.height=3.5>>=
 plot(wardRange, stat=c("ASWw", "HG", "PBC", "HC"), norm="zscore")
 @
 
@@ -797,7 +797,7 @@ worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 
 Cluster analysis mainly explains the differences on the first axis. So we create the variable test according to the second axis. In order for the chi-square test to be close to zero, the proportions of \guil{test} and \guil{non-test} must be equivalent in each group. To satisfy these two constraints, we use the median of the second axis of the MDS in each group as a separation point.
 
-<<mds-compute-annexe2, echo=TRUE, results="hide", consolew=50>>=
+<<mds-compute-annexe-second, echo=TRUE, results="hide", consolew=50>>=
 library(isotone)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){
