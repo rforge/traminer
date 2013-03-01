@@ -11,7 +11,6 @@
 \documentclass[article, nojss, a4paper, shortnames]{jss}
 
 \usepackage[english]{babel}
-\usepackage{thumbpdf}
 \usepackage{a4}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -80,7 +79,7 @@ In addition to the methods, we also discuss the building of typologies of sequen
 
 
 %% preliminary R commands
-<<preliminary, echo=FALSE, results="hide", message=FALSE, warning=FALSE>>=
+<<preliminary, echo=FALSE, results="hide", message=FALSE, warning=FALSE, fig.keep="none">>=
 options(width=60, prompt="R> ", continue="     ", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
@@ -169,7 +168,7 @@ To use the \pkg{WeightedCluster} library, it has to be installed and loaded. It 
 
 %% preliminary R commands
 %% install.packages("WeightedCluster", repos="http://R-Forge.R-project.org")
-<<WCload, eval=FALSE>>=
+<<WCload, eval=FALSE, fig.keep="none">>=
 install.packages("WeightedCluster")
 library(WeightedCluster)
 @
@@ -190,7 +189,7 @@ In R, the distances between state sequences can be computed with the aid of the 
 Here, we start by loading the example data set with the \code{data} command. We then build the sequence object by specifying the columns containing the data (17 to 86) and the weighting of the observations. The \code{seqdist} function computes the matrix of distances between sequences.
 
 %% preliminary R commands
-<<distcompute, tidy=FALSE>>=
+<<distcompute, tidy=FALSE, fig.keep="none">>=
 data(mvad)
 mvad.alphabet <- c("employment", "FE", "HE", "joblessness", "school",
     "training")
@@ -228,23 +227,23 @@ We present here the procedures for hierarchical agglomerative clustering, which 
 In \proglang{R}, the agglomeration schedule (the succession of groupings performed) is created with the \code{hclust} function.\footnote{Other possibilities exist.} This function takes the following parameters: the distance matrix (as a \code{dist} object), the method (here \guil{Ward}, we shall return to this) and the weight vector \code{members}.
 
 %% preliminary R commands
-<<hclustcompute, consolew=50>>=
+<<hclustcompute, consolew=50, fig.keep="none">>=
 wardCluster <- hclust(as.dist(mvaddist), method="ward", members=mvad$weight)
 @
 
 When the agglomeration schedule has been created, the final stages of this schedule can be visualized with the aid of the \pkg{WeightedCluster} library. This is done in two stages. One starts by constructing a tree of sequences from the agglomerative schema with the command \code{as.seqtree}. This function takes the following arguments: the clustering procedure (\code{wardCluster} in our case), the sequence object (\code{seqdata} argument), the distance matrix (\code{diss} argument) and maximum number of groupings to be represented (\code{ncluster}).
 
-<<as.seqtreecompute>>=
+<<as.seqtreecompute, fig.keep="none">>=
 wardTree <- as.seqtree(wardCluster, seqdata=mvadseq, diss=mvaddist, ncluster=6)
 @
 
 Once the tree is constructed, the \code{seqtreedisplay} function of the \pkg{TraMineR} library \citep{StuderRitschardGabadinhoMuller2011SMR} makes it possible to represent it graphically. The free GraphViz software \citep{Gansner99anopen} must be installed and accessible for the function to work properly.\footnote{The program can be downloaded from \url{http://www.graphviz.org/}.} The option \code{showdepth=TRUE} displays the levels of the groupings on the right of the graph.
 
-<<seqtreedisplay, echo=FALSE, results="hide", eval=FALSE>>=
+<<seqtreedisplay, echo=FALSE, results="hide", eval=FALSE, fig.keep="none">>=
 seqtreedisplay(wardTree, type="d", border=NA, filename="wardtree.png", showdepth=TRUE, showtree=FALSE)
 @
 
-<<seqtreedisplay-fake, eval=FALSE, echo=TRUE, results="hide">>=
+<<seqtreedisplay-fake, eval=FALSE, echo=TRUE, results="hide", fig.keep="none">>=
 seqtreedisplay(wardTree, type="d", border=NA, showdepth=TRUE)
 @
 
@@ -261,7 +260,7 @@ This example illustrates the \textit{simplification} of the data effected by the
 
 To obtain a grouping in a particular number of groups, one cuts the tree at a given level. This means that one keeps all the terminal nodes if the growing of the tree is stopped at the level presented on the right. In \proglang{R}, this information is recovered with the aid of the \code{cutree} function. For example, to use the grouping in four distinct classes:
 
-<<cutreecompute>>=
+<<cutreecompute, fig.keep="none">>=
 clust4 <- cutree(wardCluster, k=4)
 @
 
@@ -315,7 +314,7 @@ In brief, the functioning of this algorithm can be described in two phases. In a
 The algorithm is available in the library \proglang{R} \pkg{cluster} \citep{RClusterPackage, StruyfHubertRousseeuw1997}, but does not make it possible to use weighted data. The \code{wcKMedoids} function in the \pkg{WeightedCluster} library, partly based on the code available in the \pkg{cluster} library, takes weightings into account and also implements the optimizations suggested by  \citet{Reynolds2006}, which make it faster. This function also consumes only half as much memory, which makes it adequate for analysing very large data sets. Annex~\ref{annexe_optim} presents the gains in computing time in more detail.
 
 
-<<wcKMedoids-compute>>=
+<<wcKMedoids-compute, fig.keep="none">>=
 pamclust4 <- wcKMedoids(mvaddist, k=4, weights=mvad$weight)
 @
 
@@ -328,7 +327,7 @@ seqdplot(mvadseq, group=pamclust4$clustering, border=NA)
 
 The number assigned to each group corresponds to the index of the medoid of this group. The medoids can thus be recovered by using the command \code{unique(pamclust4\$clustering)}. The following command uses this possibility to display the medoid sequences of each group:
 
-<<wcKMedoids-print>>=
+<<wcKMedoids-print, fig.keep="none">>=
 print(mvadseq[unique(pamclust4$clustering), ], format="SPS")
 @
 
@@ -340,7 +339,7 @@ The PAM algorithm has several disadvantages. First, it is necessary to specify i
 
 The PAM algorithm has the advantage of optimizing a global criterion, but the algorithm is dependent on the initial choice of medoids, which is not always optimal. To overcome this limitation, we can try to initialize the PAM algorithm using the result of the hierarchical clustering procedure. To do this, the clustering obtained by the hierarchical method (the argument \code{initialclust=wardCluster}) is specified as the starting point of the \code{wcKMedoids} function (or the \code{wcKMedRange} function, see section~\ref{sec_choice_part}).
 
-<<wcKMedoids-compute4-ward>>=
+<<wcKMedoids-compute4-ward, fig.keep="none">>=
 pamwardclust4 <- wcKMedoids(mvaddist, k=4, weights=mvad$weight, initialclust=wardCluster)
 @
 
@@ -431,7 +430,7 @@ The original formulation of \citet{Kaufman1990} supposes that one weighting unit
 
 These measures are calculated with the \code{wcClusterQuality} function. The value returned by the function is a list comprising two elements. The \code{stats} element contains the values of the measures of quality.
 
-<<wcClusterQuality-compute, echo=2:3, consolew=70>>=
+<<wcClusterQuality-compute, echo=2:3, consolew=70, fig.keep="none">>=
 options(digits=2)
 clustqual4 <- wcClusterQuality(mvaddist, clust4, weights=mvad$weight)
 clustqual4$stats
@@ -442,7 +441,7 @@ According to the measure \code{ASWw=\Sexpr{round(clustqual4$stats["ASWw"], 2)}},
 
 The \code{ASW} element of the object \code{clustqual4} contains the two variant of the average silhouette of each group taken separately. According to this measure, group $3$ is particularly ill-defined since its average silhouette is negative.
 
-<<wcClusterQuality-computeasw>>=
+<<wcClusterQuality-computeasw, fig.keep="none">>=
 clustqual4$ASW
 @
 
@@ -464,7 +463,7 @@ The most characteristic sequences of each cluster are represented at the top of 
 
 The measures of the quality of a partition facilitate the choice of the best partition among a set of possibilities. They can thus be used to identify the algorithm that gives the best results. The \code{wcKmedoids} function used for PAM directly computes these values, which are stored in the elements \code{stats} and \code{ASW} as previously. The following code displays the quality measures for the partition identified with the aid of PAM. This partition thus seems better than that obtained with Ward.
 
-<<wcClusterQuality-compute9-clustqual4pam, echo=2>>=
+<<wcClusterQuality-compute9-clustqual4pam, echo=2, fig.keep="none">>=
 options(digits=1)
 pamclust4$stats
 options(digits=3)
@@ -474,7 +473,7 @@ options(digits=3)
 These measures also make it possible to compare partitions with different numbers of groups. Only pseudo $R^2$ should not be used for this purpose, since it does not penalize for complexity. Computing the quality of all these different possibilities soon becomes laborious. The as.clustrange function in the \pkg{WeightedCluster} library automatically computes these values for a set of numbers of groups derived from one hierarchical clustering procedure (\code{wardCluster} in our example). This function requires the following arguments: the matrix of dissimilarities (\code{diss}), the weightings (optional, \code{weights} argument) and the maximum number of cluster that one wants to retain (\code{ncluster}). In the following example, we estimate the clustering quality for groupings in $2, 3, \ldots, \mbox{ncluster}=20$ groups.
 
 
-<<wcRange-compute, consolew=50>>=
+<<wcRange-compute, consolew=50, fig.keep="none">>=
 wardRange <- as.clustrange(wardCluster, diss=mvaddist, weights=mvad$weight, ncluster=20)
 summary(wardRange, max.rank=2)
 @
@@ -504,7 +503,7 @@ seqdplot(mvadseq, group=wardRange$clustering$cluster6, border=NA)
 The \code{as.clustrange} function accepts several types of arguments, including the set of clustering procedures available in the \pkg{cluster} library, even if the latter do not accept weighting. However, it is not possible to use it directly with non-hierarchical algorithms such as PAM. To do this, we use the \code{wcKMedRange} function, which automatically computes the partitions for a series of values of $k$ (number of groups). The object returned is the same as that previously presented for the hierarchical clustering procedures and the same presentations can be used as previously. This function takes as a parameter a distance matrix, \code{kvals}, a vector containing the number of groups of the different partitions to be created, and a vector of \code{weights}. The supplementary arguments are passed to \code{wcKMedoids}.
 
 
-<<wcKMedRange-compute, echo=TRUE>>=
+<<wcKMedRange-compute, echo=TRUE, fig.keep="none">>=
 pamRange <- wcKMedRange(mvaddist, kvals=2:20, weights=mvad$weight)
 summary(pamRange, max.rank=2)
 @
@@ -518,13 +517,13 @@ The various tools that we have presented have enabled us to construct a typology
 Once the typology has been created, it is customary to name the types obtained so as to make them easier to interpret. The factor function makes it possible to create a categorial variable. To do so, one specifies the variable of the types (here \code{pamclust4\$clustering}), the values that this variable takes with the \code{levels} argument (these values can be found in the previous graphics), and the labels that one wants to assign to each of these types with the \code{labels} argument. The \code{labels} must be specified in the same order as the levels argument so that first item of \code{levels} (here $66$) corresponds to the first item of \code{labels} (here \guil{Training -- Employment}).
 
 
-<<cluster-naming, echo=TRUE>>=
+<<cluster-naming, echo=TRUE, fig.keep="none">>=
 mvad$pam4 <- factor(pamclust4$clustering, levels=c(66, 467, 607, 641), labels=c("Train-Empl", "School-Empl", "High Ed", "Unempl"))
 @
 
 It is also possible to automatically label the clusters using the medoid sequence of each cluster. The \code{seqclustname} function can be used for this purpose. One needs to specify the sequence object (\code{seqdata} argument), the clustering (\code{group} argument), the distance matrix (\code{diss} argument). If \code{weighted=TRUE} (default), then the weights of the \code{seqdata} object are used to find the medoids. Finally, on can set \code{perc=TRUE} to add the percentage of observation in each groups to the labels.
 
-<<auto-cluster-naming, echo=TRUE>>=
+<<auto-cluster-naming, echo=TRUE, fig.keep="none">>=
 mvad$pam4.auto <- seqclustname(mvadseq, pamclust4$clustering, mvaddist)
 table( mvad$pam4.auto, mvad$pam4)
 @
@@ -537,7 +536,7 @@ Many research questions in the social sciences connect trajectories (or sequence
 
 Suppose one seeks to measure the links between the variable \code{test} that we have created for our purposes\footnote{The detail of the creation of this variable is given in Annex~\ref{annexe_vartest}.} and our trajectories. This variable takes two modalities, \guil{test} and \guil{non-test}, and groups the sequences in the following way:
 
-<<mds-compute, echo=FALSE>>=
+<<mds-compute, echo=FALSE, fig.keep="none">>=
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){
@@ -555,7 +554,7 @@ seqdplot(mvadseq, group=mvad$test, border=NA)
 
 The \guil{non-test} individuals seem in particular to have a strong probability of undergoing a period of unemployment. Is this difference significant? One can run a chi-square test between the variable \code{test} and \code{pam4} (which covers our types) in the following way for weighted data. One starts by constructing a crossed table with the \code{xtabs} function.\footnote{For unweighted data, the \code{table} function can be used.} This function takes as a parameter a formula in which the left side of the equation refers to the weightings and the right side lists the factors that form the crossed table. The \code{data} argument specifies where variables that appear in the formula are to be found. One then runs a chi-square test on this table.
 
-<<testiplot-chisq>>=
+<<testiplot-chisq, fig.keep="none">>=
 tb <- xtabs(weight~test+pam4, data=mvad)
 chisq.test(tb)
 @
@@ -580,7 +579,7 @@ The solution to this problem consists in using discrepancy analysis \citep{Stude
 
 Briefly, a bivariate test of the association between the sequences and the variable \code{test} can be computed with the \code{dissassoc} function available in the \pkg{TraMineR} library. The results that interest us here can be read on the line Pseudo $R^2$. It can thus be observed that the \code{test} variable explains 3.6\% of the variability of the trajectories and the $p$-value is highly significant.
 
-<<testiplot-dissassoc>>=
+<<testiplot-dissassoc, fig.keep="none">>=
 set.seed(1)
 dsa <- dissassoc(mvaddist, mvad$test, weights=mvad$weight, weight.permutation="diss", R=5000)
 print(dsa$stat)
@@ -588,13 +587,13 @@ print(dsa$stat)
 
 We may include several covariates by building a sequence regression trees with the \code{seqtree} and \code{seqtreedisplay}\footnote{The free GraphViz software \citep{Gansner99anopen} must be installed and accessible for the function to work properly. It can be downloaded from \url{http://www.graphviz.org/}.} functions \citep{StuderRitschardGabadinhoMuller2011SMR}.\footnote{The ANOVA approach can also be extended to the multifactor case using the \code{dissmfacw} function.}
 
-<<seqtree-link-covar, echo=FALSE, results="hide", eval=FALSE>>=
+<<seqtree-link-covar, echo=FALSE, results="hide", eval=FALSE, fig.keep="none">>=
 set.seed(1)
 tree <- seqtree(mvadseq~gcse5eq+Grammar+funemp, data=mvad, diss=mvaddist, weight.permutation="diss")
 seqtreedisplay(tree, type="d", border=NA, filename="seqtree.png", showtree=FALSE)
 @
 
-<<seqtree-link-covar-fake, eval=FALSE, echo=TRUE, results="hide">>=
+<<seqtree-link-covar-fake, eval=FALSE, echo=TRUE, results="hide", fig.keep="none">>=
 tree <- seqtree(mvadseq~gcse5eq+Grammar+funemp, data=mvad, diss=mvaddist, weight.permutation="diss")
 seqtreedisplay(tree, type="d", border=NA)
 @
@@ -641,7 +640,7 @@ These different operations are performed easily with the \code{wcAggregateCases}
 
 Let us return to the example that we have used from the start of this manual. The following code makes it possible to identify the identical sequences. The \code{wcAggregateCases} function takes two parameters: \code{a data.frame} (or a matrix) which contains the cases to be aggregated, and an optional vector of \code{weights}.
 
-<<wcAggregateCases, echo=TRUE>>=
+<<wcAggregateCases, echo=TRUE, fig.keep="none">>=
 ac <- wcAggregateCases(mvad[, 17:86], weights=mvad$weight)
 ac
 @
@@ -658,26 +657,26 @@ The object returned by the \code{wcAggregateCases} function (here \code{ac}) giv
 With this information, we can create an object \code{uniqueSeq} of the unique sequences weighted by the number of times they appear in the data. In the following code, \code{ac\$aggIndex} makes it possible to select the unique sequences and the vector \code{ac\$aggWeights} contains the weighting of each of these sequences.
 
 
-<<wcAggregateCases-seqdef, echo=TRUE>>=
+<<wcAggregateCases-seqdef, echo=TRUE, fig.keep="none">>=
 uniqueSeq <- seqdef(mvad[ac$aggIndex, 17:86], alphabet = mvad.alphabet,
     states = mvad.scodes, labels = mvad.labels, weights=ac$aggWeights)
 @
 
 We can then compute different clustering solutions. Here, we compute the distance matrix before using this information for the \code{wcKMedoids} function. As before, we use here the vector \code{ac\$aggWeights} to apply the weightings.
 
-<<wcAggregateCases-wckmedoids, echo=TRUE>>=
+<<wcAggregateCases-wckmedoids, echo=TRUE, fig.keep="none">>=
 mvaddist2 <- seqdist(uniqueSeq, method="OM", indel=1.5, sm=subm.custom)
 pamclust4ac <- wcKMedoids(mvaddist2, k=4, weights=ac$aggWeights)
 @
 Now that the clustering has been done, the information contained in \code{ac\$disaggIndex} makes it possible to move back. For example, the typology in the original (non-aggregated) \code{data.frame} can be added with the aid of the following code. The vector \code{pamclust4ac\$clustering} contains the membership of each unique sequence in the clusters. Using the index \code{ac\$disaggIndex}, we return to the original data set, i.e. we obtain the membership of each (non-unique) sequence in the clusters.
 
-<<wcAggregateCases-wckmedoids-back, echo=TRUE>>=
+<<wcAggregateCases-wckmedoids-back, echo=TRUE, fig.keep="none">>=
 mvad$acpam4 <- pamclust4ac$clustering[ac$disaggIndex]
 @
 
 The following table gives the distribution of the original cases between the typology we obtained from the disaggregated cases (variable \code{pam4}) and the one obtained from the aggregated data (variable \code{acpam4}). It can be seen that the two solutions contain the same cases; only the labels differ.
 
-<<wcAggregateCases-wckmedoids-table, echo=TRUE>>=
+<<wcAggregateCases-wckmedoids-table, echo=TRUE, fig.keep="none">>=
 table(mvad$pam4, mvad$acpam4)
 @
 
@@ -696,7 +695,7 @@ The \code{method} argument specifies the algorithm used. Two versions are availa
 
 To measure the impact of these optimizations on performance, we ran several simulations. They grouped in $k \in (2, 8, 16, 24, 32, 48, 64, 96, 128)$ groups a set of $n \in (200, 500, 1000, 2000)$  observations whose $x$ and $y$ coordinates were randomly generated with a uniform distribution. Figure~\ref{perf-nbyk-plot-time} shows the changes in computing time (on a logarithmic scale) according to the values of $n$ and $k$. Figure~\ref{perf-nbyk-plot} shows the changes in total relative time, i.e. divided by the time taken by the fastest algorithm for this solution, with the same parameters.
 
-<<perf-loadsimul, echo=FALSE, results="hide", message=FALSE>>=
+<<perf-loadsimul, echo=FALSE, results="hide", message=FALSE, fig.keep="none">>=
 load(file="randB.RData")
 randB$nnn <- factor(randB$n, levels=c(200, 500, 1000, 2000), labels=c("n=200", "n=500", "n=1000", "n=2000"))
 library(lattice)
@@ -790,14 +789,14 @@ These indexes measure the capacity of a partition to reproduce the distance matr
 
 The \code{test} variable is constructed to explain the variability within the clusters. To do so, we use an MDS for weighted data  \citep{OksanenEtAl2012}.
 
-<<mds-compute-annexe, echo=TRUE, results="hide">>=
+<<mdscomputeannexe, echo=TRUE, results="hide", fig.keep="none">>=
 library(vegan)
 worsq <- wcmdscale(mvaddist, w=mvad$weight, k=2)
 @
 
 Cluster analysis mainly explains the differences on the first axis. So we create the variable test according to the second axis. In order for the chi-square test to be close to zero, the proportions of \guil{test} and \guil{non-test} must be equivalent in each group. To satisfy these two constraints, we use the median of the second axis of the MDS in each group as a separation point.
 
-<<mds-compute-annexe-second, echo=TRUE, results="hide", consolew=50>>=
+<<mdscomputeannexesecond, echo=TRUE, results="hide", consolew=50, fig.keep="none">>=
 library(isotone)
 mvad$test <- rep(-1, nrow(mvad))
 for(clust in unique(pamclust4$clustering)){

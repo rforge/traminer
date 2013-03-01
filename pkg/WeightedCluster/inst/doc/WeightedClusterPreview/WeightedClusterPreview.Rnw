@@ -8,7 +8,6 @@
 %\VignetteIndexEntry{WeightedCluster Preview}
 %\VignetteKeywords{Clustering, Weights, state sequences, Optimal matching}
 \documentclass[a4paper]{article}
-\usepackage{thumbpdf}
 \usepackage{hyperref}
 \usepackage{a4}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,7 +85,7 @@
 \def\floatpagefraction{1}          % \def\floatpagefraction{.5}
 
 %% preliminary R commands
-<<preliminary, echo=FALSE, results="hide", message=FALSE>>=
+<<preliminary, echo=FALSE, results="hide", message=FALSE, fig.keep="none">>=
 options(width=60, prompt="R> ", continue="     ", useFancyQuotes=FALSE, digits=3)
 library(WeightedCluster)
 library(TraMineR)
@@ -124,7 +123,7 @@ Some functions of WeightedCluster require the free GraphViz program \citep{Gansn
 
 The \pkg{WeightedCluster} library can be installed and loaded using the following commands:
 
-<<install, echo=TRUE, results="hide", eval=FALSE>>=
+<<install, echo=TRUE, results="hide", eval=FALSE, fig.keep="none">>=
 install.packages("WeightedCluster")
 library(WeightedCluster)
 @
@@ -134,14 +133,14 @@ library(WeightedCluster)
 
 In this preview, we use the dataset from \citet{McVicarAnyadike2002JRSSa} which is distributed with the \pkg{TraMineR} library \citep{GabadinhoRitschardMullerStuder2011JSS}. This dataset contains sequences of school-to-work transitions in Northern Ireland. The dataset is loaded using :
 
-<<dataload, echo=TRUE, results="hide">>=
+<<dataload, echo=TRUE, results="hide", fig.keep="none">>=
 data(mvad)
 @
 
 
 \code{wcAggregateCases} allows us to identify and aggregate identical state sequences (which are in columns \code{17:86}). We print out the basic information about the aggregation and create the \code{uniqueMvad} object which contains only unique sequences.
 
-<<wcagg, echo=TRUE>>=
+<<wcagg, echo=TRUE, fig.keep="none">>=
 aggMvad <- wcAggregateCases(mvad[, 17:86])
 print(aggMvad)
 uniqueMvad <- mvad[aggMvad$aggIndex, 17:86]
@@ -149,7 +148,7 @@ uniqueMvad <- mvad[aggMvad$aggIndex, 17:86]
 
 Using the unique sequence dataset, we build a sequence object and compute dissimilarities between sequences \citep[see][for more on this topics]{GabadinhoRitschardMullerStuder2011JSS}. The vector \code{aggMvad\$aggWeights} store the number of replication of each unique sequence. It is thus used as unique sequence weight.
 
-<<wcagg-diss, echo=TRUE>>=
+<<wcagg-diss, echo=TRUE, fig.keep="none">>=
 mvad.seq <- seqdef(uniqueMvad, weights=aggMvad$aggWeights)
 ## Computing Hamming distance between sequence
 diss <- seqdist(mvad.seq, method="HAM")
@@ -158,13 +157,13 @@ diss <- seqdist(mvad.seq, method="HAM")
 \section{Hierarchical clustering}
 We can regroup similar sequences using hierarchical clustering with \code{"average"} method using weights (\code{aggMvad\$aggWeights}) (any method may be used).
 
-<<hierclust, echo=TRUE, consolew=50>>=
+<<hierclust, echo=TRUE, consolew=50, fig.keep="none">>=
 averageClust <- hclust(as.dist(diss), method="average", members=aggMvad$aggWeights)
 @
 
 The agglomeration schedule can be represented graphically as a tree using:
 
-<<avgtreecomputeecho, echo=TRUE, eval=FALSE>>=
+<<avgtreecomputeecho, echo=TRUE, eval=FALSE, fig.keep="none">>=
 averageTree <- as.seqtree(averageClust, seqdata=mvad.seq, diss=diss, ncluster=6)
 seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE)
 @
@@ -180,7 +179,7 @@ seqtreedisplay(averageTree, type="d", border=NA,  showdepth=TRUE)
 
 \section{Cluster quality}
 We can automatically compute several clustering quality measures (presented in table~\ref{tb_cqm}) for a range of numbers of groups: 2 until ncluster=10.
-<<avgqualcompute, echo=TRUE, consolew=40>>=
+<<avgqualcompute, echo=TRUE, consolew=40, fig.keep="none">>=
 avgClustQual <- as.clustrange(averageClust, diss, weights=aggMvad$aggWeights, ncluster=10)
 @
 
@@ -220,7 +219,7 @@ plot(avgClustQual, norm="zscore")
 
 Alternatively, we can retrieve the two best solutions according to each quality measure:
 
-<<avgqualprint, echo=TRUE>>=
+<<avgqualprint, echo=TRUE, fig.keep="none">>=
 summary(avgClustQual, max.rank=2)
 @
 
@@ -228,13 +227,13 @@ summary(avgClustQual, max.rank=2)
 
 The \pkg{WeightedCluster} library also provides an optimized PAM algorithm. We can automatically compute PAM cluster for a range of numbers of groups using:
 
-<<pamcompute, echo=TRUE, consolew=40>>=
+<<pamcompute, echo=TRUE, consolew=40, fig.keep="none">>=
 pamClustRange <- wcKMedRange(diss, kvals=2:10, weights=aggMvad$aggWeights)
 @
 
 As before, we can plot the quality measures of each solution (not shown here) or retrieve the two best solutions according to each quality measure using:
 
-<<pamqualprint, echo=TRUE>>=
+<<pamqualprint, echo=TRUE, fig.keep="none">>=
 summary(pamClustRange, max.rank=2)
 @
 
@@ -258,7 +257,7 @@ seqdplot(mvad.seq, group=pamClustRange$clustering$cluster5, border=NA)
 
 Once the sequences have been regrouped, it is often useful to ``disaggregate'' the data. For instance, we may want to add the cluster membership in the original data set (i.e. before unique sequences were identified). This allows us to cross-tabulate cluster membership and father unemployment (variable \code{funemp}). This operation is performed using \code{aggMvad\$disaggIndex} which stores the index of each unique sequence in the original dataset.
 
-<<mvadcluster, echo=TRUE>>=
+<<mvadcluster, echo=TRUE, fig.keep="none">>=
 uniqueCluster5 <- avgClustQual$clustering$cluster5
 mvad$cluster5 <- uniqueCluster5[aggMvad$disaggIndex]
 table(mvad$funemp, mvad$cluster5)
