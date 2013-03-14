@@ -76,7 +76,26 @@ print.clustrange <- function(x, digits=2, ...){
 	x <- round(x$stats, digits)
 	print(x, ...)
 }
-plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", withlegend=TRUE, lwd=1, col=NULL, ...){
+
+normalize.values.all <- function(stats, norm){
+	for(i in 1:ncol(stats)){
+		stats[,i] <- normalize.values(stats[, i], norm)
+	}
+	return(stats)
+}
+normalize.values <- function(stats, norm){
+	if(norm == "range") {
+		stats <- (stats-min(stats))/(max(stats)-min(stats))
+	} else if (norm=="zscore") {
+		stats <- (stats - mean(stats ))/(sqrt(var(stats)))
+	}else if (norm=="zscoremed") {
+		stats <- (stats - median(stats))/(median(abs(stats - median(stats))))
+	}
+	return(stats)
+}
+
+
+plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", withlegend=TRUE, lwd=1, col=NULL, ylab="Indicators", xlab="N clusters", ...){
 	kvals <- x$kvals
 	if(length(stat)==1){
 		if(stat=="all"){
@@ -99,23 +118,9 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 			stats <- x$stats[, stat]
 		}
 	}
-	ylim <- c(0,1)
-	if(norm == "range") {
-		for(i in 1:ncol(stats)){
-			stats[,i] <- (stats[,i]-min(stats[,i]))/(max(stats[,i])-min(stats[,i]))
-		}
-	} else if (norm=="zscore") {
-		for(i in 1:ncol(stats)){
-			stats[,i] <- (stats[,i]-mean(stats[,i]))/(sqrt(var(stats[,i])))
-		}
-		ylim <- range(unlist(stats), finite=TRUE)
-	}else if (norm=="zscoremed") {
-		for(i in 1:ncol(stats)){
-			stats[,i] <- (stats[,i]-median(stats[,i]))/(median(abs(stats[,i]-median(stats[,i]))))
-		}
-		ylim <- range(unlist(stats), finite=TRUE)
-	}
-	plot(kvals, xlim=range(kvals, finite=TRUE), ylim=ylim, type="n", ylab="Indicators", xlab="N clusters", ...)
+	stats <- normalize.values.all(stats, norm)
+	ylim <- range(unlist(stats), finite=TRUE)
+	plot(kvals, xlim=range(kvals, finite=TRUE), ylim=ylim, type="n", ylab=ylab, xlab=xlab, ...)
 	labels <- character(ncol(stats))
 	if(is.null(col)){
 		allnames <- colnames(x$stats)
