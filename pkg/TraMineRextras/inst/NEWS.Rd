@@ -1,9 +1,23 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
-\section{Changes in version 0.3 [2013-02-28]}{
+\section{Changes in version 0.3.2 [2013-03-15]}{
+\itemize{
+    \item{No changes} 
+}
+}
+\section{Changes in version 0.2.1 [2013-03-15]}{
+\subsection{General}{
   \itemize{
     \item{NEWS is now in Rd format into inst/NEWS.Rd}
 }}
+\subsection{Bug Fixes}{
+  \itemize{
+    \item{
+    \code{FCE_to_TSE()}: Events were not properly chronologically sorted.}
+    \item{
+    \code{TSE_to_STS()}: produced inconsistent results when events were not chronologically
+    sorted by cases.}
+}}}
 \section{Changes in version 0.2 [2012-12-06]}{
 \subsection{General}{
   \itemize{
