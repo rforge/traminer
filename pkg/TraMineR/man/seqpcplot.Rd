@@ -78,7 +78,7 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
     \code{seqelist} objects.}
 
   \item{order.align}{Aligning method. For aligning on order positions use either \code{"first"} (default) or
-  \code{"last"}. \code{"first"} numbers the positions from the beginning
+  \code{"last"}. Option \code{"first"} numbers the positions from the beginning
   while \code{"last"} numbers them from the end. With \code{order.align = "time"}, the elements in the sequences are aligned on their rounded timestamps.}
 
   \item{title}{title for the graphic.}
@@ -87,8 +87,8 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
   \item{xaxis}{logical: Should x-axis be plotted?}
   \item{yaxis}{logical: Should y-axis be plotted?}
 
-  \item{axes}{if set to \code{"all"} (default value) x-axes are drawn
-    for each plot in the graphic. If set to \code{"bottom"} and
+  \item{axes}{if set as \code{"all"} (default value) x-axes are drawn
+    for each plot in the graphic. If set as \code{"bottom"} and
     \code{group} is used, axes are drawn only under the plots at
     the bottom of the graphic area. If \code{FALSE}, no x-axis is drawn.}
 
