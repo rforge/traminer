@@ -231,7 +231,7 @@ DTNBuildNode <- function(dmat, pred, minSize, ind, vardis,
 	}
 	else {
 		for (p in 1:ncol(pred)) {
-			## cat("Checking", varnames[[p]], "...\n")
+			## cat("Checking", names(pred[p]), "...\n")
 			spl <- DTNGroupFactorBinary(dissmatrix=dmat, currentSCres=SCres, pred=pred[, p], minSize=minSize, varindex=p, ind=ind, weights=weights)
 			## print(str(spl))
 			if (!is.null(spl) && (is.null(bestSpl) || spl$spl$info$SCres<bestSpl$spl$info$SCres)) {
@@ -331,6 +331,20 @@ DTNGroupFactorBinary <- function(dissmatrix, currentSCres, pred, minSize, varind
 	## Computing residuals
 	#print(inertiaMat)
 	SCres <- sum(diag(inertiaMat)/grpSize)
+	## An error here might be due to weights=0
+	## Check for grpSize==0?
+	# if(is.na(SCres)||is.na(currentSCres)){
+		# print("SCres")
+		# print(SCres)
+		# print("inertiaMat")
+		# print(inertiaMat)
+		# print("grpSize")
+		# print(grpSize)
+		# print("llgrp")
+		# print(llgrp)
+		# print("currentSCres")
+		# print(currentSCres)
+	# }
 	## cat("SCres max: ", SCres)
 	if (SCres>currentSCres){
 		## print("Unsplittable")

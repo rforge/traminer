@@ -6,7 +6,7 @@ clusterAllMethods <- function(diss, weights=NULL, maxcluster, method="all", pam.
 	hclustmethods <- c( "ward", "single", "complete", "average", "mcquitty", "median", "centroid")
 	all.methods <- c(hclustmethods, "pam", "diana", "beta.flexible")
 	noweights.methods <- c("diana", "beta.flexible")
-	if(method=="all"){
+	if(any(method=="all")){
 		if(is.null(weights)){
 			method <- all.methods
 		} else{
@@ -204,22 +204,21 @@ plot.clustrangefamily <- function(x, group="stat", method="all", pam.combine=FAL
 }
 
 # data(mvad)
-# Aggregating state sequence
-# aggMvad <- wcAggregateCases(mvad[, 17:86], weights=mvad$weight)
+# #Aggregating state sequence
 
-# Creating state sequence object
+##Creating state sequence object
 # mvad.seq <- seqdef(mvad[, 17:86])
 
-# COmpute distance using Hamming distance
-# diss <- seqdist(mvad.seq, method="HAM")
+## COmpute distance using Hamming distance
+# diss <- seqdist(biofam.seq, method="HAM")
 
-# Ward clustering
+##Ward clustering
 # allClust <- clusterAllMethods(diss, weights=aggMvad$aggWeights, maxcluster=15)
 # allClust <- clusterAllMethods(diss, maxcluster=15, method=c( "ward",  "average", "pam", "diana", "beta.flexible"))
 
 # allClust
-# Plot all statistics (standardized)
+# ##Plot all statistics (standardized)
 # plot(allClust, stat="all", norm="zscoremed", lwd=3)
 
-# Plot HC, RHC and ASW
+# ##Plot HC, RHC and ASW
 # plot(allClust, stat=c("HC", "RHC", "ASWw"), norm="zscore", lwd=3)

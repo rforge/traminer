@@ -1,10 +1,11 @@
 wcKMedRange <- function(diss, kvals, ...){
 	if (inherits(diss, "dist")) {
-		diss <- TraMineR:::dist2matrix(diss)
-	} else if(!is.matrix(diss)) {
-		diss <- as.matrix(diss)
+		n <- attr(diss, "Size")
+	}else if(is.matrix(diss)){
+		n <- nrow(diss)
+	} else {
+		stop("[!] diss should be a squared matrix or a dist object.")
 	}
-	n <- nrow(diss)
 	ret <- list()
 	ret$kvals <- kvals
 	ret$clustering <- matrix(-1, nrow=n, ncol=length(kvals))
