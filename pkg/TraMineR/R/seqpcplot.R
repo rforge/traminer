@@ -99,6 +99,7 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
         x <- TMP$timestamp
         y <- TMP$event
         if (is.null(weights)) weights <- seqeweight(seqdata)
+        xlab <- "Order Position"
         
         ## STS format (STS or DSS representation)
       } else if (inherits(seqdata, "stslist")) {
@@ -143,6 +144,10 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
       }
 
       if (is.null(xlab)) xlab <- "Timestamp"
+      
+    } else {
+
+      stop("[!] seqdata argument is missing")
       
     }
       
