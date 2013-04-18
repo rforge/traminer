@@ -99,7 +99,7 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
         x <- TMP$timestamp
         y <- TMP$event
         if (is.null(weights)) weights <- seqeweight(seqdata)
-        xlab <- "Order Position"
+        if (is.null(xlab)) xlab <- "Position"
         
         ## STS format (STS or DSS representation)
       } else if (inherits(seqdata, "stslist")) {
