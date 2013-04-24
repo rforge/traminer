@@ -10,43 +10,43 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL,
                       rows = NA, cols = NA, plot = TRUE,
                       output = !plot, ...) {
   
-  seqpcplot_privat(seqdata = seqdata, group = group, weights = weights,
-                   cex = cex, lwd = lwd, cpal = cpal,
-                   grid.scale = grid.scale,
-                   ltype = ltype, embedding = embedding,
-                   lorder = lorder, lcourse = lcourse,
-                   filter = filter, hide.col = hide.col,
-                   alphabet = alphabet, order.align = order.align,
-                   title = title, xlab = xlab, ylab = ylab,
-                   xaxis = xaxis, yaxis = yaxis,
-                   axes = axes, xtlab = xtlab,
-                   cex.plot = cex.plot,
-                   rows = rows, cols = cols, plot = plot,
-                   output = output, ...)
+  seqpcplot_private(seqdata = seqdata, group = group, weights = weights,
+                    cex = cex, lwd = lwd, cpal = cpal,
+                    grid.scale = grid.scale,
+                    ltype = ltype, embedding = embedding,
+                    lorder = lorder, lcourse = lcourse,
+                    filter = filter, hide.col = hide.col,
+                    alphabet = alphabet, order.align = order.align,
+                    title = title, xlab = xlab, ylab = ylab,
+                    xaxis = xaxis, yaxis = yaxis,
+                    axes = axes, xtlab = xtlab,
+                    cex.plot = cex.plot,
+                    rows = rows, cols = cols, plot = plot,
+                    output = output, ...)
   
 }
 
-seqpcplot_privat <- function(seqdata, weights = NULL, group,
-                             cex = 1, lwd = 1/4, cpal = NULL,
-                             grid.scale = 1/5, grid.fill = "grey95",
-                             grid.lwd = 0.5, grid.shape = "default",
-                             grid.border = "grey60", grid.col = "white",
-                             border = NULL, border.lwd = 0,
-                             lorder = NULL, lcourse = "upwards",
-                             hide.col = "grey80", col.nobs = "black",
-                             filter = NULL, alpha = 1,
-                             ltype = "unique", embedding = "most-frequent",
-                             sf.cex = 1, sf.cex.leaves = 1,
-                             title = NULL, xlab = NULL, ylab = NULL,
-                             xlim, ylim,
-                             alphabet = NULL, alphabet.optim = FALSE,
-                             R = 1000, order.align = NULL, maxit = 300,
-                             xtlab = xtlab, 
-                             xaxis = TRUE, yaxis = TRUE, axes = "all",
-                             cex.plot = 1, rows = NA, cols = NA,
-                             plot = TRUE, add = FALSE,
-                             output = !plot, verbose = FALSE,
-                             ...) {
+seqpcplot_private <- function(seqdata, weights = NULL, group,
+                              cex = 1, lwd = 1/4, cpal = NULL,
+                              grid.scale = 1/5, grid.fill = "grey95",
+                              grid.lwd = 0.5, grid.shape = "default",
+                              grid.border = "grey60", grid.col = "white",
+                              border = NULL, border.lwd = 0,
+                              lorder = NULL, lcourse = "upwards",
+                              hide.col = "grey80", col.nobs = "black",
+                              filter = NULL, alpha = 1,
+                              ltype = "unique", embedding = "most-frequent",
+                              sf.cex = 1, sf.cex.leaves = 1,
+                              title = NULL, xlab = NULL, ylab = NULL,
+                              xlim, ylim,
+                              alphabet = NULL, alphabet.optim = FALSE,
+                              R = 1000, order.align = NULL, maxit = 300,
+                              xtlab = xtlab, 
+                              xaxis = TRUE, yaxis = TRUE, axes = "all",
+                              cex.plot = 1, rows = NA, cols = NA,
+                              plot = TRUE, add = FALSE,
+                              output = !plot, verbose = FALSE,
+                              ...) {
 
   if (!"seqpcplot" %in% class(seqdata)) {
     
@@ -98,6 +98,11 @@ seqpcplot_privat <- function(seqdata, weights = NULL, group,
         id <- TMP$id
         x <- TMP$timestamp
         y <- TMP$event
+
+        ## delete 'end' event
+        if ("end" %in% levels(y) && !any(y == "end"))
+          y <- factor(y, levels = levels(y)[levels(y) != "end"])
+        
         if (is.null(weights)) weights <- seqeweight(seqdata)
         if (is.null(xlab)) xlab <- "Position"
         
