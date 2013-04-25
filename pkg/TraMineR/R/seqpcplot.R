@@ -94,8 +94,11 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
       ## seqe format
       if (inherits(seqdata, "seqelist")) { # convert seqe data
 
-        TMP <- seqe2TSE(seqdata)
-        id <- TMP$id
+        TMP <- TraMineR:::seqe2TSE(seqdata)
+        id <- factor(TMP$id)
+        if (nlevels(id) < length(seqdata)) {
+          levels(id) <- c(levels(id), seq(nlevels(id), length(seqdata), 1))
+        }
         x <- TMP$timestamp
         y <- TMP$event
 
@@ -104,7 +107,6 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
           y <- factor(y, levels = levels(y)[levels(y) != "end"])
         
         if (is.null(weights)) weights <- seqeweight(seqdata)
-        if (is.null(xlab)) xlab <- "Position"
         
         ## STS format (STS or DSS representation)
       } else if (inherits(seqdata, "stslist")) {
@@ -130,8 +132,6 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
         if (is.null(xlab)) {
           if (substr(attributes(seqdata)$names[1], 1, 2) == "ST") {
             xlab <- "Distinctive States"
-          } else {
-            xlab <- "Timestamp"
           }
         }
           
@@ -147,8 +147,6 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
       } else {
         stop("[!] invalid seqdata argument")
       }
-
-      if (is.null(xlab)) xlab <- "Timestamp"
       
     } else {
 
@@ -164,20 +162,22 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     if (is.numeric(x)) {
       if (length(unique(x)) > 1) {
         xdiff <- diff(sort(unique(x)))
-        if (sum((xdiff / min(xdiff) -
-                 round(xdiff / min(xdiff),0)) != 0) == 0) {
+        
+        if (all((xdiff / min(xdiff) - round(xdiff / min(xdiff),0)) != 0)) {
           x <- factor(x, levels = seq(min(x, na.rm = TRUE),
                            max(x, na.rm = TRUE), min(xdiff)))
+        } else if (all(xdiff - round(xdiff) == 0)) {
+          x <- factor(x, levels = seq(min(x), max(x), 1))
         } else {
           warning("[!] Problems with distances between x axis positions. The x axis positions will not be illustrated adequately.")
           x <- factor(x)
         }
+        
       } else { x <- factor(x) }  # pseudo case
     }
     if (order.align %in% c("first", "last")) {
       x <- unlist(tapply(X = as.integer(x), INDEX = list(id), FUN = ordering, align = order.align))
       x <- factor(x)
-      if (is.null(xlab)) xlab <- "Position"
     }
   
     ## y (state or event categories) must be categorical
@@ -217,7 +217,8 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     if (!is.null(weights)) {
       if (!is.numeric(weights)) stop("[!] weights are not numeric")
       if (min(weights, na.rm = TRUE) < 0) stop("[!] negative weights")
-      if (length(weights) == length(id)) {
+      if (length(weights) != nlevels(id) &&
+          length(weights) == length(id)) {
         weights <- unique(data.frame(id, weights))[, 2]
       }
       if (length(weights) != nlevels(id) | (sum(is.na(weights))) > 0) {
@@ -681,16 +682,32 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     }
     
     ## xlab and ylab
-    if (is.null(xlab)) xlab <- ""
+    if (is.null(xlab))
+      xlab <- if (order.align == "time") "Timestamp" else "Position"
     if (is.null(ylab)) ylab <- ""
     
     ## xlim and ylim parameters
+    ## compute pretty xlims and ylims
     if (missing(xlim)) {
-      xlim <- c(min(pts$x) - sqrt(grid.scale) / 2 - sqrt(max((wid.group.tot-wid.group.use) / wid.group.tot)) * sqrt(grid.scale) * ngrid0 / ngrid * cex, max(pts$x) + sqrt(grid.scale) / 2)
+      TMP1 <- which.max(propid.tot[nrow(propid.tot),])
+      TMP2 <- which.max(pts$n.1)
+      TMP <- pts$n.1[TMP2] *
+        sqrt(propid.tot[ntraj + 1, TMP1] /
+             (pts$n.1[TMP2] / wid.group.tot[1])) 
+      xlim <- c(1 - 0.5 * (sqrt(grid.scale) / 2 + TMP * cex),
+                nx + sqrt(grid.scale) / 2)
+      ## note: 0.15 is a guess for xf (see plot.seqpcplot)
     }
     if (missing(ylim)) {
-      ylim <- c(1 - sqrt(grid.scale) / 2 - sqrt(max((wid.group.tot-wid.group.use) / wid.group.tot)) * sqrt(grid.scale) * ngrid0 / ngrid * cex, ny + sqrt(grid.scale) / 2)
-    }  
+      TMP1 <- which.max(propid.tot[nrow(propid.tot),])
+      TMP2 <- which.max(pts$n.1)
+      TMP <- pts$n.1[TMP2] *
+        sqrt(propid.tot[ntraj + 1, TMP1] /
+             (pts$n.1[TMP2] / wid.group.tot[1])) 
+      ylim <- c(1 - 0.3 * (sqrt(grid.scale) / 2 + TMP * cex),
+                ny + sqrt(grid.scale) / 2)
+      ## note: 0.17 is a guess for yf (see plot.seqpcplot)
+    }
     
     ## finalize point coordinates
     
@@ -863,7 +880,14 @@ plot.seqpcplot <- function(x, add = NULL, which = NULL, ...) {
     
     ## plot the subjects without observations
     if (x$propid.tot[x$ntraj + 1, i] > 0) {
-      rect(xleft = min(x$pts$x) - sqrt(x$grid.scale) / 2 * xf - sqrt(x$propid.tot[x$ntraj + 1, i]) * sqrt(x$grid.scale) * x$ngrid0 / x$ngrid * x$cex * xf, ybottom = min(x$pts$y) - sqrt(x$grid.scale) / 2 * yf - sqrt(x$propid.tot[x$ntraj + 1, i]) * sqrt(x$grid.scale) * x$ngrid0 / x$ngrid * x$cex * yf, xright = min(x$pts$x) - sqrt(x$grid.scale) / 2 * xf, ytop = min(x$pts$y) - sqrt(x$grid.scale) / 2 * yf, col = x$col.nobs[i], border = 0, lwd = 0)
+      TMP <- x$pts$wdt.1[which.max(x$pts$n.1)] *
+        sqrt(x$propid.tot[x$ntraj + 1, i] /
+             (x$pts$n.1[which.max(x$pts$n.1)] / x$wid.group.tot[1]))      
+      rect(xleft = 1 - xf * (sqrt(x$grid.scale) / 2  + TMP * x$cex),
+           ybottom = 1 - yf * (sqrt(x$grid.scale) / 2 + TMP * x$cex),
+           xright = 1 - sqrt(x$grid.scale) / 2 * xf,
+           ytop = 1 - sqrt(x$grid.scale) / 2 * yf,
+           col = x$col.nobs[i], border = 0, lwd = 0)
     }
     
     for (j in order(x$propid.use[,i], decreasing = (x$lorder == "background"))) {
