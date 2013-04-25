@@ -44,6 +44,7 @@ typedef std::map<double, CmpCluster *>::iterator KendallTreeIterator;
 
 void finalizeKendall(SEXP ptr){
 	KendallTree * kendall;
+	//REprintf("Finalizing kendall\n");
 	kendall= static_cast<KendallTree *>(R_ExternalPtrAddr(ptr));
 	KendallTreeIterator it;
 	for (it = kendall->begin();it != kendall->end();it++) {
@@ -121,6 +122,36 @@ extern "C" {
 		UNPROTECT(3);
 		return ans;
 		
+	}
+	SEXP RClusterQualKendallFactory(){
+		//REprintf("Kendall factory\n");
+		KendallTree *kt = new KendallTree();
+		//REprintf("Kendall factory %d\n", kt->size());
+		return(kendallFactory(kt));
+	}
+	SEXP RClusterQualKendall(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP isdist, SEXP kendallS){
+		int nclusters=INTEGER(numclust)[0];
+		SEXP ans, stats, asw;
+		PROTECT(ans = allocVector(VECSXP, 2));
+		PROTECT(stats = allocVector(REALSXP, ClusterQualNumStat));
+		PROTECT(asw = allocVector(REALSXP, 2*nclusters));
+		SET_VECTOR_ELT(ans, 0, stats);
+		SET_VECTOR_ELT(ans, 1, asw);
+		//REprintf("Before Kendall\n");
+		KendallTree * kendall= static_cast<KendallTree *>(R_ExternalPtrAddr(kendallS));
+		//REprintf("Before size\n");
+		//REprintf("Kendall initialized %d\n", kendall->size());
+		resetKendallTree(kendall);
+		
+		//REprintf("Kendall initialized\n");
+		//return(ans);
+		if(INTEGER(isdist)[0]){
+			clusterquality_dist(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), (*kendall));
+		} else {
+			clusterquality(REAL(diss), INTEGER(cluster), REAL(weightSS), length(cluster), REAL(stats), nclusters, REAL(asw), (*kendall));
+		}
+		UNPROTECT(3);
+		return ans;
 	}
 	
 	SEXP RClusterComputeIndivASW(SEXP diss, SEXP cluster, SEXP weightSS, SEXP numclust, SEXP isdist){

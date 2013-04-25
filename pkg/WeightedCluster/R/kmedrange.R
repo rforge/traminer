@@ -1,4 +1,4 @@
-wcKMedRange <- function(diss, kvals, ...){
+wcKMedRange <- function(diss, kvals, weights=NULL, ...){
 	if (inherits(diss, "dist")) {
 		n <- attr(diss, "Size")
 	}else if(is.matrix(diss)){
@@ -11,15 +11,17 @@ wcKMedRange <- function(diss, kvals, ...){
 	ret$clustering <- matrix(-1, nrow=n, ncol=length(kvals))
 	ret$stats <-  matrix(-1, nrow=length(kvals), ncol=10)
 	i <- 1
+	kendall <- .Call(wc_RClusterQualKendallFactory)
 	for(k in kvals){
-		cl <- wcKMedoids(diss=diss, k=k, ...)
-		ret$clustering[,i] <- cl$clustering
-		ret$stats[i,] <- cl$stats
+		cl <- wcKMedoids(diss=diss, k=k, cluster.only=TRUE, weights=weights, ...)
+		ret$clustering[,i] <- cl
+		stat <- wcClusterQualityInternal(diss=diss, clustering=cl, weights=weights, kendall=kendall)
+		ret$stats[i,] <- stat$stats
 		i <- i+1
 	}
 	ret$clustering <- as.data.frame(ret$clustering)
 	ret$stats <- as.data.frame(ret$stats)
-	colnames(ret$stats) <- names(cl$stats)
+	colnames(ret$stats) <- names(stat$stats)
 	colnames(ret$clustering) <- paste("cluster", ret$kvals, sep="")
 	rownames(ret$stats) <- paste("cluster", ret$kvals, sep="")
 	class(ret) <- c("clustrange", class(ret))
@@ -61,9 +63,15 @@ as.clustrange.default <- function(object, diss, weights=NULL, ...){
 	numclust <- ncol(ret$clustering)
 	ret$kvals <- numeric(numclust)
 	ret$stats <-  matrix(-1, nrow=numclust, ncol=10)
+	## print("BuildingKendall")
+	kendall <- .Call(wc_RClusterQualKendallFactory)
+	## print(class(kendall))
+	## print(kendall)
+	## print("Kendall")
 	for(i in 1:numclust){
 		ret$kvals[i] <- length(unique(ret$clustering[,i]))
-		cl <- wcClusterQuality(diss, ret$clustering[,i], weights=weights)
+		## print("Starting")
+		cl <- wcClusterQualityInternal(diss, ret$clustering[,i], weights=weights, kendall=kendall)
 		ret$stats[i,] <- cl$stats
 	}
 	ret$stats <- as.data.frame(ret$stats)

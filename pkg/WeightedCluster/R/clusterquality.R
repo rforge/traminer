@@ -1,4 +1,7 @@
 wcClusterQuality <- function(diss, clustering, weights=NULL){
+	return(wcClusterQualityInternal(diss=diss, clustering=clustering, weights=weights, kendall=NULL))
+}
+wcClusterQualityInternal <- function(diss, clustering, weights=NULL, kendall=NULL){
 	if (inherits(diss, "dist")) {
 		isdist <- TRUE
 		nelements <- attr(diss, "Size")
@@ -24,7 +27,11 @@ wcClusterQuality <- function(diss, clustering, weights=NULL){
 	}
 	
 	ncluster <- max(clustering)+1
-	cq <- .Call(wc_RClusterQual, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(0))
+	if(is.null(kendall)){
+		cq <- .Call(wc_RClusterQual, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), as.integer(0))
+	}else{
+		cq <- .Call(wc_RClusterQualKendall, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(isdist), kendall)
+	}
 	names(cq[[1]]) <-c("PBC", "HG", "HGSD", "ASW", "ASWw", "CH", "R2", "CHsq", "R2sq", "HC")
 	dim(cq[[2]]) <- c(nlevels(clusterF), 2)
 	
