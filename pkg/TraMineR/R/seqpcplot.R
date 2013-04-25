@@ -168,7 +168,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
                            max(x, na.rm = TRUE), min(xdiff)))
         } else if (all(xdiff - round(xdiff) == 0)) {
           x <- factor(x, levels = seq(min(x), max(x), 1))
-        } else {
+        } else if (order.align == "time") {
           warning("[!] Problems with distances between x axis positions. The x axis positions will not be illustrated adequately.")
           x <- factor(x)
         }
