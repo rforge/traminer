@@ -9,6 +9,11 @@ Bug fixes:
     message advices to modify the (currently hidden) maxit argument.
     Additionally, automatically generated subtitles are now hidden
     when the argument title is used.
+  - as.character.seqelist(), print.seqelist(): Fixed an issue where the time 
+    of events sequences was printed using scientific notation for all numbers 
+	with more than 2 digits. The function now use the R format function and is 
+	thus taking into account global formatting options such as options(digits=) 
+	and/or options(scipen=). 
 
 ## =========
 Version 1.8-5 (Development version)
