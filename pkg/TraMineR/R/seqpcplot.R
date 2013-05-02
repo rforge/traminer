@@ -103,8 +103,8 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
         y <- TMP$event
 
         ## delete 'end' event
-        if ("end" %in% levels(y) && !any(y == "end"))
-          y <- factor(y, levels = levels(y)[levels(y) != "end"])
+        if ("_end" %in% levels(y) && !any(y == "_end"))
+          y <- factor(y, levels = levels(y)[levels(y) != "_end"])
         
         if (is.null(weights)) weights <- seqeweight(seqdata)
         
