@@ -9,19 +9,19 @@ Bug fixes:
     message advices to modify the (currently hidden) maxit argument.
     Additionally, automatically generated subtitles are now hidden
     when the argument title is used.
-  - as.character.seqelist(), print.seqelist(): Fixed an issue where the time 
-    of events sequences was printed using scientific notation for all numbers 
-	with more than 2 digits. The function now use the R format function and is 
-	thus taking into account global formatting options such as options(digits=) 
-	and/or options(scipen=).
-  - seqtrate(): corrected an error when the sequence objects has only two column. 
+  - as.character.seqelist(), print.seqelist(): fixed an issue with time 
+    display in event sequences which was in scientific notation for numbers
+    with more than 2 digits. The function now uses the R format function and 
+    thus accounts for global formatting options such as options(digits=)
+    and/or options(scipen=).
+  - seqtrate(): fixed error with sequence objects having only two columns.
 
 New functionalities:
-  - disstree2dot() and disstree2dotp() gained a new argument called "title.outer". 
+  - disstree2dot() and disstree2dotp() gain a new argument called "title.outer".
     If title.outer=TRUE, the title is printed in the outer margins.
 
 ## =========
-Version 1.8-5 (Development version)
+Version 1.8-5 
 
 Bug fixes:
   - seqefsub(): reported support did not properly account for weights.
