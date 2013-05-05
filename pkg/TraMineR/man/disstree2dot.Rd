@@ -12,11 +12,12 @@ disstree2dot(tree, filename, digits=3, imagefunc=NULL, imagedata=NULL,
              imgLeafOnly=FALSE, devicefunc="jpeg", imageext="jpg",
              device.arg=list(), use.title=TRUE, label.loc="main",
              node.loc="main", split.loc="sub", title.cex=1, legendtext=NULL,
-             legendimage=NULL, qualityimage=NULL, showdepth=FALSE, ...)
+             legendimage=NULL, qualityimage=NULL, showdepth=FALSE,
+             title.outer=FALSE, ...)
 
 disstree2dotp(tree, filename, imagedata=NULL, imgLeafOnly=FALSE,
               imagefunc=plot, title.cex=3, withquality=TRUE,
-			  quality.fontsize=title.cex, ...)
+			  quality.fontsize=title.cex, title.outer=FALSE, ...)
 
 seqtree2dot(tree, filename, seqdata=tree$info$object, imgLeafOnly=FALSE,
             sortv=NULL, dist.matrix=NULL, title.cex=3, withlegend="auto",
@@ -39,6 +40,7 @@ seqtree2dot(tree, filename, seqdata=tree$info$object, imgLeafOnly=FALSE,
   \item{node.loc}{Node content location, see \code{\link{title}} for possible values.}
   \item{split.loc}{Split information location, see \code{\link{title}} for possible values.}
   \item{title.cex}{\code{cex} applied to all calls to \code{title} (see \code{use.title}).}
+  \item{title.outer}{Logical: If \code{TRUE}, the title (see \code{use.title}) is printed in the outer margins.}
   \item{legendtext}{An optional text appearing in a distinct node.}
   \item{legendimage}{An optional image file appearing in a distinct node.}
   \item{qualityimage}{An optional image file appearing in a distinct node.}

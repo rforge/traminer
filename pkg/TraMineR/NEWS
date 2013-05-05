@@ -13,7 +13,12 @@ Bug fixes:
     of events sequences was printed using scientific notation for all numbers 
 	with more than 2 digits. The function now use the R format function and is 
 	thus taking into account global formatting options such as options(digits=) 
-	and/or options(scipen=). 
+	and/or options(scipen=).
+  - seqtrate(): corrected an error when the sequence objects has only two column. 
+
+New functionalities:
+  - disstree2dot() and disstree2dotp() gained a new argument called "title.outer". 
+    If title.outer=TRUE, the title is printed in the outer margins.
 
 ## =========
 Version 1.8-5 (Development version)
