@@ -66,8 +66,9 @@ seqformat <- function(data, var=NULL, id=NULL,
 			stsep <- seqfcheck(seqdata)
 			if (stsep %in% c("-",":")) seqdata <- seqdecomp(seqdata,sep=stsep)
 		}
-		else
+		else {
 			seqdata <- seqdecomp(seqdata,sep=stsep)
+		}
 
 		trans <- SPS_to_STS(seqdata, spsformat=SPS.in, nr=nr)
 	}
