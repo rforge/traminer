@@ -1,7 +1,13 @@
 ## =========
 Version 1.9-6 (Development version)
 
+Changes in existing functions:
+  - seqformat(): new nr= argument to specify the missing state 
+    symbol in SPS input.  
+
 Bug fixes:
+  - seqformat(): fixed a problem with missing states when converting
+    from SPS to STS (see Changes in function above.) 
   - seqpcplot(): fixed issues with 'which' argument of 'plot.seqpcplot'.
   - seqpcplot(): fixed issues with arguments xlab and title.
   - seqpcplot(): replaced a warning message by an error message at
@@ -9,9 +15,9 @@ Bug fixes:
     message advices to modify the (currently hidden) maxit argument.
     Additionally, automatically generated subtitles are now hidden
     when the argument title is used.
-  - as.character.seqelist(), print.seqelist(): fixed an issue with time 
+  - as.character.seqelist(), print.seqelist(): fixed an issue with time
     display in event sequences which was in scientific notation for numbers
-    with more than 2 digits. The function now uses the R format function and 
+    with more than 2 digits. The function now uses the R format function and
     thus accounts for global formatting options such as options(digits=)
     and/or options(scipen=).
   - seqtrate(): fixed error with sequence objects having only two columns.
@@ -21,7 +27,7 @@ New functionalities:
     If title.outer=TRUE, the title is printed in the outer margins.
 
 ## =========
-Version 1.8-5 
+Version 1.8-5
 
 Bug fixes:
   - seqefsub(): reported support did not properly account for weights.
