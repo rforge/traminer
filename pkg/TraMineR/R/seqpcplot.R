@@ -694,7 +694,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
       TMP <- pts$n.1[TMP2] *
         sqrt(propid.tot[ntraj + 1, TMP1] /
              (pts$n.1[TMP2] / wid.group.tot[1])) 
-      xlim <- c(1 - 0.5 * (sqrt(grid.scale) / 2 + TMP * cex),
+      xlim <- c(1 - sqrt(grid.scale) / 2, # 0.15 * ...  + TMP * cex
                 nx + sqrt(grid.scale) / 2)
       ## note: 0.15 is a guess for xf (see plot.seqpcplot)
     }
@@ -704,7 +704,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
       TMP <- pts$n.1[TMP2] *
         sqrt(propid.tot[ntraj + 1, TMP1] /
              (pts$n.1[TMP2] / wid.group.tot[1])) 
-      ylim <- c(1 - 0.3 * (sqrt(grid.scale) / 2 + TMP * cex),
+      ylim <- c(1 - sqrt(grid.scale) / 2,
                 ny + sqrt(grid.scale) / 2)
       ## note: 0.17 is a guess for yf (see plot.seqpcplot)
     }
