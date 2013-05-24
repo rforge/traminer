@@ -42,10 +42,10 @@ convert.g(path = NULL, fileroot= "*", from = "pdf",
 \dontrun{
 ## Convert all .pdf graphics in the "figSW" directory
 ## into .png files and put the files in a "png" subfolder.
-convert.g(path="figSw", from="pdf", to="png")
+convert.g(path="figSW", from="pdf", to="png")
 
 ## Same, but convert to .jpg files.
-convert.g(path="figSw", to="jpg")
+convert.g(path="figSW", to="jpg")
 
 ## convert file "example.eps" in current path to ".pdf"
 ## and put it in same folder.
