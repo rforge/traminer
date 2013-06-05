@@ -8,14 +8,15 @@
 Build a clustrange object to compare different clustering solutions.
 }
 \description{
-Convert a 
+Build a clustrange object to compare different clustering solutions.
 }
 \usage{
 as.clustrange(object, diss, weights=NULL, ...)
 \method{as.clustrange}{twins}(object, diss, weights=NULL, ncluster, ...) 
 \method{as.clustrange}{hclust}(object, diss, weights=NULL, ncluster, ...) 
 \method{plot}{clustrange}(x, stat="noCH", legendpos="bottomright", 
-    norm="none", withlegend=TRUE, lwd=1, col=NULL, ...)
+    norm="none", withlegend=TRUE, lwd=1, col=NULL, ylab="Indicators", 
+	xlab="N clusters", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,6 +31,8 @@ as.clustrange(object, diss, weights=NULL, ...)
   \item{withlegend}{Logical. If \code{FALSE}, the legend is not plotted.}
   \item{lwd}{Numeric. Line width, see \code{\link{par}}.}
   \item{col}{A vector of line colors, see \code{\link{par}}. If \code{NULL}, a default set of color is used.}
+  \item{xlab}{x axis label.}
+  \item{ylab}{y axis label.}
   \item{\dots}{Additionnal parameters passed to/from methods.}
 }
 \details{

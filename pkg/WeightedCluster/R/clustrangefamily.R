@@ -1,4 +1,4 @@
-clusterAllMethods <- function(diss, weights=NULL, maxcluster, method="all", pam.combine=TRUE){
+wcCmpCluster <- function(diss, weights=NULL, maxcluster, method="all", pam.combine=TRUE){
 	if(maxcluster<2){
 		stop(" [!] maxcluster should be greater than 2")
 	}

@@ -1,5 +1,6 @@
               CHANGES IN WeightedCluster VERSION 1.1
 NEW FEATURES
+  o wcCmpCluster(): Automatically compute different clustering solutions and associated quality measures to help identifying the best one.
   o as.clustrange(), wcKMedRange(): Speed and memory handling improvements.
 
 BUG FIXES

@@ -5,6 +5,7 @@ as.clustrange,
 as.seqtree,
 wcAggregateCases,
 wcClusterQuality,
+wcCmpCluster,
 wcKMedoids,
 wcKMedRange,
 wcSilhouetteObs,
@@ -21,6 +22,10 @@ S3method(as.seqtree, default)
 S3method(print, clustrange)
 S3method(plot, clustrange)
 S3method(summary, clustrange)
+
+S3method(print, clustrangefamily)
+S3method(plot, clustrangefamily)
+S3method(summary, clustrangefamily)
 
 S3method(print, kmedoids)
 
