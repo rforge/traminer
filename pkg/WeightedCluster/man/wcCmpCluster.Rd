@@ -62,7 +62,8 @@ mvad.seq <- seqdef(mvad[, 17:86])
 diss <- seqdist(mvad.seq, method="HAM")
 
 #Ward clustering
-allClust <- wcCmpCluster(diss, maxcluster=15, method=c( "ward",  "average", "pam", "diana", "beta.flexible"), pam.combine=FALSE)
+allClust <- wcCmpCluster(diss, maxcluster=15, method=c("average", "pam", "beta.flexible"), 
+                         pam.combine=FALSE)
 
 summary(allClust, max.rank=3)
 
