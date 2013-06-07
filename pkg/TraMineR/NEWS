@@ -6,6 +6,8 @@ Changes in existing functions:
     symbol in SPS input.  
 
 Bug fixes:
+  - disstree() and seqtree(): removed the warning when R equals 0 or 1 
+    (no permutations).
   - seqformat(): fixed a problem with missing states when converting
     from SPS to STS (see Changes in function above.) 
   - seqpcplot(): fixed issues with 'which' argument of 'plot.seqpcplot'.
