@@ -9,14 +9,14 @@ wcCmpCluster,
 wcKMedoids,
 wcKMedRange,
 wcSilhouetteObs,
-seqclustname,
-seqpropclust
+seqclustname
+## seqpropclust
 )
 
 S3method(as.clustrange, hclust)
 S3method(as.clustrange, twins)
 S3method(as.clustrange, default)
-S3method(as.clustrange, dtclust)
+## S3method(as.clustrange, dtclust)
 S3method(as.seqtree, hclust)
 S3method(as.seqtree, twins)
 S3method(as.seqtree, default)
