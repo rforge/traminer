@@ -6,11 +6,12 @@
   Return a factor with the terminal node membership of each case.
 }
 \usage{
-disstreeleaf(tree)
+disstreeleaf(tree, label=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tree}{The tree, a \code{disstree} or \code{DissTreeNode} object.}
+  \item{Label}{Logical. If \code{TRUE}, the returned node membership are labelled according to classifications rules.}
 }
 
 

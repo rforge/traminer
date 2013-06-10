@@ -4,6 +4,9 @@ Version 1.9-6 (Development version)
 Changes in existing functions:
   - seqformat(): new nr= argument to specify the missing state 
     symbol in SPS input.  
+  - disstreeleaf(): new label= argument to label node membership according to 
+    the classification rules.  
+
 
 Bug fixes:
   - disstree() and seqtree(): removed the warning when R equals 0 or 1 
