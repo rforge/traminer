@@ -11,7 +11,7 @@ disstreeleaf(tree, label=FALSE)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tree}{The tree, a \code{disstree} or \code{DissTreeNode} object.}
-  \item{label}{Logical. If \code{TRUE}, the returned node membership are labelled according to classifications rules.}
+  \item{label}{Logical. If \code{TRUE}, the returned leaf memberships are labelled with the corresponding classifications rules.}
 }
 
 
