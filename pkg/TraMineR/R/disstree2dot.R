@@ -150,11 +150,11 @@ disstreedisplayInternal <- function(tree, filename, tmpdisstree, imagedata, imag
 	}
 	dotval <- myshellrun(dotcommand, gvpath=gvpath)
 	if(dotval==1){
-		stop(" [!] GraphViz was not found. If you haven't, please install GraphViz to use this function: see http://www.graphviz.org\n",
-			 " [!] If GraphViz is installed on your computer, you need to specify the GraphViz installation directory using the argument gvpath='installdir'\n",
-			 " [!] You can also add this directory to the PATH environment variable\n",
-			 " [!] GraphViz installation directory usually looks like 'C:\\Program Files\\GraphViz'\n",
-			)
+		stop(paste(" [!] GraphViz was not found. If you haven't, please install GraphViz to use this function: see http://www.graphviz.org",
+			 " [!] If GraphViz is installed on your computer, you need to specify the GraphViz installation directory using the argument gvpath='installdir'",
+			 " [!] You can also add this directory to the PATH environment variable",
+			 " [!] GraphViz installation directory usually looks like 'C:\\Program Files\\GraphViz'\n", sep="\n"
+			 ))
 	}
 	
 	
