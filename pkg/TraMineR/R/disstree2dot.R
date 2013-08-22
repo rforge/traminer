@@ -88,7 +88,7 @@ disstreedisplay <- function(tree, filename=NULL, imagedata=NULL, imagefunc=plot,
 }
 
 disstreedisplayInternal <- function(tree, filename, tmpdisstree, imagedata, imagefunc, imgLeafOnly, title.cex, imageformat,
-							withquality, quality.fontsize, legendtext, showtree, showdepth, ...) {
+							withquality, quality.fontsize, legendtext, showtree, showdepth, gvpath=NULL, ...) {
 	if(imageformat!="jpg"){
 		disstree2dotp(tree=tree, filename=tmpdisstree, imagedata=imagedata, imgLeafOnly=imgLeafOnly, imagefunc=imagefunc,
 			title.cex=title.cex, devicefunc="png", imageext="png", legendtext=legendtext, 
@@ -99,22 +99,64 @@ disstreedisplayInternal <- function(tree, filename, tmpdisstree, imagedata, imag
 			title.cex=title.cex, legendtext=legendtext, withquality=withquality, quality.fontsize=quality.fontsize, showdepth=showdepth, ...)
 	}
 	
-	myshellrun <- function(cmd, ...) {
+	myshellrun <- function(cmd, gvpath=NULL, ...) {
+		cmd <- paste(gvpath, cmd, sep="")
 		if (.Platform$OS.type=="windows") {
-			return(system(paste(Sys.getenv("COMSPEC"),"/c", cmd),...))
+			return(system(paste(Sys.getenv("COMSPEC"),"/c \"", cmd, "\""), ...))
 		}
 		else {
 			return(system(cmd,...))
 		}
 	}
+	
 	if(imageformat!="jpg"){
-		dotval <- myshellrun(paste("dot -Tpng -o", tmpdisstree,".png ", tmpdisstree,".dot", sep=""))
+		dotcommand <- paste(" -Tpng -o", tmpdisstree,".png ", tmpdisstree,".dot", sep="")
 	}else{
-		dotval <- myshellrun(paste("dot -Tjpg -o", tmpdisstree,".jpg ", tmpdisstree,".dot", sep=""))
+		dotcommand <- paste(" -Tjpg -o", tmpdisstree,".jpg ", tmpdisstree,".dot", sep="")
 	}
-	if (dotval==1) {
-		stop("You should install GraphViz to use this function: see http://www.graphviz.org")
+	
+	if (is.null(gvpath)) {
+		## First check for GVPATH
+		gvpath <- Sys.getenv("GVPATH")
+		if(gvpath==""){
+			getGraphVizPath <- function(envVar){
+				envDir <- Sys.getenv(envVar)
+				dd <- dir(envDir, "Graphviz(.*)")
+				if(length(dd)>0){
+					cond <- file.exists(paste(envDir, dd, "bin", "dot.exe", sep="\\"))
+					if(sum(cond)==0){
+						return(NULL)
+					}
+					dd <- dd[cond]
+					versions <- sub("Graphviz[[:space:]]?", "", dd)
+					ii <- which.max(as.numeric(versions))
+					message(" [>] GraphViz version ", versions[ii], " found.")
+					dd <- dd[ii]
+					return(paste(envDir, dd, sep="\\"))
+				}
+				return(NULL)
+			}
+			## GVPATH not found, check default locations directories...
+			gvpath <- getGraphVizPath("programfiles")
+			if(is.null(gvpath)){
+				gvpath <- getGraphVizPath("programfiles(x86)")
+			}
+			
+		}
 	}
+	gvpath <- paste("\"", gvpath, "\\bin\\dot.exe\" ", sep="")
+	if (.Platform$OS.type!="windows") {
+		gvpath <- "dot "
+	}
+	dotval <- myshellrun(dotcommand, gvpath=gvpath)
+	if(dotval==1){
+		stop(" [!] GraphViz was not found. If you haven't, please install GraphViz to use this function: see http://www.graphviz.org\n",
+			 " [!] If GraphViz is installed on your computer, you need to specify the GraphViz installation directory using the argument gvpath='installdir'\n",
+			 " [!] You can also add this directory to the PATH environment variable\n",
+			 " [!] GraphViz installation directory usually looks like 'C:\\Program Files\\GraphViz'\n",
+			)
+	}
+	
 	
 	if (!(imageformat %in% c("jpg", "png"))) {
 		imagickval <- myshellrun(paste("convert ", tmpdisstree,".png ",tmpdisstree,".", imageformat, sep=""))
