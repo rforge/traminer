@@ -23,12 +23,12 @@ longitudinal data formats and converting between them.
 seqformat(data, var=NULL, id=NULL,
      from, to, compressed=FALSE,
      nrep=NULL, tevent, stsep=NULL, covar=NULL,
-     SPS.in=list(xfix="()", sdsep=","), nr="*",
+     SPS.in=list(xfix="()", sdsep=","),
      SPS.out=list(xfix="()", sdsep=","),
      begin=NULL, end=NULL, status=NULL,
      process=TRUE, pdata=NULL, pvar=NULL,
      limit=100, overwrite=TRUE,
-     fillblanks=NULL, tmin=NULL, tmax=NULL)
+     fillblanks=NULL, tmin=NULL, tmax=NULL, nr="*")
  }
 
 \arguments{
