@@ -4,27 +4,28 @@ Version 1.9-6 (Development version)
 Changes in existing functions:
   - seqformat(): new 'nr' argument to specify the missing state
     symbol in SPS input.
-  - disstreeleaf(): new logical 'label' argument to specify 
-    whether the leaf membership should be labelled with 
+  - disstreeleaf(): new logical 'label' argument to specify
+    whether the leaf membership should be labelled with
     the classification rules.
 
 
 Bug fixes:
-  - seqtreedisplay() and disstreedisplay(): GraphViz installator no longer add 
-    GraphViz to the PATH environment variable. These functions now try hard to 
-	find GraphViz. If GraphViz is not found, GraphViz installation directory can
-	be specified by using the new 'gvpath' argument.
+  - seqtreedisplay() and disstreedisplay(): GraphViz installer no longer 
+    adds GraphViz to the PATH environment variable. Therefore the two 
+    functions have been adapted to search for GraphViz. In case GraphViz 
+    would not be not found, you can specify the GraphViz installation 
+    directory with the new 'gvpath' argument.
   - disstree() and seqtree(): removed the warning when R equals 0 or 1
     (no permutations).
   - seqformat(): fixed a problem with missing states when converting
     from SPS to STS (see Changes in function above.)
   - seqpcplot(): fixed issues with 'which' argument of 'plot.seqpcplot'.
-  - seqpcplot(): fixed issues with arguments xlab and title.
+  - seqpcplot(): fixed issues with arguments 'xlab' and 'title'.
   - seqpcplot(): replaced a warning message by an error message at
     failures in finding plot positions for sequences. The error
-    message advices to modify the (currently hidden) maxit argument.
+    message advices to modify the (currently hidden) 'maxit' argument.
     Additionally, automatically generated subtitles are now hidden
-    when the argument title is used.
+    when the argument 'title' is used.
   - as.character.seqelist(), print.seqelist(): fixed an issue with time
     display in event sequences which was in scientific notation for numbers
     with more than 2 digits. The function now uses the R format function and
