@@ -40,7 +40,7 @@ seqrep <- function(seqdata, criterion="density", score=NULL, decreasing=TRUE,
 		## ===============
 		else if (criterion=="prob") {
 
-			score <- TraMineR:::seqlogp(seqdata)
+			score <- TraMineR::seqlogp(seqdata)
 			decreasing <- FALSE
 		}
 	}
