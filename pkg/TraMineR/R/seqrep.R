@@ -32,7 +32,7 @@ seqrep <- function(seqdata, criterion="density", score=NULL, decreasing=TRUE,
 			## State distribution
 			freq <- seqstatd(seqdata)$Frequencies
 
-			score <- apply(seqdata,1, TraMineR:::TraMineR.mscore, slength, statelist, freq)
+			score <- apply(seqdata,1, TraMineR::TraMineR.mscore, slength, statelist, freq)
 			decreasing <- TRUE
 		} 
 		## ===============
