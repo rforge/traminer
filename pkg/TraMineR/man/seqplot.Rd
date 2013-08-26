@@ -130,7 +130,6 @@ Scherer S (2001). Early Career Patterns: A Comparison of Great Britain and West 
 ## Creating state sequence objects from example data sets
 ## ======================================================
 
-library(TraMineR)
 ## biofam data set
 data(biofam)
 ## We use only a sample of 300 cases
