@@ -25,7 +25,7 @@ sequences and vice versa.
 \details{
 \tabular{ll}{
 Package: \tab TraMineR\cr
-Version: \tab 1.9-6\cr
+Version: \tab 1.9-7\cr
 Date: \tab 2013-08-26\cr
 Depends: \tab R (>= 2.8.1), RColorBrewer, boot\cr
 Suggests: \tab cluster, xtable\cr
