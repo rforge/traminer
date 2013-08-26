@@ -103,9 +103,9 @@ disstreeleaf <- function(tree, label=FALSE) {
 	}
 	categorie <- rep(-1, length(root$ind))
 	if(label){
-		return(DTNnodelabels(TraMineR:::DTNdisstreeleaf(root, categorie)))
+		return(DTNnodelabels(DTNdisstreeleaf(root, categorie)))
 	}
-	return(TraMineR:::DTNdisstreeleaf(root, categorie))
+	return(DTNdisstreeleaf(root, categorie))
 }
 
 ###########################
