@@ -1,6 +1,9 @@
 ## =========
 Version 1.9-7 (Development version)
 
+Bug fixes:
+  - seqformat(): When converting from STS to TSE, an error was raised if the 
+    tevent matrix had empty strings (ie. ""). Now, this is considered as no event.
 
 ## =========
 Version 1.8-6 
