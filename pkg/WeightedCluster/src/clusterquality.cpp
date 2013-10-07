@@ -217,7 +217,7 @@ extern "C" {
 			}
 		}
 		REprintf("Maxncluster=%d\n", maxncluster);
-		double *asw= new double[maxncluster];
+		double *asw= new double[2*maxncluster];
 		SEXP randomSample;
 		KendallTree kendall;
 		for(int r=0; r<R; r++){
@@ -255,13 +255,13 @@ extern "C" {
 						clusterquality(REAL(diss), clustsol, ww, ncase, stat, nclusters, asw, kendall);
 					}
 				}
-				REprintf("Copying values");
+				//REprintf("Copying values");
 				double * stt=REAL(VECTOR_ELT(ans, c));
 				for(int i=0; i<num_st_indice;i++){
 					stt[r+i*R] = stat[stat_indice[i]];
 					//REprintf(" [i=%d => %d, v=%g] ", i, r+i*R, stat[stat_indice[i]]);
 				}
-				REprintf("Finished Copying\n");
+				//REprintf("Finished Copying\n");
 			}
 		}
 		KendallTreeIterator it;
