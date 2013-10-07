@@ -107,7 +107,14 @@ wcSilhouetteObs <- function(diss, clustering, weights=NULL, measure="ASW"){
 }
 
 
-clusterqualitySimpleBoot <- function(diss, clustering, weights=NULL, R=999, replicates=TRUE, ...){
+
+clustrangeboot<- function(diss, clustering, weights=NULL, R=999, samplesize=NULL, simple=FALSE, ...){
+	if(simple){
+		statname <- c("PBC", "CH", "R2", "CHsq", "R2sq")
+	}else{
+		statname <- c("PBC", "HG", "HGSD", "ASW", "ASWw", "CH", "R2", "CHsq", "R2sq", "HC")
+	}
+	nstat <- length(statname)
 	if (inherits(diss, "dist")) {
 		isdist <- TRUE
 		nelements <- attr(diss, "Size")
@@ -123,41 +130,42 @@ clusterqualitySimpleBoot <- function(diss, clustering, weights=NULL, R=999, repl
 	if(is.null(weights)){
 		weights <- as.double(rep(1.0, nelements))
 	}
-	clusterF <- factor(clustering)
-	if(nlevels(clusterF) < 2){
-		stop("[!] The clustering should have at least two different values.")
+	if(!is.data.frame(clustering)){
+		clustering <- data.frame(clustering)
 	}
-	clustering <- as.integer(as.integer(clusterF)-1)
-	if(length(clustering)!=nelements|| length(weights)!=nelements){
+	if(nrow(clustering)!=nelements|| length(weights)!=nelements){
 		stop("[!] different number of elements in diss, clustering and/or weights arguments.")
 	}
-	ncluster <- max(clustering)+1
-	totweights <- sum(weights)
-	fenv <- new.env()
-	fenv$R <- 0
-	if(replicates){
-		prob <- weights/totweights
-		sampleint <- as.integer(floor(totweights))
-		internalsample <- function(){
-			return(as.integer(sample.int(nelements, size=sampleint, replace=TRUE, prob=prob)-1L))
+	clustmat <- matrix(0L, nrow=nrow(clustering), ncol=ncol(clustering))
+	nclusters <- integer(ncol(clustering))
+	ans <- vector("list", length=ncol(clustering))
+	for(i in 1:ncol(clustering)){
+		ans[[i]] <- matrix(0.0, ncol=nstat, nrow=R+1, dimnames=list(NULL, statname))
+		clusterF <- factor(clustering[, i])
+		if(nlevels(clusterF) < 2){
+			stop("[!] Each clustering should have at least two different values.")
 		}
-		t <- .Call(wc_RClusterQualSimpleBoot, diss, clustering, as.double(weights), as.integer(ncluster), as.integer(R),  quote(internalsample()), environment(), sampleint)
-		colnames(t) <-c("PBC", "CH", "R2", "CHsq", "R2sq")
-		t0 <- t[1,]
-		bts <- list(t0=t0, t=t)
-	} else {
-		SimpleBootStatistic <- function(d, w) {
-			if(fenv$R==0){
-				w <- as.double(weights)
-				fenv$R <- 1
-			}else{
-				w <- as.double(w*totweights)
-			}
-			cq <- .Call(wc_RClusterQualSimple, diss, clustering, w, as.integer(ncluster))
-			names(cq) <-c("PBC", "HG", "HGSD", "ASW", "CH", "R2", "CHsq", "R2sq", "HC")
-			return(cq[c(1, 5:8)])
-		}
-		bts <- boot(clustering, stype="w", statistic=SimpleBootStatistic, weights=weights, R=R, ...)
+		clustmat[, i] <- as.integer(as.integer(clusterF)-1)
+		nclusters[i] <- as.integer(nlevels(clusterF))
 	}
-	return(bts)
+	print(nclusters)
+	print(dim(clustmat))
+	print(head(clustmat))
+	
+	totweights <- sum(weights)
+	prob <- weights/totweights
+	if(is.null(samplesize)){
+		samplesize <- as.integer(floor(totweights))
+	}
+	
+	internalsample <- function(){
+		return(as.integer(sample.int(nelements, size=samplesize, replace=TRUE, prob=prob)-1L))
+	}
+	
+	bts <- .Call("RClusterQualBootSeveral", ans, diss, clustmat, as.double(weights), 
+										as.integer(nclusters), as.integer(R+1),  quote(internalsample()), 
+										environment(), as.integer(samplesize), as.integer(isdist), as.integer(simple), PACKAGE="WeightedCluster")
+	
+	
+	return(ans)
 }
