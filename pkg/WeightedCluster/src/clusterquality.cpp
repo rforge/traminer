@@ -252,7 +252,7 @@ extern "C" {
 						clusterqualitySimple(REAL(diss), clustsol, ww, ncase, stat, nclusters, asw);
 					}else{
 						resetKendallTree(&kendall);
-						clusterquality(REAL(diss), clustsol, ww, ncase, stat, nclusters, asw, kendall);
+						clusterquality(REAL(diss), clustsol, ww, ncase, stat, nclusters, asw, kendall); 
 					}
 				}
 				//REprintf("Copying values");
