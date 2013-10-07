@@ -192,7 +192,7 @@ extern "C" {
 		int nbclusttest = ncols(clustmatS);
 		int ncase = nrows(clustmatS);
 		int * clustmat=INTEGER(clustmatS);
-		REprintf("Clustmat size =%d x %d\n", ncase, nbclusttest);
+		//REprintf("Clustmat size =%d x %d\n", ncase, nbclusttest);
 		int R = asInteger(Rs);
 		bool simple = asLogical(simpleS);
 		int full_stat_indice[] = {ClusterQualHPG, ClusterQualHG, ClusterQualHGSD, 
@@ -216,12 +216,12 @@ extern "C" {
 				maxncluster=nclusters;
 			}
 		}
-		REprintf("Maxncluster=%d\n", maxncluster);
+		//REprintf("Maxncluster=%d\n", maxncluster);
 		double *asw= new double[2*maxncluster];
 		SEXP randomSample;
 		KendallTree kendall;
 		for(int r=0; r<R; r++){
-			REprintf("R=%d\n", r);
+			//REprintf("R=%d\n", r);
 			if(r==0){
 				ww = REAL(weightSS);
 			}else{
@@ -237,7 +237,7 @@ extern "C" {
 				ww = weights;
 			}
 			for(int c=0; c<nbclusttest; c++){
-				REprintf("Starting C=%d loop\n", c);
+				//REprintf("Starting C=%d loop\n", c);
 				int nclusters=INTEGER(numclust)[c];
 				int* clustsol =clustmat + c*ncase;
 				if(INTEGER(isdist)[0]){
