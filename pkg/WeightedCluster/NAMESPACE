@@ -35,9 +35,6 @@ S3method(wcAggregateCases, data.frame)
 S3method(wcAggregateCases, matrix)
 
 
-S3method(plot, seqtree)
-S3method(plot, disstree)
-S3method(plot, dtclust)
 
 
 useDynLib(WeightedCluster,
