@@ -1,4 +1,4 @@
-wcKMedRange <- function(diss, kvals, weights=NULL, ...){
+wcKMedRange <- function(diss, kvals, weights=NULL, R=1, samplesize=NULL, ...){
 	if (inherits(diss, "dist")) {
 		n <- attr(diss, "Size")
 	}else if(is.matrix(diss)){
@@ -6,33 +6,44 @@ wcKMedRange <- function(diss, kvals, weights=NULL, ...){
 	} else {
 		stop("[!] diss should be a squared matrix or a dist object.")
 	}
-	ret <- list()
+	ret <- list(R=R)
 	ret$kvals <- kvals
 	ret$clustering <- matrix(-1, nrow=n, ncol=length(kvals))
 	ret$stats <-  matrix(-1, nrow=length(kvals), ncol=10)
 	i <- 1
-	kendall <- .Call(wc_RClusterQualKendallFactory)
 	for(k in kvals){
 		cl <- wcKMedoids(diss=diss, k=k, cluster.only=TRUE, weights=weights, ...)
 		ret$clustering[,i] <- cl
-		stat <- wcClusterQualityInternal(diss=diss, clustering=cl, weights=weights, kendall=kendall)
-		ret$stats[i,] <- stat$stats
 		i <- i+1
 	}
+	if(R==1){
+		kendall <- .Call(wc_RClusterQualKendallFactory)
+		for(i in 1:length(kvals)){
+			stat <- wcClusterQualityInternal(diss=diss, clustering=ret$clustering[,i], weights=weights, kendall=kendall)
+			ret$stats[i,] <- stat$stats
+		}
+		ret$stats <- as.data.frame(ret$stats)
+		colnames(ret$stats) <- names(stat$stats)
+	}else{
+		ret$boot <- clustrangeboot(diss=diss, clustering=ret$clustering, weights=weights, R=R, samplesize=samplesize, simple=FALSE)
+		for(i in 1:length(kvals)){
+			ret$stats[i,] <- ret$boot[[i]][1, ]
+		}
+		ret$stats <- as.data.frame(ret$stats)
+		colnames(ret$stats) <- colnames(ret$boot[[i]])
+	}
 	ret$clustering <- as.data.frame(ret$clustering)
-	ret$stats <- as.data.frame(ret$stats)
-	colnames(ret$stats) <- names(stat$stats)
 	colnames(ret$clustering) <- paste("cluster", ret$kvals, sep="")
 	rownames(ret$stats) <- paste("cluster", ret$kvals, sep="")
 	class(ret) <- c("clustrange", class(ret))
 	return (ret)
 }
 
-as.clustrange <- function(object, diss, weights=NULL, ...){
+as.clustrange <- function(object, diss, weights=NULL, R=1, samplesize=NULL, ...){
 	UseMethod("as.clustrange")
 }
 
-as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, ...){
+as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, R=1, samplesize=NULL, ...){
 	
 	if(ncluster<3){
 		stop(" [!] ncluster should be greater than 2.")
@@ -50,14 +61,14 @@ as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, ...){
 		pred[, paste("Split", p, sep="")] <- factor(cutree(object, p))
 	}
 	object <- pred
-	as.clustrange(object, diss=diss, weights=weights, ...)
+	as.clustrange(object, diss=diss, weights=weights, R=R, samplesize=samplesize, ...)
 }
 
-as.clustrange.twins <- function(object, diss, weights=NULL, ncluster, ...) {
-	return(as.clustrange.hclust(object, diss=diss, weights=weights, ncluster=ncluster, ...))
+as.clustrange.twins <- function(object, diss, weights=NULL, ncluster, R=1, samplesize=NULL, ...) {
+	return(as.clustrange.hclust(object, diss=diss, weights=weights, ncluster=ncluster, R=R, samplesize=samplesize,...))
 }
 
-as.clustrange.default <- function(object, diss, weights=NULL, ...){
+as.clustrange.default <- function(object, diss, weights=NULL, R=1,  samplesize=NULL,...){
 	ret <- list()
 	ret$clustering <- as.data.frame(object)
 	numclust <- ncol(ret$clustering)
@@ -68,22 +79,53 @@ as.clustrange.default <- function(object, diss, weights=NULL, ...){
 	## print(class(kendall))
 	## print(kendall)
 	## print("Kendall")
-	for(i in 1:numclust){
-		ret$kvals[i] <- length(unique(ret$clustering[,i]))
-		## print("Starting")
-		cl <- wcClusterQualityInternal(diss, ret$clustering[,i], weights=weights, kendall=kendall)
-		ret$stats[i,] <- cl$stats
+	
+	
+	if(R==1){
+		for(i in 1:numclust){
+			ret$kvals[i] <- length(unique(ret$clustering[,i]))
+			## print("Starting")
+			cl <- wcClusterQualityInternal(diss, ret$clustering[,i], weights=weights, kendall=kendall)
+			ret$stats[i,] <- cl$stats
+		}
+		ret$stats <- as.data.frame(ret$stats)
+		colnames(ret$stats) <- names(stat$stats)
+	}else{
+		ret$boot <- clustrangeboot(diss=diss, clustering=ret$clustering, weights=weights, R=R, samplesize=samplesize, simple=FALSE)
+		ret$meant <- ret$stats
+		ret$stderr <- ret$stats
+		for(i in 1:numclust){
+			ret$kvals[i] <- length(unique(ret$clustering[,i]))
+			ret$stats[i,] <- ret$boot[[i]][1, ]
+			ret$meant[i,] <- colMeans(ret$boot[[i]])
+			ret$stderr[i,] <- apply(ret$boot[[i]], 2L, function(x) sqrt(var(x)))
+		}
+		ret$stats <- as.data.frame(ret$stats)
+		ret$meant <- as.data.frame(ret$meant)
+		ret$stderr <- as.data.frame(ret$stderr)
+		colnames(ret$stats) <- colnames(ret$boot[[i]])
+		colnames(ret$meant) <- colnames(ret$boot[[i]])
+		colnames(ret$stderr) <- colnames(ret$boot[[i]])
+		rownames(ret$meant) <- paste("cluster", ret$kvals, sep="")
+		rownames(ret$stderr) <- paste("cluster", ret$kvals, sep="")
 	}
-	ret$stats <- as.data.frame(ret$stats)
-	colnames(ret$stats) <- names(cl$stats)
 	colnames(ret$clustering) <- paste("cluster", ret$kvals, sep="")
 	rownames(ret$stats) <- paste("cluster", ret$kvals, sep="")
 	class(ret) <- c("clustrange", class(ret))
 	return(ret)
 }
-print.clustrange <- function(x, digits=2, ...){
-	x <- round(x$stats, digits)
+print.clustrange <- function(x, digits=2, bootstat=c("t0", "mean", "stderr"), ...){
+	if(!is.null(x$boot) && bootstat!="t0"){
+		if(bootstat=="mean"){
+			x <- round(x$meant, digits)
+		}else{
+			x <- round(x$stderr, digits)
+		}
+	} else {
+		x <- round(x$stats, digits)
+	}
 	print(x, ...)
+	
 }
 
 normalize.values.all <- function(stats, norm){
@@ -102,9 +144,15 @@ normalize.values <- function(stats, norm){
 	}
 	return(stats)
 }
+normalize.values.matrix <- function(stats, norm){
+	st <- normalize.values(c(stats), norm)
+	dim(st) <- dim(stats)
+	return(st)
+} 
 
-
-plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", withlegend=TRUE, lwd=1, col=NULL, ylab="Indicators", xlab="N clusters", ...){
+plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none", 
+							withlegend=TRUE, lwd=1, col=NULL, ylab="Indicators", 
+							xlab="N clusters", conf.int=0.9, ci.method="none", ci.alpha=.3, line="t0", ...){
 	kvals <- x$kvals
 	if(length(stat)==1){
 		if(stat=="all"){
@@ -127,10 +175,7 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 			stats <- x$stats[, stat]
 		}
 	}
-	stats <- normalize.values.all(stats, norm)
-	ylim <- range(unlist(stats), finite=TRUE)
-	plot(kvals, xlim=range(kvals, finite=TRUE), ylim=ylim, type="n", ylab=ylab, xlab=xlab, ...)
-	labels <- character(ncol(stats))
+	
 	if(is.null(col)){
 		allnames <- colnames(x$stats)
 		cols <- brewer.pal(length(allnames)+1, "Set3")[-2]
@@ -143,10 +188,46 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 		}
 		cols <- col
 	}
-	for(i in 1:ncol(stats)){
-		ss <- stats[,i]
-		lines(kvals, ss, col=cols[i], lwd=lwd, ...)
-		labels[i] <- paste(colnames(stats)[i], "(", round(min(stats[,i]), 2),"/", round(max(stats[,i]),2), ")")
+	plot.ci <-  ci.method!="none" && !is.null(x$boot)
+	if(plot.ci) {
+		upper <- stats
+		lower <- stats
+		confvec <- c((1-conf.int)/2, 1-(1-conf.int)/2)
+		getline <- function(x){
+			if(line=="t0"){
+				return(x[1])
+			}else if(line=="mean"){
+				return(mean(x))
+			}else if(line=="median"){
+				return(median(x))
+			}
+		}
+		borne <- list()
+		for(l in colnames(stats)){
+			st <- normalize.values.matrix(sapply(x$boot, function(x)x[ , l]), norm=norm)
+			stats[, l] <- apply(st, 2, getline)
+			if(ci.method=="norm"){
+				borne[[l]] <- apply(st, 2, function(x) {mean(x)+qnorm(confvec)*sqrt(var(x))})
+			}
+			else if(ci.method=="perc"){
+				borne[[l]] <- apply(st, 2, function(x) quantile(x, confvec))
+			}
+		}
+		ylim <- range(unlist(c(stats, borne)), finite=TRUE)
+	}else{
+		stats <- normalize.values.all(stats, norm)
+		ylim <- range(unlist(stats), finite=TRUE)
+	}
+	plot(kvals, xlim=range(kvals, finite=TRUE), ylim=ylim, type="n", ylab=ylab, xlab=xlab, ...)
+	labels <- paste(colnames(stats), "(", round(apply(stats, 2, min), 2),"/", round(apply(stats, 2, max),2), ")")	
+	names(labels) <- colnames(stats)
+	for(l in colnames(stats)){
+		ss <- stats[,l]
+		lines(kvals, ss, col=cols[l], lwd=lwd, ...)
+		if(plot.ci){
+			polygon(c(rev(kvals), kvals), c(rev(borne[[l]][1, ] ), borne[[l]][2, ] ), col = adjustcolor(cols[l], alpha.f=.1), border = NA)
+		}
+		
 	}
 	if(withlegend) {
 		legend(legendpos, fill=cols[1:ncol(stats)], legend=labels)

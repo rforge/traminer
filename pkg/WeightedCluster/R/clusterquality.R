@@ -108,7 +108,7 @@ wcSilhouetteObs <- function(diss, clustering, weights=NULL, measure="ASW"){
 
 
 
-clustrangeboot<- function(diss, clustering, weights=NULL, R=999, samplesize=NULL, simple=FALSE, ...){
+clustrangeboot<- function(diss, clustering, weights=NULL, R=999, samplesize=NULL, simple=FALSE){
 	if(simple){
 		statname <- c("PBC", "CH", "R2", "CHsq", "R2sq")
 	}else{
@@ -148,9 +148,7 @@ clustrangeboot<- function(diss, clustering, weights=NULL, R=999, samplesize=NULL
 		clustmat[, i] <- as.integer(as.integer(clusterF)-1)
 		nclusters[i] <- as.integer(nlevels(clusterF))
 	}
-	print(nclusters)
-	print(dim(clustmat))
-	print(head(clustmat))
+
 	
 	totweights <- sum(weights)
 	prob <- weights/totweights
@@ -166,6 +164,6 @@ clustrangeboot<- function(diss, clustering, weights=NULL, R=999, samplesize=NULL
 										as.integer(nclusters), as.integer(R+1),  quote(internalsample()), 
 										environment(), as.integer(samplesize), as.integer(isdist), as.integer(simple), PACKAGE="WeightedCluster")
 	
-	
+	class(ans) <- "clustrangeboot"
 	return(ans)
 }
