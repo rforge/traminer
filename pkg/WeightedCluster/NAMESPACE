@@ -1,4 +1,5 @@
 import(TraMineR, cluster)
+importFrom(utils, packageDescription, packageVersion)
 
 export(
 as.clustrange,

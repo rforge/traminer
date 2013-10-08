@@ -1,7 +1,7 @@
 
 .onAttach <- function(libname, pkgname){
-	suppressWarnings(descr <- utils:::packageDescription("WeightedCluster"))
-	if(utils:::packageVersion("WeightedCluster")$minor %% 2 == 0) {
+	suppressWarnings(descr <- utils::packageDescription("WeightedCluster"))
+	if(utils::packageVersion("WeightedCluster")$minor %% 2 == 0) {
 		state <- "stable"
 	}
 	else {

@@ -89,7 +89,7 @@ as.clustrange.default <- function(object, diss, weights=NULL, R=1,  samplesize=N
 			ret$stats[i,] <- cl$stats
 		}
 		ret$stats <- as.data.frame(ret$stats)
-		colnames(ret$stats) <- names(stat$stats)
+		colnames(ret$stats) <- names(cl$stats)
 	}else{
 		ret$boot <- clustrangeboot(diss=diss, clustering=ret$clustering, weights=weights, R=R, samplesize=samplesize, simple=FALSE)
 		ret$meant <- ret$stats
