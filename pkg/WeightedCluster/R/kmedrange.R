@@ -43,7 +43,7 @@ as.clustrange <- function(object, diss, weights=NULL, R=1, samplesize=NULL, ...)
 	UseMethod("as.clustrange")
 }
 
-as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, R=1, samplesize=NULL, ...){
+as.clustrange.hclust <- function(object, diss, weights=NULL, R=1, samplesize=NULL, ncluster=20, ...){
 	
 	if(ncluster<3){
 		stop(" [!] ncluster should be greater than 2.")
@@ -64,7 +64,7 @@ as.clustrange.hclust <- function(object, diss, weights=NULL, ncluster, R=1, samp
 	as.clustrange(object, diss=diss, weights=weights, R=R, samplesize=samplesize, ...)
 }
 
-as.clustrange.twins <- function(object, diss, weights=NULL, ncluster, R=1, samplesize=NULL, ...) {
+as.clustrange.twins <- function(object, diss, weights=NULL, R=1, samplesize=NULL, ncluster=20, ...) {
 	return(as.clustrange.hclust(object, diss=diss, weights=weights, ncluster=ncluster, R=R, samplesize=samplesize,...))
 }
 
