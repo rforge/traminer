@@ -225,7 +225,7 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 		ss <- stats[,l]
 		lines(kvals, ss, col=cols[l], lwd=lwd, ...)
 		if(plot.ci){
-			polygon(c(rev(kvals), kvals), c(rev(borne[[l]][1, ] ), borne[[l]][2, ] ), col = adjustcolor(cols[l], alpha.f=.1), border = NA)
+			polygon(c(rev(kvals), kvals), c(rev(borne[[l]][1, ] ), borne[[l]][2, ] ), col = adjustcolor(cols[l], alpha.f=ci.alpha), border = NA)
 		}
 		
 	}
