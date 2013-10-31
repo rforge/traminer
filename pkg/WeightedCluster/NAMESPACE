@@ -4,21 +4,18 @@ importFrom(utils, packageDescription, packageVersion)
 export(
 as.clustrange,
 as.seqtree,
-dtcut,
 wcAggregateCases,
 wcClusterQuality,
 wcCmpCluster,
 wcKMedoids,
 wcKMedRange,
 wcSilhouetteObs,
-seqclustname,
-seqpropclust
+seqclustname
 )
 
 S3method(as.clustrange, hclust)
 S3method(as.clustrange, twins)
 S3method(as.clustrange, default)
-S3method(as.clustrange, dtclust)
 S3method(as.seqtree, hclust)
 S3method(as.seqtree, twins)
 S3method(as.seqtree, default)
@@ -39,10 +36,6 @@ S3method(wcAggregateCases, data.frame)
 S3method(wcAggregateCases, matrix)
 
 
-S3method(plot, seqtree)
-S3method(plot, disstree)
-S3method(plot, dtclust)
-S3method(plot, seqtreeclust)
 
 
 useDynLib(WeightedCluster,
