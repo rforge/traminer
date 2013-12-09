@@ -9,6 +9,7 @@ Bug fixes:
   - seqformat(): When converting from STS to TSE, an error was raised if the
     tevent matrix had empty strings (ie. ""). Now, this is considered as no event.
   - seqpcplot(): Fixed error that appeared at the use of "_end" events
+  - seqpcplot(): Fixed conflict with "cnames" argument of seqdef()
 
 ## =========
 Version 1.8-6
