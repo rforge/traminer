@@ -117,7 +117,8 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
         if (order.align %in% c("first", "last")) {
           seqdata <- seqdss(seqdata)
         }
-        TMP <- data.frame(seqdata)
+        TMP <- as.data.frame(seqdata)
+        
         TMP <- reshape(data = TMP, ids = 1:nrow(TMP), times = colnames(TMP), timevar = "time", varying = list(state = colnames(TMP)), v.names = "state", direction = "long")
         TMP$id <- factor(TMP$id)
         TMP <- TMP[TMP$state %in% c(attr(seqdata, "alphabet"), attr(seqdata, "nr")), ]
