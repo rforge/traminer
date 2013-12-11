@@ -148,6 +148,13 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
 
 }
 
+\value{
+  \code{seqpcplot} returns an object of \code{class} \code{"seqpcplot"}
+  with various information for constructing the plot,
+  e.g. coordinates. There is also a \code{summary} method for such
+  objects.  
+}
+
 
 \seealso{ \code{\link{seqplot}}, \code{\link{seqdef}}, \code{\link{seqecreate}}}
 
