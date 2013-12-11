@@ -2,14 +2,16 @@
 Version 1.9-7 (Development version)
 
 Changes in existing functions:
-  - seqpcplot(): Suppressed unnecessary "output" argument. Plot output 
-    can now be stored by simple assignment p <- seqepcplot(...)
+  - seqpcplot(): Suppressed unnecessary "output" argument. The
+    'seqpcplot' object can be retrieved with the assignment operator,
+    e.g., p <- seqepcplot(...)
 
 Bug fixes:
   - seqformat(): When converting from STS to TSE, an error was raised if the
-    tevent matrix had empty strings (ie. ""). Now, this is considered as no event.
-  - seqpcplot(): Fixed error that appeared at the use of "_end" events
-  - seqpcplot(): Fixed conflict with "cnames" argument of seqdef()
+    tevent matrix had empty strings (i.e. ""). Now, this is considered as no event.
+  - seqpcplot(): Fixed error that appeared at the use of "_end" events.
+  - seqpcplot(): An error occurred when plotting a state sequence object
+    (of class stslist) with a numeric 'cnames' attribute.
 
 ## =========
 Version 1.8-6
