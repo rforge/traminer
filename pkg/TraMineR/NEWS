@@ -3,8 +3,8 @@ Version 1.9-7 (Development version)
 
 Changes in existing functions:
   - seqpcplot(): Suppressed unnecessary "output" argument. The
-    'seqpcplot' object can be retrieved with the assignment operator,
-    e.g., p <- seqepcplot(...)
+    'seqpcplot' object is automatically retrieved when using the 
+    assignment operator, e.g., p <- seqepcplot(...).
 
 Bug fixes:
   - seqformat(): When converting from STS to TSE, an error was raised if the
