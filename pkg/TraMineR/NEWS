@@ -1,9 +1,14 @@
 ## =========
-Version 1.9-7 (Development version)
+Version 1.9-8 (Development version)
+
+  - no change
+
+## =========
+Version 1.8-7 
 
 Changes in existing functions:
   - seqpcplot(): Suppressed unnecessary "output" argument. The
-    'seqpcplot' object is automatically retrieved when using the 
+    'seqpcplot' object is automatically retrieved when using the
     assignment operator, e.g., p <- seqepcplot(...).
 
 Bug fixes:
@@ -12,6 +17,11 @@ Bug fixes:
   - seqpcplot(): Fixed error that appeared at the use of "_end" events.
   - seqpcplot(): An error occurred when plotting a state sequence object
     (of class stslist) with a numeric 'cnames' attribute.
+    
+Misc:
+  - Required packages RColorBrewer and boot now listed as "imports"
+    in DESCRIPTION and using import in NAMESPACE.
+   
 
 ## =========
 Version 1.8-6
