@@ -25,14 +25,14 @@ sequences and vice versa.
 \details{
 \tabular{ll}{
 Package: \tab TraMineR\cr
-Version: \tab 1.9-7\cr
-Date: \tab 2013-12-12\cr
+Version: \tab 1.9-8\cr
+Date: \tab 2013-12-19\cr
 Authors@R: \tab c(
-  person("Alexis", "Gabadinho", role = "aut"),
-  person("Matthias", "Studer", role = "aut"),
-  person("Nicolas", "Muller", role = "ctb"),
-  person("Reto", "Buergin", role = "ctb"),
-  person("Gilbert", "Ritschard", role = c("aut", "cre", "ths", "cph"),
+  person("Alexis", "Gabadinho", role = c("aut", "cph")),
+  person("Matthias", "Studer", role = c("aut", "cph")),
+  person("Nicolas", "Muller", role = "aut"),
+  person("Reto", "Buergin", role = "aut"),
+  person("Gilbert", "Ritschard", role = c("aut", "cre", "cph"),
   email = "gilbert.ritschard@unige.ch"))\cr
 Depends: \tab R (>= 2.8.1), RColorBrewer, boot\cr
 Imports: \tab utils\cr
