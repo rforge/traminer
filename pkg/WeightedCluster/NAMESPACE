@@ -1,5 +1,6 @@
 import(TraMineR, cluster)
 importFrom(utils, packageDescription, packageVersion)
+importfrom(RColorBrewer, brewer.pal)
 
 export(
 as.clustrange,
