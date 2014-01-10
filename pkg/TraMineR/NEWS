@@ -1,8 +1,15 @@
 ## =========
 Version 1.9-8 (Development version)
 
-  - no change
+Bug fixes:
+  - seqecreate(): The function now throws an error if rows concerning a same id are 
+    not grouped (Reported by Nicolas Jay).
+    
+Misc:
+  - Function allowing other packages to access some of the TraMineR internal 
+	functions are now available. This is intended for experts only.
 
+	
 ## =========
 Version 1.8-7 
 
