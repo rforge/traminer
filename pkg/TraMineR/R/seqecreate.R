@@ -94,6 +94,9 @@ seqecreate.internal <- function(data, id, timestamp, event, endEvent, tevent,
 			seqeweight(ret) <- ww
 		}
 	}
+	if(length(ret) != length(unique(id))){
+		stop(" [!] Data for the same ID should be grouped, see help page.")
+	}
 	return(ret)
 }
 #SEXP tmrsequence(SEXP idpers, SEXP time, SEXP event, SEXP classname, SEXP seq)
