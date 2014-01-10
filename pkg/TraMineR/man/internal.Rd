@@ -7,7 +7,7 @@
  Access to internal functions
 }
 \description{
-Functions allowing other packages to access some TraMineR internal functions. For experts only.
+Functions allowing other packages to access some TraMineR internal functions. Corresponding functions respectively are \code{DTNInit}, \code{DTNsplit} and \code{TraMineR.setlayout}. For experts only.
 }
 \usage{
 internalNodeInit(...)

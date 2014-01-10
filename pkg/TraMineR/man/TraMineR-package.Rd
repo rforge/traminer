@@ -26,7 +26,7 @@ sequences and vice versa.
 \tabular{ll}{
 Package: \tab TraMineR\cr
 Version: \tab 1.9-8\cr
-Date: \tab 2013-12-19\cr
+Date: \tab 2014-01-10\cr
 Authors@R: \tab c(
   person("Alexis", "Gabadinho", role = c("aut", "cph")),
   person("Matthias", "Studer", role = c("aut", "cph")),
@@ -72,6 +72,9 @@ ex1                     Example data set with missing values and
 ex2                     Example data sets with weighted and unweighted
                         sequence data
 famform                 Example data set: sequences of family formation
+internalNodeInit        Access to internal functions
+internalSplitInit       Access to internal functions
+internalLayout          Access to internal functions
 mvad                    Example data set: Transition from school to
                         work
 plot.seqdiff            Plotting a seqdiff object.
@@ -167,11 +170,11 @@ stlab                   Get or set the state labels of a sequence
 }
 }
 \author{
-Alexis Gabadinho [aut],
-  Matthias Studer [aut],
-  Nicolas Muller [ctb],
-  Reto Buergin [ctb],
-  Gilbert Ritschard [aut, cre, ths, cph]
+Alexis Gabadinho [aut. cph],
+  Matthias Studer [aut, cph],
+  Nicolas Muller [aut],
+  Reto Buergin [aut],
+  Gilbert Ritschard [aut, cre, cph]
 Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
 }
 \references{
@@ -179,6 +182,7 @@ Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
 Analyzing and Visualizing State Sequences in R with TraMineR.
 \emph{Journal of Statistical Software} \bold{40}(4), 1-37.
 }
+
 {Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009).
 Mining Sequence Data in \code{R} with the \code{TraMineR} package:
 A user's guide. Department of Econometrics and Laboratory of
@@ -187,10 +191,13 @@ Demography, University of Geneva } }
 ## load the mvad data
 library(TraMineR)
 data(mvad)
+
 ## create a state sequence object from columns 17 to 86
 mvad.seq <- seqdef(mvad[,17:86])
+
 ## distribution plot by sex (male)
 seqdplot(mvad.seq, group=mvad$male, border=NA)
+
 ## compute the LCS pairwise distance matrix
 ## among the first 10 sequences
 mvad.lcs <- seqdist(mvad.seq[1:10,], method="LCS") }
