@@ -6,9 +6,6 @@ export(
 	"alphabet<-",
 	cpal,
 	"cpal<-",
-	internalNodeInit,
-	internalSplitInit,
-	internalLayout,
 	read.tda.mdist,
 	recodef,
     seqalign,
@@ -64,7 +61,10 @@ export(
 	seqtrate,
 	stlab,
 	"stlab<-",
-	TraMineR.checkupdates
+	TraMineR.checkupdates,
+	TraMineRInternalNodeInit,
+	TraMineRInternalSplitInit,
+	TraMineRInternalLayout
   )
 
 ## stslist methods
