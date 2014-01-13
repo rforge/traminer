@@ -1,11 +1,11 @@
-internalNodeInit <- function(...){
+TraMineRInternalNodeInit <- function(...){
 	return(DTNInit(...))
 }
 
-internalSplitInit <- function(...){
+TraMineRInternalSplitInit <- function(...){
 	return(DTNsplit(...))
 }
 
-internalLayout <- function(...){
+TraMineRInternalLayout <- function(...){
 	return(TraMineR.setlayout(...))
 }

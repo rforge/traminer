@@ -10,9 +10,9 @@
 Functions allowing other packages to access some TraMineR internal functions. Corresponding functions respectively are \code{DTNInit}, \code{DTNsplit} and \code{TraMineR.setlayout}. For experts only.
 }
 \usage{
-internalNodeInit(...)
-internalSplitInit(...)
-internalLayout(...)
+TraMineRInternalNodeInit(...)
+TraMineRInternalSplitInit(...)
+TraMineRInternalLayout(...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
