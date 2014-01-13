@@ -137,7 +137,7 @@ plot.clustrangefamily <- function(x, group="stat", method="all", pam.combine=FAL
 	names(main) <- intitle
 	
 	if(group=="stat"){
-		lout <- internalLayout(length(stat), rows, cols, withlegend, axes="all", legend.prop)
+		lout <- TraMineRInternalLayout(length(stat), rows, cols, withlegend, axes="all", legend.prop)
 	  	layout(lout$laymat, heights=lout$heights, widths=lout$widths)
 		if(is.null(col)){
 			if(length(method)>8){
@@ -177,7 +177,7 @@ plot.clustrangefamily <- function(x, group="stat", method="all", pam.combine=FAL
 		
 	} else { ## One plot per clustering method
 		
-		lout <- internalLayout(length(method), rows, cols, withlegend, axes="all", legend.prop)
+		lout <- TraMineRInternalLayout(length(method), rows, cols, withlegend, axes="all", legend.prop)
 	  	layout(lout$laymat, heights=lout$heights, widths=lout$widths)
 		for(meth in method){
 			plot(x[[meth]], withlegend=FALSE, lwd=lwd, col=col, stat=stat, norm=norm, main=main[meth], xlab=xlab, ylab=ylab, ...)
