@@ -1,0 +1,111 @@
+useDynLib(vcolmm, .registration = TRUE)
+
+import("grid", "methods", "partykit")
+
+## Generics for which we define new methods
+importFrom("Formula", "as.Formula", Formula)
+importFrom("graphics", plot)
+importFrom("nlme", fixef, ranef, VarCorr)
+importFrom("mboost", extract)
+importFrom("numDeriv", hessian)
+importFrom("party", reweight)
+importFrom("rpart", prune)
+importFrom("strucchange", sctest)
+importFrom("sandwich", estfun)
+importFrom("stats4", AIC, BIC, logLik, vcov)
+importFrom("stats",
+           anova,
+           coef, coefficients,
+           deviance,
+           fitted,
+           formula,
+           getCall,
+           model.frame,
+           model.matrix,
+           predict,
+           resid, residuals,
+           terms,
+           update,
+           weights)
+importFrom("ucminf", ucminf)
+
+## S4 classes
+exportClasses(olmm,
+              summary.olmm)
+
+## Exports
+export(
+  fvcolmm,
+  cv.tvcolmm,
+  extract,
+  neglogLik,
+  otsplot,
+  olmm,
+  tvcolmm_control,
+  tvcolmm_folds,
+  tvcolmm,
+  stabpath.tvcolmm)
+
+## Exports for olmm (S4)
+exportMethods(anova,
+              coef, coefficients,
+              deviance,
+              fitted,
+              fixef,
+              formula,
+              getCall,
+              logLik,
+              model.frame,
+              model.matrix,
+              predict,
+              print,
+              ranef,
+              ranefCov, # new method 
+              resid, residuals,
+              reweight,
+              show,
+              summary,
+              terms,
+              update,
+              VarCorr,
+              vcov,
+              weights)
+
+## S3 exports for olmm
+S3method("drop1", "olmm")
+S3method("estfun", "olmm")
+S3method("neglogLik", "olmm")
+S3method("print", "VarCorr.olmm") 
+S3method("terms", "olmm")
+
+## Exports for otsplot (S3)
+S3method("otsplot", "default")
+S3method("otsplot", "formula")
+S3method("print", "otsplot")
+
+## Exports for tvcolmm (S3)
+S3method("coef", "tvcolmm")
+S3method("coefficients", "tvcolmm")
+S3method("extract", "tvcolmm")
+S3method("getCall", "tvcolmm")
+S3method("fitted", "tvcolmm")
+S3method("logLik", "tvcolmm")
+S3method("model.frame", "tvcolmm")
+S3method("neglogLik", "tvcolmm")
+S3method("plot", "tvcolmm")
+S3method("predict", "tvcolmm")
+S3method("print", "tvcolmm")
+S3method("prune", "tvcolmm")
+S3method("ranef", "tvcolmm")
+S3method("resid", "tvcolmm")
+S3method("residuals", "tvcolmm")
+S3method("weights", "tvcolmm")
+
+S3method("logLik", "fvcolmm")
+S3method("neglogLik", "fvcolmm")
+S3method("predict", "fvcolmm")
+S3method("print", "fvcolmm")
+S3method("plot", "cv.tvcolmm")
+S3method("print", "cv.tvcolmm")
+S3method("plot", "stabpath.tvcolmm")
+S3method("print", "stabpath.tvcolmm")

@@ -1,0 +1,15 @@
+		 CHANGES IN vcolmm VERSION 0.1-10
+
+NEW FEATURES
+
+     o   added method 'drop1' method for 'olmm' objects.
+     o   added 'type = "terms"' to predict 'predict.tvcolmm'
+     	 - allows to extract the effect of the model
+	 corresponding to an observation.
+
+IMPROVEMENTS
+
+     o	 C implementation for updating the marginal Likelihood
+     	 and predicting random-effects was stabilized by 
+	 replacing many alloca's by the R built-in function
+	 Calloc, which may slow the estimation

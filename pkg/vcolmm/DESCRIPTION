@@ -1,0 +1,15 @@
+Package: vcolmm
+Version: 0.1-10
+Date: 2013-12-06
+Title: Estimation of varying coefficients in 2-level ordinal linear mixed models via model-based recursive partitioning 
+Author: Reto Buergin
+Maintainer: Reto Buergin <rbuergin@gmx.ch>, <reto.buergin@unige.ch>
+Depends: R (>= 2.12.1), grid, partykit
+Imports: Formula, stats, stats4, graphics, mboost, methods, nlme, numDeriv, party, rpart, sandwich, strucchange, ucminf
+Suggests:
+LinkingTo:
+Description: A package for estimating varying fixed effects in 2-level ordinal linear mixed-effect models (OLMM) using model-based recursive partitioning. Includes a fitting function for OLMMs and a partitioning algorithm for varying fixed effects in OLMMs. 
+License: GPL (>= 2)
+LazyLoad: yes
+NeedsCompilation: yes
+Packaged: 2013-11-23 23:18:05 UTC; reto

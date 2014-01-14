@@ -1,0 +1,51 @@
+\documentclass[nojss]{jss}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\SweaveOpts{engine=R}
+
+<<setup, echo = FALSE, results = hide>>=
+require("vcolmm")
+options(useFancyQuotes = FALSE)
+@
+
+%% author/title
+\author{Reto B\"urgin\\Universit\'e de Gen\`eve}
+\Plainauthor{Reto B\"urgin}
+
+\title{\pkg{vcolmm}: Varying Coefficients in 2-level Ordinal Linear
+  Mixed Models via \\ Model-Based Recursive Partitioning}
+\Plaintitle{Ordinal Linear Mixed Models with Varying Coefficients}
+\Shorttitle{Ordinal Linear Mixed Models with Varying Coefficients}
+
+\Keywords{linear mixed models, ordinal longitudinal data, recursive
+  partitioning} 
+
+%% abstract
+\Abstract{
+  The \pkg{vcolmm} package provides with \code{olmm()} a fitting
+  function for 2-level Ordinal Linear Mixed Models (OLMM) and an
+  algorithm, \code{tvcolmm()}, that incorporate varying coefficients
+  in OLMMs. This document is a guideline for the use of these functions. 
+}
+  
+\Address{
+  Reto B\"urgin\\
+  Institute for Demographic and Life Course Studies\\
+  Uni Mail\\
+  40 Bd du Pont-d'Arve\\
+  1211 Gen\`eve, Switzerland\\
+  E-mail: \email{reto.buergin@unige.ch}, \email{rbuergin@gmx.ch}\\
+  URL: \url{http://www.unige.ch/ses/demog/Equipe/RetoBurgin.html},\\
+}
+
+\begin{document}
+
+%\VignetteIndexEntry{vcolmm}
+%\VignetteDepends{vcolmm}
+%\VignetteKeywords{recursive partitioning}
+%\VignettePackage{vcolmm}
+
+Nothing here.
+
+\end{document}
