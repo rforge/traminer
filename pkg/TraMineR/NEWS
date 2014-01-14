@@ -8,7 +8,7 @@ Bug fixes:
 
 Misc:
   - exported alias functions allowing other packages to access TraMineR
-    internal functions (see ?internalLayout).
+    internal functions (see ?TraMineRInternalLayout).
 
 ## =========
 Version 1.8-7
