@@ -13,7 +13,7 @@
 tvcolmm_control(alpha = 0.05, bonferroni = TRUE,
                 minsplit = 50L, trim = 0.1,
                 lossfun = neglogLik, breakties = FALSE,
-                verbose = FALSE, ...)
+                terms = NULL, verbose = FALSE, ...)
 }
 
 \arguments{
@@ -33,6 +33,8 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE,
     fitted model in a node.} 
   \item{breakties}{logical. Should ties in numeric variables be broken
     randomly for computing the associated parameter instability test?}
+  \item{terms}{character vector. The names of the predictors to be
+    tested on coefficient constancy.}
   \item{verbose}{logical. Should information about the fitting process
     (such as test statistics, \eqn{p} values, 
     selected splitting variables and split points) be printed to the

@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:      Reto Buergin
 ## E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:        2013-12-05
+## Date:        2014-01-15
 ##
 ## Description:
 ## The tvcolmm function
@@ -11,15 +11,13 @@
 ## tvcolmm_control: control function for 'tvcolmm'
 ##
 ## Todo:
-## - component-wise trees
-## - boosting
+## -
 ## --------------------------------------------------------- #
 
 tvcolmm <- function(formula, data, control = tvcolmm_control(),
-                        subset, na.action, offset, 
-                        vi = c("none", "predictor-invariant",
-                          "predictor-variable"),
-                        linear = NULL, ...) {
+                    subset, na.action, offset, 
+                    vi = c("none", "po", "npo"),
+                    linear = NULL, ...) {
 
   ## check arguments
   if (control$verbose) cat("* checking arguments ... ")
@@ -43,9 +41,8 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   ## set formulas
   if (control$verbose) cat("OK\n* setting formulas ... ")
   fullForm <- as.Formula(formula)
-  formList <-
-    vcolmm:::olmm_formula(formula(fullForm, rhs = - length(fullForm)[2]),
-                 env = parent.frame(n = 1))
+  formList <- olmm_formula(formula(fullForm, rhs = - length(fullForm)[2]),
+                           env = parent.frame(n = 1))
   fullForm <- update(fullForm, formList$full)
   environment(fullForm) <- environment(eval.parent(mc$formula))
   partForm <- formula(as.Formula(fullForm),
@@ -66,7 +63,7 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   frame <- eval.parent(frame)
 
   ## compress category labels
-  frame <- vcolmm:::tvcolmm_modify_catpreds(formula = modelForm, data = frame)
+  frame <- tvcolmm_modify_catpreds(formula = modelForm, data = frame)
     
   ## list with elements to fit the model
   args <- append(list(formula = modelForm, data = frame), list(...))
@@ -78,25 +75,41 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   args$weights <- weights(model)
       
   ## modify 'control' and arguments for fitting the model
-  control <- vcolmm:::tvcolmm_modify_control(model, control)
-  args <- vcolmm:::tvcolmm_modify_modargs(model, args)
+  control <- tvcolmm_modify_control(model, control)
+  args <- tvcolmm_modify_modargs(model, args)
 
   ## extract formulas
   ff <- list(original = formula,
              root = args$formula,
-             tree = vcolmm:::tvcolmm_formula(model, control))
+             tree = tvcolmm_formula(model, control))
   
-  ## define data frame with partitioning variables
+  ## define model data
   frame <- frame[rownames(model.frame(model)), , drop = FALSE]
-  partData <- model.frame(partForm, frame)
 
+  ## define partitioning data
+  partvar <- model.frame(partForm, frame)
+
+  if (!is.null(control$type.vars) && # check
+      (length(control$type.vars) != ncol(partvar) |
+       any(!control$type.vars %in% c("tm-var", "tm-inv"))))
+    stop("'type.vars' is missspecified")
+  
+  if (is.null(control$type.vars)) { # retrieve types if necessary
+    getType <- function(i) {
+      nval <- rowSums(table(model@subject, partvar[, i]) > 0)
+      return(c("tm-inv", "tm-var")[1 + 1 * (max(nval) > 1)])
+    }
+    control$type.vars <- sapply(1:ncol(partvar), getType)
+  }
+  
   if (control$verbose) cat("\n* starting partitioning ...\n")
   
   ## set the root node
   nodes <- partynode(id = 1L,
-                     info = list(dims = c(N = nlevels(model@subject),
-                                   n = length(model@subject)),
-                       depth = 0L))
+                     info = list(dims =
+                          c(N = nlevels(model@subject),
+                            n = length(model@subject)),
+                          depth = 0L))
   
   args$data$Part <- factor(rep(1L, nrow(args$data)))
 
@@ -109,7 +122,7 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
       if (control$verbose) cat("\n* starting step", step, "...")
       
       ## get current partitions
-      where <- fitted_node(nodes, partData)
+      where <- fitted_node(nodes, partvar)
       args$data$Part <- factor(where)
 
       ## set start values if required
@@ -130,14 +143,13 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
       ## Step 2: variable selection via coefficient constancy tests
       ## --------------------------------------------------- #
       
-      test <- tvcolmm_fit_fluctest(model, nodes, partData, control)
+      test <- tvcolmm_fit_fluctest(model, nodes, partvar, control)
       
       ## return error if test failed
       if (inherits(test, "try-error"))
           stop("coefficient constancy tests failed.")
       
-      run <-
-        suppressWarnings(min(test$p.value, na.rm = TRUE)) <= control$alpha
+      run <- suppressWarnings(min(test$p.value, na.rm = TRUE)) <= control$alpha
       
       if (run) {
 
@@ -149,18 +161,18 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
         
         if (control$verbose) {
 
-          cat("\nSplitting variable:", colnames(partData)[varid])
+          cat("\nSplitting variable:", colnames(partvar)[varid])
           cat("\nPartition:", levels(args$data$Part)[partition])
           cat("\nSelection statistic (p-value) = ")
           cat(format(pval[varid], digits = 3))
         }
         
         ## ------------------------------------------------- #
-        ## Step 3: splitting
+        ## Step 3: search a cutpoint
         ## ------------------------------------------------- #
         
         newnodes <- tvcolmm_fit_splitnode(varid, partition,
-                                          partData, nodes,
+                                          partvar, nodes,
                                           model, ff, args, test,
                                           control, step)
           
@@ -210,9 +222,9 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   control$terms <- control$terms$original
   
   ## the output object
-  tree <- party(nodes, data = partData,
+  tree <- party(nodes, data = partvar,
                 fitted = data.frame(
-                  "(fitted)" = fitted_node(nodes, data = partData),
+                  "(fitted)" = fitted_node(nodes, data = partvar),
                   "(response)" = model@y,
                   "(weights)" = model@weights,
                   check.names = FALSE),
@@ -239,14 +251,14 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
 tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
                             minsplit = 50L, trim = 0.1,
                             lossfun = neglogLik, breakties = FALSE,
-                            verbose = FALSE, ...) {
+                            terms = NULL, verbose = FALSE,...) {
   
   ## check available arguments
   stopifnot(alpha >= 0 & alpha <= 1)
   stopifnot(is.logical(bonferroni))
   stopifnot(minsplit >= 0)
   
-  rval <- vcolmm:::appendDefArgs(
+  rval <- appendDefArgs(
             list(...),
             list(alpha = alpha,
                  bonferroni = bonferroni,
@@ -257,7 +269,7 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
                  maxevalsplit = 20,
                  lossfun = lossfun,
                  breakties = breakties,
-                 terms = NULL, restricted = NULL,
+                 terms = terms, restricted = NULL,
                  intercept = "none",
                  mtry = Inf,
                  maxsurrogate = 0L,
@@ -266,6 +278,7 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
                  functional.factor = "LMuo",
                  functional.ordered = "LMuo",
                  functional.numeric = "supLM",
+                 type.vars = NULL,
                  part.select = "test",
                  fast = 0L,
                  verbose = verbose))

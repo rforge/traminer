@@ -170,11 +170,7 @@ setMethod(f = "fitted", signature = "olmm",
           })
 
 
-olmm_fixef <- function(object,
-                       which = c("all",
-                         "predictor-variable",
-                         "predictor-invariant"),
-                       ...) {
+olmm_fixef <- function(object, which = c("all", "npo", "po"), ...) {
 
   which <- match.arg(which)
   dims <- object@dims
@@ -182,13 +178,13 @@ olmm_fixef <- function(object,
   rval <- c()
 
   ## predictor-variable coefficients
-  if (which %in% c("all", "predictor-variable") && dims["pEtaVar"] > 0) {
+  if (which %in% c("all", "npo") && dims["pEtaVar"] > 0) {
     subs <- seq(from  = 1, to = dims["pEtaVar"] * dims["nEta"], by = 1)
     rval <- c(rval, coef[subs])
   }
 
   ## predictor-invariant coefficients
-  if (which %in% c("all", "predictor-invariant") && dims["pEtaInv"] > 0) { 
+  if (which %in% c("all", "po") && dims["pEtaInv"] > 0) { 
     subs <- seq(from = dims["pEtaVar"] * dims["nEta"] + 1,
                 to = dims["pEtaVar"] * dims["nEta"] + dims["pEtaInv"],
                 by = 1)

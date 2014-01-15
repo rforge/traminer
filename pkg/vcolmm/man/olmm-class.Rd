@@ -113,9 +113,7 @@ Objects can be created by calls of the form \code{new("olmm", ...)}.
 \usage{
 ## Methods with "surprising" arguments
 
-\S4method{fixef}{olmm}(object,
-      which = c("all", "predictor-variable", "predictor-invariant"),
-      ...)
+\S4method{fixef}{olmm}(object, which = c("all", "npo", "po"), ...)
 
 \S4method{predict}{olmm}(object, newdata = NULL,
         type = c("prob", "class", "link"),
@@ -159,11 +157,11 @@ Objects can be created by calls of the form \code{new("olmm", ...)}.
     type of predicted value and for \code{\link{resid}} the type of
     residuals.}
   \item{which}{optional character string. For \code{\link{predict}} it
-    indicates whether \code{all} coefficients should be extracted or the
-    \code{predictor-variable} (e.g. the intercepts) or the
-    \code{predictor-invariant} (e.g. proportional odds effects) effects
-    only. For \code{model.matrix} it indicates whether the model matrix
-    of the fixed- or the random effects should be extracted.}
+    indicates whether \code{all} coefficients, just the
+    predictor-variable (\code{npo}) or the predictor-invariant (\code{po},
+    i.e. proportional odds effects).. For \code{model.matrix} it indicates
+    whether the model matrix of the fixed- or the random effects should
+    be extracted.} 
   \item{...}{potential further arguments passed to methods.}
 }
 

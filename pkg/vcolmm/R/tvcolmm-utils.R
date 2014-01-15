@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2013-01-02
+## Date:            2013-01-15
 ##
 ## Description:
 ## Workhorse functions for the 'tvcolmm' function
@@ -50,15 +50,15 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
   args$formula <-
     if (nlevels(args$data$Part) == 1L) formula$root else formula$tree
 
-  ## ## set contrasts
-  ## if (nlevels(args$data$Part) > 1L &
-  ##     control$intercept == "predictor-invariant") {
-  ##   con <- contr.sum(levels(args$data$Part))
-  ##   tab <- tapply(args$weights, args$data$Part, sum)
-  ##   con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
-  ##   colnames(con) <- levels(args$data$Part)[1:(nlevels(args$data$Part) - 1)]
-  ##   args$contrasts$Part <- con
-  ## }
+  ## set contrasts
+  if (nlevels(args$data$Part) > 1L &
+      control$intercept == "po") {
+    con <- contr.sum(levels(args$data$Part))
+    tab <- tapply(args$weights, args$data$Part, sum)
+    con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
+    colnames(con) <- levels(args$data$Part)[1:(nlevels(args$data$Part) - 1)]
+    args$contrasts$Part <- con
+  }
   
   ## fit model
   model <- try(do.call("olmm", args), TRUE)
@@ -79,22 +79,18 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
 }
 
 
-tvcolmm_fit_fluctest <- function(model, nodes, order.by, control) {
+tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
 
   subject <- model@subject
   Part <- model@frame$Part
-  terms <- names(coef(model))
-  terms <- terms[!grepl("ranefCholFac", terms)]
+  terms <- if (depth(nodes) == 0L) control$terms$root else control$terms$tree
   
-  if (is.null(Part)) Part <- factor(rep(1, nrow(order.by)))
+  if (is.null(Part)) Part <- factor(rep(1, nrow(partvar)))
   
   ## get variable types
-  FUN1 <- function(i) {
-    nval <- rowSums(table(subject, order.by[, i]) > 0)
-    return(c("subject", "observation")[1 + 1 * (max(nval) > 1)])
-  }
-  level <- sapply(1:ncol(order.by), FUN1)
-  functional <- sapply(order.by, function(x) {
+  level <- sapply(control$type.vars,
+                  function(x) ifelse(x == "tm-var", "observation", "subject"))
+  functional <- sapply(partvar, function(x) {
     switch(class(x)[1],
            factor = control$functional.factor,
            ordered = control$functional.ordered,
@@ -103,10 +99,10 @@ tvcolmm_fit_fluctest <- function(model, nodes, order.by, control) {
   })
 
   ## prepare list with arguments for 'sctest'
-  dn <- list(paste("Part", levels(Part), sep = ""), colnames(order.by))
-  rval <- list(statistic = matrix(, nlevels(Part), ncol(order.by),
+  dn <- list(paste("Part", levels(Part), sep = ""), colnames(partvar))
+  rval <- list(statistic = matrix(, nlevels(Part), ncol(partvar),
                  dimnames = dn),
-               p.value = matrix(, nlevels(Part), ncol(order.by),
+               p.value = matrix(, nlevels(Part), ncol(partvar),
                  dimnames = dn),
                method = "M-fluctuation test",
                data.name = "model")
@@ -116,14 +112,14 @@ tvcolmm_fit_fluctest <- function(model, nodes, order.by, control) {
                             function(node) info_node(node)$depth))
   
   ## apply test for each variable and partition separately  
-  for (i in 1:ncol(order.by)) {    
+  for (i in 1:ncol(partvar)) {    
     for (j in 1:nlevels(Part)) {
 
       ## extract observations of current partition
       rows <- Part == levels(Part)[j]
 
       ## extract variable to test
-      z <- order.by[rows, i]
+      z <- partvar[rows, i]
       if (is.factor(z)) z <- droplevels(z)
       
       ## check if partition contains permitted split
@@ -136,11 +132,8 @@ tvcolmm_fit_fluctest <- function(model, nodes, order.by, control) {
           z <- aggregate(z, by = list(subject[rows]), FUN = function(x) x[1])[, 2]
 
         ## function to extract scores
-        cols <- terms[grepl(paste("Part", levels(Part)[j], sep = ""), terms)]
-        cols <- cols[cols != paste("Part", levels(Part)[j], sep = "")]
+        cols <- sub("Node", levels(Part)[j], terms)
         
-        if (length(cols) == 0L) cols <- names(fixef(model))
-
         ## break the ties
         if (control$breakties) {
           oi <- sample(1:length(z), length(z))
@@ -180,13 +173,13 @@ tvcolmm_fit_fluctest <- function(model, nodes, order.by, control) {
   
   ## select variables randomly
   valid.pval <- apply(rval$p.value, 2, function(x) sum(!is.na(x)) > 0)
-  if (control$mtry < ncol(order.by) & sum(valid.pval) > 1L) {
+  if (control$mtry < ncol(partvar) & sum(valid.pval) > 1L) {
     mtry <- min(sum(valid.pval), if (control$mtry < 0) { sample(1:sum(valid.pval), 1) } else if (control$mtry < 1) { ceiling(sum(valid.pval) * control$mtry) } else { control$mtry})
     rselect <- sort(sample(which(valid.pval), mtry))
     rval$p.value[, setdiff(1:ncol(rval$p.value), rselect)] <- NA
   }
 
-  ## apply partition wise Bonferroni correction
+  ## apply partial Bonferroni correction
   if (control$bonferroni) {
     for (i in 1:nlevels(Part)) {
       pval1 <- pmin(1, sum(!is.na(rval$p.value[i, ])) * rval$p.value[i, ])
@@ -199,11 +192,8 @@ tvcolmm_fit_fluctest <- function(model, nodes, order.by, control) {
   ## print results
   if (control$verbose) {
     cat("\nFluctuation tests (p-value):\n")
-    FUN2 <- function(x) ifelse(x == "observation", "tm-var", "tm-inv")
-    type.vars <- sapply(level, FUN2)
-    names(type.vars) <- names(level)
     print(data.frame(rbind(
-                       type =  level,
+                       type =  control$type.vars,
                        functional = functional,
                        format(rval$p.value, digits = 2))))
   }
@@ -211,15 +201,15 @@ tvcolmm_fit_fluctest <- function(model, nodes, order.by, control) {
 }
 
 tvcolmm_fit_splitnode <- function(varid, partition = NULL,
-                                  order.by, nodes,
+                                  partvar, nodes,
                                   model, formula, args,
                                   test, control, step) {
 
   ## get splitting variable
-  x <- order.by[, varid]
+  x <- partvar[, varid]
 
   ## extract partitions to split
-  where <- fitted_node(nodes, order.by)
+  where <- fitted_node(nodes, partvar)
   partitions <- sort(unique(where))
   if (!is.null(partition)) partitions <- partitions[partition]
   
@@ -403,7 +393,7 @@ tvcolmm_fit_splitnode <- function(varid, partition = NULL,
       if (control$verbose) {
                               
         cat("\n\nSplit = ")
-        cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = order.by)$levels, collapse = "}, {"), "}\n", sep = ""))
+        cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = partvar)$levels, collapse = "}, {"), "}\n", sep = ""))
       }
 
       ## return new nodes
@@ -420,24 +410,24 @@ tvcolmm_formula <- function(model, control, env = parent.frame()) {
   intercept <- control$intercept
   
   ## modify predictor-variable terms
-  fixefEtaVar <- names(fixef(model, "predictor-variable"))
+  fixefEtaVar <- names(fixef(model, "npo"))
   fixefEtaVar <- unique(sub("Eta([1-9]?[0-9]?[0-9]):", "", fixefEtaVar))
   fixefEtaVar <- setdiff(fixefEtaVar, "(Intercept)")
   fixefEtaVar <- gsub("[[:punct:]]", "", fixefEtaVar)
   if (any(fixefEtaVar %in% terms))
     fixefEtaVar[fixefEtaVar %in% terms] <-
       paste("Part:", fixefEtaVar[fixefEtaVar %in% terms], sep = "")
-  if (intercept == "predictor-variable" && "(Intercept)" %in% terms)
+  if (intercept == "npo")
     fixefEtaVar <- c("Part", fixefEtaVar, "-1")
   if (length(fixefEtaVar) == 0) fixefEtaVar <- c("1")
   
   ## modify predictor-invariant terms
-  fixefEtaInv <- names(fixef(model, "predictor-invariant"))
+  fixefEtaInv <- names(fixef(model, "po"))
   fixefEtaInv <- gsub("[[:punct:]]", "", fixefEtaInv)
   if (any(fixefEtaInv %in% terms))
     fixefEtaInv[fixefEtaInv %in% terms] <-
       paste("Part:", fixefEtaInv[fixefEtaInv %in% terms], sep = "")
-  if (intercept == "predictor-invariant" && "(Intercept)" %in% terms)
+  if (intercept == "po")
     fixefEtaInv <- c("Part", fixefEtaInv)
   
   ## get response variable name
@@ -496,12 +486,6 @@ tvcolmm_modify_catpreds <- function(formula, data) {
 
 tvcolmm_modify_control <- function(model, control) {
   
-  ## preset some conflicts
-  if (control$intercept == "none") {
-    control$restricted <- unique(c("(Intercept)", control$restricted))
-    control$terms <- setdiff(control$terms, "(Intercept)")
-  } 
-  
   ## get needed information
   atEtaVar <- terms(model, "fixefEtaVar")
   atEtaInv <- terms(model, "fixefEtaInv")
@@ -511,8 +495,8 @@ tvcolmm_modify_control <- function(model, control) {
   assignEtaVar <- attr(model.matrix(model), "assign")[merge == 1L]
   assignEtaInv <- attr(model.matrix(model), "assign")[merge == 2L]
   merge <- attr(model.matrix(model), "merge")
-  fixefEtaVar <- names(fixef(model, "predictor-variable"))
-  fixefEtaInv <- names(fixef(model, "predictor-invariant"))
+  fixefEtaVar <- names(fixef(model, "npo"))
+  fixefEtaInv <- names(fixef(model, "po"))
   mmNamesEtaVar <- colnames(model.matrix(model))[merge == 1L]
   mmNamesEtaInv <- colnames(model.matrix(model))[merge == 2L]
 
@@ -576,22 +560,17 @@ tvcolmm_modify_control <- function(model, control) {
     }
   } 
 
-  ## if 'terms' is empty, take all fixed effect parameters except
+  ## if 'terms' is empty, add all fixed effect parameters except
   ## 'restricted' parameters
   if (length(control$terms) == 0L) {
 
     termsFixefEtaVar <-
       setdiff(unique(sub("Eta[1-9]+:", "", fixefEtaVar)), restFixefEtaVar)
-    if (control$intercept == "none")
-      termsFixefEtaVar <- setdiff(termsFixefEtaVar, "(Intercept)")
+    termsFixefEtaVar <- setdiff(termsFixefEtaVar, "(Intercept)")
     termsFixefEtaInv <- setdiff(fixefEtaInv, restFixefEtaInv)
-  }
-  
-  if (control$intercept != "none")
-    termsFixefEtaVar <- unique(c("(Intercept)", termsFixefEtaVar))
-    
+  } 
 
-  ## if 'restricted' is empty, take all fixef effect parameters
+  ## if 'restricted' is empty, add all fixef effect parameters
   ## except 'terms' parameters
   if (length(control$restricted) == 0L) {
 
@@ -629,11 +608,6 @@ tvcolmm_modify_control <- function(model, control) {
       FUN2(restFixefEtaVar, model@dims["nEta"])
 
   control$terms <- list(original = c(unique(sub("Eta[1-9]+:", "", termsFixefEtaVar)), termsFixefEtaInv), root = c(termsFixefEtaVar, termsFixefEtaInv))
-
-  if (control$intercept == "predictor-invariant") {
-    subs <- grepl("(Intercept)", termsFixefEtaVar) 
-    termsFixefEtaVar <- termsFixefEtaVar[!subs]
-  }
   
   FUN3 <- function(x) {
     if (grepl("(Intercept)", x)) {
@@ -651,7 +625,7 @@ tvcolmm_modify_control <- function(model, control) {
   termsFixefEtaVar <- unlist(lapply(termsFixefEtaVar, FUN3))
   termsFixefEtaInv <- unlist(lapply(termsFixefEtaInv, FUN3))
 
-  if (control$intercept == "predictor-invariant")
+  if (control$intercept == "po")
     termsFixefEtaInv <- c("PartNode", termsFixefEtaInv)
   
   control$terms$tree <- c(termsFixefEtaVar, termsFixefEtaInv)

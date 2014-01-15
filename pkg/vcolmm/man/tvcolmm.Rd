@@ -16,8 +16,7 @@
 \usage{
 tvcolmm(formula, data, control = tvcolmm_control(),
         subset, na.action, offset,
-        vi = c("none", "predictor-invariant",
-          "predictor-variable"),
+        vi = c("none", "po", "npo"),
         linear = NULL, ...)
 }
 
@@ -39,10 +38,12 @@ tvcolmm(formula, data, control = tvcolmm_control(),
     \code{\link{tvcolmm_control}}.}
   \item{subset, na.action, offset}{further model
     specification arguments as in \code{lm}.}
-  \item{vi}{character string. Defines whether a varying-intercept is
-    estimated (i.e. direct relationships between z variables and the
-    response) and if so whether the varying intercept is predictor
-    variable or predictor invariant.}
+  \item{vi}{character string. Defines whether a main effect for the
+    partiton structure should be added. \code{po} adds a
+    predictor-invariant (proportional odds) and \code{npo} a
+    predictor-variable intercept (non-proportional odds). Note that this
+    means not that the algorithm is powerful to detect variables that
+    alter those intercepts, see details.}
   \item{linear}{vector of characters. Indicates the terms that are
     assumed to be non-varying i.e. truely linear i.}
   \item{\ldots}{additional arguments passed to the \code{\link{olmm}}
@@ -80,12 +81,13 @@ tvcolmm(formula, data, control = tvcolmm_control(),
 
   The tree size is automatically selected by the stopping criteria in
   step 2. This requires a parameter \code{alpha} that can be specified
-  using the \code{control} argument and that defaults to 0.05 and
-  may be specified via cross-validation (see \code{\link{cv.tvcolmm}}).
+  using the \code{control} argument. The default is 0.05 and may be
+  specified via cross-validation (see \code{\link{cv.tvcolmm}}). 
 
-  It is possible to specify varying intercepts (i.e. x = 1). Such
-  coefficients represent are nonparametric estimates of direct effects
-  of effect modifiers \code{z1, \ldots}. See argument \code{vi}.  
+  By default, the algorithm is not sensitive to direct influences of z
+  variables on the response. If this is desired, set \code{vi = "npo"}
+  and something like \code{control = vcolmm_control(terms =
+  c("(Intercept)", ...))}. See examples.
 }
 
 \value{An object of class \code{\link{tvcolmm}}. The \code{\link{tvcolmm}} 
@@ -121,27 +123,6 @@ tvcolmm(formula, data, control = tvcolmm_control(),
   \code{\link{cv.tvcolmm}}}
 
 \examples{
-## ------------------------------------------------------------------- #
-## Example 1: Piecewise constant growth
-##
-## Fitting a varying coefficient olmm on synthetic ordinal longitudinal
-## data 'tvcolmm_1' including 300 individuals or 2700 observations. The
-## generating model is a cumulative random intercept model with 
-## 'structual breaks' at t = 3.5 and t = 6.5.
-## ------------------------------------------------------------------- #
-
-## load the data
-data(tvcolmm_1)
-
-## fit the model
-mod1 <- tvcolmm(formula = y ~ (1|id) | time,
-                data = tvcolmm_1, vi = "predictor-variable",
-                control = tvcolmm_control(verbose = TRUE))
-
-## print the results
-print(mod1)
-
-
 ## ------------------------------------------------------------------- # 
 ## Example 2: (Structured) heterogeneous treatment effect
 ##
@@ -165,21 +146,42 @@ data(tvcolmm_2)
 
 mod2 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_2,
                 control = tvcolmm_control(verbose = TRUE,
-                  minsplit = 30L), 
-                linear = "time")
+                  minsplit = 30L, terms = c("treat")), 
+                linear = "time", vi = "po")
 
 ## print the results
 print(mod2)
 
 ## ------------------------------------------------------------------- # 
-## Example 3: Empirical example
+## Example 2: Empirical example
 ## ------------------------------------------------------------------- #
 
 data(schizo)
 mod3 <- tvcolmm(imps79o ~ tx + (1|id) | week,
                 data = schizo,
                 control = tvcolmm_control(verbose = TRUE),
-                vi = "predictor-invariant")
+                vi = "po")
+
+## ------------------------------------------------------------------- #
+## Example 3: Piecewise constant growth
+##
+## Fitting a varying coefficient olmm on synthetic ordinal longitudinal
+## data 'tvcolmm_1' including 300 individuals or 2700 observations. The
+## generating model is a cumulative random intercept model with 
+## 'structual breaks' at t = 3.5 and t = 6.5.
+## ------------------------------------------------------------------- #
+
+## load the data
+data(tvcolmm_1)
+
+## fit the model
+mod1 <- tvcolmm(formula = y ~ (1|id) | time,
+                data = tvcolmm_1, vi = "npo",
+                control = tvcolmm_control(verbose = TRUE,
+                  terms = "(Intercept)")) # 'terms = "(Intercept)"' is necessary!
+
+## print the results
+print(mod1)
 
 }
 
