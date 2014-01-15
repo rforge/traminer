@@ -52,7 +52,7 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
 
   ## set contrasts
   if (nlevels(args$data$Part) > 1L &
-      control$intercept == "po") {
+      control$intercept == "predictor-invariant") {
     con <- contr.sum(levels(args$data$Part))
     tab <- tapply(args$weights, args$data$Part, sum)
     con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]

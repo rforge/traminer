@@ -67,6 +67,8 @@ olmm <- function(formula, data, weights, start, subset, na.action,
   
   if (verbose) cat("* checking arguments ... ")
   mc <- match.call(expand.dots = FALSE)
+  if (missing(start)) start <- NULL
+  if (missing(restricted)) restricted <- NULL
   
   ## family
   family <- switch(match.arg(family), cumulative = 1L,
@@ -147,6 +149,16 @@ olmm <- function(formula, data, weights, start, subset, na.action,
   }
   
   ## extract random effect grouping factor subject
+  hasRanef <- TRUE
+  if (is.null(form$subjectName)) { # hack to permit models without random effects
+    form$subjectName <- "id"
+    form$ranefEtaInv <- formula(~ 1)
+    fullmf$id <- factor(1:nrow(fullmf))
+    start["ranefCholFac1"] <- 0
+    restricted <- unique(c(restricted, "ranefCholFac1"))
+    hasRanef <- FALSE
+  }
+  
   subject <- fullmf[, form$subjectName, drop = TRUE]
   if (!is.factor(subject)) stop("subject variable must be a factor")
   if (nlevels(subject) < 3L)
@@ -162,9 +174,7 @@ olmm <- function(formula, data, weights, start, subset, na.action,
   
   W <- olmm_mergeMm(x = model.matrix(terms(ranefmfEtaVar), fullmf, contrasts[intersect(names(contrasts), all.vars(form$ranefEtaVar))]), y = model.matrix(terms(ranefmfEtaInv), fullmf, contrasts[intersect(names(contrasts), all.vars(form$ranefEtaInv))]), FALSE)
   rownames(W) <- rownames(fullmf)
-
   W <- olmm_checkMm(W)
-  if (ncol(W) < 1L) stop("design matrix for random effects is empty")
 
   ## contrasts
   cons <- append(attr(X, "contrasts"), attr(W, "contrasts"))
@@ -172,8 +182,8 @@ olmm <- function(formula, data, weights, start, subset, na.action,
   if (is.null(cons)) storage.mode(cons) <- "list"
   
   ## vector for dimensions etc.
-  dims <- as.integer(c(n = nrow(X), N = nlevels(subject), p = (nlevels(y) - 1L) * sum(attr(X, "merge") == 1L) + sum(attr(X, "merge") == 2L), pEta = ncol(X), pInt = length(intTerms), pEtaVar = sum(attr(X, "merge") == 1L), pEtaInv = sum(attr(X, "merge") == 2L), q = (nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L), qEta = ncol(W), qEtaVar = sum(attr(W, "merge") == 1L), qEtaInv = sum(attr(W, "merge") == 2L), J = nlevels(y), nEta = nlevels(y) - 1L, nPar = (nlevels(y) - 1L) * sum(attr(X, "merge") == 1L) + sum(attr(X, "merge") == 2L) + ((nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L)) * (1L + (nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L)) / 2L, nGHQ = nGHQ, nQP = nGHQ^((nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L)), family = family, link = link, verbose = verbose, numGrad = numGrad, numHess = numHess, doFit = doFit))
-  names(dims) <- c("n", "N", "p", "pEta", "pInt", "pEtaVar", "pEtaInv", "q", "qEta", "qEtaVar", "qEtaInv", "J", "nEta", "nPar", "nGHQ", "nQP", "family", "link", "verb", "numGrad", "numHess", "doFit")
+  dims <- as.integer(c(n = nrow(X), N = nlevels(subject), p = (nlevels(y) - 1L) * sum(attr(X, "merge") == 1L) + sum(attr(X, "merge") == 2L), pEta = ncol(X), pInt = length(intTerms), pEtaVar = sum(attr(X, "merge") == 1L), pEtaInv = sum(attr(X, "merge") == 2L), q = (nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L), qEta = ncol(W), qEtaVar = sum(attr(W, "merge") == 1L), qEtaInv = sum(attr(W, "merge") == 2L), J = nlevels(y), nEta = nlevels(y) - 1L, nPar = (nlevels(y) - 1L) * sum(attr(X, "merge") == 1L) + sum(attr(X, "merge") == 2L) + ((nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L)) * (1L + (nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L)) / 2L, nGHQ = nGHQ, nQP = nGHQ^((nlevels(y) - 1L) * sum(attr(W, "merge") == 1L) + sum(attr(W, "merge") == 2L)), family = family, link = link, verbose = verbose, numGrad = numGrad, numHess = numHess, doFit = doFit, hasRanef = hasRanef))
+  names(dims) <- c("n", "N", "p", "pEta", "pInt", "pEtaVar", "pEtaInv", "q", "qEta", "qEtaVar", "qEtaInv", "J", "nEta", "nPar", "nGHQ", "nQP", "family", "link", "verb", "numGrad", "numHess", "doFit", "hasRanef")
 
   ## parameter names
   parNames <- list(fixef = c(paste("Eta", rep(seq(1L, dims["nEta"], 1L), each = dims["pEtaVar"]), ":", rep(colnames(X)[attr(X, "merge") == 1L], dims["nEta"]), sep = ""), colnames(X)[attr(X, "merge") == 2L]), ranefCholFac = paste("ranefCholFac", 1L:(dims["q"] * (dims["q"] + 1L) / 2L ), sep = ""))
@@ -214,9 +224,14 @@ olmm <- function(formula, data, weights, start, subset, na.action,
                 colnames(parNames$ranefCholFac)))
   
   ## weights and nodes for the Gauss-Hermite quadrature integration
-  gh <- gauss.quad(nGHQ, "hermite")
-  ghx <- olmm_expandQP(gh$nodes, dims["q"]) # with correction
-  ghw <- olmm_expandQP(gh$weights * 1 / sqrt(2 * pi) * exp((gh$nodes^2) / 2), dims["q"])
+  if (hasRanef) {
+    gh <- gauss.quad(nGHQ, "hermite")
+    ghx <- olmm_expandQP(gh$nodes, dims["q"]) # with correction
+    ghw <- olmm_expandQP(gh$weights * 1 / sqrt(2 * pi) * exp((gh$nodes^2) / 2), dims["q"])
+  } else {
+    ghx <- matrix(0, 1, 1)
+    ghw <- matrix(1, 1, 1)
+  }
   
   ## elimination matrix for lower triangular matrices
   ranefElMat <- L.matrix(n = dims["q"])
@@ -253,23 +268,22 @@ olmm <- function(formula, data, weights, start, subset, na.action,
   
   if (verbose) cat("OK\n* setting inital values ... ")
 
-  if (missing(start)) start <- NULL
   start <- olmm_start(start, dims, parNames, X, W, eta, ranefElMat)
 
   ## restricted
   restr <- rep(FALSE, dims["nPar"])
   names(restr) <- unlist(parNames)
-  if (!missing(restricted)) {
+  if (!is.null(restricted)) {
 
-      ## checks
-      stopifnot(is.character(restricted))
-      if (dims["family"] == 3)
-          stop("'restricted' argument is not available for adjacent category model")
-      if (!all(restricted %in% names(restr)))
-          stop(paste("the coefficient(s) ", paste("'", restricted[!restricted %in% names(restr)], "'", sep = "", collapse = ", "), " in 'restricted' were not found. The coefficient names are ", paste("'", names(restr), "'", sep = "", collapse = ", "), ".", sep = ""))
-      
-      ## set restricted parameters
-      restr[restricted] <- TRUE
+    ## checks
+    stopifnot(is.character(restricted))
+    if (dims["family"] == 3)
+      stop("'restricted' argument is not available for adjacent category model")
+    if (!all(restricted %in% names(restr)))
+      stop(paste("the coefficient(s) ", paste("'", restricted[!restricted %in% names(restr)], "'", sep = "", collapse = ", "), " in 'restricted' were not found. The coefficient names are ", paste("'", names(restr), "'", sep = "", collapse = ", "), ".", sep = ""))
+    
+    ## set restricted parameters
+    restr[restricted] <- TRUE
   }
   
   ## xlevels

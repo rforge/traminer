@@ -159,9 +159,12 @@ olmm(formula, data, weights, start, subset, na.action,
 data(schizo)
 
 model.10.3.1 <-
-  olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + (1| id),
+  olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + (1 | id),
        data = schizo, family = "cumulative",
        link = "logit")
+
+#system.time(m1 <- olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week), data = schizo))
+#system.time(m2 <- polr(imps79o ~ tx + sqrt(week) + tx * sqrt(week), data = schizo))
 
 summary(model.10.3.1)
 

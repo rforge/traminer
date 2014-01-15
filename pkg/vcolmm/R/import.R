@@ -1314,8 +1314,10 @@ L.matrix <- function( n )
     if ( n < 2 )
       if ( n == 1) {
         return(matrix(1, 1, 1))
+      } else if ( n == 0) {
+        return(matrix(, 0, 0))
       } else {
-        stop( "argument n is less than 2" )
+        stop( "argument n is less than 0" )
       }
     u <- u.vectors( n )
     E <- E.matrices( n )

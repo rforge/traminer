@@ -278,9 +278,6 @@ olmm_formula <- function(formula, env = parent.frame()) {
     fixefEtaVar <- formula(~ 1)
     ranefEtaVar <- formula(~ -1)
   }
-
-  if (is.null(subjectName))
-    stop("no random effects terms specified in formula")
   
   fixefEtaVarTerms <-
     attr(terms(fixefEtaVar, keep.order = TRUE), "term.labels")

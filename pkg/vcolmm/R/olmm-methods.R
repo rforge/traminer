@@ -138,6 +138,9 @@ olmm_coef <- function(object, ...) {
   } else {
     rval <- object@coefficients
   }
+  if (dims["hasRanef"] == 0)
+    rval <- rval[!grepl("ranefCholFac", names(rval))]
+  
   return(rval)
 }
 
@@ -739,8 +742,11 @@ setMethod(f = "summary",
             }
             
             ## random effects
-            VarCorr <- unclass(VarCorr(object))
-            
+            if (dims["hasRanef"] > 0) {
+              VarCorr <- unclass(VarCorr(object))
+            } else {
+              VarCorr <- matrix(, 0, 3, dimnames = list(c(), c("Variance", "StdDev", "")))
+            }
             ## title
             methTitle <- c("Cumulative", "Baseline",
                            "Adjacent-Categories")[dims["family"]]
@@ -851,10 +857,13 @@ setMethod(f = "vcov",
           definition = function(object, ...) {
 
             dims <- object@dims
-            
+            info <- -object@info
+            if (dims["hasRanef"] == 0L)
+              info <- object@info[1:dims["p"], 1:dims["p"]]
+              
             ## extract inverse of negative info-matrix
-            rval <- chol2inv(chol(-object@info)) 
-            dimnames(rval) <- dimnames(object@info)
+            rval <- chol2inv(chol(-info)) 
+            dimnames(rval) <- dimnames(info)
 
             ## parameter transformation for adjacent-category models
             if (dims["family"] == 3L) {
