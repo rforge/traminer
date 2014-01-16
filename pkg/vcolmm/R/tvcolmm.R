@@ -124,7 +124,10 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
       ## get current partitions
       where <- fitted_node(nodes, partvar)
       args$data$Part <- factor(where)
-
+      
+      varid <- 1:ncol(partvar)
+      partid <- 1:width(nodes)
+   
       ## set start values if required
       if (control$fast > 0L)
         args$start <- tvcolmm_get_start(model, args)
@@ -142,36 +145,45 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
       ## --------------------------------------------------- #
       ## Step 2: variable selection via coefficient constancy tests
       ## --------------------------------------------------- #
+
+      if (control$fluctest) {
+        
+        test <- tvcolmm_fit_fluctest(model, nodes, partvar, control)
       
-      test <- tvcolmm_fit_fluctest(model, nodes, partvar, control)
-      
-      ## return error if test failed
-      if (inherits(test, "try-error"))
+        ## return error if test failed
+        if (inherits(test, "try-error"))
           stop("coefficient constancy tests failed.")
       
-      run <- suppressWarnings(min(test$p.value, na.rm = TRUE)) <= control$alpha
+        run <- suppressWarnings(min(test$p.value, na.rm = TRUE)) <= control$alpha
+
+        if (run) {
+
+          pval <-  apply(test$p.value, 2, function(x) suppressWarnings(min(x, na.rm = TRUE)))
+          varid <- which.min(pval)
+          partid <- which.min(test$p.value[, varid])
+        
+          if (control$verbose) {
+
+            cat("\nSplitting variable:", colnames(partvar)[varid])
+            cat("\nPartition:", levels(args$data$Part)[partid])
+            cat("\nSelection statistic (p-value) = ")
+            cat(format(pval[varid], digits = 3))
+          }
+          
+        }
+      } else {
+
+        test <- NULL
+      }
+      
       
       if (run) {
-
-        ## perform variable selection
-        pval <-  apply(test$p.value, 2, function(x) suppressWarnings(min(x, na.rm = TRUE)))
-        varid <- which.min(pval)
-        partition <- if (control$part.select == "test")
-          which.min(test$p.value[, varid])
-        
-        if (control$verbose) {
-
-          cat("\nSplitting variable:", colnames(partvar)[varid])
-          cat("\nPartition:", levels(args$data$Part)[partition])
-          cat("\nSelection statistic (p-value) = ")
-          cat(format(pval[varid], digits = 3))
-        }
         
         ## ------------------------------------------------- #
         ## Step 3: search a cutpoint
         ## ------------------------------------------------- #
         
-        newnodes <- tvcolmm_fit_splitnode(varid, partition,
+        newnodes <- tvcolmm_fit_splitnode(varid, partid,
                                           partvar, nodes,
                                           model, ff, args, test,
                                           control, step)
@@ -279,7 +291,7 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
                  functional.ordered = "LMuo",
                  functional.numeric = "supLM",
                  type.vars = NULL,
-                 part.select = "test",
+                 fluctest = TRUE,
                  fast = 0L,
                  verbose = verbose))
   

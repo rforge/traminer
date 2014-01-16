@@ -313,101 +313,99 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   loss <- lapply(splits, lapply, function(x) x[, ncol(x)])
   
   if (!any(na.omit(unlist(loss)) < Inf)) {
-    
     if (control$verbose)
       cat("\nNo admissible split found. Return object.\n")
-    rval <- FALSE
-    
+    return(FALSE)
+  }
+      
+  if (control$verbose) cat(" OK")
+  
+  ## get split
+  minLoss <- function(x) {
+    x <- unlist(x)
+    if (length(x) > 0) min(x, na.rm = TRUE) else Inf
+  }
+  vid <- (1:ncol(partvar))[which.min(sapply(loss, minLoss))]
+  pid <- (1:nlevels(Part))[which.min(sapply(loss[[vid]], minLoss))]
+  pidLab <- nodeids(as.partynode(nodes), terminal = TRUE)[pid]
+  stat <- splits[[vid]][[pid]]
+  stat <- stat[which.min(stat[, ncol(stat)]), ]
+  cut <- stat[1:(length(stat) -1)]
+  stat <- stat[length(stat)]
+  x <- partvar[, vid]
+  
+  ## collect information for the split
+  subscripts <- Part == levels(Part)[pid]
+  if (is.numeric(x)) { # numerical variables
+    breaks <- as.double(cut)
+    index <- NULL
+    ordered <- TRUE
+    subsLeft <- subscripts & x <= breaks
+    subsRight <- subscripts & x > breaks
   } else {
-    
-    if (control$verbose) cat(" OK")
-    
-    ## get split
-    minLoss <- function(x) {
-      x <- unlist(x)
-      if (length(x) > 0) min(x, na.rm = TRUE) else Inf
-    }
-    vid <- varid[which.min(sapply(loss, minLoss))]
-    pid <- partid[which.min(sapply(loss[[vid]], minLoss))]
-    pid <- nodeids(nodes)[pid]
-    tmp <- splits[[vid]][[pid]]
-    cut <- tmp[1:(length(tmp) -1)]
-    stat <- tmp[length(tmp)]
-    x <- partvar[, vid]
-    
-    ## collect information for the split
-    subscripts <- Part == levels(Part)[pid]
-    if (is.numeric(x)) { # numerical variables
-      breaks <- as.double(cut)
+    subsLeft <- subscripts & x %in% levels(x)[cut == 1L]
+    subsRight <- subscripts & x %in% levels(x)[cut == 0L]
+    if (is.ordered(x)) { 
+      breaks <- as.double(max(which(cut == 1)))
       index <- NULL
       ordered <- TRUE
-      subsLeft <- subscripts & x <= breaks
-      subsRight <- subscripts & x > breaks
     } else {
-      subsLeft <- subscripts & x %in% levels(x)[cut]
-      subsRight <- subscripts & !x %in% levels(x)[cut]
-      if (is.ordered(x)) { 
-        breaks <- as.double(max(which(cut == 1)))
-        index <- NULL
-        ordered <- TRUE
-      } else {
-        breaks <- NULL
-        index <- as.integer(-cut + 2)
-        index[table(x[subscripts]) == 0] <- NA
-        ordered <- FALSE
-      }
+      breaks <- NULL
+      index <- as.integer(-cut + 2)
+      index[table(x[subscripts]) == 0] <- NA
+      ordered <- FALSE
     }
-
-    ## !!! this part is really ugly and may be improved soon
-    
-    ## get current nodes
-    nodes <- as.list(nodes)
-    
-    ## setup 'newnodes' object
-    subs <- which(sapply(nodes, function(node) node$id) == pid)
-    newnodes <- vector("list", length(nodes) + 2)
-    newnodes[1:subs] <- nodes[1:subs]
-    if (length(nodes) > pid)
-      newnodes[(subs + 3L):length(newnodes)] <-
-        nodes[(subs + 1L):length(nodes)]
-    
-    ## adjust ids of children
-    ids <- sapply(newnodes, function(x) if (!is.null(x$id)) x$id else -1)
-    for (i in 1L:length(newnodes))
-      if (!is.null(newnodes[[i]]$kids))
-        newnodes[[i]]$kids <- which(ids %in% newnodes[[i]]$kids)
-    
-    ## setup new split
-    newnodes[[subs]]$split <-
-      partysplit(varid = vid, breaks = breaks, index = index,
-                 info = list(ordered = ordered,
-                   breaks = if (is.numeric(x)) ux else al,
-                   splitstatistic = splits,
-                   fluctest = test))
-    newnodes[[subs]]$kids <- pid + 1L:2L
-    newnodes[[subs]]$info$dims <-
-      c(N = length(unique(model@subject[subscripts])),
-        n = sum(subscripts))
-    newnodes[[subs]]$info$step <- step
-    
-    ## add new children
-    newnodes[[subs + 1L]] <- list(id = pid + 1L, info = list(dims = c(N = length(unique(model@subject[subsLeft])), n = sum(subsLeft)), depth = newnodes[[subs]]$info$depth + 1L))
-    newnodes[[subs + 2L]] <- list(id = pid + 2L, info = list(dims = c(N = length(unique(model@subject[subsRight])), n = sum(subsRight)), depth = newnodes[[subs]]$info$depth + 1L))
-    
-    ## adjust ids
-    for (i in 1L:length(newnodes))
-      newnodes[[i]]$id <- i
-    
-    ## print split
-    if (control$verbose) {
-      
-      cat("\n\nSplit = ")
-      cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = partvar)$levels, collapse = "}, {"), "}\n", sep = ""))
-    }
-    
-    ## return new nodes
-    rval <- as.partynode(newnodes)
   }
+  
+  ## !!! this part is really ugly and may be improved soon
+  
+  ## get current nodes
+  nodes <- as.list(nodes)
+  
+  ## setup 'newnodes' object
+  subs <- which(sapply(nodes, function(node) node$id) == pidLab)
+  newnodes <- vector("list", length(nodes) + 2)
+  newnodes[1:subs] <- nodes[1:subs]
+  if (length(nodes) > pidLab)
+    newnodes[(subs + 3L):length(newnodes)] <-
+      nodes[(subs + 1L):length(nodes)]
+  
+  ## adjust ids of children
+  ids <- sapply(newnodes, function(x) if (!is.null(x$id)) x$id else -1)
+  for (i in 1L:length(newnodes))
+    if (!is.null(newnodes[[i]]$kids))
+      newnodes[[i]]$kids <- which(ids %in% newnodes[[i]]$kids)
+  
+  ## setup new split
+  newnodes[[subs]]$split <-
+    partysplit(varid = vid, breaks = breaks, index = index,
+               info = list(ordered = ordered,
+                 fluctest = test,
+                 statistic = stat,
+                 splits = splits))
+  newnodes[[subs]]$kids <- pidLab + 1L:2L
+  newnodes[[subs]]$info$dims <-
+    c(N = length(unique(model@subject[subscripts])),
+      n = sum(subscripts))
+  newnodes[[subs]]$info$step <- step
+  
+  ## add new children
+  newnodes[[subs + 1L]] <- list(id = pidLab + 1L, info = list(dims = c(N = length(unique(model@subject[subsLeft])), n = sum(subsLeft)), depth = newnodes[[subs]]$info$depth + 1L))
+  newnodes[[subs + 2L]] <- list(id = pidLab + 2L, info = list(dims = c(N = length(unique(model@subject[subsRight])), n = sum(subsRight)), depth = newnodes[[subs]]$info$depth + 1L))
+  
+  ## adjust ids
+  for (i in 1L:length(newnodes))
+    newnodes[[i]]$id <- i
+  
+  ## print split
+  if (control$verbose) {
+    
+    cat("\n\nSplit = ")
+    cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = partvar)$levels, collapse = "}, {"), "}\n", sep = ""))
+  }
+  
+  ## return new nodes
+  rval <- as.partynode(newnodes)
   return(rval)
 }
 

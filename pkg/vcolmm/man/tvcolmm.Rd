@@ -123,8 +123,10 @@ tvcolmm(formula, data, control = tvcolmm_control(),
   \code{\link{cv.tvcolmm}}}
 
 \examples{
+
+\dontrun{
 ## ------------------------------------------------------------------- # 
-## Example 2: (Structured) heterogeneous treatment effect
+## Example 1: (Structured) heterogeneous treatment effect
 ##
 ## Fitting a varying coefficient olmm on synthetic ordinal longitudinal
 ## data 'tvcolmm_2' including 500 individuals or 2500 observations. Only
@@ -144,7 +146,7 @@ data(tvcolmm_2)
 
 ## fit the model
 
-mod2 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_2,
+mod1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_2,
                 control = tvcolmm_control(verbose = TRUE,
                   minsplit = 30L, terms = c("treat")), 
                 linear = "time", vi = "po")
@@ -175,14 +177,14 @@ mod3 <- tvcolmm(imps79o ~ tx + (1|id) | week,
 data(tvcolmm_1)
 
 ## fit the model
-mod1 <- tvcolmm(formula = y ~ (1|id) | time,
+mod3 <- tvcolmm(formula = y ~ (1|id) | time,
                 data = tvcolmm_1, vi = "npo",
                 control = tvcolmm_control(verbose = TRUE,
                   terms = "(Intercept)")) # 'terms = "(Intercept)"' is necessary!
 
 ## print the results
-print(mod1)
-
+print(mod3)
+}
 }
 
 \author{Reto Buergin}
