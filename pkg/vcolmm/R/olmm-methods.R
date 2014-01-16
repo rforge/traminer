@@ -857,7 +857,7 @@ setMethod(f = "vcov",
           definition = function(object, ...) {
 
             dims <- object@dims
-            info <- -object@info
+            info <- object@info
             if (dims["hasRanef"] == 0L)
               info <- object@info[1:dims["p"], 1:dims["p"]]
               

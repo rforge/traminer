@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2013-01-15
+## Date:            2013-01-16
 ##
 ## Description:
 ## Workhorse functions for the 'tvcolmm' function
@@ -51,8 +51,7 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
     if (nlevels(args$data$Part) == 1L) formula$root else formula$tree
 
   ## set contrasts
-  if (nlevels(args$data$Part) > 1L &
-      control$intercept == "predictor-invariant") {
+  if (!is.null(args$data$Part) && nlevels(args$data$Part) > 1L) {
     con <- contr.sum(levels(args$data$Part))
     tab <- tapply(args$weights, args$data$Part, sum)
     con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
@@ -61,32 +60,57 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
   }
   
   ## fit model
-  model <- try(do.call("olmm", args), TRUE)
+  object <- try(do.call("olmm", args), TRUE)
 
   if (verbose) {
     if (nlevels(args$data$Part) == 1L) {
       cat("\n\n")
-      print(model)
+      print(object)
     } else {
       cat("\n\nPartition coefficient(s) of global node model:\n")
-      terms <- if (nlevels(args$data$Part) == 1L) control$terms$root else grep("Part", names(coef(model)), value = TRUE)
-      print(data.frame(Estimate = coef(model)[terms]), digits = 2)
+      terms <- if (nlevels(args$data$Part) == 1L) control$terms$root else grep("Part", names(coef(object)), value = TRUE)
+      print(data.frame(Estimate = coef(object)[terms]), digits = 2)
     }
   }
   
   ## return model
-  return(model)
+  return(object)
 }
 
+tvcolmm_refit_model <- function(object, args) {
+
+  object@frame$Part <- args$data$Part
+  form <- olmm_formula(object@formula)
+  contrasts <- object@contrasts
+  object@X <- olmm_mergeMm(x = model.matrix(terms(terms(form$fixefEtaVar, keep.order = TRUE)), object@frame, contrasts[intersect(names(contrasts), all.vars(form$fixefEtaVar))]), y = model.matrix(terms(form$fixefEtaInv, keep.order = TRUE), object@frame, contrasts[intersect(names(contrasts), all.vars(form$fixefEtaInv))]), TRUE)
+    
+  optim <- object@optim
+  optim[[1]] <- object@coefficients
+  optim[[4L]] <- object@restricted
+  environment(optim[[2]]) <- environment()
+  if (!object@dims["numGrad"]) environment(optim[[3]]) <- environment()
+  if (optim$method %in% c("nlminb", "ucminf")) {
+      FUN <- optim$method
+      optim <- optim[-which(names(optim) == "method")] 
+  } else {
+      FUN <- "optim"
+  }
+  object@output <- do.call(FUN, optim)
+  .Call("olmm_update_marg", object, object@output$par, PACKAGE = "vcolmm")
+
+  ## return model
+  return(object)
+}
 
 tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
 
   subject <- model@subject
   Part <- model@frame$Part
-  terms <- if (depth(nodes) == 0L) control$terms$root else control$terms$tree
-  
   if (is.null(Part)) Part <- factor(rep(1, nrow(partvar)))
-  
+
+  ## get column names of scores to test
+  terms <- if (depth(nodes) == 0L) control$terms$root else control$terms$tree
+    
   ## get variable types
   level <- sapply(control$type.vars,
                   function(x) ifelse(x == "tm-var", "observation", "subject"))
@@ -152,8 +176,13 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
         }
         
         ## arguments for test
-        args <- control[names(control) %in% names(formals(strucchange:::sctest.default))]
-        args <- vcolmm:::appendDefArgs(list(x = model, order.by = z, scores = scores, functional = functional[i]), args)
+        argNames <- names(formals(strucchange:::sctest.default))
+        args <- control[names(control) %in% argNames]
+        args <- appendDefArgs(list(x = model,
+                                   order.by = z,
+                                   scores = scores,
+                                   functional = functional[i]),
+                              args)
 
         ## call test
         test <- try(do.call("sctest", args), silent = TRUE)
@@ -200,205 +229,184 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
   return(rval)
 }
 
-tvcolmm_fit_splitnode <- function(varid, partition = NULL,
+
+tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
+                                  partid = 1:width(nodes), 
                                   partvar, nodes,
                                   model, formula, args,
                                   test, control, step) {
 
-  ## get splitting variable
-  x <- partvar[, varid]
-
-  ## extract partitions to split
-  where <- fitted_node(nodes, partvar)
-  partitions <- sort(unique(where))
-  if (!is.null(partition)) partitions <- partitions[partition]
-  
-  ## loss vector (!architecture allows splitting opt. over multiple parts.)
-  loss <- vector("list", length(partitions))
-  ux <- vector("list", length(partitions))
-  al <- vector("list", length(partitions))
-  
   if (control$verbose) cat("\nPerform split? ")
-          
-  if (length(partitions) == 0L) {
 
-    if (control$verbose) cat("No\nToo few observations in nodes or/and maximum depth reached. Return object.\n")
+  ## if no splitting is necessary ...
+  if (length(partid) == 0L) {
+    if (control$verbose) cat("No\nToo few observations in nodes or/and",
+                             "maximum depth reached. Return object.\n")
+    return(FALSE)
+  }
+
+  ## ... otherwise start splitting
+  if (control$verbose) cat("Yes\n\n* computing splits ")
+  
+  Part <- factor(fitted_node(nodes, partvar))    
+
+  ## function to get all cutpoints of a variable in a partition
+  getCutpoints <- function(vid, pid) {
+    subscripts <- Part == levels(Part)[pid]
+    x <- partvar[, vid]
+    if (is.numeric(x)) {
+      sx <- sort(x[subscripts])              
+      sx <- sx[control$minsplit:(length(sx) - control$minsplit)]
+      sx <- unique(sx)
+      if ((length(sx) - 1)  > control$maxevalsplit) {
+        rval <-  as.double(quantile(sx, ppoints(control$maxevalsplit)))
+      } else {
+        rval <- sx[-length(sx)]
+      }
+      rval <- matrix(rval, ncol = 1)
+    } else {
+      rval <- vcolmm:::tvcolmm_fit_getlevels(x, subscripts)
+    }
+    return(rval)
+  }
+
+  ## function to get the splitstatistic for a given cutpoint
+  getSplitstat <- function(cutpoint, vid, pid, args, model) {
+    if (!(vid %in% varid & pid %in% partid)) return(Inf)
+    subscripts <- Part == levels(Part)[pid]
+    x <- partvar[, vid]    
+    if (is.numeric(x)) {
+      xs <- x <= cutpoint
+    } else {
+      xs <- x %in% levels(x)[cutpoint]            
+    }
+    args$data$Part[subscripts] <- levels(Part)[pid]
+    args$data$Part[xs & subscripts] <- "Right"
+    if (min(table(args$data$Part)[c(levels(args$data$Part)[pid], "Right")]) <
+        control$minsplit)
+      return(Inf)
+    model <- tvcolmm_refit_model(model, args)
+    rval <- ifelse(inherits(model, "try-error"), NaN, control$lossfun(model))
+    if (control$verbose)
+      cat(if (is.nan(rval)) "f" else if (rval == Inf) "i" else ".")
+    return(rval)
+  }
+
+  ## setup a prototyp model to use "tvcolmm_refit_model" function
+  args$data$Part <- Part
+  levels(args$data$Part) <- c(levels(args$data$Part), "Right")
+  subscripts <- args$data$Part == levels(args$data$Part)[partid[1]]
+  args$data$Part[sample(which(subscripts), as.integer(sum(subscripts)/2))] <- "Right"
+  args$doFit <- FALSE
+  splitModel <- tvcolmm_fit_model(formula, args, control)
+  
+  ## run computation (slow!!!)
+  splits <- lapply(1:ncol(partvar), function(vid) {
+    lapply(1:nlevels(Part), function(pid, vid) {
+      cp <- getCutpoints(vid, pid)
+      st <- apply(cp, 1, getSplitstat, vid = vid, pid = pid,
+                  args = args, model = splitModel)
+      return(cbind(cp, stat = st))
+    }, vid = vid)
+  })
+
+  loss <- lapply(splits, lapply, function(x) x[, ncol(x)])
+  
+  if (!any(na.omit(unlist(loss)) < Inf)) {
+    
+    if (control$verbose)
+      cat("\nNo admissible split found. Return object.\n")
     rval <- FALSE
     
   } else {
-
-    if (control$verbose) cat("Yes\n\n* computing splits ")
-
-    levels(args$data$Part) <- c(levels(args$data$Part), "Right")
-    for (i in 1:length(partitions)) {
-
-      subscripts <- where == partitions[i]
-                  
-      if (is.numeric(x)) {
-                      
-        sx <- sort(x[subscripts])              
-        sx <- sx[control$minsplit:(length(sx) - control$minsplit)]
-        sx <- unique(sx)
-        if ((length(sx) - 1)  > control$maxevalsplit) {
-          ux[[i]] <-  as.double(quantile(sx, ppoints(control$maxevalsplit)))
-        } else {
-          ux[[i]] <- sx[-length(sx)]
-        }
-        loss[[i]] <- rep(NA, length(ux[[i]]))
-
-        if (length(ux[[i]]) > 0) {
-          for (j in 1:length(ux[[i]])) {
-            
-            xs <- x <= ux[[i]][j]
-            args$data$Part[subscripts] <- partitions[i]
-            args$data$Part[xs & subscripts] <- "Right"
-            
-            if (min(table(args$data$Part)[c(partitions[i], "Right")]) <
-                control$minsplit) {
-            loss[[i]][j] <- Inf
-          } else {
-            
-            splitModel <-
-              tvcolmm_fit_model(formula, args, control)
-            loss[[i]][j] <- ifelse(inherits(splitModel, "try-error"),
-                                   NaN, control$lossfun(splitModel))
-          }
-            
-            if (control$verbose) {
-              if (is.nan(loss[[i]][j])) {
-                cat("f")
-              }  else if (loss[[i]][j] == Inf) {
-                cat("i")
-              } else {
-                cat(".")
-              }
-            }
-          }
-        }
-      } else {
-
-        al[[i]] <- vcolmm:::tvcolmm_fit_getlevels(x, subscripts)
-        loss[[i]] <- rep(NA, nrow(al[[i]]))
-        names(loss[[i]]) <- rownames(al[[i]])
-        
-        for (j in 1:nrow(al[[i]])) {
-          
-          xs <- x %in% levels(x)[al[[i]][j, ]]            
-          args$data$Part[subscripts] <- partitions[i]
-          args$data$Part[!xs & subscripts] <- "Right"
-          
-          if (min(table(args$data$Part)[c(partitions[i], "Right")]) <
-              control$minsplit) {
-            loss[[i]][j] <- Inf
-          } else {
-
-            splitModel <-
-              tvcolmm_fit_model(formula, args, control)            
-            loss[[i]][j] <- ifelse(inherits(splitModel, "try-error"),
-                                   NaN, control$lossfun(splitModel))
-            
-          }
-          if (control$verbose) {
-            if (is.nan(loss[[i]][j])) {
-              cat("f")
-            }  else if (loss[[i]][j] == Inf) {
-              cat("i")
-            } else {
-              cat(".")
-            }
-          }
-        }
-      }
-      args$data$Part[subscripts] <- partitions[i]
+    
+    if (control$verbose) cat(" OK")
+    
+    ## get split
+    minLoss <- function(x) {
+      x <- unlist(x)
+      if (length(x) > 0) min(x, na.rm = TRUE) else Inf
     }
-
-    if (!any(na.omit(unlist(loss)) < Inf)) {
-      
-      if (control$verbose)
-        cat("\nNo admissible split found. Return object.\n")
-      rval <- FALSE
-      
+    vid <- varid[which.min(sapply(loss, minLoss))]
+    pid <- partid[which.min(sapply(loss[[vid]], minLoss))]
+    pid <- nodeids(nodes)[pid]
+    tmp <- splits[[vid]][[pid]]
+    cut <- tmp[1:(length(tmp) -1)]
+    stat <- tmp[length(tmp)]
+    x <- partvar[, vid]
+    
+    ## collect information for the split
+    subscripts <- Part == levels(Part)[pid]
+    if (is.numeric(x)) { # numerical variables
+      breaks <- as.double(cut)
+      index <- NULL
+      ordered <- TRUE
+      subsLeft <- subscripts & x <= breaks
+      subsRight <- subscripts & x > breaks
     } else {
-
-      if (control$verbose) cat(" OK")
-
-      ## get partition which should be splitted
-      partsubs <- which.min(sapply(loss, function(x) if (length(x) > 0) min(x, na.rm = TRUE) else Inf))
-      partid <- partitions[partsubs]
-
-      ## collect information for the split
-      subscripts <- where == partid
-      if (is.numeric(x)) { # numerical variables
-        breaks <-
-          as.double(ux[[partsubs]][which.min(loss[[partsubs]])])
+      subsLeft <- subscripts & x %in% levels(x)[cut]
+      subsRight <- subscripts & !x %in% levels(x)[cut]
+      if (is.ordered(x)) { 
+        breaks <- as.double(max(which(cut == 1)))
         index <- NULL
         ordered <- TRUE
-        subsLeft <- subscripts & x <= breaks
-        subsRight <- subscripts & x > breaks
       } else {
-        index <- !al[[partsubs]][which.min(loss[[partsubs]]),]
-        subsLeft <- subscripts & x %in% levels(x)[index]
-        subsRight <- subscripts & !x %in% levels(x)[index]
-        if (is.ordered(x)) { # ordinal variables
-          breaks <- as.double(which.min(loss[[partsubs]]))
-          index <- NULL
-          ordered <- TRUE
-        } else { # nominal variables
-          breaks <- NULL
-          index <- as.integer(1 * index + 1)
-          index[table(x[where == partid]) == 0] <- NA
-          ordered <- FALSE
-        }
+        breaks <- NULL
+        index <- as.integer(-cut + 2)
+        index[table(x[subscripts]) == 0] <- NA
+        ordered <- FALSE
       }
-      
-      ## get current nodes
-      nodes <- as.list(nodes)
-
-      ## setup 'newnodes' object
-      subs <- which(sapply(nodes, function(node) node$id) == partid)
-      newnodes <- vector("list", length(nodes) + 2)
-      newnodes[1:subs] <- nodes[1:subs]
-      if (length(nodes) > partid)
-        newnodes[(subs + 3L):length(newnodes)] <-
-          nodes[(subs + 1L):length(nodes)]
-
-      ## adjust ids of children
-      ids <- sapply(newnodes, function(x) if (!is.null(x$id)) x$id else -1)
-      for (i in 1L:length(newnodes))
-        if (!is.null(newnodes[[i]]$kids))
-          newnodes[[i]]$kids <- which(ids %in% newnodes[[i]]$kids)
-
-      ## setup new split
-      newnodes[[subs]]$split <-
-        partysplit(varid = varid, breaks = breaks, index = index,
-                   info = list(ordered = ordered,
-                     breaks = if (is.numeric(x)) ux else al,
-                     splitstatistic = loss,
-                     fluctest = test))
-      newnodes[[subs]]$kids <- partid + 1L:2L
-      newnodes[[subs]]$info$dims <-
-        c(N = length(unique(model@subject[subscripts])),
-          n = sum(subscripts))
-      newnodes[[subs]]$info$step <- step
-
-      ## add new children
-      newnodes[[subs + 1L]] <- list(id = partid + 1L, info = list(dims = c(N = length(unique(model@subject[subsLeft])), n = sum(subsLeft)), depth = newnodes[[subs]]$info$depth + 1L))
-      newnodes[[subs + 2L]] <- list(id = partid + 2L, info = list(dims = c(N = length(unique(model@subject[subsRight])), n = sum(subsRight)), depth = newnodes[[subs]]$info$depth + 1L))
-      
-      ## adjust ids
-      for (i in 1L:length(newnodes))
-        newnodes[[i]]$id <- i
-
-      ## print split
-      if (control$verbose) {
-                              
-        cat("\n\nSplit = ")
-        cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = partvar)$levels, collapse = "}, {"), "}\n", sep = ""))
-      }
-
-      ## return new nodes
-      rval <- as.partynode(newnodes)
     }
+
+    ## !!! this part is really ugly and may be improved soon
+    
+    ## get current nodes
+    nodes <- as.list(nodes)
+    
+    ## setup 'newnodes' object
+    subs <- which(sapply(nodes, function(node) node$id) == pid)
+    newnodes <- vector("list", length(nodes) + 2)
+    newnodes[1:subs] <- nodes[1:subs]
+    if (length(nodes) > pid)
+      newnodes[(subs + 3L):length(newnodes)] <-
+        nodes[(subs + 1L):length(nodes)]
+    
+    ## adjust ids of children
+    ids <- sapply(newnodes, function(x) if (!is.null(x$id)) x$id else -1)
+    for (i in 1L:length(newnodes))
+      if (!is.null(newnodes[[i]]$kids))
+        newnodes[[i]]$kids <- which(ids %in% newnodes[[i]]$kids)
+    
+    ## setup new split
+    newnodes[[subs]]$split <-
+      partysplit(varid = vid, breaks = breaks, index = index,
+                 info = list(ordered = ordered,
+                   breaks = if (is.numeric(x)) ux else al,
+                   splitstatistic = splits,
+                   fluctest = test))
+    newnodes[[subs]]$kids <- pid + 1L:2L
+    newnodes[[subs]]$info$dims <-
+      c(N = length(unique(model@subject[subscripts])),
+        n = sum(subscripts))
+    newnodes[[subs]]$info$step <- step
+    
+    ## add new children
+    newnodes[[subs + 1L]] <- list(id = pid + 1L, info = list(dims = c(N = length(unique(model@subject[subsLeft])), n = sum(subsLeft)), depth = newnodes[[subs]]$info$depth + 1L))
+    newnodes[[subs + 2L]] <- list(id = pid + 2L, info = list(dims = c(N = length(unique(model@subject[subsRight])), n = sum(subsRight)), depth = newnodes[[subs]]$info$depth + 1L))
+    
+    ## adjust ids
+    for (i in 1L:length(newnodes))
+      newnodes[[i]]$id <- i
+    
+    ## print split
+    if (control$verbose) {
+      
+      cat("\n\nSplit = ")
+      cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = partvar)$levels, collapse = "}, {"), "}\n", sep = ""))
+    }
+    
+    ## return new nodes
+    rval <- as.partynode(newnodes)
   }
   return(rval)
 }
@@ -643,10 +651,8 @@ tvcolmm_modify_modargs <- function(model, args, control) {
 
   yName <- all.vars(formula(model))[1]
   subjectName <- model@subjectName
-
-  ## modify formula
   
-  ## formulas for fixed effects
+  ## modify formulas for fixed effects
   X <- model.matrix(model, "fixef")
   xTerms <- colnames(X)
   subsInt <- xTerms == "(Intercept)"
@@ -665,7 +671,7 @@ tvcolmm_modify_modargs <- function(model, args, control) {
     fixefEtaInv <- "-1"
   }
 
-  ## formulas for random effects
+  ## modify formulas for random effects
   W <- model.matrix(model, "ranef")
   wTerms <- colnames(W)
   subsInt <- wTerms == "(Intercept)"
@@ -805,7 +811,7 @@ tvcolmm_fit_getlevels <- function(x, subscripts) {
   } else {
     mi <- 2^(nld - 1) - 1
     indx <- matrix(0, nrow = mi, ncol = nl)
-    for (i in 1:mi) { # go through all splits #
+    for (i in seq(1, mi, length.out = mi)) { # go through all splits #
       ii <- i
       for (l in 1:nld) {
         indx[i, which(levels(x) %in% levels(xd))[l]] <- ii %% 2;
