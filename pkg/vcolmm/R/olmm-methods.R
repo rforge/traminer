@@ -222,7 +222,8 @@ setMethod(f = "logLik",
             dims <- object@dims
             rval <- object@logLik
             attr(rval, "nall") <- attr(rval, "nobs") <- dims[["n"]]
-            attr(rval, "df") <- dims[["nPar"]]
+            nPar <- dims[["nPar"]] - (1 - dims[["hasRanef"]])
+            attr(rval, "df") <- nPar
             class(rval) <- "logLik"
             return(rval)
           })
