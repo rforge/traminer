@@ -211,7 +211,7 @@ olmm_formula <- function(formula, env = parent.frame()) {
   if (length(all.vars(formula(ff, lhs = 1,
                               rhs = rep(FALSE, length(ff)[2])))) > 1)
     stop("only one response variables is allowed")
-  yName <- rownames(attr(terms(ff), "factors"))[1L]
+  yName <- all.vars(formula)[1]
   
   ## check wether the right hand side has 1 or 2 parts
   if (length(ff)[2] > 2L)
@@ -310,17 +310,23 @@ olmm_formula <- function(formula, env = parent.frame()) {
     ranefEtaInv <- formula(paste(deparse(ranefEtaInv), "-1"))
   
   ## full formula for model frame
-  full <- formula(paste(yName, " ~ ",
-                        paste(c(attr(terms(fixefEtaVar, keep.order = TRUE),
-                                     "term.labels"),
-                                attr(terms(fixefEtaInv, keep.order = TRUE),
-                                     "term.labels"),
-                                attr(terms(ranefEtaVar, keep.order = TRUE),
-                                     "term.labels"),
-                                attr(terms(ranefEtaInv, keep.order = TRUE),
-                                     "term.labels"),
-                                subjectName), collapse = " + ")))
-
+  if (sum(length(all.vars(fixefEtaVar)) + length(all.vars(fixefEtaInv)) +
+          length(all.vars(ranefEtaVar)) + length(all.vars(ranefEtaInv)) +
+          length(subjectName)) > 0) {
+    full <- formula(paste(yName, " ~ ",
+                          paste(c(attr(terms(fixefEtaVar, keep.order = TRUE),
+                                       "term.labels"),
+                                  attr(terms(fixefEtaInv, keep.order = TRUE),
+                                       "term.labels"),
+                                  attr(terms(ranefEtaVar, keep.order = TRUE),
+                                       "term.labels"),
+                                  attr(terms(ranefEtaInv, keep.order = TRUE),
+                                       "term.labels"),
+                                  subjectName), collapse = " + ")))
+  } else {
+    full <- formula(paste(yName, " ~ 1"))
+  }
+  
   ## fixef formula (used in predict)
   fixef <- 
     formula(paste(" ~ ",

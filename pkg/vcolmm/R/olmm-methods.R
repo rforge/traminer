@@ -263,7 +263,7 @@ olmm_predict <- function(object, newdata = NULL,
     if (is.logical(ranef)) {
       if (ranef) ranef <- ranef(object)
     } else {
-      stop("ranef must be a 'logical'")
+      stop("ranef must be a 'logical'.")
     }
     
   } else {
@@ -511,7 +511,7 @@ setMethod(f = "ranefCov",
           })
 
 
-olmm_resid <- function(object, ...) {
+olmm_resid <- function(object, norm = FALSE, ...) {
   fitted <- predict(object, ...)
   y <- as.integer(model.response(model.frame(object)))
   J <- object@dims["J"]
@@ -519,6 +519,10 @@ olmm_resid <- function(object, ...) {
   rval <- sapply(1:n, function(i) {
     sum(fitted[i, 1:J > y[i]]) - sum(fitted[i, 1:J < y[i]])
   })
+  if (norm) {
+    var <- (1 - apply(fitted^3, 1, sum)) / 3
+    rval <- rval / sqrt(var)
+  }
   return(rval)
 }
 

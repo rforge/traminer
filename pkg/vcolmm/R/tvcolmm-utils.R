@@ -152,11 +152,11 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
           depth[j] < control$maxdepth) {
 
         ## extract variable to test
-        if (level[i] == "subject")
-          z <- aggregate(z, by = list(subject[rows]), FUN = function(x) x[1])[, 2]
+        ## if (level[i] == "subject")
+        ##   z <- aggregate(z, by = list(subject[rows]), FUN = function(x) x[1])[, 2]
 
         ## function to extract scores
-        cols <- sub("Node", levels(Part)[j], terms)
+        cols <- sub("Node", levels(Part)[j], terms, fixed = TRUE)
         
         ## break the ties
         if (control$breakties) {
@@ -170,9 +170,20 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
         ## define the score function extractor for 'sctest'
         scores <- function(x) {
           rval <- estfun(model)[rows, cols, drop = FALSE]
-          if (level[i] == "subject") 
-            rval <- apply(rval, 2, tapply, droplevels(subject[rows]), sum)
           return(rval[oi, , drop = FALSE])
+        }
+
+        ## covariance matrix, must be improved!!!
+        vcov <- function(x, order.by, data) {
+          scores <- scores(x)
+          n <- nrow(scores)
+          ## independence case
+          v1 <- crossprod(scores / sqrt(n))
+          scores <-  apply(scores, 2, tapply, droplevels(subject[rows]), sum)
+          ## time-invariant
+          v2 <- crossprod(scores / sqrt(n))
+          rval <- (level[i] == "observation") * v1 + (level[i] == "subject") * v2
+          return(rval)
         }
         
         ## arguments for test
@@ -181,9 +192,11 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
         args <- appendDefArgs(list(x = model,
                                    order.by = z,
                                    scores = scores,
+                                   sandwich = FALSE,
+                                   vcov = vcov,
                                    functional = functional[i]),
                               args)
-
+        
         ## call test
         test <- try(do.call("sctest", args), silent = TRUE)
         
