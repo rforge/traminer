@@ -1,5 +1,3 @@
-              CHANGES IN WeightedCluster VERSION 1.3
-NONE
               CHANGES IN WeightedCluster VERSION 1.2
 NEW FEATURES
   o as.clustrange(), wcKMedRange(): Added bootstrap of cluster quality measures.
