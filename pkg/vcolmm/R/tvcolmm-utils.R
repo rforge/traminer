@@ -643,9 +643,6 @@ tvcolmm_modify_control <- function(model, control) {
   }
   termsFixefEtaVar <- unlist(lapply(termsFixefEtaVar, FUN3))
   termsFixefEtaInv <- unlist(lapply(termsFixefEtaInv, FUN3))
-
-  if (control$intercept == "po")
-    termsFixefEtaInv <- c("PartNode", termsFixefEtaInv)
   
   control$terms$tree <- c(termsFixefEtaVar, termsFixefEtaInv)
   
