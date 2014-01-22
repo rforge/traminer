@@ -216,13 +216,13 @@ predict.tvcolmm <- function(object, newdata = NULL,
     ## extract individual effects
     coef <- coef(object)   
     varcoef <- lapply(fitted, function(x) coef$varying[as.character(x), ])
-    varcoef <- matrix(unlist(varcoef), nrow = nrow(newdata), byrow = TRUE,
-                      dimnames = list(rownames(newdata),
+    varcoef <- matrix(unlist(varcoef), nrow = length(fitted), byrow = TRUE,
+                      dimnames = list(names(fitted),
                         colnames(coef$varying)))
 
-    rescoef <- matrix(coef$restricted, nrow = nrow(newdata),
+    rescoef <- matrix(coef$restricted, nrow = length(fitted),
                       ncol = length(coef$restricted), byrow = TRUE,
-                      dimnames = list(rownames(newdata),
+                      dimnames = list(names(fitted),
                         names(coef$restricted)))
 
     rval <- cbind(varcoef, rescoef)

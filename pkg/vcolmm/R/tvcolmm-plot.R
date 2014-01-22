@@ -89,20 +89,25 @@ tvcolmm_terms_plot <- function(object, terms = NULL,
                                prob = NULL, neval = 50L, add = FALSE, ...) {
 
   data <- object$data
-  allTerms <- coef(extract(object, "model"))
+  allTerms <- names(coef(extract(object, "model")))
   allVars <- extract(object, "selected")
   allVars <- intersect(colnames(data), allVars)
-
+  
   ## plot all varying coefficients ...
-  if (is.null(terms)) {
-    terms <- grep("Part[1-9]?[0-9]?[0-9]", names(allTerms), value = TRUE)    
-    terms <- unique(sub("Part[1-9]?[0-9]?[0-9]", "", terms))
-    terms <- sub(":", "", terms)
-    int <- grep("Eta[1-9]?[0-9]?[0-9]", terms)
-    terms[int] <- paste(terms[int], ":Part", sep = "")
-    terms[terms == ""] <- "Part"
-  }
+  partTerms <- grep("Part[1-9]?[0-9]?[0-9]", allTerms, value = TRUE)
+  restTerms <- setdiff(allTerms, partTerms)
+  partTerms <- unique(sub("Part[1-9]?[0-9]?[0-9]", "", partTerms))
+  partTerms <- sub(":", "", partTerms)
+  int <- grep("Eta[1-9]?[0-9]?[0-9]", partTerms)
+  partTerms[int] <- paste(partTerms[int], ":Part", sep = "")
+  partTerms[partTerms == ""] <- "Part"
+  allTerms <- c(restTerms, partTerms)
+  
+  if (is.null(terms)) terms <- partTerms
 
+  ## check terms
+  if (any(!terms %in% allTerms)) stop(paste("terms '", paste(terms[!terms %in% allTerms], collapse = "', '"), "' are invalid. Use some of '", paste(allTerms, collapse = "', '"), "'.", sep = ""))
+  
   ## ... and all partitioning variables that appear in the tree
   if (is.null(variable)) variable <- allVars
     
@@ -135,7 +140,7 @@ tvcolmm_terms_plot <- function(object, terms = NULL,
     } else {
       probi <- prob
     }
-    tmp <- if (probi < 1) { data[tvcolmm_folds(object, K = 1L, type = "subsampling", prob = probi), , drop = FALSE] } else { data }
+    tmp <- if (probi < 1) { data[tvcolmm_folds(object, K = 1L, type = "subsampling", prob = probi) == 1L, , drop = FALSE] } else { data }
 
     newdata <- NULL
     for (j in 1:length(z)) newdata <- rbind(newdata, tmp)
@@ -154,12 +159,13 @@ tvcolmm_terms_plot <- function(object, terms = NULL,
         paste("coef(", terms[j], "|", variable[i], ")", sep = "")
 
       if (is.numeric(z)) {
-        args <- vcolmm:::appendDefArgs(dotList[intersect(names(dotList), names(formals(plot.default)))], list(type = "s"))
+        args <- vcolmm:::appendDefArgs(dotList, list(type = "s"))
         args <- vcolmm:::appendDefArgs(list(x = z, y = betaj), args)
       } else {
-        args <- dotList[intersect(names(dotList), names(formals(barplot.default)))]
-        args <- vcolmm:::appendDefArgs(list(x = as.integer(z), y = betaj), args)
-        if (!add) args <- vcolmm:::appendDefArgs(args, list(type = "b", axes = FALSE))
+        args <- dotList
+        args <- vcolmm:::appendDefArgs(list(x = as.integer(z), y = betaj,
+                                            type = "b"), args)
+        if (!add) args <- vcolmm:::appendDefArgs(args, list(axes = FALSE))
       }
 
       if (add) {

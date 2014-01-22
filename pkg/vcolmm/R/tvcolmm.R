@@ -148,8 +148,9 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
 
       if (control$fluctest) {
         
-        test <- tvcolmm_fit_fluctest(model, nodes, partvar, control)
-      
+        test <- tvcolmm_fit_fluctest(model, nodes, partvar, control,
+                                     ff, args)
+        
         ## return error if test failed
         if (inherits(test, "try-error"))
           stop("coefficient constancy tests failed.")
@@ -217,12 +218,23 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
       }
     }
 
+  ## if 'intercept == "po"', refit the model with appropriate contrasts
+  if (nlevels(args$data$Part) > 0 && control$intercept == "po") {
+    con <- contr.sum(levels(args$data$Part))
+    tab <- tapply(args$weights, args$data$Part, sum)
+    con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
+    colnames(con) <- levels(args$data$Part)[1:(nlevels(args$data$Part) - 1)]
+    args$contrasts$Part <- con
+    model <- tvcolmm_fit_model(ff, args, control, FALSE)
+  }
+
   if (control$verbose) {
     cat("\nFitted model:\n")
     print(model)
   }
 
   if (control$verbose) cat("\n* building object ...")
+
   
   ## prepare the title
   title <-

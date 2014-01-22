@@ -49,26 +49,22 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
   ## set formula
   args$formula <-
     if (nlevels(args$data$Part) == 1L) formula$root else formula$tree
-
-  ## set contrasts
-  if (!is.null(args$data$Part) && nlevels(args$data$Part) > 1L) {
-    con <- contr.sum(levels(args$data$Part))
-    tab <- tapply(args$weights, args$data$Part, sum)
-    con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
-    colnames(con) <- levels(args$data$Part)[1:(nlevels(args$data$Part) - 1)]
-    args$contrasts$Part <- con
-  }
   
   ## fit model
   object <- try(do.call("olmm", args), TRUE)
 
+  
   if (verbose) {
     if (nlevels(args$data$Part) == 1L) {
       cat("\n\n")
       print(object)
     } else {
       cat("\n\nPartition coefficient(s) of global node model:\n")
-      terms <- if (nlevels(args$data$Part) == 1L) control$terms$root else grep("Part", names(coef(object)), value = TRUE)
+      terms <- if (nlevels(args$data$Part) == 1L) {
+        control$terms$root
+      } else {
+        grep("Part", names(coef(object)), value = TRUE)
+      }
       print(data.frame(Estimate = coef(object)[terms]), digits = 2)
     }
   }
@@ -102,7 +98,8 @@ tvcolmm_refit_model <- function(object, args) {
   return(object)
 }
 
-tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
+tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
+                                 formula, args) {
 
   subject <- model@subject
   Part <- model@frame$Part
@@ -134,11 +131,21 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
   ## get depths of nodes for the check
   depth <- unlist(nodeapply(nodes, nodeids(nodes, terminal = TRUE),
                             function(node) info_node(node)$depth))
+
+  ## hack^1: if intercept = "po" fit a second model with the second level of
+  ## 'Part' as reference level
+  if (nlevels(args$data$Part) > 1L && control$intercept == "po") {
+    args$contrasts$Part <- contr.treatment(levels(args$data$Part), base = 2)
+    model2 <- tvcolmm_fit_model(formula, args, control, FALSE)
+  }
   
   ## apply test for each variable and partition separately  
   for (i in 1:ncol(partvar)) {    
     for (j in 1:nlevels(Part)) {
 
+      ## hack^1: choose the model (only important if 'intercept == "po"')
+      m <- if (nlevels(Part) > 1L && control$intercept == "po" && j == 1L) model2 else model
+      
       ## extract observations of current partition
       rows <- Part == levels(Part)[j]
 
@@ -150,10 +157,6 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
       if (sum(cumsum(sort(table(z))) >= control$minsplit) > 1 &
           max(cumsum(sort(table(z)))) >= 2 * control$minsplit &
           depth[j] < control$maxdepth) {
-
-        ## extract variable to test
-        ## if (level[i] == "subject")
-        ##   z <- aggregate(z, by = list(subject[rows]), FUN = function(x) x[1])[, 2]
 
         ## function to extract scores
         cols <- sub("Node", levels(Part)[j], terms, fixed = TRUE)
@@ -169,7 +172,7 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
 
         ## define the score function extractor for 'sctest'
         scores <- function(x) {
-          rval <- estfun(model)[rows, cols, drop = FALSE]
+          rval <- estfun(m)[rows, cols, drop = FALSE]
           return(rval[oi, , drop = FALSE])
         }
 
@@ -188,17 +191,17 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control) {
         
         ## arguments for test
         argNames <- names(formals(strucchange:::sctest.default))
-        args <- control[names(control) %in% argNames]
-        args <- appendDefArgs(list(x = model,
-                                   order.by = z,
-                                   scores = scores,
-                                   sandwich = FALSE,
-                                   vcov = vcov,
-                                   functional = functional[i]),
-                              args)
+        testArgs <- control[names(control) %in% argNames]
+        testArgs <- appendDefArgs(list(x = m,
+                                       order.by = z,
+                                       scores = scores,
+                                       sandwich = FALSE,
+                                       vcov = vcov,
+                                       functional = functional[i]),
+                                  testArgs)
         
         ## call test
-        test <- try(do.call("sctest", args), silent = TRUE)
+        test <- try(do.call("sctest", testArgs), silent = TRUE)
         
         if (!inherits(test, "try-error")) {
           
@@ -504,6 +507,15 @@ tvcolmm_modify_catpreds <- function(formula, data) {
 
 
 tvcolmm_modify_control <- function(model, control) {
+
+  ## prevent conflicts
+  if (control$intercept == "none") {
+    control$restricted <- unique(c("(Intercept)", control$restricted))
+    control$terms <- setdiff(control$terms, "(Intercept)")
+    intercept <- FALSE
+  } else {
+    intercept <- TRUE
+  }
   
   ## get needed information
   atEtaVar <- terms(model, "fixefEtaVar")
@@ -529,50 +541,46 @@ tvcolmm_modify_control <- function(model, control) {
     if (all(control$terms %in% c(fixefEtaVar, fixefEtaInv))) {
 
       termsFixefEtaVar <- intersect(control$terms, fixefEtaVar)
-      termsFixefEtaVar <-
-        unique(sub("Eta[1-9]+:", "", termsFixefEtaVar))
+      termsFixefEtaVar <- unique(sub("Eta[1-9]+:", "", termsFixefEtaVar))
       termsFixefEtaInv <- intersect(control$terms, fixefEtaInv)
+      
     } else if (all(control$terms %in% c(atEtaVar, atEtaInv))) {
 
       subs <- which(atEtaVar %in% control$terms)
-      if (length(subs) > 0) {
+      if (length(subs) > 0)
         termsFixefEtaVar <- mmNamesEtaVar[assignEtaVar %in% (subs - 1L)]
-      }
       
       subs <- which(atEtaInv %in% control$terms)
-      if (length(subs) > 0) {
+      if (length(subs) > 0)
         termsFixefEtaInv <- mmNamesEtaInv[assignEtaInv %in% subs]
-      }
-
+      
     } else {
 
       stop("invalid 'terms' argument")
     }
+    if (!"(Intercept)" %in% c(termsFixefEtaVar, termsFixefEtaVar))
+      intercept <- FALSE
   }
 
   if (length(control$restricted) > 0L) {
 
     if (all(control$restricted %in% c(fixefEtaVar, fixefEtaInv))) {
 
-      restFixefEtaVar <-
-        intersect(control$restricted, fixefEtaVar)
-      restFixefEtaVar <-
-        unique(sub("Eta[1-9]+:", "", restFixefEtaVar))
-      restFixefEtaInv <-
-        intersect(control$restricted, fixefEtaInv)
+      restFixefEtaVar <- intersect(control$restricted, fixefEtaVar)
+      restFixefEtaVar <- unique(sub("Eta[1-9]+:", "", restFixefEtaVar))
+      restFixefEtaInv <- intersect(control$restricted, fixefEtaInv)
+      
     } else if (all(control$restricted %in%
                    c(atEtaVar, atEtaInv))) {
 
       subs <- which(atEtaVar %in% control$restricted)
-      if (length(subs) > 0) {
-        restFixefEtaVar <-
-          mmNamesEtaVar[assignEtaVar %in% (subs - 1)]
-      }   
+      if (length(subs) > 0)
+        restFixefEtaVar <- mmNamesEtaVar[assignEtaVar %in% (subs - 1)]
+      
       subs <- which(atEtaInv %in% control$restricted)
-      if (length(subs) > 0) {
+      if (length(subs) > 0)
         restFixefEtaInv <- mmNamesEtaInv[assignEtaInv %in% subs]
-      } 
-
+      
     } else {
 
       stop("invalid 'restricted' argument")
@@ -585,9 +593,11 @@ tvcolmm_modify_control <- function(model, control) {
 
     termsFixefEtaVar <-
       setdiff(unique(sub("Eta[1-9]+:", "", fixefEtaVar)), restFixefEtaVar)
-    termsFixefEtaVar <- setdiff(termsFixefEtaVar, "(Intercept)")
     termsFixefEtaInv <- setdiff(fixefEtaInv, restFixefEtaInv)
-  } 
+  }
+
+  if (!control$intercept == "npo")
+    termsFixefEtaVar <- setdiff(termsFixefEtaVar, "(Intercept)")
 
   ## if 'restricted' is empty, add all fixef effect parameters
   ## except 'terms' parameters
@@ -643,12 +653,14 @@ tvcolmm_modify_control <- function(model, control) {
   }
   termsFixefEtaVar <- unlist(lapply(termsFixefEtaVar, FUN3))
   termsFixefEtaInv <- unlist(lapply(termsFixefEtaInv, FUN3))
+
+  if (intercept && control$intercept == "po")
+    termsFixefEtaInv <- c("PartNode", termsFixefEtaInv)
   
-  control$terms$tree <- c(termsFixefEtaVar, termsFixefEtaInv)
-  
+  control$terms$tree <- c(termsFixefEtaVar, termsFixefEtaInv)  
   control$restricted <- c(setdiff(unique(sub("Eta[1-9]+:", "", restFixefEtaVar)), "(Intercept)"), restFixefEtaInv)
   
-  if (length(control$terms$tree) * length(control$terms$tree) == 0)
+  if (length(control$terms$root) * length(control$terms$tree) == 0)
     stop("no 'terms' found.")
   
   return(control)

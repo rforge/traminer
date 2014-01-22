@@ -137,8 +137,7 @@ tvcolmm(formula, data, control = tvcolmm_control(),
 ##                    b_1 (z_1, z_2) treatment,       u_i ~ N(0, s_u)
 ##
 ## The true treatment effects are 1.25 for z1 = 1 / z2 = 1, 0.75 for
-## z1 = 1 / z2 = 2 and -0.5 for z1 = 2 and z2 = 2. z3 is a true
-## nuisance variable. 
+## z1 = 1 / z2 = 2 and -0.5 for z1 = 2 and z2 = 2. z3 is nuisance. 
 ## ------------------------------------------------------------------- #
 
 ## load the data
@@ -152,7 +151,7 @@ mod1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_2,
                 linear = "time", vi = "po")
 
 ## print the results
-print(mod2)
+print(mod1)
 
 ## ------------------------------------------------------------------- # 
 ## Example 2: Empirical example
