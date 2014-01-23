@@ -250,6 +250,11 @@ olmm_predict <- function(object, newdata = NULL,
   
   type <- match.arg(type) # retrieve type
   form <- vcolmm:::olmm_formula(object@formula) # extract formulas
+  if (object@dims["hasRanef"] < 1L) {
+    form$subjectName <- "id"
+    form$full <- update(form$full, . ~ . + id)
+    form$ranefEtaInv <- ~ 1
+  }
   
   if (is.null(newdata)) {
     

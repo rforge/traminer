@@ -458,22 +458,30 @@ tvcolmm_formula <- function(model, control, env = parent.frame()) {
   W <- model.matrix(model, "ranef")
   
   ## predictor-variable random effects
-  ranefEtaVar <- colnames(W, "ranef")[attr(W, "merge") == 1L]
-  ranefEtaVar[ranefEtaVar == "(Intercept)"] <- "1"
-  ranefEtaVar <- gsub("[[:punct:]]", "", ranefEtaVar)
-  if (length(ranefEtaVar) > 0) {   
-    ranefEtaVar <- paste("(", paste(ranefEtaVar, collapse = " + "), " | ",
-                         model@subjectName, ")", sep = "")
+  if (model@dims["hasRanef"] > 0) {
+    ranefEtaVar <- colnames(W, "ranef")[attr(W, "merge") == 1L]
+    ranefEtaVar[ranefEtaVar == "(Intercept)"] <- "1"
+    ranefEtaVar <- gsub("[[:punct:]]", "", ranefEtaVar)
+    if (length(ranefEtaVar) > 0) {   
+      ranefEtaVar <- paste("(", paste(ranefEtaVar, collapse = " + "), " | ",
+                           model@subjectName, ")", sep = "")
+    } 
+  } else {
+    ranefEtaVar <- c()
   }
-
+  
   ## predictor-invariant random effects
-  ranefEtaInv <- colnames(W, "ranef")[attr(W, "merge") == 2L]
-  ranefEtaInv[ranefEtaInv == "(Intercept)"] <- "1"
-  ranefEtaInv <- gsub("[[:punct:]]", "", ranefEtaInv)
-  if (length(ranefEtaInv) > 0) {   
-    ranefEtaInv <- paste("(", paste(ranefEtaInv, collapse = " + "), " | ",
-                         model@subjectName, ")", sep = "")
-    
+  if (model@dims["hasRanef"] > 0) {
+    ranefEtaInv <- colnames(W, "ranef")[attr(W, "merge") == 2L]
+    ranefEtaInv[ranefEtaInv == "(Intercept)"] <- "1"
+    ranefEtaInv <- gsub("[[:punct:]]", "", ranefEtaInv)
+    if (length(ranefEtaInv) > 0) {   
+      ranefEtaInv <- paste("(", paste(ranefEtaInv, collapse = " + "), " | ",
+                           model@subjectName, ")", sep = "")
+      
+    }
+  } else {
+    ranefEtaInv <- c()
   }
 
   ## paste together the formula
@@ -697,21 +705,25 @@ tvcolmm_modify_modargs <- function(model, args, control) {
   subsInt <- wTerms == "(Intercept)"
   wTerms[!subsInt] <- gsub("[[:punct:]]", "", wTerms[!subsInt])
   colnames(W) <- wTerms
-  if ("(Intercept)" %in% wTerms)
-    wTerms[wTerms == "(Intercept)"] <- "1"
-  
-  if (any(subs <- (attr(W, "merge") == 1 & attr(W, "assign") >= 0))) {
-    ranefEtaVar <- paste(wTerms[subs], collapse = " + ")
-    ranefEtaVar <- paste("(", ranefEtaVar, "|", subjectName, ")", sep = "")
+  if (model@dims["hasRanef"] > 0) {
+    if ("(Intercept)" %in% wTerms)
+      wTerms[wTerms == "(Intercept)"] <- "1"
+    
+    if (any(subs <- (attr(W, "merge") == 1 & attr(W, "assign") >= 0))) {
+      ranefEtaVar <- paste(wTerms[subs], collapse = " + ")
+      ranefEtaVar <- paste("(", ranefEtaVar, "|", subjectName, ")", sep = "")
+    } else {
+      ranefEtaVar <- ""
+    }
+    
+    if (any(subs <- (attr(W, "merge") == 2 & attr(W, "assign") >= 0))) {
+      ranefEtaInv <- paste(wTerms[subs], collapse = " + ")
+      ranefEtaInv <- paste("(", ranefEtaInv, "|", subjectName, ")", sep = "")
+    } else {
+      ranefEtaInv <- ""
+    }
   } else {
-    ranefEtaVar <- ""
-  }
-
-  if (any(subs <- (attr(W, "merge") == 2 & attr(W, "assign") >= 0))) {
-    ranefEtaInv <- paste(wTerms[subs], collapse = " + ")
-    ranefEtaInv <- paste("(", ranefEtaInv, "|", subjectName, ")", sep = "")
-  } else {
-    ranefEtaInv <- ""
+    ranefEtaVar <- ranefEtaInv <- ""
   }
 
   ## paste all together to one formula

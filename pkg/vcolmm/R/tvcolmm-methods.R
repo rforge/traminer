@@ -193,18 +193,29 @@ predict.tvcolmm <- function(object, newdata = NULL,
 
   if (is.logical(ranef) && ranef) {
 
+    ## please explain why!!!
     if (is.null(newdata)) {
       ranef <- ranef(extract(object, "model"))
     } else {
       subjectName <- extract(object, "model")@subjectName
-      if (!subjectName %in% colnames(newdata)) stop(paste("column '", subjectName, "' not found in the 'newdata'.", sep = ""))
-      subject <- droplevels(newdata[, subjectName])
-      ranef <- matrix(0, nlevels(subject),
-                      extract(object, "model")@dims["q"],
-                      dimnames = list(levels(subject),
-                        colnames(extract(object, "model")@W)))
-    }
+      if (extract(object, "model")@dims["hasRanef"] > 0L) {
+        if (!subjectName %in% colnames(newdata)) stop(paste("column '", subjectName, "' not found in the 'newdata'.", sep = ""))
+        subject <- droplevels(newdata[, subjectName])
+        ranef <- matrix(0, nlevels(subject),
+                        extract(object, "model")@dims["q"],
+                        dimnames = list(levels(subject),
+                          colnames(extract(object, "model")@W)))
+        subs <- intersect(levels(subject), rownames(ranef(extract(object, "model"))))
+        ranef[subs, ] <- ranef(extract(object, "model"))[subs, ]        
+      } else {
+        subject <- newdata$id <- factor(1:nrow(newdata))
+        ranef <- matrix(0, nlevels(subject), 1,
+                        dimnames = list(levels(newdata$id), "(Intercept)"))
+      }
+    } 
   }
+
+  if (extract(object, "model")@dims["hasRanef"] == 0L)
 
   ## return fitted node ids
   if (type == "node") {
