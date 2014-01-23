@@ -173,8 +173,7 @@ neglogLik.tvcolmm <- function(object, ...)
 
 predict.tvcolmm <- function(object, newdata = NULL,
                            type = c("prob", "class", "node",
-                             "link", "terms"), ranef = FALSE, 
-                            ...) {
+                             "link", "terms"), ...) {
 
   ## match type
   type <- match.arg(type)
@@ -190,32 +189,6 @@ predict.tvcolmm <- function(object, newdata = NULL,
     fitted <- fitted_node(object$node, newdata[, colnames(object$data), drop = FALSE])
     newdata$Part <- vcolmm:::tvcolmm_get_part(object, newdata)
   }
-
-  if (is.logical(ranef) && ranef) {
-
-    ## please explain why!!!
-    if (is.null(newdata)) {
-      ranef <- ranef(extract(object, "model"))
-    } else {
-      subjectName <- extract(object, "model")@subjectName
-      if (extract(object, "model")@dims["hasRanef"] > 0L) {
-        if (!subjectName %in% colnames(newdata)) stop(paste("column '", subjectName, "' not found in the 'newdata'.", sep = ""))
-        subject <- droplevels(newdata[, subjectName])
-        ranef <- matrix(0, nlevels(subject),
-                        extract(object, "model")@dims["q"],
-                        dimnames = list(levels(subject),
-                          colnames(extract(object, "model")@W)))
-        subs <- intersect(levels(subject), rownames(ranef(extract(object, "model"))))
-        ranef[subs, ] <- ranef(extract(object, "model"))[subs, ]        
-      } else {
-        subject <- newdata$id <- factor(1:nrow(newdata))
-        ranef <- matrix(0, nlevels(subject), 1,
-                        dimnames = list(levels(newdata$id), "(Intercept)"))
-      }
-    } 
-  }
-
-  if (extract(object, "model")@dims["hasRanef"] == 0L)
 
   ## return fitted node ids
   if (type == "node") {
@@ -249,8 +222,7 @@ predict.tvcolmm <- function(object, newdata = NULL,
   } else {
 
     ## call predict.olmm
-    return(predict(object$info$model, newdata = newdata, type = type,
-                   ranef = ranef, ...))
+    return(predict(object$info$model, newdata = newdata, type = type, ...))
   }
   return(fitted)
 }
@@ -320,7 +292,11 @@ print.tvcolmm <- function(x, ...) {
                   if (x$info$control$bonferroni) " (Bonferroni corrected)",
                   "\n\t minsplit = ", x$info$control$minsplit, "\n", sep = "")
 
-    rval <- paste(rval, "\nRestricted effects:\n", sep = "")
+    if (any(length(so@REmat) > 0 && nrow(so@REmat) > 0 |
+            sum(!grepl("Part", rownames(etaInv))) > 0 |
+            sum(!grepl("Part", rownames(etaVar))) > 0))
+      rval <- paste(rval, "\nRestricted effects:\n", sep = "")
+    
     if (length(so@REmat) > 0  && nrow(so@REmat) > 0) {
         rval <- paste(rval, "\nRandom effects:\n", sep = "")
         rval <- paste(rval, vcolmm:::formatMatrix(so@REmat[, 1:2, drop = FALSE], ...), sep = "")
@@ -335,7 +311,7 @@ print.tvcolmm <- function(x, ...) {
       }
     }
     
-    if (length(etaVar) > 0  && nrow(so@FEmatEtaVar) > 0) {
+    if (length(etaVar) > 0  && nrow(etaVar) > 0) {
       subs <- which(!grepl("Part", rownames(etaVar)))
       if (length(subs) > 0) {
         rval <-
