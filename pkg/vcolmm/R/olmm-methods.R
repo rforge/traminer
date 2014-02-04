@@ -210,6 +210,72 @@ setMethod("formula",
 	  })
 
 
+rhoTerm <- function(object, order.by) {
+  subject <- as.integer(object@subject[order(order.by)])
+  n <- length(subject)
+  N <- nlevels(subject)
+  Ti <- table(subject)
+  FUN <- function(t) {
+    Tit <- table(subject[1:t])
+    term1 <- t^2 / n^2 * sum(Ti * (Ti - 1))
+    term2 <- 2 * t^2 / n - 2 * t / n * sum(Ti[subject[1:t]])
+    term3 <- sum(Tit^2) - t
+    return(term1 + term2 + term3)
+  }    
+  return(sapply(1:length(subject), FUN))
+}
+
+gefp.olmm <- function(object, order.by, terms = NULL, subset = NULL) {
+  psi <- estfun(object)
+  if (is.null(terms)) terms <- 1:ncol(psi)
+  psi <- psi[, terms, drop = FALSE]
+  if (is.null(subset)) subset <- 1:nrow(psi)
+  psi <- psi[subset, , drop = FALSE]
+  order.by <- order.by[subset]
+  subject <- object@subject[subset]
+  if (is.factor(order.by)) order.by <- droplevels(order.by)
+  J_obs <- as.matrix(crossprod(psi))
+  J_sbj <- as.matrix(crossprod(apply(psi, 2, tapply, droplevels(subject), sum)))
+  rho <- (J_sbj - J_obs) / sum(table(subject) * (table(subject) - 1))
+  n <- nrow(psi)
+  k <- ncol(psi)
+  index <- order(order.by)
+  process <- apply(psi[index, , drop = FALSE], 2, cumsum)  
+  if (object@dims["hasRanef"] > 0L) {
+    term <- rhoTerm(object, order.by)
+    J <- sapply(1:n, function(t) J_obs / n + n / (t * (n - t)) * rho * term[t])
+    J <- array(J, dim = c(ncol(psi), ncol(psi), n))
+    J[, , n] <- J[, , 1]
+    J12i_sbj <- chol2inv(chol(root.matrix(J_sbj / n)))
+    for (i in 1:n) {
+      J12i <- try(chol2inv(chol(root.matrix(as.matrix(J[,,i])))), silent = TRUE)
+      if (class(J12i) == "try-error") { cat("f"); J12i <- J12i_sbj }
+      process[i, ] <- J12 %*% process[i, ] / sqrt(n)
+    }
+  } else {
+    J12 <- root.matrix(J_obs / n)
+    process <- t(chol2inv(chol(J12)) %*% t(process)) / sqrt(n)
+  }
+  process <- rbind(0, process)
+  time <- order.by[index]
+  if (is.factor(time)) time <- as.numeric(droplevels(time))
+  time <- suppressWarnings(c(time[1] - as.numeric(diff(time[1:2])), time))
+  rval <- list(process = suppressWarnings(zoo(process, time)),
+               nreg = k,
+               nobs = n,
+               call = match.call(),
+               fit = NULL,
+               scores = NULL,
+               fitted.model = NULL,
+               par = NULL,
+               lim.process = "Brownian bridge",
+               type.name = "M-fluctuation test",
+               order.name = deparse(substitute(order.by)),
+               J12 = diag(k))
+  class(rval) <- "gefp"
+  return(rval)
+}
+
 setMethod(f = "getCall",
           signature = "olmm",
           definition = function(x, ...) {

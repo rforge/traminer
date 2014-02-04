@@ -88,19 +88,6 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
 
   ## define partitioning data
   partvar <- model.frame(partForm, frame)
-
-  if (!is.null(control$type.vars) && # check
-      (length(control$type.vars) != ncol(partvar) |
-       any(!control$type.vars %in% c("tm-var", "tm-inv"))))
-    stop("'type.vars' is missspecified")
-  
-  if (is.null(control$type.vars)) { # retrieve types if necessary
-    getType <- function(i) {
-      nval <- rowSums(table(model@subject, partvar[, i]) > 0)
-      return(c("tm-inv", "tm-var")[1 + 1 * (max(nval) > 1)])
-    }
-    control$type.vars <- sapply(1:ncol(partvar), getType)
-  }
   
   if (control$verbose) cat("\n* starting partitioning ...\n")
   
@@ -287,6 +274,7 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
             list(alpha = alpha,
                  bonferroni = bonferroni,
                  minsplit = minsplit,
+                 trim = trim,
                  maxdepth = Inf,
                  maxwidth = Inf,
                  nselect = Inf,
@@ -302,7 +290,6 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
                  functional.factor = "LMuo",
                  functional.ordered = "LMuo",
                  functional.numeric = "supLM",
-                 type.vars = NULL,
                  fluctest = TRUE,
                  fast = 0L,
                  verbose = verbose))

@@ -405,9 +405,11 @@ olmm <- function(formula, data, weights, start, subset, na.action,
     ## fit / predict random effects   
     
     ## compute expected standardized random effects
-    if (verbose) cat("\n* predicting random effects ... ")
-    .Call("olmm_update_u", object, PACKAGE = "vcolmm")
-
+    if (object@dims["hasRanef"] > 0 && verbose) {
+      cat("\n* predicting random effects ... ")
+      .Call("olmm_update_u", object, PACKAGE = "vcolmm")
+    }
+    
     ## reset environment of estimation equations
     environment(object@optim[[2L]]) <- baseenv()
     if (!object@dims["numGrad"]) environment(object@optim[[3]]) <- baseenv()
@@ -419,7 +421,8 @@ olmm <- function(formula, data, weights, start, subset, na.action,
     ## update the object with the current estimates
     .Call("olmm_update_marg", object, object@coefficients,
           PACKAGE = "vcolmm")
-    .Call("olmm_update_u", object, PACKAGE = "vcolmm")
+    if (object@dims["hasRanef"] > 0L)
+      .Call("olmm_update_u", object, PACKAGE = "vcolmm")
 
     if (verbose) cat("\n* no computations processed, return model object\n")
   } 

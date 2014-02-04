@@ -75,11 +75,20 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
 
 tvcolmm_refit_model <- function(object, args) {
 
+  ## set new partition
   object@frame$Part <- args$data$Part
+
   form <- olmm_formula(object@formula)
   contrasts <- object@contrasts
+
+  ## update model matrix
   object@X <- olmm_mergeMm(x = model.matrix(terms(terms(form$fixefEtaVar, keep.order = TRUE)), object@frame, contrasts[intersect(names(contrasts), all.vars(form$fixefEtaVar))]), y = model.matrix(terms(form$fixefEtaInv, keep.order = TRUE), object@frame, contrasts[intersect(names(contrasts), all.vars(form$fixefEtaInv))]), TRUE)
-    
+
+  ## reset scores
+  object@score_sbj[] <- object@score_obs[] <- object@score[] <-
+    object@logLik_sbj[] <- object@logLik[] <- 0
+
+  ## prepare optimization
   optim <- object@optim
   optim[[1]] <- object@coefficients
   optim[[4L]] <- object@restricted
@@ -91,6 +100,8 @@ tvcolmm_refit_model <- function(object, args) {
   } else {
       FUN <- "optim"
   }
+
+  ## run optimization
   object@output <- do.call(FUN, optim)
   .Call("olmm_update_marg", object, object@output$par, PACKAGE = "vcolmm")
 
@@ -107,10 +118,8 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
 
   ## get column names of scores to test
   terms <- if (depth(nodes) == 0L) control$terms$root else control$terms$tree
-    
+
   ## get variable types
-  level <- sapply(control$type.vars,
-                  function(x) ifelse(x == "tm-var", "observation", "subject"))
   functional <- sapply(partvar, function(x) {
     switch(class(x)[1],
            factor = control$functional.factor,
@@ -118,7 +127,8 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
            integer = control$functional.numeric,
            numeric = control$functional.numeric)
   })
-
+  
+  
   ## prepare list with arguments for 'sctest'
   dn <- list(paste("Part", levels(Part), sep = ""), colnames(partvar))
   rval <- list(statistic = matrix(, nlevels(Part), ncol(partvar),
@@ -150,58 +160,37 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
       rows <- Part == levels(Part)[j]
 
       ## extract variable to test
-      z <- partvar[rows, i]
-      if (is.factor(z)) z <- droplevels(z)
+      z <- partvar[, i]
       
       ## check if partition contains permitted split
-      if (sum(cumsum(sort(table(z))) >= control$minsplit) > 1 &
-          max(cumsum(sort(table(z)))) >= 2 * control$minsplit &
+      if (sum(cumsum(sort(table(z[rows]))) >= control$minsplit) > 1 &
+          max(cumsum(sort(table(z[rows])))) >= 2 * control$minsplit &
           depth[j] < control$maxdepth) {
 
         ## function to extract scores
         cols <- sub("Node", levels(Part)[j], terms, fixed = TRUE)
-        
-        ## break the ties
-        if (control$breakties) {
-          oi <- sample(1:length(z), length(z))
+  
+
+        ## run the tests
+        gefp <- try(gefp.olmm(m, z, cols, rows), silent = TRUE)
+        if (!inherits(gefp, "try-error")) {
+
+          ## parameters for categorical variables
+          order.by <- z[rows]
+          functional <- tolower(functional)
+          fi <- switch(functional[i],
+                       "dm" = maxBB,
+                       "cvm" = meanL2BB,
+                       "suplm" = supLM(from = control$trim, to = 1 - control$trim),
+                       "range" = rangeBB,
+                       "lmuo" = catL2BB(gefp),
+                       "wdmo" = ordwmax(gefp),
+                       "maxlmo" = ordL2BB(gefp),
+                       stop("Unknown efp functional."))
+          test <- try(sctest(gefp, functional = fi), silent = TRUE)
         } else {
-          oi <- 1:length(z)
+          test <- gefp
         }
-        
-        z <- z[oi]
-
-        ## define the score function extractor for 'sctest'
-        scores <- function(x) {
-          rval <- estfun(m)[rows, cols, drop = FALSE]
-          return(rval[oi, , drop = FALSE])
-        }
-
-        ## covariance matrix, must be improved!!!
-        vcov <- function(x, order.by, data) {
-          scores <- scores(x)
-          n <- nrow(scores)
-          ## independence case
-          v1 <- crossprod(scores / sqrt(n))
-          scores <-  apply(scores, 2, tapply, droplevels(subject[rows]), sum)
-          ## time-invariant
-          v2 <- crossprod(scores / sqrt(n))
-          rval <- (level[i] == "observation") * v1 + (level[i] == "subject") * v2
-          return(rval)
-        }
-        
-        ## arguments for test
-        argNames <- names(formals(strucchange:::sctest.default))
-        testArgs <- control[names(control) %in% argNames]
-        testArgs <- appendDefArgs(list(x = m,
-                                       order.by = z,
-                                       scores = scores,
-                                       sandwich = FALSE,
-                                       vcov = vcov,
-                                       functional = functional[i]),
-                                  testArgs)
-        
-        ## call test
-        test <- try(do.call("sctest", testArgs), silent = TRUE)
         
         if (!inherits(test, "try-error")) {
           
@@ -238,7 +227,6 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
   if (control$verbose) {
     cat("\nFluctuation tests (p-value):\n")
     print(data.frame(rbind(
-                       type =  control$type.vars,
                        functional = functional,
                        format(rval$p.value, digits = 2))))
   }
@@ -372,9 +360,7 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
       ordered <- FALSE
     }
   }
-  
-  ## !!! this part is really ugly and may be improved soon
-  
+    
   ## get current nodes
   nodes <- as.list(nodes)
   

@@ -10,7 +10,8 @@ importFrom("mboost", extract)
 importFrom("numDeriv", hessian)
 importFrom("party", reweight)
 importFrom("rpart", prune)
-importFrom("strucchange", sctest)
+importFrom("strucchange", gefp, sctest, supLM, catL2BB, maxBB, meanL2BB,
+           rangeBB, ordwmax, ordL2BB)
 importFrom("sandwich", estfun)
 importFrom("stats4", AIC, BIC, logLik, vcov)
 importFrom("stats",
@@ -28,8 +29,9 @@ importFrom("stats",
            update,
            weights)
 importFrom("ucminf", ucminf)
+importFrom("zoo", zoo)
 
-## S4 classes
+## Exported S4 classes
 exportClasses(olmm,
               summary.olmm)
 

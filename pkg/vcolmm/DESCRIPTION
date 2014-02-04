@@ -5,7 +5,7 @@ Title: Estimation of varying coefficients in 2-stage ordinal linear mixed models
 Author: Reto Buergin
 Maintainer: Reto Buergin <rbuergin@gmx.ch>, <reto.buergin@unige.ch>
 Depends: R (>= 2.12.1), grid, partykit
-Imports: Formula, stats, stats4, graphics, mboost, methods, nlme, numDeriv, party, rpart, sandwich, strucchange, ucminf
+Imports: Formula, stats, stats4, graphics, mboost, methods, nlme, numDeriv, party, rpart, sandwich, strucchange, ucminf, zoo
 Suggests:
 LinkingTo:
 Description: This package aims at estimating varying fixed effects in 2-stage ordinal linear mixed-effect models (OLMM) via model-based recursive partitioning. The package includes a fitting function for OLMMs and a partitioning algorithm for varying fixed effects in OLMMs. 
