@@ -215,8 +215,9 @@ rhoTerm <- function(object, order.by) {
   n <- length(subject)
   N <- nlevels(subject)
   Ti <- table(subject)
+  Tit <- rep(0, length(Ti))
   FUN <- function(t) {
-    Tit <- table(subject[1:t])
+    Tit[subject[t]] <<- Tit[subject[t]] + 1
     term1 <- t^2 / n^2 * sum(Ti * (Ti - 1))
     term2 <- 2 * t^2 / n - 2 * t / n * sum(Ti[subject[1:t]])
     term3 <- sum(Tit^2) - t
@@ -250,7 +251,7 @@ gefp.olmm <- function(object, order.by, terms = NULL, subset = NULL) {
     for (i in 1:n) {
       J12i <- try(chol2inv(chol(root.matrix(as.matrix(J[,,i])))), silent = TRUE)
       if (class(J12i) == "try-error") { cat("f"); J12i <- J12i_sbj }
-      process[i, ] <- J12 %*% process[i, ] / sqrt(n)
+      process[i, ] <- J12i %*% process[i, ] / sqrt(n)
     }
   } else {
     J12 <- root.matrix(J_obs / n)
@@ -271,7 +272,7 @@ gefp.olmm <- function(object, order.by, terms = NULL, subset = NULL) {
                lim.process = "Brownian bridge",
                type.name = "M-fluctuation test",
                order.name = deparse(substitute(order.by)),
-               J12 = diag(k))
+               J12 = NULL)
   class(rval) <- "gefp"
   return(rval)
 }
@@ -827,11 +828,15 @@ setMethod(f = "summary",
               methTitle <- paste(methTitle,
                                  c("Logit", "Probit",
                                    "Cauchy")[dims["link"]])
-            methTitle <- paste(methTitle,
-                               " Mixed-Effect Model fit by the\n",
-                               "Gauss-Hermite approximation of the\n",
-                               "Marginal Likelihood", sep = "")
-
+            if (dims["hasRanef"] > 0) {
+              methTitle <- paste(methTitle,
+                                 " Mixed-Effect Model fit by the\n",
+                                 "Gauss-Hermite approximation of the\n",
+                                 "Marginal Likelihood", sep = "")
+            } else {
+              methTitle <- paste(methTitle, "Model")
+            }
+            
             ## build a summary.olmm object
             new(Class = "summary.olmm",
                 methTitle = methTitle,

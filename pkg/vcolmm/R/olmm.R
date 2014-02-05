@@ -156,6 +156,7 @@ olmm <- function(formula, data, weights, start, subset, na.action,
     fullmf$id <- factor(1:nrow(fullmf))
     start["ranefCholFac1"] <- 0
     restricted <- unique(c(restricted, "ranefCholFac1"))
+    nGHQ <- 1L
     hasRanef <- FALSE
   }
   
@@ -405,8 +406,8 @@ olmm <- function(formula, data, weights, start, subset, na.action,
     ## fit / predict random effects   
     
     ## compute expected standardized random effects
-    if (object@dims["hasRanef"] > 0 && verbose) {
-      cat("\n* predicting random effects ... ")
+    if (object@dims["hasRanef"] > 0) {
+      if (verbose) cat("\n* predicting random effects ... ")
       .Call("olmm_update_u", object, PACKAGE = "vcolmm")
     }
     
