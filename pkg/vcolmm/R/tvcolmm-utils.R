@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2013-01-16
+## Date:            2013-02-06
 ##
 ## Description:
 ## Workhorse functions for the 'tvcolmm' function
@@ -9,6 +9,7 @@
 ## Overview:
 ##
 ## tvcolmm_fit_model:       Fit the current model
+## tvcolmm_refit_model:     Refit model
 ## tvcolmm_fit_fluctest:    Run coefficient constancy tests
 ## tvcolmm_fit_splitnode:   Split in variable x.
 ## tvcolmm_formula:         Extract separate formulas for
@@ -303,7 +304,14 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   args$data$Part[sample(which(subscripts), as.integer(sum(subscripts)/2))] <- "Right"
   args$doFit <- FALSE
   splitModel <- tvcolmm_fit_model(formula, args, control)
-  
+
+  ## set start values
+  if (control$fast > 0L) {
+    subs <- intersect(names(coef(splitModel)), names(coef(model)))
+    splitModel@coefficients[subs] <- model@coefficients[subs]
+  }
+
+    
   ## run computation (slow!!!)
   splits <- lapply(1:ncol(partvar), function(vid) {
     lapply(1:nlevels(Part), function(pid, vid) {
