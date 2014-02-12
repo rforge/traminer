@@ -42,7 +42,7 @@ STS_to_TSE <- function(seqdata, id=NULL, tevent) {
         s1 <- seqdata[i,1]
 		e1 <- levent[[paste(s1,">",s1,sep="")]]
 
-		if (!is.null(e1) && !is.na(e1)) { ## if NA, we don't generate an event
+		if (!is.null(e1) && !is.na(e1[1])) { ## if NA, we don't generate an event
 			for (k in e1){
 				ids[myi] <- id[i]
 				times[myi] <- 0
@@ -57,7 +57,7 @@ STS_to_TSE <- function(seqdata, id=NULL, tevent) {
 
 			if (!is.na(s1) && !is.na(s2) && s2!=s1 && s1!="" && s2!="") {
 				ev <- levent[[paste(s1,">",s2,sep="")]]
-				if(!is.na(ev)){
+				if(!is.na(ev[1])){
 					for (k in ev){
 						ids[myi] <- id[i]
 						times[myi] <- j
