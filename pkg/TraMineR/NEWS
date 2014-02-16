@@ -1,10 +1,12 @@
 ## =========
 Version 1.9-9 (Development version)
 
-  - no changes
+Bug fixes:
+  - fixed error occurring when converting from STS to TSE with
+    a tevent matrix containing empty strings (i.e. "")
 
 ## =========
-Version 1.8-8 
+Version 1.8-8
 
 Bug fixes:
   - seqecreate(): an error is thrown when events are not grouped
