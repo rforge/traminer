@@ -26,7 +26,7 @@ sequences and vice versa.
 \tabular{ll}{
 Package: \tab TraMineR\cr
 Version: \tab 1.9-9\cr
-Date: \tab 2014-01-14\cr
+Date: \tab 2014-02-15\cr
 Authors@R: \tab c(
   person("Alexis", "Gabadinho", role = c("aut", "cph")),
   person("Matthias", "Studer", role = c("aut", "cph")),
