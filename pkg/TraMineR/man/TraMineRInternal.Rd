@@ -1,10 +1,10 @@
-\name{internalLayout}
-\alias{internalNodeInit}
-\alias{internalSplitInit}
-\alias{internalLayout}
+\name{TraMineRInternalLayout}
+\alias{TraMineRInternalNodeInit}
+\alias{TraMineRInternalSplitInit}
+\alias{TraMineRInternalLayout}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
- Access to internal functions
+ Access to TraMineR internal functions
 }
 \description{
 Functions allowing other packages to access some TraMineR internal functions. Corresponding functions respectively are \code{DTNInit}, \code{DTNsplit} and \code{TraMineR.setlayout}. For experts only.
