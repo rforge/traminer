@@ -2,8 +2,8 @@
 Version 1.9-9 (Development version)
 
 Bug fixes:
-  - fixed error occurring when converting from STS to TSE with
-    a tevent matrix containing empty strings (i.e. "")
+  - seqformat(): fixed error occurring when converting from STS to TSE
+    with a tevent matrix containing empty strings (i.e. "")
 
 ## =========
 Version 1.8-8
