@@ -241,17 +241,19 @@ gefp.olmm <- function(object, order.by, terms = NULL, subset = NULL) {
   n <- nrow(psi)
   k <- ncol(psi)
   index <- order(order.by)
-  process <- apply(psi[index, , drop = FALSE], 2, cumsum)  
+  process <- apply(psi[index, , drop = FALSE], 2, cumsum)
   if (object@dims["hasRanef"] > 0L) {
     term <- rhoTerm(object, order.by)
     J <- sapply(1:n, function(t) J_obs / n + n / (t * (n - t)) * rho * term[t])
     J <- array(J, dim = c(ncol(psi), ncol(psi), n))
     J[, , n] <- J[, , 1]
-    J12i_sbj <- chol2inv(chol(root.matrix(J_sbj / n)))
     for (i in 1:n) {
       J12i <- try(chol2inv(chol(root.matrix(as.matrix(J[,,i])))), silent = TRUE)
-      if (class(J12i) == "try-error") { cat("f"); J12i <- J12i_sbj }
-      process[i, ] <- J12i %*% process[i, ] / sqrt(n)
+      if (class(J12i) == "try-error") {
+        process[i, ] <- NA
+      } else {
+        process[i, ] <- J12i %*% process[i, ] / sqrt(n)
+      }
     }
   } else {
     J12 <- root.matrix(J_obs / n)

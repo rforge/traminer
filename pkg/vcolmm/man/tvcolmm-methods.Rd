@@ -23,7 +23,7 @@
 \method{coef}{tvcolmm}(object, ...)
 
 \method{extract}{tvcolmm}(object, what = c("control", "fluctest",
-              "model", "selected", "pval"), ids = nodeids(object), ...)
+              "model", "selected", "p.value"), ids = nodeids(object), ...)
 
 \method{fitted}{tvcolmm}(object, ...)
 
@@ -37,8 +37,7 @@
 \method{neglogLik}{tvcolmm}(object, ...)
 
 \method{predict}{tvcolmm}(object, newdata = NULL,
-        type = c("prob", "class", "node", "link", "terms"),
-        ranef = FALSE, ...)
+        type = c("prob", "class", "node", "link", "terms"), ...)
 
 \method{print}{tvcolmm}(x, ...)
 
@@ -66,8 +65,6 @@
     node.} 
   \item{nselect}{integer. The maximum number of paritioning variables in
     the tree structure.}
-  \item{ranef}{logical or matrix. Specifies if prediction should be
-    conditional on random effects.}
   \item{folds}{folds for cross-validation. See
     \code{\link{tvcolmm_folds}}.}
   \item{cv}{logical scalar. Whether the log-likelihood should be
