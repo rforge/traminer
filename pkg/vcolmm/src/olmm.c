@@ -499,9 +499,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 
 	for (int j = 0; j < q; j++) { /* columns of RanefCholFac */
 	  
-	  for(int l = j; l < q; l++) { /* rows of RanefCholFac */
+	  for (int l = j; l < q; l++) { /* rows of RanefCholFac */
 	    
-	    subsTmp = j * q - j * (j + 1) /2 + l;
+	    subsTmp = j * q - j * (j + 1) / 2 + l;
 
 	    if (l < qEtaVar * nEta) {
 	      

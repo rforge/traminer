@@ -23,7 +23,7 @@ setClass("olmm",
            restricted = "logical",   # restricted coefficients
            eta = "matrix",           # linear predictor
            u = "matrix",             # stand. random effects
-           logLik_obs = "numeric",   # observation-wise ll
+           logLik_obs = "numeric",   # observation-wise ll (unused!)
            logLik_sbj = "numeric",   # subject-wise ll
            logLik = "numeric",       # marginal log Likelihood
            score_obs = "matrix",     # observation-wise scores
@@ -36,16 +36,3 @@ setClass("olmm",
            optim = "list",           # call for optimization
            output = "list"           # output of optimisation
            ))
-
-## class for summaries on 'olmm' objects
-setClass("summary.olmm",
-         representation(
-           methTitle = "character",
-           formula = "character",
-           data = "character",
-           subset = "character",
-           AICtab = "data.frame",
-           FEmatEtaInv = "matrix",
-           FEmatEtaVar = "matrix",
-           REmat = "matrix",
-           dims = "integer"))

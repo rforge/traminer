@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2013-02-06
+## Date:            2014-03-19
 ##
 ## Description:
 ## Workhorse functions for the 'tvcolmm' function
@@ -25,14 +25,14 @@
 ## tvcolmm_get_terms:       Get names of varying coefficients
 ## tvcolmm_fit_getlevels:
 ## tvcolmm_fit_checksplit:  Checks whether a split is valid with
-##                        respect to the minsplit parameter.
+##                          respect to the minsplit parameter.
 ## tvcolmm_fit_surrogate:   Extracts surrogate splits using the
-##                        .csurr function of the partykit
-##                        package
+##                          .csurr function of the partykit
+##                          package
 ## tvcolmm_fit_probsplit:   Extracts the conditional proportions
-##                        for daughter nodes for probability
-##                        splits of missing values in the
-##                        splitting covariate
+##                          for daughter nodes for probability
+##                          splits of missing values in the
+##                          splitting covariate
 ## tvcolmm_prune_node:
 ## tvcolmm_prune_depth:
 ## tvcolmm_prune_minsplit:
@@ -149,6 +149,10 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
     args$contrasts$Part <- contr.treatment(levels(args$data$Part), base = 2)
     model2 <- tvcolmm_fit_model(formula, args, control, FALSE)
   }
+
+  ## extract transformed scores
+  scores <- estfun.olmm(x = model, level = "observation",
+                        decorrelate = TRUE)
   
   ## apply test for each variable and partition separately  
   for (i in 1:ncol(partvar)) {    
@@ -173,21 +177,23 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
   
 
         ## run the tests
-        gefp <- try(gefp.olmm(m, z, cols, rows), silent = TRUE)
+        scores <- estfun.olmm(x = m, level = "observation",
+                              decorrelate = TRUE,
+                              terms = cols, subset = rows)
+        gefp <- try(gefp.olmm(m, scores, z, cols, rows), silent = TRUE)
         if (!inherits(gefp, "try-error")) {
 
           ## parameters for categorical variables
           order.by <- z[rows]
-          functional <- tolower(functional)
-          fi <- switch(functional[i],
-                       "dm" = maxBB,
-                       "cvm" = meanL2BB,
-                       "suplm" = supLM(from = control$trim),
-                       "range" = rangeBB,
-                       "lmuo" = catL2BB(gefp),
-                       "wdmo" = ordwmax(gefp),
-                       "maxlmo" = ordL2BB(gefp),
-                       stop("Unknown efp functional."))
+          if (is.character(functional)) {
+            functional <- tolower(functional)
+            fi <- switch(functional[i],
+                         "suplm" = supLM(from = control$trim),
+                         "lmuo" = catL2BB(gefp),
+                         stop("Unknown efp functional."))
+          } else {
+            fi <- functional[i]
+          }
           test <- try(sctest(gefp, functional = fi), silent = TRUE)
         } else {
           test <- gefp
@@ -270,7 +276,7 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
       }
       rval <- matrix(rval, ncol = 1)
     } else {
-      rval <- vcolmm:::tvcolmm_fit_getlevels(x, subscripts)
+      rval <- tvcolmm_fit_getlevels(x, subscripts)
     }
     return(rval)
   }
@@ -520,8 +526,8 @@ tvcolmm_modify_control <- function(model, control) {
   }
   
   ## get needed information
-  atEtaVar <- terms(model, "fixefEtaVar")
-  atEtaInv <- terms(model, "fixefEtaInv")
+  atEtaVar <- terms(model, "fixef-npo")
+  atEtaInv <- terms(model, "fixef-po")
   atEtaVar <- c("(Intercept)", attr(atEtaVar, "term.labels"))
   atEtaInv <- attr(atEtaInv, "term.labels")
   merge <- attr(model.matrix(model), "merge")
@@ -801,7 +807,7 @@ tvcolmm_get_terms <- function(object) {
   ids <- nodeids(object)
   model <- extract(object, "model")
   
-  formula <- vcolmm:::olmm_formula(object$info$formula$tree)$fixefEtaVar 
+  formula <- olmm_formula(object$info$formula$tree)$fixefEtaVar 
   factors <- attr(terms(formula), "factors")
   if ("Part" %in% all.vars(formula)) {    
     tmp1 <- paste("Eta", 1:model@dims["nEta"], ":", sep  = "")
@@ -811,7 +817,7 @@ tvcolmm_get_terms <- function(object) {
     
   }
   
-  formula <- vcolmm:::olmm_formula(object$info$formula$tree)$fixefEtaInv 
+  formula <- olmm_formula(object$info$formula$tree)$fixefEtaInv 
   factors <- attr(terms(formula), "factors")
   if ("Part" %in% all.vars(formula)) {
     tmp <- c(colnames(factors)[factors["Part", ] > 0])
@@ -855,76 +861,76 @@ tvcolmm_fit_checksplit <- function(split, weights, minsplit)
   (sum(split * weights) < minsplit || sum((1 - split) * weights) < minsplit)
 
 
-tvcolmm_fit_surrogate <- function(split, partvar, weights, model, control) {
+## tvcolmm_fit_surrogate <- function(split, partvar, weights, model, control) {
 
-  if (control$condsurrogate == "subject") {
+##   if (control$condsurrogate == "subject") {
 
-    subject <- model@subject
-    weights <- unique(cbind(subject, weights))[, -1]
+##     subject <- model@subject
+##     weights <- unique(cbind(subject, weights))[, -1]
     
-    FUN <- function(x) {
-      rval <- x[1]
-      x <- na.omit(x)
-      if (length(x) == 0) rval[1] <- NA else rval <- sample(x, 1)
-      return(rval)
-    }
+##     FUN <- function(x) {
+##       rval <- x[1]
+##       x <- na.omit(x)
+##       if (length(x) == 0) rval[1] <- NA else rval <- sample(x, 1)
+##       return(rval)
+##     }
 
-    partvar <- aggregate(partvar, by = list(subject), FUN = FUN)
-    partvar <- partvar[, -1, drop = FALSE]
-  }
+##     partvar <- aggregate(partvar, by = list(subject), FUN = FUN)
+##     partvar <- partvar[, -1, drop = FALSE]
+##   }
   
-  x <- partvar[, split$varid]
-  xna <- is.na(x)
+##   x <- partvar[, split$varid]
+##   xna <- is.na(x)
   
-  weights[xna] <- 0L
+##   weights[xna] <- 0L
   
-  inp <- rep(TRUE, ncol(partvar))
-  inp[split$varid] <- FALSE
+##   inp <- rep(TRUE, ncol(partvar))
+##   inp[split$varid] <- FALSE
 
-  kidsids <- kidids_split(split, data = partvar)
-  kidsids[is.na(kidsids)] <- 1L
+##   kidsids <- kidids_split(split, data = partvar)
+##   kidsids[is.na(kidsids)] <- 1L
 
-  if (sum(inp) > 0) {
+##   if (sum(inp) > 0) {
 
-    rval <-
-      partykit:::.csurr(split = kidsids, data = partvar,
-                        inp = inp, weights = as.integer(weights),
-                        ctrl = list(maxsurrogate = control$maxsurrogate))
-  } else {
+##     rval <-
+##       partykit:::.csurr(split = kidsids, data = partvar,
+##                         inp = inp, weights = as.integer(weights),
+##                         ctrl = list(maxsurrogate = control$maxsurrogate))
+##   } else {
 
-    rval <- list()
-  }
+##     rval <- list()
+##   }
   
-  return(rval)
-}
+##   return(rval)
+## }
 
 
-tvcolmm_fit_probsplit <- function(split, model, partvar, weights, control) {
+## tvcolmm_fit_probsplit <- function(split, model, partvar, weights, control) {
 
-  if (control$probsurrogate) {
+##   if (control$probsurrogate) {
         
-    kidsids <- kidids_split(split, data = partvar)[weights > 0]    
+##     kidsids <- kidids_split(split, data = partvar)[weights > 0]    
 
-    ## choose randomly a value of an individual
-    if (control$condsurrogate == "subject") {
-      FUN <- function(x) {
-        rval <- x[1]
-        x <- na.omit(x)
-        if (length(x) == 0) rval[1] <- NA else rval <- sample(x, 1)
-        return(rval)
-      }
-      kidsids <- tapply(kidsids, as.integer(model@subject[weights > 0]), FUN)
-    }
+##     ## choose randomly a value of an individual
+##     if (control$condsurrogate == "subject") {
+##       FUN <- function(x) {
+##         rval <- x[1]
+##         x <- na.omit(x)
+##         if (length(x) == 0) rval[1] <- NA else rval <- sample(x, 1)
+##         return(rval)
+##       }
+##       kidsids <- tapply(kidsids, as.integer(model@subject[weights > 0]), FUN)
+##     }
 
-    rval <- prop.table(table(kidsids))
-    storage.mode(rval) <- "double"
-    return(rval)
+##     rval <- prop.table(table(kidsids))
+##     storage.mode(rval) <- "double"
+##     return(rval)
     
-  } else {
+##   } else {
 
-    return(NULL)
-  }
-}
+##     return(NULL)
+##   }
+## }
 
 
 tvcolmm_prune_node <- function(object, alpha = NULL, depth = NULL,

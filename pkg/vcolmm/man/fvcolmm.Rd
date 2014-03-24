@@ -1,4 +1,4 @@
-\name{vcolmm2-forest}
+\name{fvcolmm}
 
 \alias{fvcolmm}
 \alias{logLik.fvcolmm}
@@ -17,15 +17,15 @@
 \usage{
 
 fvcolmm(..., folds = NULL,
-               control = tvcolmm_control(alpha = 1.0,
-                 bonferroni = FALSE, mtry = 5), add = TRUE)
+        control = tvcolmm_control(alpha = 1.0,
+        bonferroni = FALSE, mtry = 5), add = TRUE)
 
 \method{logLik}{fvcolmm}(object, ...)
 \method{neglogLik}{fvcolmm}(object, ...)
 \method{predict}{fvcolmm}(object, newdata = NULL,
-                       type = c("prob", "class", "link",
-                         "terms"), ranef = FALSE, 
-                       verbose = FALSE, ...)
+        type = c("prob", "class", "link",
+          "terms"), ranef = FALSE, 
+         verbose = FALSE, ...)
 \method{print}{fvcolmm}(x, ...)
 }
 
@@ -33,7 +33,7 @@ fvcolmm(..., folds = NULL,
   \item{...}{for \code{\link{fvcolmm}}, this is either a
     specification of a model with the same arguments used for
     \code{\link{tvcolmm}}, i.e. \code{fvcolmm(formula = ..., data
-      = ..., ...)} or a fitted \code{\link{fvcolmm}} object as
+      = ..., ...)} or a fitted \code{\link{tvcolmm}} object as
     first argument that should be added additional trees. For other
     functions, these are just supplementary arguments.}
   \item{object}{an object of class \code{\link{fvcolmm}}.}

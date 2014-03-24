@@ -2,21 +2,23 @@
 
 \alias{olmm}
 
-\title{Ordinal linear mixed models for 2-level data}
+\title{Fitting ordinal 2-stage linear mixed models}
 
 \description{
-  Fits different types of 2-level linear mixed models for clustered or
+  Fits different types of 2-stage linear mixed models for clustered or
   longitudinal ordinal responses. Random effects are assumed to be
   multivariate normal distributed with expectation 0. At the time being,
   cumulative link models with the logit, probit or cauchy link, the
   baseline-category (baseline category = superior category) and the
-  adjacent-category logit model are available. Effects can be variable
-  or invariant across predictors belonging to odds.
+  adjacent-category logit model are available. Coefficients can be
+  variable (i.e. non-proportional odds effects) or invariant
+  (i.e. proportional odds effects) across predictors.
 
-  Direct marginal likelihood maximization is used (e.g. Hedeker;
-  1994). Random effects are predicted by their expectation (see Hartzl
-  et al.; 2001). Standard deviations of parameter estimates base on the
-  expected Fisher-information matrix (default).
+  The fitting function uses direct marginal likelihood maximization
+  using Gauss-Hermite quadrature (e.g. Hedeker; 1994). Random effects
+  are predicted by their expectation (see Hartzl et al.; 2001). Standard
+  deviations of parameter estimates are, by default, based on the expected
+  Fisher-information matrix.
 }
 
 \usage{
@@ -30,18 +32,20 @@ olmm(formula, data, weights, start, subset, na.action,
 }
 
 \arguments{
-  \item{formula}{a symbolic description of the model to fit. This should
-    be of form
-
+  \item{formula}{a symbolic description of the model. This should be of
+    form 
+    
     \code{y ~ x1 + \ldots + (1 + w1 + \ldots | id) | xk + \ldots + (\ldots | id)} 
-
+    
     where \code{x1 + \ldots} describes the predictor-invariant
-    (i.e. proportional odds) fixed effect terms, 
-    \code{(1 + w1 + \ldots | id)} the predictor-invariant random effect
-    terms and \code{xk + \ldots + (\ldots | id)} the predictor variable
-    fixed and random effect terms. The response (e.g. \code{y}) must be
-    \code{\link{ordered}} and the subject variable (e.g. \code{id})
-    must be a \code{\link{factor}}. Binary responses are allowed.}
+    i.e. proportional odds fixed coefficient terms, 
+    \code{(1 + w1 + \ldots | id)} the predictor-invariant random
+    coefficient terms and \code{xk + \ldots + (\ldots | id)} the
+    predictor-variable i.e. non-proportional odds fixed and random
+    coefficient terms. The response (e.g. \code{y}) must be an
+    \code{\link{ordered}} factor and the subject variable
+    (e.g. \code{id}) a \code{\link{factor}}. Binary responses are
+    allowed.} 
   \item{data}{an optional data frame containing the variables named in
     \code{formula}. By default the variables are taken from the
     environment from which \code{olmm} is called.}
@@ -83,32 +87,26 @@ olmm(formula, data, weights, start, subset, na.action,
   \item{...}{further undocumented arguments to be passed.}
 }
 
-\details{The function is intended for fitting simple ordinal 2-level
+\details{The function can be used to fit simple ordinal 2-stage
   mixed effect models with up to 3-4 random effects. For
-  higher-dimensional problems the procedure may has difficulties with
-  convergence (e.g. Tutz; 1996) and the number of quadrature points 
-  is limited. For several model types there is an C-implementation for
-  the likelihood- and the score function.
+  models with higher dimensions on random effects, the procedure may
+  shows difficulties with convergence (cf. Tutz; 1996). 
 
-  Technically, the function also fits models to binary data. It is
-  however recommended to use more flexible implementations for that
-  purpose, such as the \code{glmer} function of package \code{lme4}.
-  
-  Cumulative link models are fitted via direct marginal maximum
-  likelihood fitting as suggested by Hedeker (1994). Adjacent- and
-  baseline-category models are also fitted via direct marginal
-  likelihood estimation, using for both the Likelihood of the
-  baseline-category model. Coefficients of adjacent model are
-  retrieved via transformation (e.g. Agresti; 2010).
+  Cumulative link models are fit with the direct marginal maximum
+  likelihood approach, as suggested by Hedeker (1994). Adjacent- and
+  baseline-category models are fitted as well using direct marginal
+  likelihood maximization, using for both the likelihood of the
+  baseline-category model. Coefficients for the adjacent-category model
+  are retrieved via coefficient transformation (e.g. Agresti; 2010).
 
   Initial values may improve the computation time and avoid
   divergence. The \code{start} argument accepts a vector with named
-  elements according to the column labels from
-  \code{\link{model.matrix}}. To retrieve this labels, one may pre-run
-  the \code{olmm} function the argument \code{doFit = FALSE} and then
-  take a look at the \code{coefficients} slot. At the time being,
-  initial values for adjacent-categories models must be transformed into
-  the baseline-category model form.
+  elements according to the column labels from the
+  \code{\link{model.matrix}}. To retrieve these labels, one may pre-run
+  the \code{olmm} function with the argument \code{doFit = FALSE} and
+  then look at the names in the \code{coefficients} slot. At the time
+  being, initial values for adjacent-categories models must be
+  transformed into the baseline-category model form.
 
   The argument \code{optim} may be used to modify the optimizer. For
   example, the Nelder-Mead algorithm of \code{\link{optim}} function can
@@ -117,11 +115,19 @@ olmm(formula, data, weights, start, subset, na.action,
   list(method = "nlminb")).}
 
   \code{weights} should be used with caution. \code{olmm} can handle
-  time-invariant weights only. Weights are used for the log-likelihood
-  and to compute the expected fisher information matrix (as suggested in
-  Hedeker(1994), sec. 3.2). For numerical approximations of the (observed)
-  fisher information (i.e. \code{numGrad = TRUE}, \code{numHess = TRUE})
-  the weights are ignored.
+  time-invariant weights only (one distinct weight per subject). Weights
+  are used for computing the log-likelihood and the expected fisher
+  information matrix (as suggested in Hedeker(1994), sec. 3.2). For
+  numerical approximations of the (observed) fisher information
+  (i.e. \code{numGrad = TRUE}, \code{numHess = TRUE}) the weights are
+  currently ignored.
+
+  For alternative fitting functions, see fore example \code{clmm} of
+  package \code{ordinal}, \code{cumlogitRE} of package \code{glmmAK},
+  \code{nplmt} of package \code{mixcat}, \code{DPolmm} of package
+  \code{DPpackage}, \code{lcmm} of package \code{lcmm}, \code{MCMCglmm}
+  of package \code{MCMCglmm}, \code{sabre} of package \code{sabreR} or
+  \code{OrdinalBoost} of package \code{GMMBoost}. 
 }
 
 \value{An object of class \code{\link{olmm}}. See
@@ -162,9 +168,6 @@ model.10.3.1 <-
   olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + (1 | id),
        data = schizo, family = "cumulative",
        link = "logit")
-
-#system.time(m1 <- olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week), data = schizo))
-#system.time(m2 <- polr(imps79o ~ tx + sqrt(week) + tx * sqrt(week), data = schizo))
 
 summary(model.10.3.1)
 

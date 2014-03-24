@@ -1,42 +1,37 @@
-\name{olmm-class}
-\Rdversion{1.1}
 \docType{class}
+\name{olmm-class}
 \alias{olmm-class}
-\alias{anova,olmm-method}
-\alias{coefficients,olmm-method}
-\alias{coef,olmm-method}
-\alias{deviance,olmm-method}
+\alias{anova.olmm}
+\alias{coefficients.olmm}
+\alias{coef.olmm}
+\alias{deviance.olmm}
 \alias{drop1.olmm}
-\alias{estfun.olmm}
-\alias{fitted,olmm-method}
-\alias{formula,olmm-method}
-\alias{fixef,olmm-method}
-\alias{getCall,olmm-method}
-\alias{logLik,olmm-method}
-\alias{model.frame,olmm-method}
-\alias{model.matrix,olmm-method}
-\alias{neglogLik,olmm-method}
-\alias{predict,olmm-method}
-\alias{print,olmm-method}
-\alias{ranef,olmm-method}
-\alias{ranefCov,olmm-method}
-\alias{resid,olmm-method}
-\alias{residuals,olmm-method}
-\alias{reweight,olmm-method}
+\alias{fitted.olmm}
+\alias{formula.olmm}
+\alias{fixef.olmm}
+\alias{getCall.olmm}
+\alias{logLik.olmm}
+\alias{model.frame.olmm}
+\alias{model.matrix.olmm}
+\alias{neglogLik.olmm}
+\alias{ranef.olmm}
+\alias{ranefCov.olmm}
+\alias{resid.olmm}
+\alias{residuals.olmm}
+\alias{reweight.olmm}
 \alias{show,olmm-method}
-\alias{summary,olmm-method}
-\alias{terms,olmm-method}
 \alias{terms.olmm}
-\alias{update,olmm-method}
-\alias{VarCorr,olmm-method}
-\alias{vcov,olmm-method}
-\alias{weights,olmm-method}
+\alias{update.olmm}
+\alias{VarCorr.olmm}
+\alias{print.VarCorr.olmm}
+\alias{vcov.olmm}
+\alias{weights.olmm}
 
 \title{Class \code{olmm}}
 
 \description{
-The \code{olmm} class represents 2-level ordinal linear mixed models
-fitted by the \code{\link{olmm}} function.}
+The \code{olmm} class represents 2-stage ordinal linear mixed models
+fit by the \code{\link{olmm}} function.}
 
 \section{Objects from the Class}{
 Objects can be created by calls of the form \code{new("olmm", ...)}. 
@@ -111,57 +106,36 @@ Objects can be created by calls of the form \code{new("olmm", ...)}.
 }
 
 \usage{
-## Methods with "surprising" arguments
 
-\S4method{fixef}{olmm}(object, which = c("all", "npo", "po"), ...)
+\method{fixef}{olmm}(object, which = c("all", "npo", "po"), ...)
 
-\S4method{predict}{olmm}(object, newdata = NULL,
-        type = c("prob", "class", "link"),
-        na.action = na.pass, offset = NULL,
-        ranef = FALSE, subset = NULL, ...)
+\method{model.matrix}{olmm}(object, which = c("fixef", "ranef"), ...)
 
-\S4method{model.matrix}{olmm}(object, which = c("fixef", "ranef"), ...)
-
-\S4method{weights}{olmm}(object, level = c("observation", "subject"),
+\method{weights}{olmm}(object, level = c("observation", "subject"),
 ...)
 
-## S3 methods
+\method{resid}{olmm}(object, norm = FALSE, ...)
 
-\method{drop1}{olmm}(object, scope, scale = 0, test = c("none", "Chisq"),
-       k = 2, trace = FALSE, ...)
+\method{terms}{olmm}(x, which = c("fixef-po", "fixef-npo",
+           "ranef-po", "ranef-npo"), ...)
 
-\method{estfun}{olmm}(x, level = c("observation", "subject"), ...)
-
-\method{terms}{olmm}(x, ...)
+\method{weights}{olmm}(object, level = c("observation", "subject"), ...)
 }
 
 \arguments{
   \item{object, x}{an \code{\link{olmm}} object.}
-  \item{k}{see \code{\link{drop1}}.}
-  \item{level}{character string. Indicates whether the returned weights
-    should be by observation or by subject.}
-  \item{na.action, offset, subset}{further arguments to be passed to
-    \code{\link{model.frame}} to extract the data.}
-  \item{newdata}{an optional data frame in which to look for variables
-    to predict. If omitted, the fitted values are used.}
-  \item{ranef}{logical or a numeric matrix. The logical indicates
-    whether the prediction is to be unconditional (FALSE) or conditional
-    on random effects. If TRUE and \code{newdata = NULL} the predicted
-    random effects will be used, otherwise a matrix with random effects
-    is required.}  
-  \item{scale}{see \code{\link{drop1}}.}
-  \item{scope}{see \code{\link{drop1}}.}
-  \item{test}{see \code{\link{drop1}}.}
-  \item{trace}{see \code{\link{drop1}}.}
-  \item{type}{character string. Denotes for \code{\link{predict}} the
-    type of predicted value and for \code{\link{resid}} the type of
-    residuals.}
-  \item{which}{optional character string. For \code{\link{predict}} it
+  \item{level}{character string. Indicates whether the returned values
+    should on the observation level (\code{level = "observation"}) or on 
+    the subject level (\code{level = "subject"}).}
+  \item{norm}{logical. Whether residuals should be divided by their
+    standard deviation.}
+  \item{which}{optional character string. For \code{\link{fixef}}, it
     indicates whether \code{all} coefficients, just the
-    predictor-variable (\code{npo}) or the predictor-invariant (\code{po},
-    i.e. proportional odds effects).. For \code{model.matrix} it indicates
-    whether the model matrix of the fixed- or the random effects should
-    be extracted.} 
+    predictor-variable (\code{npo}, non-proportional odds) or the
+    predictor-invariant (\code{po}, proportional odds) should be
+    returned. For \code{model.matrix} it indicates whether the model
+    matrix of the fixed- (\code{which = "fixef"}) or the random effects
+    (\code{which = "ranef"}) should be extracted.}
   \item{...}{potential further arguments passed to methods.}
 }
 
@@ -172,14 +146,25 @@ Objects can be created by calls of the form \code{new("olmm", ...)}.
     \item{\code{coef(object, ...)}:}{ extracts model coefficients.} 
     \item{\code{deviance(object, ...)}:}{returns the deviance of a
       fitted model.}
-    \item{\code{estfun(x, level, ...)}:}{extracts the
-      empirical estimating functions i.e. negative scores i.e. negative
-      partial derivatives of the log-likelihood of a fitted model.}
+    \item{\code{drop1(object, scope, scale = 0, test = c("none",
+	"Chisq"), k = 2, trace = FALSE, ...)}:}{computes single term
+      deletions. See \code{\link{drop1}}.} 
+    \item{\code{estfun.olmm(x, level = c("observation", "subject"),
+	decorrelate = FALSE, center = TRUE, silent = FALSE, ...)}:}{extracts the 
+      empirical estimating functions (negative partial derivatives of the
+      log-likelihood of the fitted model. See \code{\link{gefp.olmm}}.} 
+    \item{\code{extractAIC(fit, scale, k, ...)}:}{computes the AIC. See
+      \code{\link{extractAIC}}.}  
     \item{\code{fitted(object, type, ...)}:}{extracts the fitted values
       from the model.}
-    \item{\code{fixef(object, which, ...)}:}{extract the fitted fixed
-      effects.}
-    \item{\code{formula(x, ...)}:}{extracts the formula of the object.} 
+    \item{\code{fixef(object, which = c("all", "npo", "po"),
+	...)}:}{extracts estimated fixed effects.}
+    \item{\code{formula(x, ...)}:}{extracts the formula of the object.}
+    \item{\code{gefp.olmm(object, scores = estfun.olmm(object,
+	decorrelate = TRUE), order.by = NULL, terms = NULL, subset =
+	NULL, center = TRUE, ...)}:}{extracts the empirical cumulative
+      score process of a model. See 
+      \code{\link{gefp.olmm}}.}    
     \item{\code{getCall(x, ...)}:}{extract the call of the fitted
       model.} 
     \item{\code{logLik(object, ...)}:}{extract the log-likelihood of the
@@ -190,31 +175,34 @@ Objects can be created by calls of the form \code{new("olmm", ...)}.
       matrix of the fitted model.}
     \item{\code{neglogLik(object, ...)}:}{extract negative
       log-likelihood.} 
-    \item{\code{predict(object, newdata, type, na.action, offset,
-	ranef, subset, ...)}:}{prediction for fitted values or new data.}
-    \item{\code{print(x, digits, ...)}:}{print the model summary.}
+    \item{\code{predict(object, newdata, type, ranef, na.action,
+	...)}}{prediction for fitted values or new data. See
+      \code{\link{predict.olmm}}.}   
+    \item{\code{print(x, digits, ...)}:}{prints a short model
+      summary. See \code{\link{summary.olmm}}.} 
     \item{\code{ranef(x, norm, ...)}}{extract the fitted random
       effects.} 
     \item{\code{ranefCov(object, ...)}:}{extract the variance-covariance
       matrix of the random effects from the fitted object.}
-    \item{\code{resid(object, ...)}:}{extract the residuals propagated
+    \item{\code{resid(object, norm, ...)}:}{extract the residuals propagated
       by Li and Sheperd (2012). By default, the residuals from the
       marginal outcome distribution are computed. The conditional
       residuals can be computed by assigning \code{ranef = TRUE}.}
     \item{\code{reweight(object, weights, ...)}:}{re-fit the model with
       new weights.}
     \item{\code{show(object)}:}{show the summary of the fitted model.}
-    \item{\code{summary(object, ...)}:}{extract the summary of the
-      fitted model.}
+    \item{\code{summary(object, silent, ...)}:}{extracts a summary of
+      the fitted model. See \code{\link{summary.olmm}}.}
     \item{\code{terms(x, which, ...)}:}{extracts the terms of model
-      matrices. Available are \code{"fixefEtaInv"},
-      \code{"fixefEtaVar"}, \code{"ranefEtaInv"} and
-      \code{"ranefEtaVar"}} 
+      matrices. Available are \code{"fixef-po"},
+      \code{"fixef-npo"}, \code{"ranef-po"} and
+      \code{"ranef-npo"}} 
     \item{\code{update(object, formula., evaluate, ...)}:}{update and
       re-fit the object.}
-    \item{\code{VarCorr(x, ...)}:}{extract the estimated variances,
-      standard deviations and correlations for the random effects.} 
-    \item{\code{vcov(object, ...)}:}{calculate the variance-covariance
+    \item{\code{VarCorr(x, sigma, rdig, ...)}:}{extract the estimated
+      variances, standard deviations and correlations for the random
+      effects.}  
+    \item{\code{vcov(object, ...)}:}{computes the variance-covariance
       matrix of the main parameters of the fitted model.}
     \item{\code{weights(object, level, ...)}:}{extract model weights.}
   }
@@ -247,7 +235,8 @@ Objects can be created by calls of the form \code{new("olmm", ...)}.
 
 \author{Reto Buergin}
 
-\seealso{\code{\link{olmm}}}
+\seealso{\code{\link{olmm}}, \code{\link{predict.olmm}},
+  \code{\link{gefp.olmm}}} 
 
 \examples{
 showClass("olmm")

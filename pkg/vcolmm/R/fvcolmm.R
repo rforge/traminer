@@ -138,7 +138,7 @@ predict.fvcolmm <- function(object, newdata = NULL,
   args <- list()  
   args$data <- model.frame(object$info$model)
   args$doFit <- FALSE
-  args <- vcolmm:::appendDefArgs(args, object$info$dotargs)
+  args <- appendDefArgs(args, object$info$dotargs)
   
   if (verbose) cat("\n* predicting ")
   
@@ -154,8 +154,8 @@ predict.fvcolmm <- function(object, newdata = NULL,
       args$formula <- object$info$formula$root
     } else {
       args$data$Part <-
-        vcolmm:::tvcolmm_get_part(object, object$data, object$fitted[, "(weights)"])
-      args$contrasts <- vcolmm:::appendDefArgs(list(Part = contrasts(args$data$Part)), args$contrasts)
+        tvcolmm_get_part(object, object$data, object$fitted[, "(weights)"])
+      args$contrasts <- appendDefArgs(list(Part = contrasts(args$data$Part)), args$contrasts)
       args$formula <- object$info$formula$tree
     }
     object$info$model <- suppressWarnings(do.call("olmm", args))
@@ -201,10 +201,10 @@ predict.fvcolmm <- function(object, newdata = NULL,
       
       ## prepare formula for model without fixed effects
       form <- as.Formula(object$info$formula$root)
-      reEtaVar <- vcolmm:::findbars(formula(form, rhs = 2))[[1]]
+      reEtaVar <- findbars(formula(form, rhs = 2))[[1]]
       reEtaVar <- ifelse(is.null(reEtaVar), "1",
                          paste("1 + (", deparse(reEtaVar), ")", sep = ""))
-      reEtaInv <- vcolmm:::findbars(formula(form, rhs = 1))[[1]]
+      reEtaInv <- findbars(formula(form, rhs = 1))[[1]]
       reEtaInv <- ifelse(is.null(reEtaInv), "",
                          paste("(", deparse(reEtaInv), ")", sep = ""))
       form <-
@@ -214,9 +214,8 @@ predict.fvcolmm <- function(object, newdata = NULL,
       newdata[, yname] <- # add an artificial response
         factor(sample(ylevs, nrow(newdata), replace = TRUE),
                levels = ylevs, ordered = TRUE)
-      args <-
-        vcolmm:::appendDefArgs(list(formula = form, data = newdata,
-                                    doFit = FALSE), object$info$dotargs)
+      args <- appendDefArgs(list(formula = form, data = newdata,
+                                 doFit = FALSE), object$info$dotargs)
       model <- do.call("olmm", args)
       
       ## run the marginal prediction with 'pred' as linear predictor
@@ -263,7 +262,7 @@ predict.fvcolmm <- function(object, newdata = NULL,
 
 print.fvcolmm <- function(x, ...) {
 
-  cat("\tvarying coefficient olmm forest\n")
+  cat("\tVarying coefficient olmm forest\n")
   cat("\nNumber of trees:", length(x$info$node), "\n")
   return(invisible(x))
 }

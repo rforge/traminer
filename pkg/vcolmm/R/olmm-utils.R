@@ -1,6 +1,6 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2013-07-12
+## Date:            2014-03-19
 ##
 ## Description:
 ## Utility functions for the olmm function (see olmm.R). Some
@@ -11,6 +11,8 @@
 ## ucminf:          http://cran.r-project.org/web/packages/ucminf/index.html
 ##
 ## Contents:
+##
+## Functions for olmm:
 ## olmm_expandQP:        expand grid for numerical integration
 ## olmm_fn
 ## olmm_gn
@@ -26,6 +28,21 @@
 ## gcauchy:              derivate of dcauchy
 ## glogis:               derivate of dlogis
 ## gnorm:                derivate of dnorm
+##
+##
+## Functions for tvcolmm:
+## olmm_update2:         updates the model for a new set of coefficients
+##
+## Functions for estfun.olmm:
+## olmm_scoreVar:        computes the variance of the observation scores.
+## olmm_scoreCovWin:     computes the intra-subject covariance of the observation scores.
+## olmm_scoreCovBet:     computes the between-subject covariance of the observation scores.
+## olmm_fDecorrelate:    the equation to be optimized to zero: the difference between
+##                       the adjusted intra-subject covariance and the adjusted between-subject
+##                       covariance of likelihood scores.
+## olmm_gDecorrelate:    the derivation of olmm_fDecorrelate.
+## olmm_decorMat:        computes the transformation matrix for removing the intra-subject
+##                       correlation of ML scores.
 ##
 ## To do:
 ## - replace ranefChol fac initial value with covariance matrix
@@ -58,6 +75,7 @@ olmm_expandQP <- function(x, q) {
 
 
 olmm_fn <- function(par, restricted) {
+  if (!exists("object")) object <- new(Class = "olmm")
   parNew <- object@coefficients
   parNew[!restricted] <- par[!restricted]
   .Call("olmm_update_marg", object, as.numeric(parNew), PACKAGE = "vcolmm")
@@ -65,6 +83,7 @@ olmm_fn <- function(par, restricted) {
 }
 
 olmm_gr <- function(par, restricted) {
+  if (!exists("object")) object <- new(Class = "olmm")
   scoreNew <- object@score
   scoreNew[restricted] <- 0.0
   return(-scoreNew)
@@ -569,3 +588,172 @@ olmm_update2 <- function(object, par) {
   return(object)
 }
 
+olmm_scoreVar <- function(object) {
+
+  ## ------------------------------------------------------- #
+  ## Description:
+  ## Computes variance of scores.
+  ##
+  ## Arguments:
+  ## object: a fitted 'olmm' object
+  ## ------------------------------------------------------- #
+  
+  n <- object@dims["n"]
+  return(crossprod(-object@score_obs) / n)
+}
+
+olmm_scoreCovWin <- function(object) {
+
+  ## ------------------------------------------------------- #
+  ## Description:
+  ## Computes within-individual covariance of scores.
+  ##
+  ## Arguments:
+  ## object: a fitted 'olmm' object
+  ## ------------------------------------------------------- #
+  
+  n <- object@dims["n"]
+  Ni <- table(object@subject)
+  return((crossprod(-object@score_sbj) - olmm_scoreVar(object) * n) /
+         sum(Ni * (Ni - 1)))
+}
+
+olmm_scoreCovBet <- function(object) {
+
+  ## ------------------------------------------------------- #
+  ## Description:
+  ## Computes between-individual covariance of scores.
+  ##
+  ## Arguments:
+  ## object: a fitted 'olmm' object
+  ## ------------------------------------------------------- #
+  
+  n <- object@dims["n"]
+  Ni <- table(object@subject)
+  sCovBet <- -(olmm_scoreVar(object) * n + olmm_scoreCovWin(object) * sum(Ni * (Ni - 1)))
+  return(sCovBet / (n^2 - n - sum(Ni * (Ni - 1))))
+}
+
+olmm_f_scoreTransfMat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
+
+  ## ------------------------------------------------------- #
+  ## Description:
+  ## Difference between adjusted within- and adjusted between-
+  ## individual covariance.
+  ## ------------------------------------------------------- #
+
+  adjScoreCovWin <-
+    sVar %*% t(T) + T %*% sVar + (Nmax - 2) * T %*% sVar %*% t(T) +
+    sCovWin + (Nmax - 2) * sCovWin %*% t(T) + (Nmax - 2) * T %*% sCovWin +
+      ((Nmax - 1)^2 - (Nmax - 2)) * T %*% sCovWin %*% t(T)
+
+  adjScoreCovBet <-
+    sCovBet +
+        (Nmax - 1) * sCovBet %*% t(T) + (Nmax - 1) * T %*% sCovBet +
+        (Nmax - 1)^2 * T %*% sCovBet %*% t(T)
+  
+  rval <- adjScoreCovWin - adjScoreCovBet
+  subs <- which(!duplicated(c(Tindex)) & c(Tindex) != 0)
+  return(c(rval[subs]))
+}
+
+olmm_g_scoreTransfMat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
+
+  ## ------------------------------------------------------- #
+  ## Description:
+  ## Gradient for the olmm_f_scoreTransfMat() function above
+  ## ------------------------------------------------------- #
+
+  k <- ncol(T)
+  nPar <- max(Tindex)
+  subs <- which(!duplicated(c(Tindex)) & c(Tindex) != 0)
+  rval <- matrix(0, nPar, nPar)
+  for (i in 1:nPar) {
+    ind <- 1L * (Tindex == i)
+    val <- T[which(ind == 1L)][1]
+
+    gAdjScoreCovWin <-
+      sVar %*% t(ind) + ind %*% sVar + 2 * val * (Nmax - 2) * ind %*% sVar %*% t(ind) +
+        (Nmax - 2) * sCovWin %*% t(ind) + (Nmax - 2) * ind %*% sCovWin +
+          2 * val * ((Nmax - 1)^2 - (Nmax - 2)) * ind %*% sCovWin %*% t(ind)
+
+    gAdjScoreCovBet <-
+      (Nmax - 1) * sCovBet %*% t(ind)  + (Nmax - 1) * ind %*% sCovBet +
+           2 * val * (Nmax - 1)^2 * ind %*% sCovBet %*% t(ind)
+    
+    rval[, i] <- (gAdjScoreCovWin + gAdjScoreCovBet)[subs]
+  }
+  return(rval)
+}
+
+olmm_scoreTransfMat <- function(object, terms = NULL, reltol = 1e-6,
+                                maxreltol = 1e-3, maxit = 100L,
+                                method = c("symmetric", "unconstraint"),
+                                verbose = FALSE, omit.terms = TRUE) {
+
+    method <- match.arg(method)
+  
+    ## get required characteristics of the model
+    n <- object@dims["n"]
+    Nmax <- max(table(object@subject))
+    sVar <- olmm_scoreVar(object)
+    sCovWin <- olmm_scoreCovWin(object)
+    sCovBet <- olmm_scoreCovBet(object)
+    const <- 1 / abs(min(sCovBet))
+  
+    ## reduce to coefficient subset if intended
+    if (!is.null(terms)) {
+        sVar <- sVar[terms, terms, drop = FALSE]
+        sCovWin <- sCovWin[terms, terms, drop = FALSE]
+        sCovBet <- sCovBet[terms, terms, drop = FALSE]
+    } else {
+        terms <- 1:ncol(sVar)
+    } 
+    k <- length(terms)
+
+    ## set initial values
+    T <- Tindex <- matrix(0, k, k)
+    subs <- if (method == "symmetric") lower.tri(T, TRUE) else matrix(TRUE, k, k)
+    ## omit off-diagonal terms which are zero
+    if (omit.terms) {
+        subs[abs(sVar) + abs(sCovWin) + abs(sCovBet) < .Machine$double.eps] <- FALSE
+    }  
+    nPar <- sum(subs)
+    Tindex[subs] <- 1:nPar
+    if (method == "symmetric")
+        Tindex[upper.tri(Tindex, FALSE)] <- t(Tindex)[upper.tri(Tindex, FALSE)]
+    par <- rep(0, nPar)
+    fEval <- rep(Inf, nPar)
+    niter <- 0
+  
+    ## optimize by Newton's algorithm
+    while (niter < maxit &
+           ((rt <- max(abs(fEval / sCovBet[subs]), na.rm = TRUE)) >= reltol)) {
+        niter <- niter + 1
+        if (verbose) cat("\nniter =", niter,
+                         "fEval =", format(fEval, digits = 3, scientific = TRUE),
+                         "reltol =", format(rt, digits = 3, scientific = TRUE))
+        fEval <- olmm_f_scoreTransfMat(T, Tindex, sVar, sCovWin, sCovBet, Nmax)
+        gEval <- olmm_g_scoreTransfMat(T, Tindex, sVar, sCovWin, sCovBet, Nmax)
+        par <- solve(gEval, -fEval) + par
+        T[] <- c(0, par)[Tindex + 1]
+    } 
+
+    ## check convergence
+    if (niter == maxit) {
+        mess <- paste("\noptimization not converged: niter =", niter,
+                      "reltol =", format(rt, digits = 3, scientific = TRUE), "\n")
+        if (rt > maxreltol) {
+            stop(mess)
+        } else {
+            if (verbose) cat(mess)
+            warning(mess)
+        }
+    } else {
+        if (verbose) cat("\noptimization converged: niter =", niter,
+                      "reltol =", format(rt, digits = 3, scientific = TRUE), "\n")
+    }
+
+    ## return transformation matrix
+    return(T)
+} 

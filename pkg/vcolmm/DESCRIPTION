@@ -1,14 +1,14 @@
 Package: vcolmm
-Version: 0.1-10
-Date: 2014-01-20
-Title: Estimation of varying coefficients in 2-stage ordinal linear mixed models via model-based recursive partitioning 
+Version: 0.1-11
+Date: 2014-03-20
+Title: Tree-based learning of varying coefficients in ordinal 2-stage linear mixed models
 Author: Reto Buergin
 Maintainer: Reto Buergin <rbuergin@gmx.ch>, <reto.buergin@unige.ch>
 Depends: R (>= 2.12.1), grid, partykit
-Imports: Formula, stats, stats4, graphics, mboost, methods, nlme, numDeriv, party, rpart, sandwich, strucchange, ucminf, zoo
+Imports: Formula, stats, graphics, mboost, methods, nlme, numDeriv, party, rpart, sandwich, strucchange, ucminf, zoo
 Suggests:
 LinkingTo:
-Description: This package aims at estimating varying fixed effects in 2-stage ordinal linear mixed-effect models (OLMM) via model-based recursive partitioning. The package includes a fitting function for OLMMs and a partitioning algorithm for varying fixed effects in OLMMs. 
+Description: The package aims at learning varying fixed coefficients in ordinal 2-stage linear mixed models (OLMM) based on model-based recursive partitioning. The package includes a fitting function for OLMMs and a partitioning algorithm for varying fixed effects in OLMMs. 
 License: GPL (>= 2)
 LazyLoad: yes
 NeedsCompilation: yes

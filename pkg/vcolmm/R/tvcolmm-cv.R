@@ -341,8 +341,8 @@ plot.cv.tvcolmm <- function(x, ...) {
   }   
 
   ## set plot arguments
-  plotArgs <- vcolmm:::appendDefArgs(list(x = xx, y = yy), list(...))
-  plotArgs <- vcolmm:::appendDefArgs(plotArgs, defArgs)
+  plotArgs <- appendDefArgs(list(x = xx, y = yy), list(...))
+  plotArgs <- appendDefArgs(plotArgs, defArgs)
     
   ## plot 
   do.call("matplot", plotArgs)
@@ -394,7 +394,7 @@ plot.stabpath.tvcolmm <- function(x, ...) {
 
   dotList <- list(...)
   
-  col <- rep(vcolmm:::rainbowPalette, length.out = length(x$max))
+  col <- rep(rainbowPalette, length.out = length(x$max))
   lty <- rep(1:4, length.out = length(x$max))
   
   defArgs <- list(type = "S", xlab = expression(alpha),
@@ -411,8 +411,8 @@ plot.stabpath.tvcolmm <- function(x, ...) {
   } 
   
   ## set plot arguments
-  plotArgs <- vcolmm:::appendDefArgs(list(x = xx, y = yy), list(...))
-  plotArgs <- vcolmm:::appendDefArgs(plotArgs, defArgs)
+  plotArgs <- appendDefArgs(list(x = xx, y = yy), list(...))
+  plotArgs <- appendDefArgs(plotArgs, defArgs)
   
   ## plot 
   do.call("matplot", plotArgs)

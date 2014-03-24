@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2013-12-05
+## Date:            2014-17-03
 ##
 ## Description:
 ## S3 methods for tvcolmm objects
@@ -43,7 +43,7 @@ coef.tvcolmm <- function(object, ...) {
     if (depth(object) > 0L) {
 
       ## create object with all possible coefficients for each node
-      terms <- vcolmm:::tvcolmm_get_terms(object)
+      terms <- tvcolmm_get_terms(object)
       varcoef <- rep(NA, length(terms) * length(ids))
       for (i in 1:length(terms))
         for (j in 1:length(ids))
@@ -187,7 +187,7 @@ predict.tvcolmm <- function(object, newdata = NULL,
     names(fitted) <- rownames(object$info$model@frame)
   } else {
     fitted <- fitted_node(object$node, newdata[, colnames(object$data), drop = FALSE])
-    newdata$Part <- vcolmm:::tvcolmm_get_part(object, newdata)
+    newdata$Part <- tvcolmm_get_part(object, newdata)
   }
 
   ## return fitted node ids
@@ -236,7 +236,7 @@ prune.tvcolmm <- function(tree, alpha = NULL, depth = NULL,
   call$data <- model.frame(tree)
 
   ## prune the tree structure
-  node <- vcolmm:::tvcolmm_prune_node(tree, alpha, depth, minsplit, nselect)
+  node <- tvcolmm_prune_node(tree, alpha, depth, minsplit, nselect)
 
   ## if something changes ...
   if (!identical(node, tree$node)) {
@@ -245,8 +245,8 @@ prune.tvcolmm <- function(tree, alpha = NULL, depth = NULL,
       tree$fitted[, "(fitted)"] <-
         fitted_node(tree$node, data = tree$data)
       call$data$Part <-
-        vcolmm:::tvcolmm_get_part(tree, tree$data, tree$fitted[,"(weights)"])
-      call$contrasts <- vcolmm:::appendDefArgs(list(Part = contrasts(call$data$Part)), call$contrasts)
+        tvcolmm_get_part(tree, tree$data, tree$fitted[,"(weights)"])
+      call$contrasts <- appendDefArgs(list(Part = contrasts(call$data$Part)), call$contrasts)
     } else {
       call$formula <- tree$info$formula$root
     }    
@@ -273,11 +273,13 @@ prune.tvcolmm <- function(tree, alpha = NULL, depth = NULL,
 print.tvcolmm <- function(x, ...) {
 
   so <- summary(x$info$model)
-  etaVar <- so@FEmatEtaVar
-  etaInv <- so@FEmatEtaInv
+  etaVar <- so$FEmatEtaVar
+  etaInv <- so$FEmatEtaInv
   
   header_panel <- function(x) {
     rval <- paste(x$info$title, "\n", sep = "")
+    if (!is.null(x$info$call$formula))
+      rval <- paste(rval, " Family: ", x$family, "\n", sep = "")
     if (!is.null(x$info$call$formula))
       rval <- paste(rval, "Formula: ",
                     deparse(x$info$call$formula)[1], "\n", sep = "")
@@ -287,19 +289,19 @@ print.tvcolmm <- function(x, ...) {
     if (!is.null(x$info$call$subset))
       rval <- paste(rval, " Subset: ",
                     deparse(x$info$call$subset),"\n", sep = "")
-    rval <- paste(rval, "Tuning-Parameters:",
+    rval <- paste(rval, "\nTuning-parameters:",
                   "\n\t alpha = ", format(x$info$control$alpha, ...),
                   if (x$info$control$bonferroni) " (Bonferroni corrected)",
                   "\n\t minsplit = ", x$info$control$minsplit, "\n", sep = "")
 
-    if (any(length(so@REmat) > 0 && nrow(so@REmat) > 0 |
+    if (any(length(so$REmat) > 0 && nrow(so$REmat) > 0 |
             sum(!grepl("Part", rownames(etaInv))) > 0 |
             sum(!grepl("Part", rownames(etaVar))) > 0))
       rval <- paste(rval, "\nRestricted effects:\n", sep = "")
     
-    if (length(so@REmat) > 0  && nrow(so@REmat) > 0) {
+    if (length(so$REmat) > 0  && nrow(so$REmat) > 0) {
         rval <- paste(rval, "\nRandom effects:\n", sep = "")
-        rval <- paste(rval, vcolmm:::formatMatrix(so@REmat[, 1:2, drop = FALSE], ...), sep = "")
+        rval <- paste(rval, formatMatrix(so$REmat[, 1:2, drop = FALSE], ...), sep = "")
       }
     
     if (length(etaInv) > 0  && nrow(etaInv) > 0) {
@@ -307,7 +309,7 @@ print.tvcolmm <- function(x, ...) {
       if (length(subs) > 0) {
         rval <-
           paste(rval, "\nPredictor-invariant fixed effects:\n", sep = "")
-        rval <- paste(rval, vcolmm:::formatMatrix(etaInv[subs, , drop = FALSE], ...), sep = "")
+        rval <- paste(rval, formatMatrix(etaInv[subs, , drop = FALSE], ...), sep = "")
       }
     }
     
@@ -316,7 +318,7 @@ print.tvcolmm <- function(x, ...) {
       if (length(subs) > 0) {
         rval <-
           paste(rval, "\nPredictor-variable fixed effects:\n", sep = "")
-        rval <- paste(rval, vcolmm:::formatMatrix(etaVar[subs, , drop = FALSE], ...), sep = "")
+        rval <- paste(rval, formatMatrix(etaVar[subs, , drop = FALSE], ...), sep = "")
       }
     }
     
@@ -334,18 +336,18 @@ print.tvcolmm <- function(x, ...) {
       if (sum(subs) > 0) {
         rval <-
           paste(rval, "\nPredictor-invariant fixed effects:\n", sep = "")
-        rval <- paste(rval, vcolmm:::formatMatrix(etaInv[subs, , drop = FALSE], ...), sep = "")
+        rval <- paste(rval, formatMatrix(etaInv[subs, , drop = FALSE], ...), sep = "")
       }
     }
     
-    if (length(so@FEmatEtaVar) > 0  && nrow(so@FEmatEtaVar) > 0) {
+    if (length(so$FEmatEtaVar) > 0  && nrow(so$FEmatEtaVar) > 0) {
 
       subs <- rownames(etaVar) %in% paste("Eta", 1:x$info$model@dims["J"], ":Part", node$id, sep = "") | grepl(paste("Part", node$id, ":", sep = ""), rownames(etaVar))
       
       if (sum(subs) > 0) {
         rval <-
           paste(rval, "\nPredictor-variable fixed effects:\n", sep = "")
-        rval <- paste(rval, vcolmm:::formatMatrix(etaVar[subs, , drop = FALSE], ...), sep = "")
+        rval <- paste(rval, formatMatrix(etaVar[subs, , drop = FALSE], ...), sep = "")
       }
     }
     

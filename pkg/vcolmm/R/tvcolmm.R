@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:      Reto Buergin
 ## E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:        2014-01-15
+## Date:        2014-03-17
 ##
 ## Description:
 ## The tvcolmm function
@@ -224,12 +224,7 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
 
   
   ## prepare the title
-  title <-
-    paste(c("Cumulative", "Baseline", "Adjacent")[model@dims["family"]])
-  if (model@dims["family"] == 1)
-    title <-
-      paste(title, c("Logit", "Probit", "Cauchy")[model@dims["link"]])
-  title <- paste(title, "Mixed Model with Varying-Effects")
+  title <- c("Ordinal linear mixed model with varying effects")
   control$terms <- control$terms$original
   
   ## the output object

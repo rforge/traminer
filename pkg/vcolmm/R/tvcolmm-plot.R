@@ -159,13 +159,13 @@ tvcolmm_terms_plot <- function(object, terms = NULL,
         paste("coef(", terms[j], "|", variable[i], ")", sep = "")
 
       if (is.numeric(z)) {
-        args <- vcolmm:::appendDefArgs(dotList, list(type = "s"))
-        args <- vcolmm:::appendDefArgs(list(x = z, y = betaj), args)
+        args <- appendDefArgs(dotList, list(type = "s"))
+        args <- appendDefArgs(list(x = z, y = betaj), args)
       } else {
         args <- dotList
-        args <- vcolmm:::appendDefArgs(list(x = as.integer(z), y = betaj,
+        args <- appendDefArgs(list(x = as.integer(z), y = betaj,
                                             type = "b"), args)
-        if (!add) args <- vcolmm:::appendDefArgs(args, list(axes = FALSE))
+        if (!add) args <- appendDefArgs(args, list(axes = FALSE))
       }
 
       if (add) {
@@ -174,7 +174,7 @@ tvcolmm_terms_plot <- function(object, terms = NULL,
         fun <- plot.default
       }
       
-      args <- vcolmm:::appendDefArgs(args, list(xlab = variable[i], ylab = ylab))
+      args <- appendDefArgs(args, list(xlab = variable[i], ylab = ylab))
 
       ## call plot or points
       do.call(fun, args)
@@ -212,7 +212,7 @@ panel_coef <- function(obj, terms, id = TRUE, dims = c("n", "N"),
     coef <- coef(obj, nodeids(obj))$varying[, terms, drop = FALSE]
     
     gp_def <- gpar(cex = 0.75)
-    gp <- vcolmm:::appendDefArgs(list(...), gp_def)
+    gp <- appendDefArgs(list(...), gp_def)
     class(gp) <- "gpar"
     
     args_def <- list(xlim = c(0.75, ncol(coef) + 0.25), pch = 4L,
@@ -221,7 +221,7 @@ panel_coef <- function(obj, terms, id = TRUE, dims = c("n", "N"),
                      height = 1, width = 0.6)    
     args_def$ylim <- args_def$ylim + 0.1 * c(-1, 1) * diff(args_def$ylim)
     args_def$ylim <- range(c(0, args_def$ylim))
-    args <- vcolmm:::appendDefArgs(list(...), args_def)
+    args <- appendDefArgs(list(...), args_def)
     
     rval <- function(node) {
             
@@ -230,7 +230,7 @@ panel_coef <- function(obj, terms, id = TRUE, dims = c("n", "N"),
       grid.rect(gp = gpar(fill = "white", col = 0))
       
       pushViewport(viewport(layout.pos.row = 1L))
-      grid.text(vcolmm:::panel_get_main(obj, node, id, dims))
+      grid.text(panel_get_main(obj, node, id, dims))
       upViewport()
 
       pushViewport(viewport(layout.pos.row = 2L))
@@ -299,7 +299,7 @@ panel_fluctest <- function(obj, id = TRUE, dims = c("n", "N"),
   
   gp_def <- gpar(cex = 0.75, col = "black", fontface = 1L,
                  lwd = 1, fontsize = get.gpar()$fontsize)
-  gp <- vcolmm:::appendDefArgs(gp, gp_def)
+  gp <- appendDefArgs(gp, gp_def)
   class(gp) <- "gpar"
   
   alpha <- extract(obj, "control")$alpha
@@ -311,7 +311,7 @@ panel_fluctest <- function(obj, id = TRUE, dims = c("n", "N"),
   args_def <- list(height = 0.75, width = 0.75, pch = 4L)
   args_def$xlim <- if (all | log) c(0, 1) else c(0, 1.1 * alpha)
   
-  args <- vcolmm:::appendDefArgs(list(...), args_def)    
+  args <- appendDefArgs(list(...), args_def)    
   FUN <- function(x) suppressWarnings(min(x, na.rm = TRUE))
   
   rval <- function(node) {
@@ -376,7 +376,7 @@ panel_fluctest <- function(obj, id = TRUE, dims = c("n", "N"),
     grid.rect(gp = gpar(fill = "white", col = 0))
     
     pushViewport(viewport(layout.pos.row = 1))
-    grid.text(vcolmm:::panel_get_main(obj, node, id, dims))
+    grid.text(panel_get_main(obj, node, id, dims))
     upViewport()
     
     pushViewport(viewport(layout.pos.row = 2))

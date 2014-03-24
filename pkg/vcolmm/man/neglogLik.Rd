@@ -4,7 +4,7 @@
 
 \title{Extract the negative log-Likelihood of a model.}
 
-\description{Generic function to extract the log-Likelihood of a model
+\description{Generic function to extract the log-likelihood of a model
   multiplied by minus one.} 
 
 \usage{

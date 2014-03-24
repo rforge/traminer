@@ -97,6 +97,5 @@
 }
 
 \author{Reto Buergin}
-  
-\keyword{tree}
+
 \keyword{methods}
