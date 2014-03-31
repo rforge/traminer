@@ -16,7 +16,7 @@
 
 tvcolmm <- function(formula, data, control = tvcolmm_control(),
                     subset, na.action, offset, 
-                    vi = c("none", "po", "npo"),
+                    vi = c("npo", "po", "none"),
                     linear = NULL, ...) {
 
   ## check arguments
@@ -73,6 +73,7 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   model <- try(do.call("olmm", args))
   args$doFit <- TRUE
   args$weights <- weights(model)
+
       
   ## modify 'control' and arguments for fitting the model
   control <- tvcolmm_modify_control(model, control)
@@ -89,7 +90,7 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   ## define partitioning data
   partvar <- model.frame(partForm, frame)
   
-  if (control$verbose) cat("\n* starting partitioning ...\n")
+  if (control$verbose) cat("OK\n* starting partitioning ...\n")
   
   ## set the root node
   nodes <- partynode(id = 1L,

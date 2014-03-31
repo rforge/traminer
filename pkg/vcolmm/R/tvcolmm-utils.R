@@ -53,7 +53,6 @@ tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
   
   ## fit model
   object <- try(do.call("olmm", args), TRUE)
-
   
   if (verbose) {
     if (nlevels(args$data$Part) == 1L) {
@@ -143,23 +142,36 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
   depth <- unlist(nodeapply(nodes, nodeids(nodes, terminal = TRUE),
                             function(node) info_node(node)$depth))
 
+  ## extract transformed scores
+  scores <- estfun.olmm(x = model, level = "observation",
+                        prewhite = TRUE, prewhite.fail = "ignore",
+                        complete = TRUE, nuisance = control$nuisance,
+                        silent = TRUE)
+  
   ## hack^1: if intercept = "po" fit a second model with the second level of
   ## 'Part' as reference level
   if (nlevels(args$data$Part) > 1L && control$intercept == "po") {
-    args$contrasts$Part <- contr.treatment(levels(args$data$Part), base = 2)
+    args$contrasts$Part <- contr.treatment(levels(args$data$Part), base = 2)  
     model2 <- tvcolmm_fit_model(formula, args, control, FALSE)
+    scores2 <- estfun.olmm(x = model2, level = "observation",
+                           prewhite = TRUE, prewhite.fail = "ignore",
+                           complete = TRUE, nuisance = control$nuisance,
+                           silent = TRUE)
   }
 
-  ## extract transformed scores
-  scores <- estfun.olmm(x = model, level = "observation",
-                        decorrelate = TRUE)
   
   ## apply test for each variable and partition separately  
   for (i in 1:ncol(partvar)) {    
     for (j in 1:nlevels(Part)) {
 
       ## hack^1: choose the model (only important if 'intercept == "po"')
-      m <- if (nlevels(Part) > 1L && control$intercept == "po" && j == 1L) model2 else model
+      if (nlevels(Part) > 1L && control$intercept == "po" && j == 1L) {
+        m <- model2
+        s <- scores2
+      } else {
+        m <- model
+        s <- scores
+      }
       
       ## extract observations of current partition
       rows <- Part == levels(Part)[j]
@@ -177,10 +189,9 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
   
 
         ## run the tests
-        scores <- estfun.olmm(x = m, level = "observation",
-                              decorrelate = TRUE,
-                              terms = cols, subset = rows)
-        gefp <- try(gefp.olmm(m, scores, z, cols, rows), silent = TRUE)
+        gefp <- try(gefp.olmm(object = m, scores = s,
+                              order.by = z, terms = cols, subset = rows,
+                              center = TRUE, silent = TRUE), silent = TRUE)
         if (!inherits(gefp, "try-error")) {
 
           ## parameters for categorical variables
@@ -667,6 +678,10 @@ tvcolmm_modify_control <- function(model, control) {
   
   control$terms$tree <- c(termsFixefEtaVar, termsFixefEtaInv)  
   control$restricted <- c(setdiff(unique(sub("Eta[1-9]+:", "", restFixefEtaVar)), "(Intercept)"), restFixefEtaInv)
+
+  control$nuisance <-
+    c(control$restricted,
+      names(model@coefficients)[(model@dims["p"] + 1):model@dims["nPar"]])
   
   if (length(control$terms$root) * length(control$terms$tree) == 0)
     stop("no 'terms' found.")

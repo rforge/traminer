@@ -13,7 +13,7 @@
 \usage{
 tvcolmm(formula, data, control = tvcolmm_control(),
         subset, na.action, offset,
-        vi = c("none", "po", "npo"),
+        vi = c("npo", "po", "none"),
         linear = NULL, ...)
 }
 
@@ -146,8 +146,7 @@ data(tvcolmm_2)
 
 model.1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_2,
                    control = tvcolmm_control(verbose = TRUE,
-                     minsplit = 30L, terms = c("treat")), 
-                   linear = "time", vi = "po")
+                     minsplit = 30L), vi = "po", linear = "time")
 
 ## print the results
 print(mod1)
@@ -160,8 +159,7 @@ data(schizo)
 
 model.2 <- tvcolmm(imps79o ~ tx + (1|id) | week,
                    data = schizo,
-                   control = tvcolmm_control(verbose = TRUE),
-                   vi = "po")
+                   control = tvcolmm_control(verbose = TRUE))
 
 ## ------------------------------------------------------------------- #
 ## Example 3: Piecewise constant growth
@@ -178,8 +176,7 @@ data(tvcolmm_1)
 ## fit the model
 model.3 <- tvcolmm(formula = y ~ (1|id) | time,
                    data = tvcolmm_1, vi = "npo",
-                   control = tvcolmm_control(verbose = TRUE,
-                     terms = "(Intercept)")) # 'terms = "(Intercept)"' is necessary!
+                   control = tvcolmm_control(verbose = TRUE)) 
 
 ## print the results
 print(mod3)

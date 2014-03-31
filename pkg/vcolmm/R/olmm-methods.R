@@ -1,6 +1,6 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2014-03-19
+## Date:            2014-03-26
 ##
 ## Description:
 ## methods for olmm objects.
@@ -235,59 +235,146 @@ drop1.olmm <- function(object, scope, scale = 0, test = c("none", "Chisq"),
 }
 
 estfun.olmm <- function(x, level = c("observation", "subject"),
-                        decorrelate = FALSE, silent = FALSE, ...) {
+                        prewhite = FALSE, prewhite.fail = c("stop", "ignore"),
+                        complete = FALSE, nuisance = NULL, control = list(),
+                        verbose = FALSE, silent = FALSE, ...) {
 
-    level <- match.arg(level)
+  level <- match.arg(level)
+  prewhite.fail <- match.arg(prewhite.fail)
+  
+  ## get data from 'olmm' object
+  subject <- x@subject
+  n <- x@dims["n"]
+  N <- x@dims["N"]
+  Ni <- table(subject)
+  Nmax <- max(Ni)
+  
+  ## get terms
+  terms <- 1:x@dims["nPar"] # internal variable
+  if (!is.null(nuisance) & is.character(nuisance))
+    nuisance <- which(names(coef(x)) %in% nuisance)
+  terms <- setdiff(terms, nuisance)
+  
+  if (level == "observation") {
 
-    ## get data from 'olmm' object
-    subject <- x@subject
-    Ni <- table(subject)
-    Nmax <- max(Ni)
+    if (verbose) cat("* extract scores from fitted object ... ")
+    scores <- -x@score_obs
+    scores <- scores[, terms, drop = FALSE]
+    n <- nrow(scores)
+    k <- ncol(scores)
     
-    if (level == "observation") {
-
-        scores <- -x@score_obs
-        n <- nrow(scores)
-        k <- ncol(scores)
-
-        if (decorrelate) {
-
-            ## pseudo warning indicating that transformation is not regular
-            if (any(Ni < Nmax))
-                if (!silent) warning("the data are not balanced. ",
-                                     "Complete data with expected scores (=0).")
-
-            ## compute transformation matrix
-            T <- try(olmm_scoreTransfMat(x, terms = 1:k, ...), silent = TRUE)
-
-            ## transform scores
-            if (class(T) != "try-error") {
-
-                rn <- rownames(scores)
-                cn <- colnames(scores)
-                FUN <- function(i) {
-                    Ti <- kronecker(matrix(1, Ni[i], Ni[i]) - diag(Ni[i]), T)
-                    diag(Ti) <- 1
-                    Ti %*% c(t(scores[subject == levels(subject)[i],]))
-                }
-                scores <- matrix(unlist(lapply(1:nlevels(subject), FUN)), n, k,
-                                 byrow = TRUE, dimnames = list(rn,cn))
-                rownames(T) <- colnames(T) <- cn
-                attr(scores, "T") <- T
-            } else {
-                
-                if (!silent) warning("computation of transformation matrix failed. ",
-                                     "Return original estimating equations.")
-            }
-        }
-    } else {
+    if (prewhite) {
         
-        scores <- -x@score_sbj
-        scores <- Ni / Nmax * scores # corrects for unbalanced data
-    }
+      ## compute transformation matrix
+      if (verbose) cat("OK\n* compute transformation matrix ...")
+      T <- try(olmm_scoreTransfMat(x, terms = terms, verbose = verbose,
+                                   control = control, silent = silent, ...),
+               silent = TRUE)
 
-    ## return scores
-    return(scores)
+      ## transform scores
+      if (class(T) == "try-error") {
+        if (verbose) cat("\n")
+        mess <- "computation of transformation matrix failed."
+        if (prewhite.fail == "stop") stop(mess)
+        if (!silent) warning(mess)
+        return(scores)
+      }
+
+      if (verbose) cat("\n* transforming scores ... ")
+      
+      if (all(Ni == Nmax) | !complete) {
+
+        if (!silent && any(Ni < Nmax)) {
+          warning("the transformation method works only with balanced data.")
+        }
+
+        Ti <- kronecker(matrix(1, Nmax, Nmax) - diag(Nmax), T)
+        diag(Ti) <- 1
+        FUN1 <- function(i) {
+          Ti[1:(k * Ni[i]), 1:(k * Ni[i])] %*% c(t(scores[subject == levels(subject)[i],]))
+        }
+        sTmp <- matrix(unlist(lapply(1:nlevels(subject), FUN1)),
+                       nrow(scores), ncol(scores), byrow = TRUE)
+        scores[] <- sTmp[order(subject), ]
+        if (verbose) cat("OK")
+          
+      } else {
+
+        sT <- 0.0 * scores
+        
+        Ti <- kronecker(matrix(1, Nmax, Nmax) - diag(Nmax), T)
+        diag(Ti) <- 1
+        FUN2 <- function(i, Ti, subject, scores) {
+          Ti %*% c(t(scores[subject == levels(subject)[i],]))
+        }
+
+        ## transform complete cases
+        subsSbj <- which(Ni == Nmax)
+        subsObs <- which(subject %in% levels(subject)[subsSbj])
+        subsObs <- subsObs[order(subject[subsObs])]
+        sTmp <- matrix(unlist(lapply(subsSbj, FUN2, Ti, subject, scores)),
+                       Nmax * length(subsSbj), ncol(scores), byrow = TRUE)
+        sT[subsObs,] <- sTmp
+        
+        ## repeatedly transform incomplete cases
+        if (verbose) cat("\n* data are unbalanced.",
+                         "Apply imputation algorithm with Nmax =", Nmax, "...")
+        subsSbj <- which(Ni < Nmax)
+        subsObs <- which(subject %in% levels(subject)[subsSbj])
+        subsObs <- subsObs[order(subject[subsObs])]        
+        subsAdd <- unlist(lapply(Ni, function(x) rep(c(0, 1), c(x, Nmax - x))))
+        subsAdd <-
+          which(subsAdd[rep(1:N, each = Nmax) %in% which(Ni < Nmax)] == 1)       
+        sTmp <- 0.0 * scores[subsObs, ]
+
+        control <- appendDefArgs(control, list(Rmax = 100L, abstol = sd(scores) / 100))
+        eps <- 2 * control$abstol
+        r <- 0
+        while (r < control$Rmax & eps > control$abstol) { 
+          r <- r + 1
+          sAdd <- olmm_addObsScores(x)
+          sR <- rbind(scores[subsObs,], -sAdd$score_obs)
+          sbj <- factor(c(subject[subsObs], sAdd$subject), levels(subject))
+          sR <- lapply(subsSbj, FUN2, Ti, sbj, sR)
+          sR <- matrix(unlist(sR), Nmax * length(subsSbj), ncol(sTmp), byrow = TRUE)
+          sR <- sR[-subsAdd,,drop = FALSE]
+          sR <- sTmp + sR
+          if (r > 1) eps <- max(abs(sR / r - sTmp / (r - 1)))
+          if (verbose && r > 1)
+            cat("\nnit = ", r,
+                "max|diff| =", format(eps, digits = 3, scientific = TRUE))
+          sTmp <- sR
+        }
+        if (eps <= control$abstol) {
+          if (verbose)
+            cat("\nalgorithm converged: nit =", r,
+                "max|diff| =", format(eps, digits = 3, scientific = TRUE), "\n")
+        } else {
+          if (!silent) warning("imputation algorithm did not converge.")
+        }
+        sT[subsObs,] <- sTmp / r
+        scores <- sT
+      }
+      
+      attr(scores, "T") <- T
+    } else {
+      if (verbose) cat("OK")
+    }
+  } else {
+
+    if (verbose) cat("* extracting subject scores ... ")
+    scores <- -x@score_sbj[, terms, drop = FALSE]
+    if (complete) {
+      if (verbose) cat("OK\n* correcting for unbalanced data ... ")
+      scores <- Ni / Nmax * scores # corrects for unbalanced data
+    }
+    if (verbose) cat("OK")
+  }
+
+  if (verbose) cat("\n* return negative scores\n")
+  
+  ## return scores
+  return(scores)
 }
     
 
@@ -330,23 +417,28 @@ formula.olmm <- function(x, ...) {
   formula(x@formula)
 }
 
-gefp.olmm <- function(object, scores = estfun.olmm(object, decorrelate = TRUE),
+gefp.olmm <- function(object, scores = NULL,
                       order.by = NULL, terms = NULL, subset = NULL,
-                      center = TRUE, silent = FALSE, ...) {
+                      center = TRUE, omit.terms = TRUE,
+                      silent = FALSE, ...) {
   
   ## extract scores (if scores is not a matrix)
   if (is.null(scores)) {
-    scores <- estfun.olmm(scores, decorrelate = TRUE, ...)
+    estfunArgs <-
+      appendDefArgs(list(...),
+                    list(prewhite = TRUE, complete = TRUE))
+    estfunArgs$x <- object
+    scores <- try(do.call("estfun.olmm", estfunArgs))
   } else if (is.function(scores)) {    
     scores <- scores(object)
-  }
-  if (!is.matrix(scores)) stop("extracting the estimation function failed.")
+  } 
+  if (!is.matrix(scores)) stop("extracting the score function failed.")
 
   ## check arguments
   if (is.null(order.by)) order.by <- 1:nrow(scores)
   if (length(order.by) != nrow(scores))
-    stop("the length of 'order.by' should be equal the number of rows of",
-         "the estimating functions.")
+    stop("the length of 'order.by' should be equal the number of rows of ",
+         " the score function.")
   if (is.factor(order.by)) order.by <- droplevels(order.by)
 
   ## get dimensions
@@ -373,10 +465,15 @@ gefp.olmm <- function(object, scores = estfun.olmm(object, decorrelate = TRUE),
 
   ## multiply scores with the inverse of the square root of their crossproduct
   J12Inv <- try(chol2inv(chol(root.matrix(crossprod(process)))), silent = TRUE)
-  if (class(J12Inv) == "try-error" && !is.null(subset) && !is.null(terms)) {
-      if (!silent) warning("covariance matrix is not positive semidefinite. Use 'terms' columns only")
-      J12Inv <- matrix(0, k, k, dimnames = list(colnames(process), colnames(process)))
-      J12Inv[terms, terms] <- chol2inv(chol(root.matrix(crossprod(process)[terms, terms])))
+  if (class(J12Inv) == "try-error" && omit.terms) {
+      J12 <- crossprod(process)
+      subs <- rep(TRUE, k)
+      subs[diag(J12) / max(diag(J12)) < 1e-2] <- FALSE
+      J12Inv <- matrix(0, k, k)
+      J12Inv[subs, subs] <- chol2inv(chol(root.matrix(J12[subs, subs])))
+      if (!silent) warning("covariance matrix is not positive semidefinite. ",
+                           "Omit terms: ",
+                           paste(colnames(process)[!subs], collapse = ", "))
   } 
   process <- t(J12Inv %*% t(process))
 
@@ -637,12 +734,12 @@ print.olmm <- function(x, digits = max(3, getOption("digits") - 3), ...) {
 
   if (length(so$FEmatEtaInv) > 0 && nrow(so$FEmatEtaInv) > 0) {
     cat("\nPredictor-invariant fixed effects:\n")
-    print(so$FEmatEtaInv[,1], digits = digits)
+    print(fixef(x, "po"), digits = digits)
   }
   
   if (length(so$FEmatEtaVar) > 0 && nrow(so$FEmatEtaVar) > 0) {
     cat("\nPredictor-variable fixed effects:\n")
-    print(so$FEmatEtaVar[,1], digits = digits)
+    print(fixef(x, "npo"), digits = digits)
   }
 }
 

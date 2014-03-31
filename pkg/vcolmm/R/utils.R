@@ -1,10 +1,10 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2013-12-06
+## Date:            2014-03-26
 ##
 ## Description:
-## Functions that apply to 'vcolmm1' and 'vcolmm2' objects
+## General utility functions 
 ##
 ## Overview:
 ## appendDefArgs:   adds default arguments to a list of arguments
