@@ -713,7 +713,7 @@ olmm_g_scoreTransfMat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
 
 olmm_scoreTransfMat <- function(object, method = c("symmetric", "unconstraint"),
                                 Nmax = NULL, terms = NULL, control = list(),
-                                start = NULL, verbose = FALSE, omit.terms = TRUE,
+                                verbose = FALSE, omit.terms = TRUE,
                                 silent = FALSE) {
 
   method <- match.arg(method)
@@ -749,7 +749,8 @@ olmm_scoreTransfMat <- function(object, method = c("symmetric", "unconstraint"),
   } 
   k <- length(terms)
   
-  ## set initial values
+  ## set initial values (currently omitted)
+  start <- NULL
   T <- if (is.null(start)) {
     matrix(0, k, k, dimnames = list(rownames(sVar), colnames(sVar)))
   } else {

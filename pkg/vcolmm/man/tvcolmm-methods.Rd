@@ -23,14 +23,15 @@
 \method{coef}{tvcolmm}(object, ...)
 
 \method{extract}{tvcolmm}(object, what = c("control", "sctest",
-              "model", "selected", "p.value"), ids = nodeids(object), ...)
+              "model", "selected", "p.value", "coef", "sd", "var"),
+        ids = nodeids(object), ...)
 
 \method{fitted}{tvcolmm}(object, ...)
 
 \method{getCall}{tvcolmm}(x, ...)
 
 \method{logLik}{tvcolmm}(object, cv = FALSE,
-               folds = tvcolmm_folds(object, "kfold"), ...)
+       folds = tvcolmm_folds(object, "kfold"), ...)
 
 \method{model.frame}{tvcolmm}(formula, ...)
 
@@ -42,7 +43,7 @@
 \method{print}{tvcolmm}(x, ...)
 
 \method{prune}{tvcolmm}(tree, alpha = NULL, depth = NULL,
-            minsplit = NULL, nselect = NULL, ...)
+     minsplit = NULL, nselect = NULL, ...)
 
 \method{ranef}{tvcolmm}(object, ...)
 
@@ -73,10 +74,9 @@
 }
 
 \details{
-  Except for \code{print}, \code{predict} and \code{prune}, these
-  methods extract the underneath \code{olmm} object and assign that
-  object to the equally named methods. The detailed documentation with
-  descriptions of arguments is in \code{\link{olmm-class}}.
+  Except for \code{print}, \code{predict} and \code{prune}, the
+  methods extract the underneath \code{olmm} object and assign it
+  to the equally named methods for \code{olmm} objects.. 
   
   The \code{predict} function has two additional options for the
   \code{type} argument. The option \code{"node"} calls the node id of an

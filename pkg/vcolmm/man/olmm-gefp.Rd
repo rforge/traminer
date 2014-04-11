@@ -15,7 +15,8 @@
 \usage{
 
 estfun.olmm(x, level = c("observation", "subject"),
-            prewhite = FALSE, complete = FALSE,
+            prewhite = FALSE, complete = prewhite,
+            Nbal = NULL, subset = NULL,
             nuisance = NULL, control = list(),
             verbose = FALSE, silent = FALSE, ...)
 
@@ -40,6 +41,12 @@ olmm_scoreTransfMat(object, method = c("symmetric", "unconstraint"),
     transformation. See details.}
   \item{complete}{logical scalar. If \code{TRUE} and the data are
     unbalanced, the estimation equations are adjusted. See details.}
+  \item{Nbal}{scalar integer. The number of observations per subject for
+    which the transformation should be performed when data are unbalanced.}
+  \item{subset}{a vector to extract the subset of scores to be used. For
+    \code{estfun.olmm}, this argument can be used to specify which
+    observations of an individual with more than Nbal observations
+    should be dropped.}
   \item{nuisance}{integer vector. Defines the coefficients which are
     regarded as nuisance and therefore omitted from the transformation.}
   \item{control}{list. Control parameter for optimization algorithms. To 
@@ -57,7 +64,6 @@ olmm_scoreTransfMat(object, method = c("symmetric", "unconstraint"),
     column means of the estimating equations.} 
   \item{terms}{integer, logical or a character vector. Extracts the
     columns of the estimating equations.} 
-  \item{subset}{subset of estimating function to be used.}
   \item{order.by}{a vector of a single explanatory variable to be used
     to order the estimating equations. If set to \code{NULL} (the default) the
     observations are assumed to be ordered.}
