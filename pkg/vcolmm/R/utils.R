@@ -13,6 +13,7 @@
 ## --------------------------------------------------------- #
 
 appendDefArgs <- function(args, default) {
+  if (is.null(args)) return(default)
   subs <- setdiff(names(default), names(args))
   if (length(subs) > 0)
     for (i in subs) args[[i]] <- default[[i]] 

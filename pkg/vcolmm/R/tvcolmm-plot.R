@@ -16,11 +16,11 @@
 ## panel_get_main:
 ## panel_coef:
 ## panel_empty:
-## panel_fluctest:
+## panel_sctest:
 ## --------------------------------------------------------- #
 
 plot.tvcolmm <- function(x, type = c("default", "coef", 
-                              "fluctest", "simple", "terms"),
+                              "sctest", "simple", "terms"),
                          main = NULL, drop_terminal = TRUE,
                          tnex = 1, newpage = TRUE,
                          pop = TRUE, gp = gpar(),
@@ -40,7 +40,7 @@ plot.tvcolmm <- function(x, type = c("default", "coef",
   } else {
     
     if (type == "default" & depth(x) < 1L)
-      type <- "fluctest"
+      type <- "sctest"
     
     ## tree plots
     
@@ -49,7 +49,7 @@ plot.tvcolmm <- function(x, type = c("default", "coef",
       switch(type,
              "default" = if (depth(x) > 3L) panel_empty else panel_coef,
              "coef" = panel_coef,
-             "fluctest" = panel_fluctest,
+             "sctest" = panel_sctest,
              "simple" = panel_empty)
     tp_args <-
       list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
@@ -59,9 +59,9 @@ plot.tvcolmm <- function(x, type = c("default", "coef",
     ## inner panel
     ip_fun <-
       switch(type,
-             "default" = if (depth(x) > 3L) node_inner else panel_fluctest,
+             "default" = if (depth(x) > 3L) node_inner else panel_sctest,
              "coef" = node_inner,
-             "fluctest" = if (terminal) node_inner else panel_fluctest,
+             "sctest" = if (terminal) node_inner else panel_sctest,
              "simple" = node_inner)
     ip_args <-
       list(...)[names(list(...)) %in% names(formals(ip_fun))[-1]]
@@ -199,83 +199,222 @@ panel_get_main <- function(obj, node, id, dims) {
                   "n = ", node$info$dims["n"],
                   "/ N = ", node$info$dims["N"], sep = "")
   } else if ("n" %in% dims) {
-    rval <- paste(rval, "n = ", node$info$dims["n"])
+    rval <- paste(rval, "nobs = ", node$info$dims["n"])
   } else if ("N" %in% dims) {
     rval <- paste(rval, "N = ", node$info$dims["N"])
   }
   return(rval)
 }
 
-panel_coef <- function(obj, terms, id = TRUE, dims = c("n", "N"),
-                       margins = c(2, 2, 0, 0), gp = gpar(), ...) {
+panel_coef <- function(obj, terms = NULL, id = TRUE,
+                       dims = c("n", "N"),
+                       margins = c(3, 2, 0, 0), gp = gpar(),
+                       mean = FALSE, conf.int = FALSE, plot_gp = list(),
+                       mean_gp = list(), conf.int_gp = list(), ...) {
+
+  gp_def <- gpar(cex = 0.75)
+  gp <- appendDefArgs(gp, gp_def)
+  class(gp) <- "gpar"
+
+  ## extract coefficients
+  coef <- extract(obj, "coef")$varying
+  if (is.null(terms)) terms <- colnames(coef)
+  if (!is.list(terms)) terms <- list(terms)
+  coef <- coef[, unlist(terms), drop = FALSE]
+  coefList <- lapply(terms, function(trms) coef[, trms, drop = FALSE])
+
+  if (conf.int) {
+    sd <- extract(obj, "sd")$varying
+    sd <- sd[, unlist(terms), drop = FALSE]
+    sdList <- lapply(terms, function(trms) sd[, trms, drop = FALSE])
+  }
+  
+  ## plot parameters
+  if (length(plot_gp) == 0L) {
+    plot_gp <- vector("list", length(terms))
+  } else if (any(!unlist(lapply(plot_gp, is.list)))) {
+    plot_gp <- lapply(1:length(terms), function(i) plot_gp)
+  }
+  
+  plot_gp <-
+    lapply(1:length(coefList),
+           function(i) {
+             if (conf.int) {
+               ylim <- range(c(c(coefList[[i]] - 2 * sdList[[i]]),
+                               c(coefList[[i]] + 2 * sdList[[i]])))
+             } else {
+               ylim <- range(coefList[[i]])
+             }
+             ylim <- ylim + c(-1, 1) * 0.1 * range(ylim)
+             rval <- list(xlim = c(0.75, ncol(coefList[[i]]) + 0.25),
+                          pch = 19L, ylim = ylim,
+                          ylab = "coef",  type = "p",
+                          label = abbreviate(colnames(coefList[[i]])),
+                          height = 1, width = 0.6,
+                          gp = gpar(cex = 1L))
+             rval$ylim <- rval$ylim + 0.1 * c(-1, 1) * diff(rval$ylim)
+             rval$ylim <- range(c(0, rval$ylim))
+             if (length(plot_gp) > 0L)
+               rval <- appendDefArgs(plot_gp[[i]], rval)
+             return(rval)
+           })
+
+  if (conf.int) {
+
+    if (length(conf.int_gp) == 0L) {
+      conf.int_gp <- vector("list", length(terms))
+    } else if (any(!unlist(lapply(conf.int_gp, is.list)))) {
+      conf.int_gp <- lapply(1:length(terms), function(i) conf.int_gp)
+    }    
+    conf.int_gp_def <- list(angle = 90,
+                            length = unit(0.5, "native"),
+                            ends = "both",
+                            type = "open")
+    conf.int_gp <- lapply(1:length(terms),
+                          function(i) appendDefArgs(conf.int_gp[[i]],
+                                                    conf.int_gp_def))
+  }
+  
+  ## population mean
+  if (mean) {
+
+    if (length(mean_gp) == 0L) {
+      mean_gp <- vector("list", length(terms))
+    } else if (any(!unlist(lapply(mean_gp, is.list)))) {
+      mean_gp <- lapply(1:length(terms), function(i) mean_gp)
+    }    
+    mean_gp_def <- list(gp = gpar(col = "grey50", lty = 1, lwd = 0.75), pch = 19L)
+    mean_gp <- lapply(1:length(terms),
+                      function(i) appendDefArgs(mean_gp[[i]], mean_gp_def))
+
+    w <- tapply(weights(obj), predict(obj, type = "node"), sum) / sum(weights(obj))
+    meanCoef <- colSums(coef * matrix(w, nrow(coef), ncol(coef)))
+    meanCoef <- lapply(terms, function(trms) meanCoef[trms, drop = FALSE])
+    if (conf.int) {
+      meanSd <- sqrt(colSums(sd^2 * matrix(w, nrow(coef), ncol(coef))^2))
+      meanSd <- lapply(terms, function(trms) sqrt(meanSd[trms, drop = FALSE]))
+    }
+  }
+
+  qN <- qnorm(0.975)
+  
+  rval <- function(node) {
     
-    coef <- coef(obj, nodeids(obj))$varying[, terms, drop = FALSE]
+    strUnit <- unit(2, "strheight", "A")
+    pushViewport(viewport(layout = grid.layout(2, 1, heights = unit.c(strUnit, unit(1, "npc") - strUnit)))) # 1
+    grid.rect(gp = gpar(fill = "white", col = 0))
     
-    gp_def <- gpar(cex = 0.75)
-    gp <- appendDefArgs(list(...), gp_def)
-    class(gp) <- "gpar"
+    pushViewport(viewport(layout.pos.row = 1L)) # 2
+    grid.text(panel_get_main(obj, node, id, dims))
+    upViewport()
     
-    args_def <- list(xlim = c(0.75, ncol(coef) + 0.25), pch = 4L,
-                     ylim = range(c(coef)), ylab = "coef", 
-                     label = abbreviate(colnames(coef)),
-                     height = 1, width = 0.6)    
-    args_def$ylim <- args_def$ylim + 0.1 * c(-1, 1) * diff(args_def$ylim)
-    args_def$ylim <- range(c(0, args_def$ylim))
-    args <- appendDefArgs(list(...), args_def)
+    pushViewport(viewport(layout.pos.row = 2L)) # 2
+    pushViewport(viewport(layout = grid.layout(length(coefList), 1))) # 3
     
-    rval <- function(node) {
-            
-      strUnit <- unit(2, "strheight", "A")
-      pushViewport(viewport(layout = grid.layout(2, 1, heights = unit.c(strUnit, unit(1, "npc") - strUnit))))
-      grid.rect(gp = gpar(fill = "white", col = 0))
+    for (i in 1:length(coefList)) {
       
-      pushViewport(viewport(layout.pos.row = 1L))
-      grid.text(panel_get_main(obj, node, id, dims))
-      upViewport()
-
-      pushViewport(viewport(layout.pos.row = 2L))
-      pushViewport(viewport(height = unit(args$height, "npc"),
-                            width = unit(args$width, "npc")))
+      pushViewport(viewport(layout.pos.row = i)) # 4
+      
+      pushViewport(viewport(height = unit(plot_gp[[i]]$height, "npc"),
+                            width = unit(plot_gp[[i]]$width, "npc"))) # 5
       pushViewport(plotViewport(margins = margins,
-                                xscale = args$xlim, yscale = args$ylim,
-                                default.units = "native"))
-
-      grid.segments(unit(1:ncol(coef), "native"),
-                    unit(rep(args$ylim[1], ncol(coef)), "native"),
-                    unit(1:ncol(coef), "native"),
-                    unit(rep(args$ylim[2], ncol(coef)), "native"),
+                                xscale = plot_gp[[i]]$xlim, yscale = plot_gp[[i]]$ylim,
+                                default.units = "native")) # 6
+      
+      grid.segments(unit(1:ncol(coefList[[i]]), "native"),
+                    unit(rep(plot_gp[[i]]$ylim[1], ncol(coefList[[i]])), "native"),
+                    unit(1:ncol(coefList[[i]]), "native"),
+                    unit(rep(plot_gp[[i]]$ylim[2], ncol(coefList[[i]])), "native"),
                     gp = gpar(col = "lightgrey"))
       
-      grid.segments(unit(args$xlim[1], "native"), unit(0, "native"),
-                    unit(args$xlim[2], "native"), unit(0, "native"),
+      grid.segments(unit(plot_gp[[i]]$xlim[1], "native"), unit(0, "native"),
+                    unit(plot_gp[[i]]$xlim[2], "native"), unit(0, "native"),
                     gp = gpar(col = "black"))
       
-      grid.segments(unit(args$xlim[1], "native"), unit(0, "native"),
-                    unit(args$xlim[2], "native"), unit(0, "native"),
+      grid.segments(unit(plot_gp[[i]]$xlim[1], "native"), unit(0, "native"),
+                    unit(plot_gp[[i]]$xlim[2], "native"), unit(0, "native"),
                     gp = gpar(col = "black"))
 
-      grid.points(unit(1:ncol(coef), "native"),
-                  unit(coef[as.character(id_node(node)),],
-                       "native"),
-                  pch = args$pch, gp = gp)
+      if (conf.int) {
+        
+        grid.segments(unit(1:ncol(coefList[[i]]), "native"),
+                      unit(coefList[[i]][as.character(id_node(node)),] -
+                           qN * sdList[[i]][as.character(id_node(node)),], "native"),
+                      unit(1:ncol(coefList[[i]]), "native"),
+                      unit(coefList[[i]][as.character(id_node(node)),] +
+                           qN * sdList[[i]][as.character(id_node(node)),], "native"),
+                      arrow = arrow(angle = conf.int_gp[[i]]$angle,
+                        length = conf.int_gp[[i]]$length, 
+                        ends = conf.int_gp[[i]]$ends,
+                        type = conf.int_gp[[i]]$type),
+                      gp = plot_gp[[i]]$gp)
+        
+        if (FALSE) {
+          
+          grid.segments(unit(1:ncol(coefList[[i]]), "native"),
+                        unit(meanCoef[[i]] - qN * meanSd[[i]], "native"),
+                        unit(1:ncol(coefList[[i]]), "native"),
+                        unit(meanCoef[[i]] + qN * meanSd[[i]], "native"),
+                        arrow = arrow(angle = conf.int_gp[[1]]$angle,
+                        length = conf.int_gp[[i]]$length, 
+                        ends = conf.int_gp[[i]]$ends,
+                        type = conf.int_gp[[i]]$type),
+                        gp = mean_gp[[i]]$gp)
 
-      if (id_node(node) == min(nodeids(obj, terminal = TRUE))) {
-          grid.yaxis(gp = gpar(lineheight = 0.5))
-          grid.text(args$ylab, unit(-2, "lines"), unit(0.5, "npc"),
-                    rot = 90)
+        }
+        
+      }
+      
+      if (plot_gp[[i]]$type %in% c("p", "b")) {
+
+        if (mean) {
+          grid.points(unit(1:ncol(coefList[[i]]), "native"),
+                      unit(meanCoef[[i]], "native"),
+                      pch = mean_gp[[i]]$pch, gp = mean_gp[[i]]$gp)
+        }
+        
+        grid.points(unit(1:ncol(coefList[[i]]), "native"),
+                    unit(coefList[[i]][as.character(id_node(node)),],
+                         "native"),
+                    pch = plot_gp[[i]]$pch, gp = plot_gp[[i]]$gp)
       }
 
-      grid.xaxis(at = 1:ncol(coef), label = args$label,
-                 gp = gpar(lineheight = 0.5))
-
-      grid.rect()
       
-      ## close viewports
-      upViewport(4L)
-      return(rval)
+      if (plot_gp[[i]]$type %in% c("l", "b")) {
+
+        if (mean) {
+          grid.lines(unit(1:ncol(coefList[[i]]), "native"),
+                     unit(meanCoef[[i]], "native"),
+                     gp = mean_gp[[i]]$gp)
+        }
+        
+        grid.lines(unit(1:ncol(coefList[[i]]), "native"),
+                   unit(coefList[[i]][as.character(id_node(node)),],
+                        "native"),
+                   gp = plot_gp[[i]]$gp)
+      }
+      
+      if (id_node(node) == min(nodeids(obj, terminal = TRUE))) {
+        grid.yaxis(gp = gpar(lineheight = 0.5))
+        grid.text(plot_gp[[i]]$ylab, unit(-2, "lines"), unit(0.5, "npc"),
+                  rot = 90)
+      }
+      
+      grid.xaxis(at = 1:ncol(coefList[[i]]), label = plot_gp[[i]]$label,
+                 gp = gpar(lineheight = 0.5))
+      
+      grid.rect()
+      upViewport(3L)
+
+    }
+    
+    ## close viewports
+    upViewport(3L)
+    return(rval)
   }
 }
 class(panel_coef) <- "grapcon_generator"
+
 
 panel_empty <- function(obj, id = TRUE, dims = c("n", "N"), ...) {
     
@@ -291,7 +430,7 @@ panel_empty <- function(obj, id = TRUE, dims = c("n", "N"), ...) {
 }
 class(panel_empty) <- "grapcon_generator"
 
-panel_fluctest <- function(obj, id = TRUE, dims = c("n", "N"),
+panel_sctest <- function(obj, id = TRUE, dims = c("n", "N"),
                            margins = c(2, 2, 0, 2), log = FALSE,
                            all = NULL, gp = gpar(), ...) {
   
@@ -319,13 +458,13 @@ panel_fluctest <- function(obj, id = TRUE, dims = c("n", "N"),
     pval <- order.by <- NULL
     testMessage <- ""
     show <- FALSE        
-    if (is.terminal(node) && !is.null(obj$info$fluctest)) {
+    if (is.terminal(node) && !is.null(obj$info$sctest)) {
       pval <-
-        obj$info$fluctest$p.value[paste("Part", node$id, sep = ""), ]
+        obj$info$sctest$p.value[paste("Part", node$id, sep = ""), ]
       order.by <- names(pval)
       show <- TRUE
-    } else if (!is.null(split_node(node)$info$fluctest)) {
-      pval <- apply(split_node(node)$info$fluctest$p.value, 2, FUN)
+    } else if (!is.null(split_node(node)$info$sctest)) {
+      pval <- apply(split_node(node)$info$sctest$p.value, 2, FUN)
       order.by <- names(pval)
       show <- TRUE
     } else {
@@ -430,4 +569,4 @@ panel_fluctest <- function(obj, id = TRUE, dims = c("n", "N"),
   }
   return(rval)
   }
-class(panel_fluctest) <- "grapcon_generator"
+class(panel_sctest) <- "grapcon_generator"

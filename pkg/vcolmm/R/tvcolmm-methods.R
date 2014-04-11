@@ -26,66 +26,88 @@
 ## - anova.tvcolmm
 ## --------------------------------------------------------- #
 
-coef.tvcolmm <- function(object, ...) {
+tvcolmm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
+
+  what <- match.arg(what)
+  
+  ids <- nodeids(object, terminal = TRUE)
+  control <- extract(object, "control")
+
+  rval <- list()
+  
+  ## extract coefficients
+  coef <- switch(what,
+                 coef = coef(extract(object, "model")),
+                 sd = diag(vcov(extract(object, "model"))),
+                 var = diag(vcov(extract(object, "model"))))
+
+  ## restricted coefficients
+  rval$restricted <- coef[!grepl("Part", names(coef))]
+  
+  ## varying coefficients
+  if (depth(object) > 0L) {
     
-    ids <- nodeids(object, terminal = TRUE)
-    control <- extract(object, "control")
+    ## create object with all possible coefficients for each node
+    terms <- tvcolmm_get_terms(object)
+    varcoef <- rep(NA, length(terms) * length(ids))
+    for (i in 1:length(terms))
+      for (j in 1:length(ids))
+        names(varcoef)[length(ids) * (i - 1) + j] <-
+          sub("Part", paste("Part", ids[j], sep = ""), terms[i])
+    subs <- intersect(names(varcoef), names(coef))
+    varcoef[subs] <- coef[subs]
+    
+    if ((subs <- paste("Part", max(ids), sep = "")) %in%
+        names(varcoef)) {
+      con <- extract(object, "model")@contrasts$Part
 
-    rval <- list()
-
-    ## extract coefficients
-    coef <- coef(extract(object, "model"))
-
-    ## restricted coefficients
-    rval$restricted <- coef[!grepl("Part", names(coef))]
-
-    ## varying coefficients
-    if (depth(object) > 0L) {
-
-      ## create object with all possible coefficients for each node
-      terms <- tvcolmm_get_terms(object)
-      varcoef <- rep(NA, length(terms) * length(ids))
-      for (i in 1:length(terms))
-        for (j in 1:length(ids))
-          names(varcoef)[length(ids) * (i - 1) + j] <-
-            sub("Part", paste("Part", ids[j], sep = ""), terms[i])
-      subs <- intersect(names(varcoef), names(coef))
-      varcoef[subs] <- coef[subs]
-      
-      if ((subs <- paste("Part", max(ids), sep = "")) %in%
-          names(varcoef)) {
-        con <- extract(object, "model")@contrasts$Part
+      if (what == "coef") {
         varcoef[subs] <-
           sum(con[as.character(max(ids)),] *
               coef[paste("Part", setdiff(ids, max(ids)), sep = "")])
-      }
-      
-      ## create a matrix of coefficients
-      FUN <- function(i) {
-        name <- paste("Part", i, sep = "")
-        parts <- strsplit(names(varcoef), ":")
-        subs <- sapply(parts, function(x) sum(x == name) > 0)
-        rval <- varcoef[subs]
-        names(rval) <- sub(name, "Part", names(rval))
-        names(rval) <- sub("Part:", "", names(rval))
-        return(rval)
-      }
         
-      rval$varying <- lapply(as.character(ids), FUN)
-        rval$varying <-
-          matrix(unlist(rval$varying), nrow = length(ids), byrow = TRUE,
-                 dimnames = list(ids, names(rval$varying[[1]])))
-      
-    } else {
-        rval$varying <- NULL
+      } else if (what %in% c("sd", "var")) {
+        varcoef[subs] <-
+          sum((con[as.character(max(ids)),])^2 *
+              coef[paste("Part", setdiff(ids, max(ids)), sep = "")])
+      }
     }
-    return(rval)
-}
+    
+    ## create a matrix of coefficients
+    FUN <- function(i) {
+      name <- paste("Part", i, sep = "")
+      parts <- strsplit(names(varcoef), ":")
+      subs <- sapply(parts, function(x) sum(x == name) > 0)
+      rval <- varcoef[subs]
+      names(rval) <- sub(name, "Part", names(rval))
+      names(rval) <- sub("Part:", "", names(rval))
+      return(rval)
+    }
+    
+    rval$varying <- lapply(as.character(ids), FUN)
+    rval$varying <-
+      matrix(unlist(rval$varying), nrow = length(ids), byrow = TRUE,
+             dimnames = list(ids, names(rval$varying[[1]])))
+    
+  } else {
+    rval$varying <- NULL
+  }
+
+  if (what == "sd") {
+    rval$restricted <- sqrt(rval$restricted)
+    rval$varying <- sqrt(rval$varying)
+  }
   
+  return(rval)
+}
+
+coef.tvcolmm <- function(object, ...) tvcolmm_get_estimates(object, ...)
+
 coefficients.tvcolmm <- coef.tvcolmm 
 
-extract.tvcolmm <- function(object, what = c("control", "fluctest",
-                                      "model", "selected", "p.value"),
+extract.tvcolmm <- function(object, what = c("control", "sctest",
+                                      "model", "selected", "p.value",
+                                      "coef", "sd", "var"),
                             ids = nodeids(object), ...) {
   
   what <- match.arg(what)
@@ -94,20 +116,20 @@ extract.tvcolmm <- function(object, what = c("control", "fluctest",
 
     return(object$info$control)
     
-  } else if (what == "fluctest") {
+  } else if (what == "sctest") {
 
-    if (depth(object) == 0L) return(list("1" = object$info$fluctest))
+    if (depth(object) == 0L) return(list("1" = object$info$sctest))
     
-    getFluctest <- function(node) {
+    getSctest <- function(node) {
       if (is.terminal(node)) {
-        rval <- info_node(node)$fluctest
+        rval <- info_node(node)$sctest
       } else {
-        rval <- split_node(node)$info$fluctest
+        rval <- split_node(node)$info$sctest
       }
       return(rval)
     }
     
-    return(nodeapply(object, ids, getFluctest))
+    return(nodeapply(object, ids, getSctest))
     
     
   } else if (what == "model") {
@@ -126,14 +148,18 @@ extract.tvcolmm <- function(object, what = c("control", "fluctest",
 
     getPval <- function(node) {
       if (is.terminal(node)) {
-        test <- info_node(node)$fluctest
+        test <- info_node(node)$sctest
       } else {
-        test <- split_node(node)$info$fluctest
+        test <- split_node(node)$info$sctest
       }
       return(min(test$p.value, na.rm = TRUE))
     }
     rval <- unlist(nodeapply(object, ids, getPval))
     return(rval)
+  } else if (what %in% c("coef", "sd", "var")){
+
+    return(tvcolmm_get_estimates(object, what = what))
+
   }
 }
 
@@ -196,9 +222,11 @@ predict.tvcolmm <- function(object, newdata = NULL,
     ## return fitted nodes
     return(fitted)
   } else if (type == "terms") {
-    
+      
     ## extract individual effects
-    coef <- coef(object)   
+    what <- list(...)$what
+    if (is.null(what)) what <- "coef"
+    coef <- extract(object, what)
     varcoef <- lapply(fitted, function(x) coef$varying[as.character(x), ])
     varcoef <- matrix(unlist(varcoef), nrow = length(fitted), byrow = TRUE,
                       dimnames = list(names(fitted),
@@ -246,7 +274,8 @@ prune.tvcolmm <- function(tree, alpha = NULL, depth = NULL,
         fitted_node(tree$node, data = tree$data)
       call$data$Part <-
         tvcolmm_get_part(tree, tree$data, tree$fitted[,"(weights)"])
-      call$contrasts <- appendDefArgs(list(Part = contrasts(call$data$Part)), call$contrasts)
+      call$contrasts <- appendDefArgs(list(Part = contrasts(call$data$Part)),
+                                      call$contrasts)
     } else {
       call$formula <- tree$info$formula$root
     }    
@@ -258,7 +287,7 @@ prune.tvcolmm <- function(tree, alpha = NULL, depth = NULL,
     control$info$terms <-
       setdiff(names(fixef(tree$info$model)), control$restricted)
     tree$info$test <-
-      tvcolmm_fit_fluctest(tree$info$model, tree$nodes, tree$data, control)
+      tvcolmm_fit_sctest(tree$info$model, tree$nodes, tree$data, control)
   }
   if (!is.null(alpha)) 
     tree$info$control$alpha <- alpha

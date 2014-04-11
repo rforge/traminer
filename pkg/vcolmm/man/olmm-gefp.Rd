@@ -15,8 +15,8 @@
 \usage{
 
 estfun.olmm(x, level = c("observation", "subject"),
-            prewhite = FALSE, prewhite.fail = c("stop", "ignore"),
-            complete = FALSE, nuisance = NULL, control = list(),
+            prewhite = FALSE, complete = FALSE,
+            nuisance = NULL, control = list(),
             verbose = FALSE, silent = FALSE, ...)
 
 gefp.olmm(object, scores = NULL,
@@ -24,9 +24,8 @@ gefp.olmm(object, scores = NULL,
           center = TRUE, omit.terms = TRUE,
           silent = FALSE, ...)
 
-olmm_scoreTransfMat(object, terms = NULL, 
-                    method = c("symmetric", "unconstraint"),
-		    Nmax = NULL, control = list(),
+olmm_scoreTransfMat(object, method = c("symmetric", "unconstraint"),
+		    Nmax = NULL, terms = NULL, control = list(),
                     verbose = FALSE, omit.terms = TRUE,
                     silent = FALSE)
 }
@@ -39,9 +38,6 @@ olmm_scoreTransfMat(object, terms = NULL,
   \item{prewhite}{logical scalar. Indicates whether the within-subject
     correlation of scores should be removed by a linear
     transformation. See details.}
-  \item{prewhite.fail}{character. Instructs whether an error should
-    be reported (\code{"stop"}) or the raw estimating equations
-    should be returned (\code{"ignore"}) in cases the prewhitening failed.}
   \item{complete}{logical scalar. If \code{TRUE} and the data are
     unbalanced, the estimation equations are adjusted. See details.}
   \item{nuisance}{integer vector. Defines the coefficients which are

@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2013-12-06
+## Date:            2014-01-03
 ##
 ## Description:
 ## Random forests based on the tvcolmm algorithm.

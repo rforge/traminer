@@ -1,6 +1,6 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2014-03-26
+## Date:            2014-03-31
 ##
 ## Description:
 ## methods for olmm objects.
@@ -114,7 +114,7 @@ anova.olmm <- function(object, ...) {
 
     ## single model
 
-    stop("single argument anova for olmm objects' not yet implemented")
+    stop("single argument anova for 'olmm' objects not yet implemented")
   }
 }
 
@@ -235,142 +235,214 @@ drop1.olmm <- function(object, scope, scale = 0, test = c("none", "Chisq"),
 }
 
 estfun.olmm <- function(x, level = c("observation", "subject"),
-                        prewhite = FALSE, prewhite.fail = c("stop", "ignore"),
-                        complete = FALSE, nuisance = NULL, control = list(),
+                        prewhite = FALSE, complete = prewhite,
+                        Nbal = NULL, subset = NULL,
+                        nuisance = NULL, control = list(),
                         verbose = FALSE, silent = FALSE, ...) {
 
   level <- match.arg(level)
-  prewhite.fail <- match.arg(prewhite.fail)
+
+  if (verbose) cat("* extract scores from fitted object ... ")
   
-  ## get data from 'olmm' object
+  ## set subset
+  if (is.null(subset)) {
+    subset <- rep(TRUE, x@dims["n"])
+  } else {
+    if (is.character(subset)) subset <- rownames(model.frame(x)) %in% subset
+    if (is.numeric(subset) && length(subset) == x@dims["n"] &&
+        all(subset %in% c(1, 0))) subset <- as.logical(subset)
+    if (is.numeric(subset)) subset <- (1:x@dims["n"]) %in% subset
+  }
+  
+  ## check for balanced data and automatically modify subset
+  if (complete) {
+
+    Ni <- table(x@subject[subset])
+
+    ## set Nbal
+    if (!is.null(Nbal)) {
+      if (Nbal > max(Ni))
+        stop("at least one subject must have equal or more than ",
+             Nbal, " observations.")
+    } else {
+      Nbal <- sort(unique(Ni))[rev(which(table(Ni) > 50))[1]]
+      if (is.na(Nbal)) Nbal <- max(Ni)
+    }  
+    if (!silent && sum(Ni == Nbal) < 50)
+      warning("the number of subjects with ", Nbal, " observations is smaller ",
+              "than 50. The transformation may be inaccurate.")
+    if (any(Ni > Nbal)) {
+      FUN <- function(x) x[1:min(Nbal, length(x))]
+      subs <- unlist(tapply(1:length(x@subject), x@subject, FUN))
+      subs <- (1:x@dims["n"]) %in% subs
+      if (!silent) warning("omit ", sum(!subs), " observation from individuals ",
+                           "with more than ", Nbal, " observations.")
+      subset <- subset & subs
+    }
+
+    ## recompute the scores for the subset
+    if (any(!subset)) {
+      x@frame <- model.frame(x)[subset,,drop = FALSE]
+      x@y <- x@y[subset]
+      x@subject <- x@subject[subset]
+      attrX <- attributes(x@X)
+      x@X <- x@X[subset,,drop=FALSE]
+      attributes(x@X) <- appendDefArgs(attributes(x@X), attrX)
+      attrW <- attributes(x@W)
+      x@W <- x@W[subset,,drop=FALSE]
+      attributes(x@W) <- appendDefArgs(attributes(x@W), attrW)
+      x@weights <- x@weights_sbj[as.integer(x@subject)]
+      x@offset <- x@offset[subset]
+      x@dims["n"] <- nrow(x@frame)
+      x@eta <- x@eta[subset,,drop=FALSE]
+      x@score_obs <- x@score_obs[subset,,drop=FALSE]
+      .Call("olmm_update_marg", x, x@coefficients, PACKAGE = "vcolmm")
+    }
+  }
+  
+  scores <-  -x@score_obs
   subject <- x@subject
-  n <- x@dims["n"]
-  N <- x@dims["N"]
   Ni <- table(subject)
-  Nmax <- max(Ni)
+  
+  ## checks
+  if (x@dims["hasRanef"] == 0L) {
+    prewhite <- FALSE
+    complete <- FALSE
+  }
   
   ## get terms
   terms <- 1:x@dims["nPar"] # internal variable
   if (!is.null(nuisance) & is.character(nuisance))
     nuisance <- which(names(coef(x)) %in% nuisance)
   terms <- setdiff(terms, nuisance)
+  scores <- scores[, terms, drop = FALSE]
+  
+  if (verbose) cat("OK")
   
   if (level == "observation") {
 
-    if (verbose) cat("* extract scores from fitted object ... ")
-    scores <- -x@score_obs
-    scores <- scores[, terms, drop = FALSE]
     n <- nrow(scores)
     k <- ncol(scores)
     
     if (prewhite) {
         
       ## compute transformation matrix
-      if (verbose) cat("OK\n* compute transformation matrix ...")
-      T <- try(olmm_scoreTransfMat(x, terms = terms, verbose = verbose,
-                                   control = control, silent = silent, ...),
-               silent = TRUE)
-
-      ## transform scores
-      if (class(T) == "try-error") {
-        if (verbose) cat("\n")
-        mess <- "computation of transformation matrix failed."
-        if (prewhite.fail == "stop") stop(mess)
-        if (!silent) warning(mess)
-        return(scores)
-      }
-
-      if (verbose) cat("\n* transforming scores ... ")
+      if (verbose) cat("\n* compute transformation matrix ...")
+      T <- olmm_scoreTransfMat(object = x, terms = terms, verbose = verbose,
+                               control = control, silent = silent, ...)
       
-      if (all(Ni == Nmax) | !complete) {
-
-        if (!silent && any(Ni < Nmax)) {
-          warning("the transformation method works only with balanced data.")
-        }
-
-        Ti <- kronecker(matrix(1, Nmax, Nmax) - diag(Nmax), T)
+      ## if transformation failed, return raw scores
+      if (attr(T, "conv") > 0L) {
+        
+        if (verbose) cat("\n* transforming scores ... ")
+        
+        ## transformation matrix for one subject
+        Ti <- kronecker(matrix(1, Nbal, Nbal) - diag(Nbal), T)
         diag(Ti) <- 1
-        FUN1 <- function(i) {
-          Ti[1:(k * Ni[i]), 1:(k * Ni[i])] %*% c(t(scores[subject == levels(subject)[i],]))
-        }
-        sTmp <- matrix(unlist(lapply(1:nlevels(subject), FUN1)),
-                       nrow(scores), ncol(scores), byrow = TRUE)
-        scores[] <- sTmp[order(subject), ]
-        if (verbose) cat("OK")
+      
+        if (all(Ni == Nbal) | !complete) {
+
+          if (!silent && any(Ni < Nbal))
+            warning("the transformation method works only with balanced data.")
+
+          sbj <- factor(c(as.character(subject), rep(levels(subject), Nbal - Ni)),
+                        levels = levels(subject))
+          subsAdd <- c(sapply(Ni, function(n) 1:Nbal > n))
+          sT <- rbind(scores, matrix(0, length(sbj) - length(subject), k))
+          subsOrd <- order(sbj)
+          sTmp <- matrix(c(t(sT[order(sbj),,drop=FALSE])), Nbal * k, nlevels(subject))
+          sTmp <- matrix(c(Ti %*% sTmp), nrow(sT), k, byrow = TRUE)
+          sTmp <- sTmp[!subsAdd,,drop=FALSE]        
+          scores[rownames(scores)[order(order(subject))],] <- sTmp
+          if (verbose) cat("OK")
           
-      } else {
-
-        sT <- 0.0 * scores
-        
-        Ti <- kronecker(matrix(1, Nmax, Nmax) - diag(Nmax), T)
-        diag(Ti) <- 1
-        FUN2 <- function(i, Ti, subject, scores) {
-          Ti %*% c(t(scores[subject == levels(subject)[i],]))
-        }
-
-        ## transform complete cases
-        subsSbj <- which(Ni == Nmax)
-        subsObs <- which(subject %in% levels(subject)[subsSbj])
-        subsObs <- subsObs[order(subject[subsObs])]
-        sTmp <- matrix(unlist(lapply(subsSbj, FUN2, Ti, subject, scores)),
-                       Nmax * length(subsSbj), ncol(scores), byrow = TRUE)
-        sT[subsObs,] <- sTmp
-        
-        ## repeatedly transform incomplete cases
-        if (verbose) cat("\n* data are unbalanced.",
-                         "Apply imputation algorithm with Nmax =", Nmax, "...")
-        subsSbj <- which(Ni < Nmax)
-        subsObs <- which(subject %in% levels(subject)[subsSbj])
-        subsObs <- subsObs[order(subject[subsObs])]        
-        subsAdd <- unlist(lapply(Ni, function(x) rep(c(0, 1), c(x, Nmax - x))))
-        subsAdd <-
-          which(subsAdd[rep(1:N, each = Nmax) %in% which(Ni < Nmax)] == 1)       
-        sTmp <- 0.0 * scores[subsObs, ]
-
-        control <- appendDefArgs(control, list(Rmax = 100L, abstol = sd(scores) / 100))
-        eps <- 2 * control$abstol
-        r <- 0
-        while (r < control$Rmax & eps > control$abstol) { 
-          r <- r + 1
-          sAdd <- olmm_addObsScores(x)
-          sR <- rbind(scores[subsObs,], -sAdd$score_obs)
-          sbj <- factor(c(subject[subsObs], sAdd$subject), levels(subject))
-          sR <- lapply(subsSbj, FUN2, Ti, sbj, sR)
-          sR <- matrix(unlist(sR), Nmax * length(subsSbj), ncol(sTmp), byrow = TRUE)
-          sR <- sR[-subsAdd,,drop = FALSE]
-          sR <- sTmp + sR
-          if (r > 1) eps <- max(abs(sR / r - sTmp / (r - 1)))
-          if (verbose && r > 1)
-            cat("\nnit = ", r,
-                "max|diff| =", format(eps, digits = 3, scientific = TRUE))
-          sTmp <- sR
-        }
-        if (eps <= control$abstol) {
-          if (verbose)
-            cat("\nalgorithm converged: nit =", r,
-                "max|diff| =", format(eps, digits = 3, scientific = TRUE), "\n")
         } else {
-          if (!silent) warning("imputation algorithm did not converge.")
+
+          sT <- 0.0 * scores
+
+          ## transform complete cases
+          subsSbj <- which(Ni == Nbal)
+          subsObs <- which(subject %in% levels(subject)[subsSbj])
+          subsOrd <- subsObs[order(subject[subsObs])]
+          sTmp <- matrix(c(t(scores[subsOrd,,drop=FALSE])), Nbal * k, length(subsSbj))
+          sTmp <- matrix(c(Ti %*% sTmp), length(subsObs), k, byrow = TRUE)
+          sT[rownames(sT)[subsOrd],] <- sTmp
+          
+          ## repeatedly transform incomplete cases
+          if (verbose) cat("\n* data are unbalanced.",
+                           "Apply imputation algorithm with Nbal =", Nbal, "...")
+          subsSbj <- which(Ni < Nbal)
+          subsObs <- which(subject %in% levels(subject)[subsSbj])
+          subsOrd <- subsObs[order(subject[subsObs])]
+          sTmp <- 0.0 * scores[subsObs, ]
+          subsAdd <- c(sapply(Ni[subsSbj], function(n) 1:Nbal > n))
+          control <-
+            appendDefArgs(control,
+                          list(Rmax = 100L,
+                               abstol = sd(scores[abs(scores) > 0]) / 100))
+          eps <- 2 * control$abstol
+          r <- 0L
+          while (r < control$Rmax & eps > control$abstol) { 
+            r <- r + 1L
+            sAdd <- olmm_addScores(x)
+            sR <- rbind(scores[subsObs,], -sAdd$score_obs[, terms, drop = FALSE])
+            if (r == 1L) # is always the same for a fixed data set
+              sbj <- factor(c(as.character(subject[subsObs]),
+                              as.character(sAdd$subject)),
+                            levels = levels(subject))
+            sR <- matrix(c(t(sR[order(sbj),,drop=FALSE])), Nbal*k,length(subsSbj))
+            sR <- matrix(c(Ti %*% sR), Nbal * length(subsSbj), k, byrow = TRUE)
+            sR <- sR[!subsAdd,,drop=FALSE]
+            sR <- sTmp + sR
+            if (r > 1) eps <- max(abs(sR / r - sTmp / (r - 1)))
+            if (verbose && r > 1)
+              cat("\nnit = ", r,
+                  "max|diff| =", format(eps, digits = 3, scientific = TRUE))
+            sTmp <- sR
+          }
+          if (eps <= control$abstol) {
+            if (verbose)
+              cat("\nalgorithm converged: nit =", r,
+                  "max|diff| =", format(eps, digits = 3, scientific = TRUE), "\n")
+          } else {
+            if (!silent) warning("imputation algorithm did not converge.")
+          }
+          sT[rownames(sT)[subsOrd],] <- (sTmp / r)
+          scores[] <- sT[]
+          ## add information about the completing data method
+          attr(scores, "conv.complete") <- as.integer(eps <= control$abstol)
+          attr(scores, "nit.complete") <- r
+          attr(scores, "eps.complete") <- eps
         }
-        sT[subsObs,] <- sTmp / r
-        scores <- sT
       }
       
+      ## add attributes about the transformation matrix
       attr(scores, "T") <- T
-    } else {
-      if (verbose) cat("OK")
+      attr(scores, "conv.T") <- attr(T, "conv")
+      attr(scores, "nit.T") <- attr(T, "nit")
+      attr(scores, "eps.T") <- attr(T, "eps")
+      
     }
+
+    if (!complete && any(!subset)) scores <- scores[subset,,drop=FALSE]
+    
   } else {
 
-    if (verbose) cat("* extracting subject scores ... ")
-    scores <- -x@score_sbj[, terms, drop = FALSE]
-    if (complete) {
-      if (verbose) cat("OK\n* correcting for unbalanced data ... ")
-      scores <- Ni / Nmax * scores # corrects for unbalanced data
-    }
+    scores <- apply(scores, 2, tapply, subject, sum)
+    
+    if (!silent && complete)
+      warning("handling unbalanced data for subject level scores has ",
+              "yet not been implemented.")
     if (verbose) cat("OK")
   }
 
+  ## append attributes
+  defAttr <- list(T = matrix(0,k,k), conv.T = 1L, nit.T = 0L,
+                  eps.T = 0.05, conv.complete = 1L, nit.complete = 0L,
+                  eps.complete = 0.0)
+  attributes(scores) <- appendDefArgs(attributes(scores), defAttr)
+  colnames(attr(scores, "T")) <- rownames(attr(scores, "T")) <- colnames(scores)
+  
   if (verbose) cat("\n* return negative scores\n")
   
   ## return scores
@@ -426,38 +498,40 @@ gefp.olmm <- function(object, scores = NULL,
   if (is.null(scores)) {
     estfunArgs <-
       appendDefArgs(list(...),
-                    list(prewhite = TRUE, complete = TRUE))
+                    list(silent = silent, force = force,
+                         prewhite = TRUE, complete = TRUE))
     estfunArgs$x <- object
     scores <- try(do.call("estfun.olmm", estfunArgs))
   } else if (is.function(scores)) {    
     scores <- scores(object)
-  } 
+  }
+    
   if (!is.matrix(scores)) stop("extracting the score function failed.")
 
-  ## check arguments
-  if (is.null(order.by)) order.by <- 1:nrow(scores)
-  if (length(order.by) != nrow(scores))
-    stop("the length of 'order.by' should be equal the number of rows of ",
-         " the score function.")
+  ## set 'order.by'
+  if (is.null(order.by)) order.by <- 1:object@dims["n"]
   if (is.factor(order.by)) order.by <- droplevels(order.by)
+  
+  ## set subset
+  if (!is.null(subset)) {
+    if (is.character(subset)) subset <- rownames(scores) %in% subset
+    if (is.numeric(subset)) subset <- (1:object@dims["n"]) %in% subset
+  } else {
+    subset <- rep(TRUE, object@dims["n"])
+  }
+  subsScores <- rownames(object@score_obs) %in% rownames(scores)
 
+  ## create process
+  process <- scores[subset[subsScores], ]
+  cn <- colnames(process) 
+  order.by <- order.by[subset & subsScores]
+  
   ## get dimensions
   n <- nrow(scores)
   k <- ncol(scores)
-  eps <- object@output$info[["maxgradient"]]
-  
-  ## create process
-  process <- scores
-  cn <- colnames(process)
-
-  ## extract subset 
-  if (!is.null(subset)) {
-    process <- process[subset, , drop = FALSE]
-    order.by <- order.by[subset]
-  }
   
   ## if necessary, subtract the column means
-  if (center & max(abs(cMeans <- colMeans(process))) > eps)
+  if (center & max(abs(cMeans <- colMeans(process))) > 1e-6)
     process <- process - matrix(cMeans, nrow(process), ncol(process), byrow = TRUE)
   
   ## scale scores by the number of observations
@@ -503,6 +577,7 @@ gefp.olmm <- function(object, scores = NULL,
                lim.process = "Brownian bridge",
                type.name = "M-fluctuation test",
                order.name = deparse(substitute(order.by)),
+               subset <- rownames(object@score_obs)[subset & subsScores],
                J12 = NULL)
   class(rval) <- "gefp"
   return(rval)

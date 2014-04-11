@@ -22,7 +22,7 @@
 \usage{
 \method{coef}{tvcolmm}(object, ...)
 
-\method{extract}{tvcolmm}(object, what = c("control", "fluctest",
+\method{extract}{tvcolmm}(object, what = c("control", "sctest",
               "model", "selected", "p.value"), ids = nodeids(object), ...)
 
 \method{fitted}{tvcolmm}(object, ...)

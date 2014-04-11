@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-03-19
+## Date:            2014-01-03
 ##
 ## Description:
 ## Workhorse functions for the 'tvcolmm' function
@@ -10,7 +10,7 @@
 ##
 ## tvcolmm_fit_model:       Fit the current model
 ## tvcolmm_refit_model:     Refit model
-## tvcolmm_fit_fluctest:    Run coefficient constancy tests
+## tvcolmm_fit_sctest:    Run coefficient constancy tests
 ## tvcolmm_fit_splitnode:   Split in variable x.
 ## tvcolmm_formula:         Extract separate formulas for
 ##                          model and partitioning from
@@ -40,6 +40,7 @@
 ## tvcolmm_prune_nselect:
 ##
 ## Last modifications:
+## 2014-04-01:   rename 'fluctest' to 'sctest'
 ## 2013-12-02:   remove 'tvcolmm_fit_setupnode'
 ## 2013-11-01:   modify 'restricted' and 'terms' correctly in
 ##               'tvcolmm_modify_modargs'
@@ -109,8 +110,8 @@ tvcolmm_refit_model <- function(object, args) {
   return(object)
 }
 
-tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
-                                 formula, args) {
+tvcolmm_fit_sctest <- function(model, nodes, partvar, control,
+                               formula, args) {
 
   subject <- model@subject
   Part <- model@frame$Part
@@ -143,22 +144,25 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
                             function(node) info_node(node)$depth))
 
   ## extract transformed scores
-  scores <- estfun.olmm(x = model, level = "observation",
-                        prewhite = TRUE, prewhite.fail = "ignore",
-                        complete = TRUE, nuisance = control$nuisance,
-                        silent = TRUE)
+  estfunArgs <-
+    appendDefArgs(control$estfun,
+                  list(prewhite = TRUE,
+                       complete = TRUE,
+                       nuisance = control$nuisance,
+                       verbose = FALSE, silent = TRUE))
+  estfunArgs$x <- model; estfunArgs$level <- "observation"; # overwrite
+  scores <- do.call("estfun.olmm", estfunArgs)
   
   ## hack^1: if intercept = "po" fit a second model with the second level of
   ## 'Part' as reference level
   if (nlevels(args$data$Part) > 1L && control$intercept == "po") {
     args$contrasts$Part <- contr.treatment(levels(args$data$Part), base = 2)  
     model2 <- tvcolmm_fit_model(formula, args, control, FALSE)
-    scores2 <- estfun.olmm(x = model2, level = "observation",
-                           prewhite = TRUE, prewhite.fail = "ignore",
-                           complete = TRUE, nuisance = control$nuisance,
-                           silent = TRUE)
+    estfunArgs$x <- model2
+    scores2 <- do.call("estfun.olmm", estfunArgs)
   }
 
+  gefpArgs <- appendDefArgs(control$gefp, list(center = TRUE, silent = TRUE))
   
   ## apply test for each variable and partition separately  
   for (i in 1:ncol(partvar)) {    
@@ -189,9 +193,10 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
   
 
         ## run the tests
-        gefp <- try(gefp.olmm(object = m, scores = s,
-                              order.by = z, terms = cols, subset = rows,
-                              center = TRUE, silent = TRUE), silent = TRUE)
+        gefpArgs$object <- m; gefpArgs$scores <- s;
+        gefpArgs$order.by <- z; gefpArgs$terms <- cols; gefpArgs$subset <- rows
+        gefp <- try(do.call("gefp.olmm", gefpArgs), TRUE)
+                                    
         if (!inherits(gefp, "try-error")) {
 
           ## parameters for categorical variables
@@ -243,10 +248,22 @@ tvcolmm_fit_fluctest <- function(model, nodes, partvar, control,
 
   ## print results
   if (control$verbose) {
-    cat("\nFluctuation tests (p-value):\n")
+
+    ## results
+    cat("\nCoefficient constancy tests (p-value):\n")
     print(data.frame(rbind(
                        functional = functional,
                        format(rval$p.value, digits = 2))))
+
+    ## add notes if necessary
+    if (attr(scores, "conv.T") == 0L)
+      cat("\nNote: Computation of transformation matrix failed.",
+          "\nTests are based on raw scores and may be inaccurate.\n")
+
+    if (attr(scores, "conv.complete") == 0L)
+      cat("\nNote: Imputation method for complete data failed.",
+          "\nThe p-values may be different in a replication.\n")
+    
   }
   return(rval)
 }
@@ -277,7 +294,8 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
     subscripts <- Part == levels(Part)[pid]
     x <- partvar[, vid]
     if (is.numeric(x)) {
-      sx <- sort(x[subscripts])              
+      sx <- sort(x[subscripts])
+      if (length(sx) < control$minsplit) return(matrix(,0,1))
       sx <- sx[control$minsplit:(length(sx) - control$minsplit)]
       sx <- unique(sx)
       if ((length(sx) - 1)  > control$maxevalsplit) {
@@ -407,7 +425,7 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   newnodes[[subs]]$split <-
     partysplit(varid = vid, breaks = breaks, index = index,
                info = list(ordered = ordered,
-                 fluctest = test,
+                 sctest = test,
                  statistic = stat,
                  splits = splits))
   newnodes[[subs]]$kids <- pidLab + 1L:2L
@@ -426,8 +444,16 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   
   ## print split
   if (control$verbose) {
+
+    if (!control$sctest) {
+      cat("\n\nSplitting variable:", colnames(partvar)[vid])
+      cat("\nPartition:", levels(args$data$Part)[pid])
+      cat("\nSelection statistic = ", stat)
+    } else {
+      cat("\n")
+    }
     
-    cat("\n\nSplit = ")
+    cat("\nSplit = ")
     cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = partvar)$levels, collapse = "}, {"), "}\n", sep = ""))
   }
   
@@ -679,9 +705,10 @@ tvcolmm_modify_control <- function(model, control) {
   control$terms$tree <- c(termsFixefEtaVar, termsFixefEtaInv)  
   control$restricted <- c(setdiff(unique(sub("Eta[1-9]+:", "", restFixefEtaVar)), "(Intercept)"), restFixefEtaInv)
 
-  control$nuisance <-
-    c(control$restricted,
-      names(model@coefficients)[(model@dims["p"] + 1):model@dims["nPar"]])
+  if (model@dims["hasRanef"] > 0)
+    control$nuisance <-
+      c(control$restricted,
+        names(model@coefficients)[(model@dims["p"] + 1):model@dims["nPar"]])
   
   if (length(control$terms$root) * length(control$terms$tree) == 0)
     stop("no 'terms' found.")
@@ -996,7 +1023,7 @@ tvcolmm_prune_depth <- function(node, d, depth) {
       node$kids <- NULL
       node$surrogates <- NULL
       node$info$terminal <- TRUE
-      node$info$fluctest <- node$split$info$fluctest
+      node$info$sctest <- node$split$info$sctest
       node$split <- NULL
     }
   }
@@ -1017,7 +1044,7 @@ tvcolmm_prune_minsplit <- function(node, minsplit) {
       node$kids <- NULL
       node$surrogates <- NULL
       node$info$terminal <- TRUE
-      node$info$fluctest <- node$split$info$fluctest
+      node$info$sctest <- node$split$info$sctest
       node$split <- NULL
     }
   }

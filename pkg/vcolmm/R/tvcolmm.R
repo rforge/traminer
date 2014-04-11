@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:      Reto Buergin
 ## E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:        2014-03-17
+## Date:        2014-04-07
 ##
 ## Description:
 ## The tvcolmm function
@@ -24,7 +24,8 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   mc <- match.call(expand.dots = FALSE)
   stopifnot(inherits(formula, "formula"))
   stopifnot(inherits(control, "tvcolmm_control"))
-  if (any(all.vars(formula) == "Part")) stop("'Part' is a reserved keyword and cannot be used for variable names")
+  if (any(all.vars(formula) == "Part"))
+    stop("'Part' is a reserved keyword and cannot be used for variable names")
   
   ## set restricted parameters
   control$restricted <- linear 
@@ -134,10 +135,10 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
       ## Step 2: variable selection via coefficient constancy tests
       ## --------------------------------------------------- #
 
-      if (control$fluctest) {
+      if (control$sctest) { # you can set this to false
         
-        test <- tvcolmm_fit_fluctest(model, nodes, partvar, control,
-                                     ff, args)
+        test <- tvcolmm_fit_sctest(model, nodes, partvar, control,
+                                   ff, args)
         
         ## return error if test failed
         if (inherits(test, "try-error"))
@@ -147,7 +148,8 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
 
         if (run) {
 
-          pval <-  apply(test$p.value, 2, function(x) suppressWarnings(min(x, na.rm = TRUE)))
+          pval <-  apply(test$p.value, 2,
+                         function(x) suppressWarnings(min(x, na.rm = TRUE)))
           varid <- which.min(pval)
           partid <- which.min(test$p.value[, varid])
         
@@ -182,13 +184,13 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
         
         } else {
 
-          ## add fluctest in the info slot of each terminal node
+          ## add sctest in the info slot of each terminal node
           ids <- nodeids(nodes, terminal = TRUE)
           nodes <- as.list(nodes)
           for (i in 1:length(nodes)) {
             if (nodes[[i]]$id %in% ids) {
               nodes[[i]]$info$step <- step
-              nodes[[i]]$info$fluctest <- test
+              nodes[[i]]$info$sctest <- test
             }
           }
           nodes <- as.partynode(nodes)
@@ -244,7 +246,7 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
                     linear = control$restricted,
                     control = control,
                     model = model,
-                    fluctest = test,
+                    sctest = test,
                     dotargs = list(...)))
 
   class(tree) <- c("tvcolmm", "party")
@@ -286,7 +288,7 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
                  functional.factor = "LMuo",
                  functional.ordered = "LMuo",
                  functional.numeric = "supLM",
-                 fluctest = TRUE,
+                 sctest = TRUE,
                  fast = 0L,
                  verbose = verbose))
   

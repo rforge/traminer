@@ -89,8 +89,14 @@ olmm <- function(formula, data, weights, start, subset, na.action,
   if (missing(formula)) stop("model requires a formula")
 
   ## contrasts
-  if (missing(contrasts)) contrasts <- NULL
-
+  con <- lapply(1:ncol(data), function(i) attr(data[, i], "contrasts"))
+  names(con) <- colnames(data)
+  con <- con[which(!unlist(lapply(con, is.null)))]
+  if (missing(contrasts)) {
+    contrasts <- NULL
+  }
+  contrasts <- appendDefArgs(contrasts, con)
+  
   ## number of Gauss-Hermite quadrature points
   if (nGHQ != as.integer(round(nGHQ)))
     warning(paste("'nGHQ' has been set to ", nGHQ, ".", sep = ""))

@@ -84,12 +84,12 @@ data(tvcolmm_2)
 
 folds <- tvcolmm_folds(tvcolmm_2$id, type = "subsampling", K = 2)
 
-forest <- fvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3 + z4,
-                  data = tvcolmm_2,
-                  control = tvcolmm_control(mtry = 2,
-                    minsplit = 100, maxevalsplit = 5,
-                    verbose = TRUE),
-                  folds = folds)
+f1 <- fvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3 + z4,
+              data = tvcolmm_1,
+              control = tvcolmm_control(mtry = 2,
+                minsplit = 100, maxevalsplit = 5,
+                verbose = TRUE, sctest = FALSE),
+              folds = folds)
 
 }
 }

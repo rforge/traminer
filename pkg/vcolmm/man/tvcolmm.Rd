@@ -128,7 +128,7 @@ tvcolmm(formula, data, control = tvcolmm_control(),
 ## Example 1: (Structured) heterogeneous treatment effect
 ##
 ## Fitting a varying coefficient olmm on synthetic ordinal longitudinal
-## data 'tvcolmm_2' including 500 individuals or 2500 observations. Only
+## data 'tvcolmm_1' including 500 individuals or 2500 observations. Only
 ## the effect 'treat' id treated as varying effect regarding  'z1', 'z2'
 ## and 'z3'. The model is
 ##
@@ -140,46 +140,61 @@ tvcolmm(formula, data, control = tvcolmm_control(),
 ## ------------------------------------------------------------------- #
 
 ## load the data
-data(tvcolmm_2)
+data(tvcolmm_1)
 
 ## fit the model
 
-model.1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_2,
-                   control = tvcolmm_control(verbose = TRUE,
-                     minsplit = 30L), vi = "po", linear = "time")
+m1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_1,
+              control = tvcolmm_control(verbose = TRUE,
+                minsplit = 30L), vi = "po", linear = "time")
 
 ## print the results
-print(mod1)
+print(m1)
 
 ## ------------------------------------------------------------------- # 
 ## Example 2: Empirical example
+##
+## The algorithm is used to find out whether if 'week' influences the
+## coefficient of 'treat' and if 'week' has a direct impact on the
+## responses.
 ## ------------------------------------------------------------------- #
 
 data(schizo)
 
-model.2 <- tvcolmm(imps79o ~ tx + (1|id) | week,
-                   data = schizo,
-                   control = tvcolmm_control(verbose = TRUE))
+## we have to delete the time points which are rare because the
+## algorithm for handling unbalancedness works only if there are
+## enough complete cases
+
+schizo <- schizo[!schizo$week %in% c(2, 4, 5), ] 
+
+m2 <- tvcolmm(imps79o ~ tx + (1|id) | week,
+              data = schizo,
+              control = tvcolmm_control(verbose = TRUE,
+                estfun = list(control = list(maxit = 1000), verbose = TRUE)),
+              vi = "npo")
+
+print(m2)
+
+## the convergence is really slow. The method works better with large N
 
 ## ------------------------------------------------------------------- #
 ## Example 3: Piecewise constant growth
 ##
 ## Fitting a varying coefficient olmm on synthetic ordinal longitudinal
-## data 'tvcolmm_1' including 300 individuals or 2700 observations. The
+## data 'tvcolmm_2' including 300 individuals or 2700 observations. The
 ## generating model is a cumulative random intercept model with 
 ## 'structual breaks' at t = 3.5 and t = 6.5.
 ## ------------------------------------------------------------------- #
 
 ## load the data
-data(tvcolmm_1)
+data(tvcolmm_2)
 
 ## fit the model
-model.3 <- tvcolmm(formula = y ~ (1|id) | time,
-                   data = tvcolmm_1, vi = "npo",
-                   control = tvcolmm_control(verbose = TRUE)) 
-
+m3 <- tvcolmm(formula = y ~ (1|id) | time,
+              data = tvcolmm_2, vi = "npo",
+              control = tvcolmm_control(verbose = TRUE))
 ## print the results
-print(mod3)
+print(m3)
 }
 }
 
