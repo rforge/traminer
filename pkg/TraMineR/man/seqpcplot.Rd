@@ -253,7 +253,7 @@ seqpcplot(seqdata = biofam.seqe,
                           value = "(Parent)-(Left)"),
           alphabet = lab, order.align = "first")
 
-## color sequences over 5% (within group) (function method)
+## color sequences over 10% (within group) (function method)
 seqpcplot(seqdata = biofam.seqe,
           filter = list(type = "function",
                           value = "minfreq",
