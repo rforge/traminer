@@ -105,7 +105,7 @@ cv.tvcolmm <- function(object, folds = tvcolmm_folds(object),
   
   ## get data of 'object'
   data <- model.frame(object)
-  weights <- weights(extract(object, "model"))
+  weights <- weights(object)
   partvar <- colnames(object$data)
   modelvar <- colnames(model.frame(extract(object, "model")))
   subjectName <- extract(object, "model")@subjectName
@@ -143,8 +143,11 @@ cv.tvcolmm <- function(object, folds = tvcolmm_folds(object),
   ## process cross-validation
   nfails <- 0L
   for (i in 1:K) {
-    
-    if (verbose) cat("\n* evaluating fold", i, "")
+
+    if (verbose) {
+      if (i > 1L) cat("\n")
+      cat("* evaluating fold", i, "")
+    }
     
     ## re-fit the tree with training sample (in-bag)
     ibSubs <- folds[, i]
@@ -166,11 +169,12 @@ cv.tvcolmm <- function(object, folds = tvcolmm_folds(object),
       if (type %in% c("loss", "stabpath")) {
 
           if (fixed) {
-              alpha <- control$alpha
+            nsteps <- 1
+            alpha <- control$alpha
           } else {
-              alpha <-
-                  c(0, if (depth(ibTree) > 0)
-                    sort(extract(ibTree, "pval", nodes)))
+            nsteps <- ibTree$info$nsteps
+            alpha <- c(0, extract(ibTree, "p.value", steps = 1:nsteps))
+            alpha <- alpha[1:nsteps]
           }
           cv[[i]] <- vector(mode = "list", length = 2)   
           cv[[i]][[1]] <- alpha
@@ -194,9 +198,9 @@ cv.tvcolmm <- function(object, folds = tvcolmm_folds(object),
     }
 
     if (length(alpha) > 0) {
-      for (j in 1:length(alpha)) {
-        
-        ibTree <- try(prune(ibTree, alpha = rev(alpha)[j]))
+      for (j in 1:nsteps) {
+
+        if (!fixed) ibTree <- try(prune(ibTree, step = rev(1:nsteps)[j] - 1))
         
         if (inherits(ibTree, "try-error")) {
           
@@ -208,13 +212,13 @@ cv.tvcolmm <- function(object, folds = tvcolmm_folds(object),
         } else if (type == "loss") {        
           
           pred <- predict(ibTree, newdata = data[oobSubs, ,drop = FALSE])
-          cv[[i]][[2]][, length(alpha) - j + 1L] <-
+          cv[[i]][[2]][, nsteps - j + 1L] <-
             sum(-log(pred[yMat[oobSubs,] > 0]))
           
         } else if (type == "stabpath") {
           
           ## get selected variables in current tree
-          cv[[i]][[2]][, length(alpha) - j + 1L] <- as.integer(partvar %in% extract(ibTree, "selected"))
+          cv[[i]][[2]][, nsteps - j + 1L] <- as.integer(partvar %in% extract(ibTree, "selected"))
           
         }
         
@@ -235,16 +239,16 @@ cv.tvcolmm <- function(object, folds = tvcolmm_folds(object),
     getVals <- function(x, grid) {
       rval <- matrix(0, nrow(x[[2L]]), length(grid))
       for (i in 1:length(grid)) {
-        subs <- max(which(x[[1]] <= grid[i]))
-        rval[, i] <- x[[2L]][,subs]
+        subs <- which(x[[1]] <= grid[i])
+        if (length(subs) > 0) subs <- max(subs)
+        if (length(subs) > 0) rval[, i] <- x[[2L]][,subs]
       }
       return(rval)
     }
   
     ## compute results
     
-    grid <-
-        sort(unique(c(unlist(lapply(cv, function(x) x[[1]])), alpha.max)))
+    grid <- c(sort(unique(unlist(lapply(cv, function(x) x[[1]])))), alpha.max)
     rval <- list(alpha = grid)
     
     if (type == "loss") {
@@ -378,15 +382,9 @@ stabpath.tvcolmm <- function(object, q = 2L, ...) {
 print.stabpath.tvcolmm <- function(x, ...) {
 
   cat("\tStability Path\n")
-  if (length(x$selected) > 0) {
-    cat("\nSelected partitioning variables:\n")
-    print(x$selected)
-  } else {
-    cat("\nNo variables selected\n")
-  }
   cat("\nSelection probabilities:\n")
   print(x$max[x$max > 0])
-  cat("q: ", x$q, "\n\n")
+  cat("\nq: ", x$q, "\n\n")
   return(invisible(x))
 }
 

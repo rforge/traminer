@@ -1,6 +1,6 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2014-03-31
+## Date:            2014-04-14
 ##
 ## Description:
 ## methods for olmm objects.
@@ -235,7 +235,7 @@ drop1.olmm <- function(object, scope, scale = 0, test = c("none", "Chisq"),
 }
 
 estfun.olmm <- function(x, level = c("observation", "subject"),
-                        prewhite = FALSE, complete = prewhite,
+                        predecor = FALSE, complete = predecor,
                         Nbal = NULL, subset = NULL,
                         nuisance = NULL, control = list(),
                         verbose = FALSE, silent = FALSE, ...) {
@@ -306,7 +306,7 @@ estfun.olmm <- function(x, level = c("observation", "subject"),
   
   ## checks
   if (x@dims["hasRanef"] == 0L) {
-    prewhite <- FALSE
+    predecor <- FALSE
     complete <- FALSE
   }
   
@@ -324,7 +324,7 @@ estfun.olmm <- function(x, level = c("observation", "subject"),
     n <- nrow(scores)
     k <- ncol(scores)
     
-    if (prewhite) {
+    if (predecor) {
         
       ## compute transformation matrix
       if (verbose) cat("\n* compute transformation matrix ...")
@@ -350,10 +350,10 @@ estfun.olmm <- function(x, level = c("observation", "subject"),
           subsAdd <- c(sapply(Ni, function(n) 1:Nbal > n))
           sT <- rbind(scores, matrix(0, length(sbj) - length(subject), k))
           subsOrd <- order(sbj)
-          sTmp <- matrix(c(t(sT[order(sbj),,drop=FALSE])), Nbal * k, nlevels(subject))
+          sTmp <- matrix(c(t(sT[subsOrd,,drop=FALSE])), Nbal * k, nlevels(subject))
           sTmp <- matrix(c(Ti %*% sTmp), nrow(sT), k, byrow = TRUE)
           sTmp <- sTmp[!subsAdd,,drop=FALSE]        
-          scores[rownames(scores)[order(order(subject))],] <- sTmp
+          scores[rownames(scores)[order(subject)],] <- sTmp
           if (verbose) cat("OK")
           
         } else {
@@ -499,7 +499,7 @@ gefp.olmm <- function(object, scores = NULL,
     estfunArgs <-
       appendDefArgs(list(...),
                     list(silent = silent, force = force,
-                         prewhite = TRUE, complete = TRUE))
+                         predecor = TRUE, complete = TRUE))
     estfunArgs$x <- object
     scores <- try(do.call("estfun.olmm", estfunArgs))
   } else if (is.function(scores)) {    

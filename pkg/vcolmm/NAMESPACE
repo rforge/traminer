@@ -37,8 +37,9 @@ exportClasses(olmm)
 
 ## Exports
 export(
-  fvcolmm, # new
   cv.tvcolmm, # new
+  fvcolmm, # new
+  fvcolmm_control, # new
   estfun.olmm,
   extract,
   fixef,
@@ -50,6 +51,7 @@ export(
   prune,
   ranef,
   ranefCov, # new
+  splitpath, # new
   tvcolmm_control, # new
   tvcolmm_folds, # new
   tvcolmm, # new
@@ -112,6 +114,8 @@ S3method(prune, tvcolmm)
 S3method(ranef, tvcolmm)
 S3method(resid, tvcolmm)
 S3method(residuals, tvcolmm)
+S3method(splitpath, tvcolmm)
+S3method(print, splitpath.tvcolmm)
 S3method(weights, tvcolmm)
 
 ## Exports for fvcolmm (S3)

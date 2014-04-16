@@ -10,7 +10,7 @@
 }
 
 \usage{
-\method{plot}{tvcolmm}(x, type = c("default", "coef", "sctest",
+\method{plot}{tvcolmm}(x, type = c("default", "coef", 
         "simple", "terms"),
      main = NULL, drop_terminal = TRUE,
      tnex = 1, newpage = TRUE,
@@ -23,7 +23,7 @@
 \arguments{
   \item{x}{An object of class \code{\link{tvcolmm}}.}
   \item{type}{the type of the plot. Available types are
-    \code{"default"}, \code{"sctest"}, \code{"simple"} and
+    \code{"default"} \code{"simple"} and
     \code{"terms"}.}  
   \item{main}{character. A main title for the plot.}
   \item{drop_terminal}{a logical indicating whether all terminal nodes

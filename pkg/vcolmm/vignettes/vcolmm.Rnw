@@ -23,10 +23,11 @@ options(useFancyQuotes = FALSE)
 
 %% abstract
 \Abstract{
-  The \pkg{vcolmm} package provides with \code{olmm()} a fitting
-  function for 2-level Ordinal Linear Mixed Models (OLMM) and an
-  algorithm, \code{tvcolmm()}, that incorporate varying coefficients
-  in OLMMs. This document is a guideline for the use of these functions. 
+  The \pkg{vcolmm} package aims at learning varying fixed coefficients
+  in ordinal 2-stage linear mixed models (OLMM) based on model-based
+  recursive partitioning. The package includes a fitting function for
+  OLMMs and a partitioning algorithm for varying fixed effects in
+  OLMMs. This document is a guideline for the use of these functions. 
 }
   
 \Address{
@@ -46,6 +47,127 @@ options(useFancyQuotes = FALSE)
 %\VignetteKeywords{recursive partitioning}
 %\VignettePackage{vcolmm}
 
-Nothing here.
+<<echo = FALSE>>=
+run <- FALSE
+@ 
+
+<<>>=
+library(vcolmm)
+@ 
+
+<<echo = FALSE>>=
+load("m1.RData")
+@ 
+
+\section{Growing a tree}
+
+<<echo = FALSE>>=
+if (run) {
+  data(tvcolmm_1)
+  m1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3, 
+                tvcolmm_1, vi = "po", linear = "time", 
+                control = tvcolmm_control(verbose = TRUE, maxevalsplit = 3L))
+  save(m1, file = "m1.RData")
+}
+@ 
+
+
+<<eval = FALSE>>=
+data(tvcolmm_1)
+m1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z4, 
+              tvcolmm_1, vi = "po", linear = "time")
+@ 
+
+\section{Analyze a fitted model}
+
+\subsection{Print methods}
+
+\footnotesize
+<<>>=
+print(m1, digits = 2)
+@ 
+\normalsize
+
+<<eval = FALSE>>=
+splitpath(m1)
+@ 
+
+\subsection{Plot methods}
+
+<<eval = FALSE>>=
+plot(m1, conf.int = TRUE, mean = TRUE, dims = "n")
+@ 
+
+\begin{figure}[htbp]
+  \centering
+<<fig = TRUE, echo = FALSE>>=
+plot(m1, conf.int = TRUE, mean = TRUE,
+     dims = "n",
+     conf.int_gp = list(length = unit(1.5, "mm")),
+     margins = c(1,1,0,0))
+@ 
+\end{figure}
+
+\subsection{Pruning}
+
+<<echo = TRUE, eval = FALSE>>=
+m1.prune <- prune(m1, alpha = 1e-20)
+m1.prune <- prune(m1, minsplit = 1000) 
+m1.prune <- prune(m1, nselect = 0)
+m1.prune <- prune(m1, depth = 0)
+m1.prune <- prune(m1, width = 1)
+m1.prune <- prune(m1, step = 2)
+
+m1.prune <- prune(m1, minbucket = 791)
+plot(m1.prune)
+m1.prune <- prune(m1, nselect = 0)
+
+@ 
+
+
+\subsection{Cross-validation}
+
+<<eval = FALSE>>=
+
+logLik(m1)
+logLik(m1, cv = TRUE, verbose = TRUE)
+
+sb <- stabpath.tvcolmm(m1, alpha.max = 0.1, folds = tvcolmm_folds(m1, K = 30), verbose = TRUE)
+
+extract(ibTree, "p.value")
+ warnings()
+
+@ 
+
+\section{Random forests}
+ 
+
+<<echo = FALSE, eval = FALSE>>=
+if (run) {
+  data(tvcolmm_1)
+  folds <- tvcolmm_folds(tvcolmm_1$id, K = 15, type = "subsampling")
+  f1 <- fvcolmm(formula = y ~ time + treat + (1|id) | z1 + z2 + z3 + z4 + z5 + z6, 
+                data = tvcolmm_1, vi = "po", linear = "time", 
+                control = fvcolmm_control(verbose = TRUE, 
+                  mtry = 2, maxwidth = 3),
+                folds = folds)
+  save(f1, file = "f1.RData")
+} else {
+  load("f1.RData")
+}
+@ 
+
+<<echo = TRUE, eval = FALSE>>=
+data(tvcolmm_1)
+folds <- tvcolmm_folds(tvcolmm_1$id, K = 5, type = "subsampling")
+f1 <- fvcolmm(formula = y ~ time + treat + (1|id) | z1 + z2 + z3 + z4 + z5 + z6, 
+              data = tvcolmm_1, vi = "po", linear = "time", 
+              control = fvcolmm_control(verbose = TRUE, 
+                mtry = 2, maxwidth = 3), 
+              folds = folds)
+@
+
+\subsection{Diagnosis}
+
 
 \end{document}

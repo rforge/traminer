@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:      Reto Buergin
 ## E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:        2014-04-07
+## Date:        2014-04-15
 ##
 ## Description:
 ## The tvcolmm function
@@ -102,12 +102,18 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
   
   args$data$Part <- factor(rep(1L, nrow(args$data)))
 
+  splitpath <- list()
+  
   run <- TRUE
   step <- 0L
   
   while (run) {
 
       step <- step + 1L
+
+      test <- NULL
+      split <- NULL
+      
       if (control$verbose) cat("\n* starting step", step, "...")
       
       ## get current partitions
@@ -130,41 +136,33 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
       ## return error if fitting failed
       if (inherits(model, "try-error"))
         stop("model fitting failed.")
+      
+      if (width(nodes) == control$maxwidth |
+          length(unique(sapply(splitpath, function(x) x$varid))) == control$nselect |
+          control$maxdepth == 0L) {
+        run <- FALSE
+      }
+      if (run && control$sctest) { # you can set this to false
 
-      ## --------------------------------------------------- #
-      ## Step 2: variable selection via coefficient constancy tests
-      ## --------------------------------------------------- #
-
-      if (control$sctest) { # you can set this to false
+        ## --------------------------------------------------- #
+        ## Step 2: variable selection via coefficient constancy tests
+        ## --------------------------------------------------- #
         
-        test <- tvcolmm_fit_sctest(model, nodes, partvar, control,
-                                   ff, args)
+        test <- tvcolmm_fit_sctest(model, nodes, partvar, control, ff, args)
         
         ## return error if test failed
         if (inherits(test, "try-error"))
-          stop("coefficient constancy tests failed.")
-      
-        run <- suppressWarnings(min(test$p.value, na.rm = TRUE)) <= control$alpha
-
+          stop("coefficient constancy tests failed. Abort")
+        
+        run <- min(c(1, test$p.value), na.rm = TRUE) <= control$alpha
+          
         if (run) {
-
+          
           pval <-  apply(test$p.value, 2,
                          function(x) suppressWarnings(min(x, na.rm = TRUE)))
-          varid <- which.min(pval)
-          partid <- which.min(test$p.value[, varid])
-        
-          if (control$verbose) {
-
-            cat("\nSplitting variable:", colnames(partvar)[varid])
-            cat("\nPartition:", levels(args$data$Part)[partid])
-            cat("\nSelection statistic (p-value) = ")
-            cat(format(pval[varid], digits = 3))
-          }
-          
-        }
-      } else {
-
-        test <- NULL
+          varid <- if (length(pval) > 0) which.min(pval) else NULL
+          partid <- if (length(pval) > 0) which.min(test$p.value[, varid]) else NULL
+        } 
       }
       
       
@@ -174,42 +172,40 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
         ## Step 3: search a cutpoint
         ## ------------------------------------------------- #
         
-        newnodes <- tvcolmm_fit_splitnode(varid, partid,
-                                          partvar, nodes,
-                                          model, ff, args, test,
-                                          control, step)
-          
-        if (is.partynode(newnodes)) {
-          nodes <- newnodes
+        split <- tvcolmm_fit_loss(varid, partid, partvar, nodes,
+                                  model, ff, args, control, step)
         
-        } else {
-
-          ## add sctest in the info slot of each terminal node
-          ids <- nodeids(nodes, terminal = TRUE)
-          nodes <- as.list(nodes)
-          for (i in 1:length(nodes)) {
-            if (nodes[[i]]$id %in% ids) {
-              nodes[[i]]$info$step <- step
-              nodes[[i]]$info$sctest <- test
-            }
-          }
-          nodes <- as.partynode(nodes)
-
-          ## set stop flag
+        if (!any(na.omit(unlist(lapply(split$lossgrid, lapply, function(x) c(Inf, x[, ncol(x)])))) < Inf))
           run <- FALSE
+      }
+      
+      
+      if (run)
+        nodes <- tvcolmm_fit_splitnode(nodes, model, split, partvar, step)
+      
+      splitpath[[step]] <- list(
+                             varid = split$varid,
+                             partid = split$partid,
+                             cutid = split$cutid,
+                             sctest = test,
+                             lossgrid = split$lossgrid)
+      
+      ## print the actions
+      if (control$verbose) {
+        if (run) {
+          ids <- nodeids(nodes)
+          cat("\n\nSplitting variable:", names(partvar)[split$varid])
+          cat("\nPartition:", ids[split$varid])
+          cat("\nCutpoint:\n\n")
+          print(split$lossgrid[[split$varid]][[split$partid]][split$cutid,,drop=0])
+        } else {
+          cat("\nNo admissible split found. Return object.\n")
         }
       }
-
-      ## check width of tree
-      if (width(nodes) > control$maxwidth) {
-        if (control$verbose)
-          cat("\nMaximal width reached. Return object.\n")
-        run <- FALSE
-      }
     }
-
+  
   ## if 'intercept == "po"', refit the model with appropriate contrasts
-  if (nlevels(args$data$Part) > 0 && control$intercept == "po") {
+  if (nlevels(args$data$Part) > 1L && control$intercept == "po") {
     con <- contr.sum(levels(args$data$Part))
     tab <- tapply(args$weights, args$data$Part, sum)
     con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
@@ -217,18 +213,20 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
     args$contrasts$Part <- con
     model <- tvcolmm_fit_model(ff, args, control, FALSE)
   }
-
+  
   if (control$verbose) {
     cat("\nFitted model:\n")
     print(model)
   }
-
+  
   if (control$verbose) cat("\n* building object ...")
-
   
   ## prepare the title
   title <- c("Ordinal linear mixed model with varying effects")
   control$terms <- control$terms$original
+  
+  ## modify splitpath    
+  splitpath <- tvcolmm_modify_splitpath(splitpath, nodes, partvar, control)
   
   ## the output object
   tree <- party(nodes, data = partvar,
@@ -239,16 +237,17 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
                   check.names = FALSE),
                 terms = terms(as.Formula(formula), keep.order = TRUE),
                 info = list(
-                    title = title,
-                    call = mc,
-                    formula = ff,
-                    vi = control$intercept,
-                    linear = control$restricted,
-                    control = control,
-                    model = model,
-                    sctest = test,
-                    dotargs = list(...)))
-
+                  title = title,
+                  call = mc,
+                  formula = ff,
+                  vi = control$intercept,
+                  linear = control$restricted,
+                  control = control,
+                  model = model,
+                  nsteps = step,
+                  splitpath = splitpath,
+                  dotargs = list(...)))
+      
   class(tree) <- c("tvcolmm", "party")
 
   if (control$verbose)
@@ -258,39 +257,45 @@ tvcolmm <- function(formula, data, control = tvcolmm_control(),
 }
 
 tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
-                            minsplit = 50L, trim = 0.1,
-                            lossfun = neglogLik, breakties = FALSE,
-                            terms = NULL, verbose = FALSE,...) {
+                            minsplit = 50L, minbucket = 25L,
+                            maxdepth = Inf, maxwidth = Inf,
+                            mtry = Inf, nselect = Inf,
+                            estfun = list(), sctest = TRUE, 
+                            maxevalsplit = 20, lossfun = neglogLik,
+                            fast = 0L, verbose = FALSE,...) {
   
   ## check available arguments
   stopifnot(alpha >= 0 & alpha <= 1)
   stopifnot(is.logical(bonferroni))
   stopifnot(minsplit >= 0)
+
+  estfun <- appendDefArgs(estfun, list(predecor = TRUE, silent = TRUE))
+  estfun$level <- "observation"
   
   rval <- appendDefArgs(
             list(...),
             list(alpha = alpha,
                  bonferroni = bonferroni,
                  minsplit = minsplit,
-                 trim = trim,
-                 maxdepth = Inf,
-                 maxwidth = Inf,
-                 nselect = Inf,
-                 maxevalsplit = 20,
+                 minbucket = minbucket,
+                 maxdepth = maxdepth,
+                 maxwidth = maxwidth,
+                 mtry = mtry,
+                 nselect = nselect,
+                 estfun = estfun,
+                 sctest = sctest,
+                 maxevalsplit = maxevalsplit,
                  lossfun = lossfun,
-                 breakties = breakties,
-                 terms = terms, restricted = NULL,
-                 intercept = "none",
-                 mtry = Inf,
+                 fast = fast, 
+                 verbose = verbose,
+                 terms = NULL, restricted = NULL,
+                 intercept = NULL,
                  maxsurrogate = 0L,
                  probsurrogate = FALSE,
                  condsurrogate = "observation",
                  functional.factor = "LMuo",
                  functional.ordered = "LMuo",
-                 functional.numeric = "supLM",
-                 sctest = TRUE,
-                 fast = 0L,
-                 verbose = verbose))
+                 functional.numeric = "supLM"))
   
   class(rval) <- "tvcolmm_control"
   return(rval)

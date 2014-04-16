@@ -16,11 +16,10 @@
 ## panel_get_main:
 ## panel_coef:
 ## panel_empty:
-## panel_sctest:
 ## --------------------------------------------------------- #
 
 plot.tvcolmm <- function(x, type = c("default", "coef", 
-                              "sctest", "simple", "terms"),
+                              "simple", "terms"),
                          main = NULL, drop_terminal = TRUE,
                          tnex = 1, newpage = TRUE,
                          pop = TRUE, gp = gpar(),
@@ -39,9 +38,6 @@ plot.tvcolmm <- function(x, type = c("default", "coef",
     do.call("fun", args)
   } else {
     
-    if (type == "default" & depth(x) < 1L)
-      type <- "sctest"
-    
     ## tree plots
     
     ## terminal panel
@@ -49,7 +45,6 @@ plot.tvcolmm <- function(x, type = c("default", "coef",
       switch(type,
              "default" = if (depth(x) > 3L) panel_empty else panel_coef,
              "coef" = panel_coef,
-             "sctest" = panel_sctest,
              "simple" = panel_empty)
     tp_args <-
       list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
@@ -59,9 +54,8 @@ plot.tvcolmm <- function(x, type = c("default", "coef",
     ## inner panel
     ip_fun <-
       switch(type,
-             "default" = if (depth(x) > 3L) node_inner else panel_sctest,
+             "default" = node_inner,
              "coef" = node_inner,
-             "sctest" = if (terminal) node_inner else panel_sctest,
              "simple" = node_inner)
     ip_args <-
       list(...)[names(list(...)) %in% names(formals(ip_fun))[-1]]
@@ -196,7 +190,7 @@ panel_get_main <- function(obj, node, id, dims) {
     rval <- paste(rval, ": ", sep = "")
   if (all(c("n", "N") %in% dims)) {
     rval <- paste(rval,
-                  "n = ", node$info$dims["n"],
+                  "nobs = ", node$info$dims["n"],
                   "/ N = ", node$info$dims["N"], sep = "")
   } else if ("n" %in% dims) {
     rval <- paste(rval, "nobs = ", node$info$dims["n"])
@@ -222,7 +216,7 @@ panel_coef <- function(obj, terms = NULL, id = TRUE,
   if (!is.list(terms)) terms <- list(terms)
   coef <- coef[, unlist(terms), drop = FALSE]
   coefList <- lapply(terms, function(trms) coef[, trms, drop = FALSE])
-
+  
   if (conf.int) {
     sd <- extract(obj, "sd")$varying
     sd <- sd[, unlist(terms), drop = FALSE]
@@ -247,7 +241,7 @@ panel_coef <- function(obj, terms = NULL, id = TRUE,
              }
              ylim <- ylim + c(-1, 1) * 0.1 * range(ylim)
              rval <- list(xlim = c(0.75, ncol(coefList[[i]]) + 0.25),
-                          pch = 19L, ylim = ylim,
+                          pch = 4L, ylim = ylim,
                           ylab = "coef",  type = "p",
                           label = abbreviate(colnames(coefList[[i]])),
                           height = 1, width = 0.6,
@@ -267,7 +261,7 @@ panel_coef <- function(obj, terms = NULL, id = TRUE,
       conf.int_gp <- lapply(1:length(terms), function(i) conf.int_gp)
     }    
     conf.int_gp_def <- list(angle = 90,
-                            length = unit(0.5, "native"),
+                            length = unit(2, "strwidth", "-"),
                             ends = "both",
                             type = "open")
     conf.int_gp <- lapply(1:length(terms),
@@ -283,7 +277,7 @@ panel_coef <- function(obj, terms = NULL, id = TRUE,
     } else if (any(!unlist(lapply(mean_gp, is.list)))) {
       mean_gp <- lapply(1:length(terms), function(i) mean_gp)
     }    
-    mean_gp_def <- list(gp = gpar(col = "grey50", lty = 1, lwd = 0.75), pch = 19L)
+    mean_gp_def <- list(gp = gpar(col = "grey50", lty = 1, lwd = 0.75), pch = 4L)
     mean_gp <- lapply(1:length(terms),
                       function(i) appendDefArgs(mean_gp[[i]], mean_gp_def))
 
@@ -429,144 +423,3 @@ panel_empty <- function(obj, id = TRUE, dims = c("n", "N"), ...) {
   return(rval)
 }
 class(panel_empty) <- "grapcon_generator"
-
-panel_sctest <- function(obj, id = TRUE, dims = c("n", "N"),
-                           margins = c(2, 2, 0, 2), log = FALSE,
-                           all = NULL, gp = gpar(), ...) {
-  
-  if (is.null(all)) all <- depth(obj) < 3 & ncol(obj$data) < 5
-  
-  gp_def <- gpar(cex = 0.75, col = "black", fontface = 1L,
-                 lwd = 1, fontsize = get.gpar()$fontsize)
-  gp <- appendDefArgs(gp, gp_def)
-  class(gp) <- "gpar"
-  
-  alpha <- extract(obj, "control")$alpha
-  if (log) {
-    if (alpha < 1e-3) alpha <- 1e-4
-    alpha <- (log10(alpha) + 4) / 4
-  }
-  
-  args_def <- list(height = 0.75, width = 0.75, pch = 4L)
-  args_def$xlim <- if (all | log) c(0, 1) else c(0, 1.1 * alpha)
-  
-  args <- appendDefArgs(list(...), args_def)    
-  FUN <- function(x) suppressWarnings(min(x, na.rm = TRUE))
-  
-  rval <- function(node) {
-    
-    pval <- order.by <- NULL
-    testMessage <- ""
-    show <- FALSE        
-    if (is.terminal(node) && !is.null(obj$info$sctest)) {
-      pval <-
-        obj$info$sctest$p.value[paste("Part", node$id, sep = ""), ]
-      order.by <- names(pval)
-      show <- TRUE
-    } else if (!is.null(split_node(node)$info$sctest)) {
-      pval <- apply(split_node(node)$info$sctest$p.value, 2, FUN)
-      order.by <- names(pval)
-      show <- TRUE
-    } else {
-      testMessage <- "test not available"
-    }
-    
-    if (show & log) {
-      pval[pval < 1e-4] <- 1e-4
-      pval <- (log10(pval) + 4) / 4
-    }
-    
-    if (show & (all | (!all & any(pval <= alpha, na.rm = TRUE)))) {
-      
-      if (!all) {
-        subs <- !is.na(pval) & pval <= alpha
-        order.by <- order.by[subs]
-        pval <- pval[subs]
-      }
-      best <- which.min(pval)
-      if (!is.null(args$ylim)) ylim <- ylim else ylim <- c(0.5, length(pval) + 0.5)
-      gp_node <- gp
-      gp_node$cex <- rep(gp$cex, length(pval))
-      gp_node$col <- rep(gp$col, length(pval))
-      gp_node$lwd <- rep(gp$lwd, length(pval))
-      gp_node$fontface <- rep(gp$fontface, length(pval))
-      gp_node$fontsize <- rep(gp$fontsize, length(pval))
-      pch <- rep(args$pch, length(pval))
-      pch[is.na(pval)] <- 1L
-      gp_node$lwd[best] <- 2 * max(gp$lwd)
-      gp_node$fontface[best] <- 2L
-      pval[is.na(pval)] <- args$xlim[2]
-    } else {
-      if (show) {
-        show <- FALSE
-        testMessage <- "min(p-value) > alpha"
-      }
-      ## pseudo values
-      gp_node <- gp
-      ylim <- c(0, 1)
-    }
-    
-    pushViewport(viewport(
-                   y = unit(0.5 + (args$height - 0.75) / 2, "npc"),
-                   height = unit(args$height, "npc"),
-                   width = unit(args$width, "npc")))
-    strUnit <- unit(2, "strheight", "A")
-    pushViewport(viewport(layout = grid.layout(2, 1, heights = unit.c(strUnit, unit(1, "npc") - strUnit))))
-    grid.rect(gp = gpar(fill = "white", col = 0))
-    
-    pushViewport(viewport(layout.pos.row = 1))
-    grid.text(panel_get_main(obj, node, id, dims))
-    upViewport()
-    
-    pushViewport(viewport(layout.pos.row = 2))
-    
-    grid.rect(gp = gpar(fill = "white", col = 0))
-    pushViewport(plotViewport(margins = margins, xscale = args$xlim,
-                                  yscale = ylim, default.units = "native"))
-    
-    if (show) {
-      
-      grid.segments(unit(rep(args$xlim[1], length(pval)), "native"),
-                    unit(1:length(pval), "native"),
-                    unit(rep(args$xlim[2], length(pval)), "native"),
-                    unit(1:length(pval), "native"),
-                    gp = gpar(col = "lightgrey"))            
-      grid.lines(unit(c(alpha, alpha), "native"),
-                 unit(ylim, "native"),
-                 gp = gpar(lty = 2))
-      grid.points(unit(pval, "native"),
-                  unit(1:length(pval), "native"),
-                  pch = pch, gp = gp_node)
-      grid.yaxis(at = 1:length(pval), label = order.by,
-                 gp = gpar(lineheight = 0.5, 
-                   fontsize = gp_node$fontsize,
-                   fontface = gp_node$fontface))
-      
-      if (log) {
-        at <- (c(-3, -2, -1, 0) + 4) / 4
-        label <- c(0.001, 0.01, 0.1, 1)
-        subs <- which(label > args$xlim[1] & label < args$xlim[2])
-        grid.xaxis(at = at[subs],
-                   label = label[subs],
-                   gp = gpar(lineheight = 0.5))
-      } else {                
-        grid.xaxis(at = args$xlim, label = args$xlim,
-                   gp = gpar(lineheight = 0.5))
-      }
-      grid.text(paste("p-value", if (log) "(log)", ""),
-                y = unit(-1.5, "lines"))
-      
-      grid.rect()
-      
-    } else {          
-      grid.rect(gp = gpar(fill = "white", col = 0))
-      grid.text(testMessage,
-                gp = gpar(fontface = 2,
-                  fontsize = 1.1 * gp$fontsize))
-    }
-    
-    upViewport(4L)
-  }
-  return(rval)
-  }
-class(panel_sctest) <- "grapcon_generator"

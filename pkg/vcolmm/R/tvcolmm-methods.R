@@ -26,141 +26,66 @@
 ## - anova.tvcolmm
 ## --------------------------------------------------------- #
 
-tvcolmm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
-
-  what <- match.arg(what)
-  
-  ids <- nodeids(object, terminal = TRUE)
-  control <- extract(object, "control")
-
-  rval <- list()
-  
-  ## extract coefficients
-  coef <- switch(what,
-                 coef = coef(extract(object, "model")),
-                 sd = diag(vcov(extract(object, "model"))),
-                 var = diag(vcov(extract(object, "model"))))
-
-  ## restricted coefficients
-  rval$restricted <- coef[!grepl("Part", names(coef))]
-  
-  ## varying coefficients
-  if (depth(object) > 0L) {
-    
-    ## create object with all possible coefficients for each node
-    terms <- tvcolmm_get_terms(object)
-    varcoef <- rep(NA, length(terms) * length(ids))
-    for (i in 1:length(terms))
-      for (j in 1:length(ids))
-        names(varcoef)[length(ids) * (i - 1) + j] <-
-          sub("Part", paste("Part", ids[j], sep = ""), terms[i])
-    subs <- intersect(names(varcoef), names(coef))
-    varcoef[subs] <- coef[subs]
-    
-    if ((subs <- paste("Part", max(ids), sep = "")) %in%
-        names(varcoef)) {
-      con <- extract(object, "model")@contrasts$Part
-
-      if (what == "coef") {
-        varcoef[subs] <-
-          sum(con[as.character(max(ids)),] *
-              coef[paste("Part", setdiff(ids, max(ids)), sep = "")])
-        
-      } else if (what %in% c("sd", "var")) {
-        varcoef[subs] <-
-          sum((con[as.character(max(ids)),])^2 *
-              coef[paste("Part", setdiff(ids, max(ids)), sep = "")])
-      }
-    }
-    
-    ## create a matrix of coefficients
-    FUN <- function(i) {
-      name <- paste("Part", i, sep = "")
-      parts <- strsplit(names(varcoef), ":")
-      subs <- sapply(parts, function(x) sum(x == name) > 0)
-      rval <- varcoef[subs]
-      names(rval) <- sub(name, "Part", names(rval))
-      names(rval) <- sub("Part:", "", names(rval))
-      return(rval)
-    }
-    
-    rval$varying <- lapply(as.character(ids), FUN)
-    rval$varying <-
-      matrix(unlist(rval$varying), nrow = length(ids), byrow = TRUE,
-             dimnames = list(ids, names(rval$varying[[1]])))
-    
-  } else {
-    rval$varying <- NULL
-  }
-
-  if (what == "sd") {
-    rval$restricted <- sqrt(rval$restricted)
-    rval$varying <- sqrt(rval$varying)
-  }
-  
-  return(rval)
-}
-
 coef.tvcolmm <- function(object, ...) tvcolmm_get_estimates(object, ...)
 
 coefficients.tvcolmm <- coef.tvcolmm 
 
-extract.tvcolmm <- function(object, what = c("control", "sctest",
-                                      "model", "selected", "p.value",
+extract.tvcolmm <- function(object, what = c("control", "model", 
+                                      "sctest", "p.value",
+                                      "lossgrid", "selected", 
                                       "coef", "sd", "var"),
-                            ids = nodeids(object), ...) {
+                            ids = nodeids(object), steps = NULL, ...) {
   
   what <- match.arg(what)
-
+  splitpath <- object$info$splitpath
+  if (is.null(steps))
+    steps <- which(sapply(splitpath, function(x) !is.null(unlist(x))))
+  sctest <- object$info$control$sctest
+  
   if (what == "control") {
 
     return(object$info$control)
     
-  } else if (what == "sctest") {
-
-    if (depth(object) == 0L) return(list("1" = object$info$sctest))
+  } else if (sctest && what == "sctest") {
     
-    getSctest <- function(node) {
-      if (is.terminal(node)) {
-        rval <- info_node(node)$sctest
-      } else {
-        rval <- split_node(node)$info$sctest
-      }
-      return(rval)
-    }
+    splitpath <- object$info$splitpath
+    rval <- lapply(splitpath[steps], function(x) x$sctest)
+    return(rval)
     
-    return(nodeapply(object, ids, getSctest))
+  } else if (what == "lossgrid") {
     
+    splitpath <- object$info$splitpath
+    rval <- lapply(splitpath[steps], function(x) x$lossgrid)
+    return(rval)
     
   } else if (what == "model") {
-
+    
     return(object$info$model)
     
   } else if (what == "selected") {
 
-    ids <- setdiff(nodeids(object,, FALSE), nodeids(object,, TRUE))
-    getSelected <- function(node) node$split$varid
-    rval <- unique(unlist(nodeapply(object, ids, getSelected)))
-    rval <- colnames(object$data)[rval]
+    splitpath <- object$info$splitpath
+    rval <- unique(unlist(lapply(splitpath[steps], function(x) x$varid)))
+    if (length(rval) > 0L) rval <- colnames(object$data)[rval]
     return(rval)
-
-  } else if (what == "p.value") {
-
-    getPval <- function(node) {
-      if (is.terminal(node)) {
-        test <- info_node(node)$sctest
-      } else {
-        test <- split_node(node)$info$sctest
-      }
-      return(min(test$p.value, na.rm = TRUE))
-    }
-    rval <- unlist(nodeapply(object, ids, getPval))
+    
+  } else if (sctest && what == "p.value") {
+    
+    rval <- unlist(sapply(splitpath[steps],
+                          function(x) {
+                            if (is.null(x$sctest)) return(NA)
+                            rval <- na.omit(c(x$sctest$p.value))
+                            if (length(rval) == 0) return(NA)
+                            return(min(rval, na.rm = TRUE))
+                          }))
     return(rval)
+    
   } else if (what %in% c("coef", "sd", "var")){
 
     return(tvcolmm_get_estimates(object, what = what))
-
+    
   }
+  return(NULL)
 }
 
 fitted.tvcolmm <- function(object, ...) {
@@ -177,9 +102,11 @@ logLik.tvcolmm <- function(object, cv = FALSE,
   if (cv) {
     cv <- cv.tvcolmm(object, folds, alpha.max = object$info$control$alpha, 
                      fixed = TRUE, ...)
-    weights <- matrix(weights(extract(object, "model")), 
-                      nrow(folds), ncol(folds))
-    rval <- -sum(cv$loss[, 1] * colSums(folds == 0 * weights))
+    weights <- weights(object)
+    oobWeights <- matrix(weights, nrow(folds), ncol(folds))
+    rval <- -sum(cv$loss[, 1] * colSums((folds == 0) * oobWeights))
+    if (sum((folds == 0) * oobWeights) !=  sum(weights))
+      rval <- rval * sum(weights) / sum((folds == 0) * oobWeights)
     dims <- extract(object, "model")@dims
     attr(rval, "nall") <- attr(rval, "nobs") <- dims[["n"]]
     attr(rval, "df") <- dims[["nPar"]]
@@ -255,60 +182,16 @@ predict.tvcolmm <- function(object, newdata = NULL,
   return(fitted)
 }
 
-prune.tvcolmm <- function(tree, alpha = NULL, depth = NULL,
-                          minsplit = NULL, nselect = NULL, ...) {
-  
-  call <- getCall(tree$info$model)
-  call$formula <- tree$info$formula$tree
-  call$control <- tree$info$control
-  call$data <- model.frame(tree)
-
-  ## prune the tree structure
-  node <- tvcolmm_prune_node(tree, alpha, depth, minsplit, nselect)
-
-  ## if something changes ...
-  if (!identical(node, tree$node)) {
-    tree$node <- node
-    if (depth(tree$node) > 0L) {
-      tree$fitted[, "(fitted)"] <-
-        fitted_node(tree$node, data = tree$data)
-      call$data$Part <-
-        tvcolmm_get_part(tree, tree$data, tree$fitted[,"(weights)"])
-      call$contrasts <- appendDefArgs(list(Part = contrasts(call$data$Part)),
-                                      call$contrasts)
-    } else {
-      call$formula <- tree$info$formula$root
-    }    
-    tree$info$model <- try(eval(call), silent = TRUE)
-    if (inherits(tree$info$model, "try-error"))
-      stop("tree model fitting failed")
-    tree$info$control$terms
-    control <- tree$info$control
-    control$info$terms <-
-      setdiff(names(fixef(tree$info$model)), control$restricted)
-    tree$info$test <-
-      tvcolmm_fit_sctest(tree$info$model, tree$nodes, tree$data, control)
-  }
-  if (!is.null(alpha)) 
-    tree$info$control$alpha <- alpha
-  if (!is.null(depth))
-    tree$info$control$depth <- depth
-  if (!is.null(minsplit))
-    tree$info$control$minsplit <- minsplit
-  return(tree)
-}
-
-
 print.tvcolmm <- function(x, ...) {
-
+  
   so <- summary(x$info$model)
   etaVar <- so$FEmatEtaVar
   etaInv <- so$FEmatEtaInv
   
   header_panel <- function(x) {
-    rval <- paste(x$info$title, "\n", sep = "")
-    if (!is.null(x$info$call$formula))
-      rval <- paste(rval, " Family: ", x$family, "\n", sep = "")
+    rval <- paste(x$info$title, "\n\n", sep = "")
+    if (!is.null(so$family))
+      rval <- paste(rval, " Family: ", so$family, "\n", sep = "")
     if (!is.null(x$info$call$formula))
       rval <- paste(rval, "Formula: ",
                     deparse(x$info$call$formula)[1], "\n", sep = "")
@@ -319,9 +202,9 @@ print.tvcolmm <- function(x, ...) {
       rval <- paste(rval, " Subset: ",
                     deparse(x$info$call$subset),"\n", sep = "")
     rval <- paste(rval, "\nTuning-parameters:",
-                  "\n\t alpha = ", format(x$info$control$alpha, ...),
+                  "\nalpha = ", format(x$info$control$alpha, ...),
                   if (x$info$control$bonferroni) " (Bonferroni corrected)",
-                  "\n\t minsplit = ", x$info$control$minsplit, "\n", sep = "")
+                  "\nminsplit = ", x$info$control$minsplit, "\n", sep = "")
 
     if (any(length(so$REmat) > 0 && nrow(so$REmat) > 0 |
             sum(!grepl("Part", rownames(etaInv))) > 0 |
@@ -383,9 +266,65 @@ print.tvcolmm <- function(x, ...) {
     return(rval)
   }
   
-  partykit::print.party(x, header_panel = header_panel,
-                        terminal_panel = terminal_panel, ...)
+  print.party(x, header_panel = header_panel,
+              terminal_panel = terminal_panel, ...)
+}
+
+prune.tvcolmm <- function(tree, alpha = NULL,
+                          depth = NULL, width = NULL,
+                          minsplit = NULL, minbucket = NULL, 
+                          nselect = NULL, step = NULL, ...) {
   
+  call <- getCall(tree$info$model)
+  call$formula <- tree$info$formula$tree
+  call$control <- tree$info$control
+  call$data <- model.frame(tree)
+
+  ## prune the tree structure
+  node <- tvcolmm_prune_node(tree, alpha, depth, width,
+                             minsplit, minbucket,
+                             nselect, step)
+
+  ## if something changes ...
+  if (!identical(node, tree$node)) {
+    tree$node <- node
+    if (depth(tree$node) > 0L) {
+      tree$fitted[, "(fitted)"] <-
+        fitted_node(tree$node, data = tree$data)
+      call$data$Part <-
+        tvcolmm_get_part(tree, tree$data, tree$fitted[,"(weights)"])
+      call$contrasts <- appendDefArgs(list(Part = contrasts(call$data$Part)),
+                                      call$contrasts)
+    } else {
+      call$formula <- tree$info$formula$root
+    }    
+    tree$info$model <- try(eval(call), silent = TRUE)
+    if (inherits(tree$info$model, "try-error"))
+      stop("tree model fitting failed")
+    tree$info$control$terms
+    control <- tree$info$control
+    control$info$terms <-
+      setdiff(names(fixef(tree$info$model)), control$restricted)
+    tree$info$control <- control
+    nsteps <- width(tree)
+    tree$info$nsteps <- nsteps
+    splitpath <- tree$info$splitpath[1:tree$info$nsteps]
+    splitpath[[nsteps]]$varid <- NULL
+    splitpath[[nsteps]]$partid <- NULL
+    splitpath[[nsteps]]$cutid <- NULL
+    splitpath[[nsteps]]$var <- NULL
+    splitpath[[nsteps]]$cutpoint <- NULL
+    if (control$sctest) splitpath[[nsteps]]$lossgrid <- NULL
+    tree$info$splitpath <-
+      tvcolmm_modify_splitpath(splitpath, tree$node, tree$data, tree$info$control)
+  }
+  if (!is.null(alpha)) 
+    tree$info$control$alpha <- alpha
+  if (!is.null(depth))
+    tree$info$control$depth <- depth
+  if (!is.null(minsplit))
+    tree$info$control$minsplit <- minsplit
+  return(tree)
 }
 
 ranef.tvcolmm <- function(object, ...)
@@ -395,6 +334,43 @@ resid.tvcolmm <- function(object, ...)
   return(resid(object = object$info$model, ...))
 
 residuals.tvcolmm <- resid.tvcolmm
+
+splitpath.tvcolmm <- function(tree, ...) tree$info$splitpath
+
+print.splitpath.tvcolmm <- function(x, steps = NULL, ...) {
+
+  if (!is.null(steps)) steps <- intersect(steps, 1:length(x))
+  if (is.null(steps)) steps <- 1:length(x)
+  
+  for (step in steps) {
+    if (step != steps[1]) cat("\n")
+    cat("Step:", step)
+    if (is.null(unlist(x[[step]]$varid))) {
+      cat(" (no splitting processed)\n")
+    } else {
+      cat("\nSplitting variable:", x[[step]]$var)
+      cat("\nPartition:", x[[step]]$partid)
+      cat("\nCutpoint: ")
+      cat(paste("{",paste(x[[step]]$cutpoint, collapse = "}, {"), "}\n", sep = ""))
+    }
+     if (!is.null(x[[step]]$sctest) | !is.null(x[[step]]$lossgrid))
+       cat("\nDetails:\n")
+    if (!is.null(x[[step]]$sctest)) {
+      cat("\nCoefficient constancy tests (p-value):\n")
+      print(x[[step]]$sctest$p.value, ...)
+    }
+    if (!is.null(x[[step]]$lossgrid)) {
+      cat("\nLoss-minimizing grid search:\n") 
+      for (j1 in 1:length(x[[step]]$lossgrid)) {
+        for (j2 in 1:length(x[[step]]$lossgrid[[j1]])) {
+          cat("Variable:", names(x[[step]]$lossgrid)[j1],
+              "Node:", sub("Part", "", names(x[[step]]$lossgrid[[j1]])[j2]), "\n\n")
+          print(x[[step]]$lossgrid[[j1]][[j2]], ...)
+        }
+      }
+    }
+  }
+}
 
 weights.tvcolmm <- function(object, ...) {
   weights(extract(object, "model"))

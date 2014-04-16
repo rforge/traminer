@@ -15,7 +15,7 @@
 \usage{
 
 estfun.olmm(x, level = c("observation", "subject"),
-            prewhite = FALSE, complete = prewhite,
+            predecor = FALSE, complete = predecor,
             Nbal = NULL, subset = NULL,
             nuisance = NULL, control = list(),
             verbose = FALSE, silent = FALSE, ...)
@@ -36,7 +36,7 @@ olmm_scoreTransfMat(object, method = c("symmetric", "unconstraint"),
   \item{level}{character string. Indicates whether the returned values
     should on the observation level (\code{level = "observation"}) or on 
     the subject level (\code{level = "subject"}).}
-  \item{prewhite}{logical scalar. Indicates whether the within-subject
+  \item{predecor}{logical scalar. Indicates whether the within-subject
     correlation of scores should be removed by a linear
     transformation. See details.}
   \item{complete}{logical scalar. If \code{TRUE} and the data are
@@ -91,25 +91,25 @@ olmm_scoreTransfMat(object, method = c("symmetric", "unconstraint"),
   Complements the \code{estfun} method of the package \code{sandwich}
   and the \code{gefp} method of the package \code{strucchange} for
   \code{\link{olmm}} objects. The implementation is different from
-  originals to allow the score function to be prewhitened with respect
-  to intra-subject correlation. The value returned by \code{gefp.olmm}
-  may be used for testing coefficient constancy regarding an explanatory
-  variable \code{order.by} by the \code{sctest} function of package
-  \code{strucchange}.
+  originals to allow the score function to be pre-decorrelated with
+  respect to intra-subject correlation. The value returned by
+  \code{gefp.olmm} may be used for testing coefficient constancy
+  regarding an explanatory variable \code{order.by} by the \code{sctest}
+  function of package \code{strucchange}.
 
-  If \code{prewhite = TRUE} in \code{estfun.olmm}, a linear
+  If \code{predecor = TRUE} in \code{estfun.olmm}, a linear
   within-subject transformation is applied that removes (approximately) 
   the intra-subject correlation from the scores. Specifically, u_it, 
-  the ML score of observation t of subject i, is transformed to 
+  the ML score t'th observation of subject i, is transformed to 
   u*_it = u_it + T sum(u_it'', t'' != t) such that Cov(u*_it, u*_it') = 
   Cov(u*_it, u*_i't'') for all i != i' and t != t'. The transformation 
   matrix T is computed with the \code{\link{olmm_scoreTransfMat}}
   function and involves a nonlinear optimization. According to our
-  simulations, the method works stable for a model for a balanced
-  dataset with about 100 subject and between 3 and 10 observations per
-  individual. 
+  simulations, the procedure works stable for models on balanced
+  data with about 100 subjects and between 3 and 10 observations per
+  subject. 
 
-  If \code{complete = TRUE} and \code{prewhite = TRUE} and \code{level =
+  If \code{complete = TRUE} and \code{predecor = TRUE} and \code{level =
   "observation"}, an algorithm is applied to handle unbalanced data:
   First, the transformation matrix is estimated based on the scores of
   subjects that share the same maximal number of observations. Then, for
@@ -139,10 +139,10 @@ olmm_scoreTransfMat(object, method = c("symmetric", "unconstraint"),
   The resulting estimating equations are stored in the \code{process}
   slot, see above.
   
-  The \code{subset} and the \code{terms} arguments are  designed for the
-  \code{\link{tvcolmm}} algorithm. Centering the scores is necessary if
-  the column sums of the estimating equations is unequal 0, which may
-  occurs if the scores are previously prewhitened.
+  The \code{subset} and the \code{terms} arguments are specifically
+  designed for the \code{\link{tvcolmm}} algorithm. Centering the scores
+  is necessary if the column sums of the estimating equations are
+  unequal 0, which may occurs if the scores are pre-decorrelated.
 }
 
 \references{

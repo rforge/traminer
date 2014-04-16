@@ -18,5 +18,7 @@ neglogLik <- function(object, ...) UseMethod("neglogLik")
 
 ranefCov <- function(object, ...) UseMethod("ranefCov")
 
+splitpath <- function(tree, ...) UseMethod("splitpath")
+
 ## S4 generics
 

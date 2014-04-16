@@ -44,6 +44,9 @@
 ## 2013-12-02:   remove 'tvcolmm_fit_setupnode'
 ## 2013-11-01:   modify 'restricted' and 'terms' correctly in
 ##               'tvcolmm_modify_modargs'
+##
+## To do:
+## - improve minsplit pruning
 ## --------------------------------------------------------- #
 
 tvcolmm_fit_model <- function(formula, args, control, verbose = FALSE) {
@@ -114,9 +117,9 @@ tvcolmm_fit_sctest <- function(model, nodes, partvar, control,
                                formula, args) {
 
   subject <- model@subject
-  Part <- model@frame$Part
-  if (is.null(Part)) Part <- factor(rep(1, nrow(partvar)))
-
+  Part <- factor(fitted_node(nodes, partvar))  
+  w <- weights(model)
+  
   ## get column names of scores to test
   terms <- if (depth(nodes) == 0L) control$terms$root else control$terms$tree
 
@@ -136,75 +139,79 @@ tvcolmm_fit_sctest <- function(model, nodes, partvar, control,
                  dimnames = dn),
                p.value = matrix(, nlevels(Part), ncol(partvar),
                  dimnames = dn),
-               method = "M-fluctuation test",
-               data.name = "model")
+               method = "M-fluctuation test")
 
   ## get depths of nodes for the check
   depth <- unlist(nodeapply(nodes, nodeids(nodes, terminal = TRUE),
                             function(node) info_node(node)$depth))
 
   ## extract transformed scores
-  estfunArgs <-
-    appendDefArgs(control$estfun,
-                  list(prewhite = TRUE,
-                       complete = TRUE,
-                       nuisance = control$nuisance,
-                       verbose = FALSE, silent = TRUE))
-  estfunArgs$x <- model; estfunArgs$level <- "observation"; # overwrite
+  estfunArgs <- control$estfun
+  estfunArgs$x <- model
   scores <- do.call("estfun.olmm", estfunArgs)
   
   ## hack^1: if intercept = "po" fit a second model with the second level of
   ## 'Part' as reference level
   if (nlevels(args$data$Part) > 1L && control$intercept == "po") {
     args$contrasts$Part <- contr.treatment(levels(args$data$Part), base = 2)  
-    model2 <- tvcolmm_fit_model(formula, args, control, FALSE)
-    estfunArgs$x <- model2
-    scores2 <- do.call("estfun.olmm", estfunArgs)
+    mTmp <- tvcolmm_fit_model(formula, args, control, FALSE)
+    estfunArgs$x <- mTmp
+    sTmp <- do.call("estfun.olmm", estfunArgs)
+    subs1 <- colnames(scores) == paste("Part", levels(args$data$Part)[2], sep = "")
+    subs2 <- colnames(sTmp) == paste("Part", levels(args$data$Part)[1], sep = "")
+    attr <- attributes(scores)
+    scores <- cbind(scores[, 1:(which(subs1) - 1) ,drop = FALSE],
+                    sTmp[, which(subs2) ,drop = FALSE],
+                    scores[, which(subs1):ncol(scores) ,drop = FALSE])
+    attributes(scores) <- appendDefArgs(attributes(scores), attr)
+    rm(mTmp, sTmp)
   }
 
   gefpArgs <- appendDefArgs(control$gefp, list(center = TRUE, silent = TRUE))
+  gefpArgs$object <- model; gefpArgs$scores <- scores;
   
   ## apply test for each variable and partition separately  
   for (i in 1:ncol(partvar)) {    
     for (j in 1:nlevels(Part)) {
-
-      ## hack^1: choose the model (only important if 'intercept == "po"')
-      if (nlevels(Part) > 1L && control$intercept == "po" && j == 1L) {
-        m <- model2
-        s <- scores2
-      } else {
-        m <- model
-        s <- scores
-      }
       
       ## extract observations of current partition
       rows <- Part == levels(Part)[j]
-
+        
       ## extract variable to test
       z <- partvar[, i]
       
-      ## check if partition contains permitted split
-      if (sum(cumsum(sort(table(z[rows]))) >= control$minsplit) > 1 &
-          max(cumsum(sort(table(z[rows])))) >= 2 * control$minsplit &
+      ## check if partition contains at least one permitted split
+      ## this ensures that we don't select a variable without permitted split
+      if (is.numeric(z)) {
+        sz <- cumsum(tapply(w[rows], z[rows], sum))
+        mb <- max(c(0, apply(cbind(sz, sum(w[rows]) - sz), 1, min)))
+      } else {
+        sz <- tvcolmm_fit_getlevels(z, rows)
+        mb <- max(c(0, apply(sz, 1, function(x) {
+          subs <- z %in% levels(z)[x]
+          min(sum(w[subs & rows]), sum(w[!subs & rows]))
+        })))
+      }
+      if (sum(w[rows]) >= control$minsplit & 
+          mb >= control$minbucket &
           depth[j] < control$maxdepth) {
-
+      
         ## function to extract scores
         cols <- sub("Node", levels(Part)[j], terms, fixed = TRUE)
   
-
         ## run the tests
-        gefpArgs$object <- m; gefpArgs$scores <- s;
         gefpArgs$order.by <- z; gefpArgs$terms <- cols; gefpArgs$subset <- rows
         gefp <- try(do.call("gefp.olmm", gefpArgs), TRUE)
                                     
         if (!inherits(gefp, "try-error")) {
 
           ## parameters for categorical variables
+          trim <- control$minbucket / sum(w[rows])
           order.by <- z[rows]
           if (is.character(functional)) {
             functional <- tolower(functional)
             fi <- switch(functional[i],
-                         "suplm" = supLM(from = control$trim),
+                         "suplm" = supLM(from = trim),
                          "lmuo" = catL2BB(gefp),
                          stop("Unknown efp functional."))
           } else {
@@ -228,7 +235,7 @@ tvcolmm_fit_sctest <- function(model, nodes, partvar, control,
   if (control$verbose && all(depth) == control$maxdepth)
     cat("\n\nMaximal depth reached. Return object.")
   
-  ## select variables randomly
+  ## select variables randomly (for random forests)
   valid.pval <- apply(rval$p.value, 2, function(x) sum(!is.na(x)) > 0)
   if (control$mtry < ncol(partvar) & sum(valid.pval) > 1L) {
     mtry <- min(sum(valid.pval), if (control$mtry < 0) { sample(1:sum(valid.pval), 1) } else if (control$mtry < 1) { ceiling(sum(valid.pval) * control$mtry) } else { control$mtry})
@@ -269,11 +276,8 @@ tvcolmm_fit_sctest <- function(model, nodes, partvar, control,
 }
 
 
-tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
-                                  partid = 1:width(nodes), 
-                                  partvar, nodes,
-                                  model, formula, args,
-                                  test, control, step) {
+tvcolmm_fit_loss <- function(varid, partid, partvar, nodes,
+                             model, formula, args, control, step) {
 
   if (control$verbose) cat("\nPerform split? ")
 
@@ -281,31 +285,32 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   if (length(partid) == 0L) {
     if (control$verbose) cat("No\nToo few observations in nodes or/and",
                              "maximum depth reached. Return object.\n")
-    return(FALSE)
+    return(NULL)
   }
 
   ## ... otherwise start splitting
   if (control$verbose) cat("Yes\n\n* computing splits ")
   
   Part <- factor(fitted_node(nodes, partvar))    
-
+  w <- weights(model)
+  
   ## function to get all cutpoints of a variable in a partition
   getCutpoints <- function(vid, pid) {
     subscripts <- Part == levels(Part)[pid]
-    x <- partvar[, vid]
-    if (is.numeric(x)) {
-      sx <- sort(x[subscripts])
-      if (length(sx) < control$minsplit) return(matrix(,0,1))
-      sx <- sx[control$minsplit:(length(sx) - control$minsplit)]
-      sx <- unique(sx)
-      if ((length(sx) - 1)  > control$maxevalsplit) {
-        rval <-  as.double(quantile(sx, ppoints(control$maxevalsplit)))
+    if (sum(subscripts) < 1L | sum(w[subscripts]) < control$minsplit)
+      return(matrix(,0,1))
+    z <- partvar[, vid]
+    if (is.numeric(z)) {
+      sz <- unique(sort(z[subscripts]))
+      if ((length(sz) - 1)  > control$maxevalsplit) {
+        rval <-  as.double(quantile(sz, ppoints(control$maxevalsplit)))
       } else {
-        rval <- sx[-length(sx)]
+        rval <- sz[-length(sz)]
       }
-      rval <- matrix(rval, ncol = 1)
+      rval <- matrix(rval, ncol = 1,
+                     dimnames = list(1:length(rval), "cut"))
     } else {
-      rval <- tvcolmm_fit_getlevels(x, subscripts)
+      rval <- tvcolmm_fit_getlevels(z, subscripts)
     }
     return(rval)
   }
@@ -314,17 +319,16 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   getSplitstat <- function(cutpoint, vid, pid, args, model) {
     if (!(vid %in% varid & pid %in% partid)) return(Inf)
     subscripts <- Part == levels(Part)[pid]
-    x <- partvar[, vid]    
-    if (is.numeric(x)) {
-      xs <- x <= cutpoint
+    z <- partvar[, vid]    
+    if (is.numeric(z)) {
+      zs <- z <= cutpoint
     } else {
-      xs <- x %in% levels(x)[cutpoint]            
+      zs <- z %in% levels(z)[cutpoint]            
     }
     args$data$Part[subscripts] <- levels(Part)[pid]
-    args$data$Part[xs & subscripts] <- "Right"
-    if (min(table(args$data$Part)[c(levels(args$data$Part)[pid], "Right")]) <
-        control$minsplit)
-      return(Inf)
+    args$data$Part[zs & subscripts] <- "Right"
+    if (sum(w[zs & subscripts]) < control$minbucket) return(Inf)
+    if (sum(w[!zs & subscripts]) < control$minbucket) return(Inf)
     model <- tvcolmm_refit_model(model, args)
     rval <- ifelse(inherits(model, "try-error"), NaN, control$lossfun(model))
     if (control$verbose)
@@ -345,27 +349,19 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
     subs <- intersect(names(coef(splitModel)), names(coef(model)))
     splitModel@coefficients[subs] <- model@coefficients[subs]
   }
-
     
   ## run computation (slow!!!)
-  splits <- lapply(1:ncol(partvar), function(vid) {
+  lossgrid <- lapply(1:ncol(partvar), function(vid) {
     lapply(1:nlevels(Part), function(pid, vid) {
       cp <- getCutpoints(vid, pid)
       st <- apply(cp, 1, getSplitstat, vid = vid, pid = pid,
                   args = args, model = splitModel)
-      return(cbind(cp, stat = st))
+      return(cbind(cp, loss = st))
     }, vid = vid)
   })
 
-  loss <- lapply(splits, lapply, function(x) x[, ncol(x)])
-  
-  if (!any(na.omit(unlist(loss)) < Inf)) {
-    if (control$verbose)
-      cat("\nNo admissible split found. Return object.\n")
-    return(FALSE)
-  }
-      
-  if (control$verbose) cat(" OK")
+  Part <- factor(fitted_node(nodes, partvar))
+  loss <- lapply(lossgrid, lapply, function(x) x[, ncol(x)])
   
   ## get split
   minLoss <- function(x) {
@@ -374,11 +370,23 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   }
   vid <- (1:ncol(partvar))[which.min(sapply(loss, minLoss))]
   pid <- (1:nlevels(Part))[which.min(sapply(loss[[vid]], minLoss))]
+  stat <- lossgrid[[vid]][[pid]]
+  cid <- which.min(stat[, ncol(stat)])
+  
+  if (control$verbose) cat(" OK")
+  
+  return(list(varid = vid, partid = pid, cutid = cid, lossgrid = lossgrid))
+}
+
+tvcolmm_fit_splitnode <- function(nodes, model, loss, partvar, step) {
+
+  Part <- factor(fitted_node(nodes, partvar))
+  vid <- loss$varid
+  pid <- loss$partid
   pidLab <- nodeids(as.partynode(nodes), terminal = TRUE)[pid]
-  stat <- splits[[vid]][[pid]]
-  stat <- stat[which.min(stat[, ncol(stat)]), ]
-  cut <- stat[1:(length(stat) -1)]
-  stat <- stat[length(stat)]
+  stat <- loss$lossgrid[[vid]][[pid]]
+  stat <- stat[loss$cutid, ]
+  cut <- stat[1:(length(stat) - 1)]
   x <- partvar[, vid]
   
   ## collect information for the split
@@ -424,42 +432,35 @@ tvcolmm_fit_splitnode <- function(varid = 1:ncol(partvar),
   ## setup new split
   newnodes[[subs]]$split <-
     partysplit(varid = vid, breaks = breaks, index = index,
-               info = list(ordered = ordered,
-                 sctest = test,
-                 statistic = stat,
-                 splits = splits))
+               info = list(ordered = ordered, step = step))
   newnodes[[subs]]$kids <- pidLab + 1L:2L
   newnodes[[subs]]$info$dims <-
     c(N = length(unique(model@subject[subscripts])),
       n = sum(subscripts))
-  newnodes[[subs]]$info$step <- step
   
   ## add new children
-  newnodes[[subs + 1L]] <- list(id = pidLab + 1L, info = list(dims = c(N = length(unique(model@subject[subsLeft])), n = sum(subsLeft)), depth = newnodes[[subs]]$info$depth + 1L))
-  newnodes[[subs + 2L]] <- list(id = pidLab + 2L, info = list(dims = c(N = length(unique(model@subject[subsRight])), n = sum(subsRight)), depth = newnodes[[subs]]$info$depth + 1L))
+  newnodes[[subs + 1L]] <-
+    list(id = pidLab + 1L,
+         info = list(
+           dims = c(
+             N = length(unique(model@subject[subsLeft])),
+             n = sum(subsLeft)),
+           depth = newnodes[[subs]]$info$depth + 1L))
+  
+  newnodes[[subs + 2L]] <-
+    list(id = pidLab + 2L,
+         info =
+         list(dims = c(
+                N = length(unique(model@subject[subsRight])),
+                n = sum(subsRight)),
+              depth = newnodes[[subs]]$info$depth + 1L))
   
   ## adjust ids
   for (i in 1L:length(newnodes))
     newnodes[[i]]$id <- i
   
-  ## print split
-  if (control$verbose) {
-
-    if (!control$sctest) {
-      cat("\n\nSplitting variable:", colnames(partvar)[vid])
-      cat("\nPartition:", levels(args$data$Part)[pid])
-      cat("\nSelection statistic = ", stat)
-    } else {
-      cat("\n")
-    }
-    
-    cat("\nSplit = ")
-    cat(paste("{",paste(character_split(newnodes[[subs]]$split, data = partvar)$levels, collapse = "}, {"), "}\n", sep = ""))
-  }
-  
   ## return new nodes
-  rval <- as.partynode(newnodes)
-  return(rval)
+  return(as.partynode(newnodes))
 }
 
 tvcolmm_formula <- function(model, control, env = parent.frame()) {
@@ -550,7 +551,7 @@ tvcolmm_modify_catpreds <- function(formula, data) {
   return(data)
 }
 
-
+  
 tvcolmm_modify_control <- function(model, control) {
 
   ## prevent conflicts
@@ -704,11 +705,14 @@ tvcolmm_modify_control <- function(model, control) {
   
   control$terms$tree <- c(termsFixefEtaVar, termsFixefEtaInv)  
   control$restricted <- c(setdiff(unique(sub("Eta[1-9]+:", "", restFixefEtaVar)), "(Intercept)"), restFixefEtaInv)
-
-  if (model@dims["hasRanef"] > 0)
-    control$nuisance <-
-      c(control$restricted,
-        names(model@coefficients)[(model@dims["p"] + 1):model@dims["nPar"]])
+  
+  ## coefficients to treated as nuisance for estfun.olmm
+  if (is.null(control$estfun$nuisance)) {
+    nui <- control$restricted
+    if (model@dims["hasRanef"] > 0)
+      nui <- c(nui, grep("ranefCholFac", names(coef(model)), value = TRUE))
+    control$estfun$nuisance <- nui
+  }  
   
   if (length(control$terms$root) * length(control$terms$tree) == 0)
     stop("no 'terms' found.")
@@ -899,9 +903,6 @@ tvcolmm_fit_getlevels <- function(x, subscripts) {
   return(indx)
 }
 
-tvcolmm_fit_checksplit <- function(split, weights, minsplit)
-  (sum(split * weights) < minsplit || sum((1 - split) * weights) < minsplit)
-
 
 ## tvcolmm_fit_surrogate <- function(split, partvar, weights, model, control) {
 
@@ -975,8 +976,10 @@ tvcolmm_fit_checksplit <- function(split, weights, minsplit)
 ## }
 
 
-tvcolmm_prune_node <- function(object, alpha = NULL, depth = NULL,
-                               minsplit = NULL, nselect = NULL) {
+tvcolmm_prune_node <- function(object, alpha = NULL,
+                               depth = NULL, width = NULL,
+                               minsplit = NULL, minbucket = NULL,
+                               nselect = NULL, step = NULL) {
 
   stopifnot(class(object)[1] %in% c("tvcolmm", "party", "partynode"))
   if ("partynode" %in% class(object)) {
@@ -988,13 +991,33 @@ tvcolmm_prune_node <- function(object, alpha = NULL, depth = NULL,
   control <- object$info$control
   if (!is.null(depth) && depth(rval) > 0L)
     rval <- tvcolmm_prune_depth(rval, 0L, depth)
+  if (!is.null(width) && width(rval) > 0L) 
+    rval <- tvcolmm_prune_step(object$node, width)
   if (!is.null(minsplit) && depth(rval) > 0L)
     rval <- tvcolmm_prune_minsplit(rval, minsplit)
-  if (!is.null(alpha) && depth(rval) > 0L)
-    rval <- tvcolmm_prune_alpha(rval, alpha)
-  if (!is.null(nselect) && depth(rval) > 0L)
-    rval <- tvcolmm_prune_nselect(rval, nselect)
-
+  if (!is.null(minbucket) && depth(rval) > 0L)
+    rval <- tvcolmm_prune_minbucket(rval, minbucket)
+  if (!is.null(nselect) && length(extract(object, "selected"))) {
+    splitpath <- object$info$splitpath
+    vars <- sapply(splitpath, function(x) x$varid)
+    nvars <- sapply(1:length(vars), function(x) length(unique(vars[1:x])))
+    step <- max(c(0, which(nvars <= nselect)))
+    rval <- tvcolmm_prune_step(object$node, step)
+  }
+  if (!is.null(alpha) && depth(rval) > 0L) {
+    splitpath <- object$info$splitpath
+    ids <- nodeids(object)
+    stepids <- nodeapply(object,  ids, function(node) node$split$info$step)
+    stepids <- sapply(stepids, function(x) if (is.null(x)) Inf else x)
+    p.value <- extract(object, "p.value")
+    step <- which(!is.na(p.value) & p.value <= alpha)[1]
+    if (length(step) > 0L)
+      rval <- tvcolmm_prune_step(object$node, step)
+  }
+  if (!is.null(step) && object$info$nsteps > step) {
+    rval <- tvcolmm_prune_step(object$node, step)
+  }
+  
   ## delete empty nodes and adjust id labeling
   rval <- as.list(rval)
   rval <- rval[sapply(rval, function(x) !is.null(x))] # delete nodes
@@ -1022,20 +1045,17 @@ tvcolmm_prune_depth <- function(node, d, depth) {
     } else {
       node$kids <- NULL
       node$surrogates <- NULL
-      node$info$terminal <- TRUE
-      node$info$sctest <- node$split$info$sctest
       node$split <- NULL
     }
   }
   return(node)
 }
 
-
 tvcolmm_prune_minsplit <- function(node, minsplit) {
   
   if (!is.terminal(node)) {
     n <- info_node(node)$dims["n"]
-    if (n >= 2 * minsplit) {
+    if (n >= minsplit) {
       kids <- sapply(node$kids, function(kids) kids$id)
       for (i in 1:length(kids)) {
         node$kids[[i]] <- tvcolmm_prune_minsplit(node$kids[[i]], minsplit)
@@ -1043,59 +1063,180 @@ tvcolmm_prune_minsplit <- function(node, minsplit) {
     } else {
       node$kids <- NULL
       node$surrogates <- NULL
-      node$info$terminal <- TRUE
-      node$info$sctest <- node$split$info$sctest
       node$split <- NULL
     }
   }
   return(node)
 }
 
-
-tvcolmm_prune_alpha <- function(node, alpha) {
+tvcolmm_prune_minbucket <- function(node, minbucket) {
   
-  FUN <- function(node, step) {   
-    if (!is.terminal(node)) {
-      s <- info_node(node)$step
-      if (s < step) {
-        kids <- sapply(node$kids, function(kids) kids$id)
-        for (i in 1:length(kids)) {
-          node$kids[[i]] <- FUN(node$kids[[i]], step)
-        }
-      } else {
-        node$kids <- NULL
-        node$surrogates <- NULL
-        node$split <- NULL
+  if (!is.terminal(node)) {
+    n <- sapply(node$kids, function(x) x$info$dims["n"])
+    if (min(n) >= minbucket) {
+      kids <- sapply(node$kids, function(kids) kids$id)
+      for (i in 1:length(kids)) {
+        node$kids[[i]] <- tvcolmm_prune_minbucket(node$kids[[i]], minbucket)
       }
+    } else {
+      node$kids <- NULL
+      node$surrogates <- NULL
+      node$split <- NULL
     }
-    return(node)
   }
-  
-  ids <- setdiff(nodeids(node, terminal = FALSE),
-                 nodeids(node, terminal = TRUE))
-  steps <- unlist(nodeapply(node, ids, function(node) node$info$step))    
-  pval <- extract.tvcolmm(node, "p.value", ids)
-  
-  if (max(pval) > alpha) {
-    step <- min(steps[pval > alpha])
-    node <- FUN(node, step)
-  } 
   return(node)
 }
 
-tvcolmm_prune_nselect <- function(node, nselect) {
-
-  ids <- setdiff(nodeids(node, terminal = FALSE),
-                 nodeids(node, terminal = TRUE))    
-  pvals <- c(sort(extract.tvcolmm(node, "p.value", ids), decreasing = TRUE), 0)
-  selected <- extract.tvcolmm(node, "selected")
+tvcolmm_prune_step <- function(node, step) {
   
-  while (length(selected) > nselect) {
-    node <- tvcolmm_prune_alpha(node, mean(pvals[1:2]))
-    ids <- setdiff(nodeids(node, terminal = FALSE),
-                   nodeids(node, terminal = TRUE))
-    pvals <- c(if (length(ids) > 0) sort(extract.tvcolmm(node, "p.value", ids), decreasing = TRUE), 0)
-    selected <- extract.tvcolmm(node, "selected")
+  if (!is.terminal(node)) {
+    if (node$split$info$step <= step) {
+      kids <- sapply(node$kids, function(kids) kids$id)
+      for (i in 1:length(kids)) {
+        node$kids[[i]] <- tvcolmm_prune_step(node$kids[[i]], step)
+      }
+    } else {
+      node$kids <- NULL
+      node$surrogates <- NULL
+      node$split <- NULL
+    }
   }
   return(node)
+}
+
+tvcolmm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
+
+  what <- match.arg(what)
+  
+  ids <- nodeids(object, terminal = TRUE)
+  control <- extract(object, "control")
+
+  rval <- list()
+  
+  ## extract coefficients
+  coef <- switch(what,
+                 coef = coef(extract(object, "model")),
+                 sd = diag(vcov(extract(object, "model"))),
+                 var = diag(vcov(extract(object, "model"))))
+
+  ## restricted coefficients
+  rval$restricted <- coef[!grepl("Part", names(coef))]
+  
+  ## varying coefficients
+  if (depth(object) > 0L) {
+    
+    ## create object with all possible coefficients for each node
+    terms <- tvcolmm_get_terms(object)
+    varcoef <- rep(NA, length(terms) * length(ids))
+    for (i in 1:length(terms))
+      for (j in 1:length(ids))
+        names(varcoef)[length(ids) * (i - 1) + j] <-
+          sub("Part", paste("Part", ids[j], sep = ""), terms[i])
+    subs <- intersect(names(varcoef), names(coef))
+    varcoef[subs] <- coef[subs]
+    
+    if ((subs <- paste("Part", max(ids), sep = "")) %in%
+        names(varcoef)) {
+      con <- extract(object, "model")@contrasts$Part
+
+      if (what == "coef") {
+        varcoef[subs] <-
+          sum(con[as.character(max(ids)),] *
+              coef[paste("Part", setdiff(ids, max(ids)), sep = "")])
+        
+      } else if (what %in% c("sd", "var")) {
+        varcoef[subs] <-
+          sum((con[as.character(max(ids)),])^2 *
+              coef[paste("Part", setdiff(ids, max(ids)), sep = "")])
+      }
+    } 
+    
+    ## create a matrix of coefficients
+    FUN <- function(i) {
+      name <- paste("Part", i, sep = "")
+      parts <- strsplit(names(varcoef), ":")
+      subs <- sapply(parts, function(x) sum(x == name) > 0)
+      rval <- varcoef[subs]
+      names(rval) <- sub(name, "Part", names(rval))
+      names(rval) <- sub("Part:", "", names(rval))
+      return(rval)
+    }
+    
+    rval$varying <- lapply(as.character(ids), FUN)
+    rval$varying <-
+      matrix(unlist(rval$varying), nrow = length(ids), byrow = TRUE,
+             dimnames = list(ids, names(rval$varying[[1]])))
+    
+  } else {
+    terms <- setdiff(tvcolmm_get_terms(object), "Part")
+    terms <- sapply(terms, function(x) sub("Part:", "", x))
+    if (object$info$vi == "npo") {
+      nEta <- object$info$model@dims["nEta"]
+      subs <- names(coef) %in% paste("Eta", 1:nEta, ":(Intercept)", sep = "")
+      names(coef)[subs] <- paste("Eta", 1:nEta, ":Part", sep = "")
+    }
+    rval$varying <- matrix(coef[terms], 1, dimnames = list("1", terms))
+    rval$restricted <- coef[setdiff(names(coef), terms)]
+  }
+
+  if (what == "sd") {
+    rval$restricted <- sqrt(rval$restricted)
+    rval$varying <- sqrt(rval$varying)
+  }
+  
+  return(rval)
+}
+
+tvcolmm_modify_splitpath <- function(splitpath, nodes, partvar, control) {
+
+  ids <- nodeids(nodes)
+  stepids <- nodeapply(nodes,  ids, function(node) node$split$info$step)
+  stepids <- sapply(stepids, function(x) if (is.null(x)) Inf else x)
+  
+  for(step in 1:length(splitpath)) {
+    if (step > 1L) {
+      parentids <- ids[stepids < step]
+      kids <- nodeapply(nodes, parentids, function(node) node$kids)
+      kidids <- c()
+      for (i in 1:length(kids)) {
+        kidids <- c(kidids, unlist(lapply(kids[[i]], function(x) x$id)))
+      }
+      kidids <- setdiff(sort(kidids), parentids)
+    } else {
+      kidids <- 1L
+    }
+    splitpath[[step]]$ids <- kidids
+    if (control$sctest) {
+      if (!is.null(splitpath[[step]]$sctest)) {
+        rownames(splitpath[[step]]$sctest$statistic) <-
+          paste("Part", kidids, sep = "")
+        rownames(splitpath[[step]]$sctest$p.value) <-
+          paste("Part", kidids, sep = "")
+      }
+      if (!is.null(splitpath[[step]]$varid)) {
+        if (length(splitpath[[step]]$lossgrid) > 1L)
+          splitpath[[step]]$lossgrid[-splitpath[[step]]$varid] <- NULL
+        if (length(splitpath[[step]]$lossgrid[[1]]) > 1L)
+          splitpath[[step]]$lossgrid[[1]][-splitpath[[step]]$partid] <- NULL
+        names(splitpath[[step]]$lossgrid)[1L] <- 
+          colnames(partvar)[splitpath[[step]]$varid]
+        names(splitpath[[step]]$lossgrid[[1]])[1L] <- 
+          paste("Part", ids[stepids == step], sep = "")
+      }
+    } else {
+      if (!is.null(splitpath[[step]]$lossgrid)) {
+        names(splitpath[[step]]$lossgrid) <- colnames(partvar)
+        for (i in 1:ncol(partvar)) 
+          names(splitpath[[step]]$lossgrid[[i]]) <- 
+            paste("Part", kidids, sep = "")
+      }
+    }
+    if (!is.null(splitpath[[step]]$varid)) {
+      splitpath[[step]]$partid <- ids[stepids == step]
+      splitpath[[step]]$var <- colnames(partvar)[splitpath[[step]]$varid]
+      splitpath[[step]]$cutpoint <- character_split(nodeapply(nodes, ids[stepids == step], function(node) node$split)[[1]], data = partvar)$levels
+    }
+  }
+  class(splitpath) <- "splitpath.tvcolmm"
+  return(splitpath)
 }

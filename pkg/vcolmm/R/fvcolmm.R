@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-01-03
+## Date:            2014-04-13
 ##
 ## Description:
 ## Random forests based on the tvcolmm algorithm.
@@ -14,9 +14,8 @@
 ## To do:
 ## --------------------------------------------------------- #
 
-fvcolmm <- function(..., folds = NULL,
-                    control = tvcolmm_control(alpha = 1.0,
-                      bonferroni = FALSE, mtry = 5), add = TRUE) {
+
+fvcolmm <- function(..., folds = NULL, control = fvcolmm_control(), add = TRUE) {
   
   mc <- match.call()
   
@@ -33,17 +32,10 @@ fvcolmm <- function(..., folds = NULL,
     object$info$control$verbose <- FALSE
     
   } else {
-  
-    ## establish default parameters  
-    defargs <- names(formals(fvcolmm)$control)[-1]
-    for (i in defargs) {
-      if (!i %in% names(mc$control))
-        control[[i]] <- formals(fvcolmm)$control$alpha
-    }
     
     ## modify control parameters temporarily for a first tree
     maxdepth <- control$maxdepth
-    control$maxdepth <- 0
+    control$maxdepth <- 0L
     verbose <- control$verbose
     control$verbose <- FALSE
     
@@ -51,12 +43,12 @@ fvcolmm <- function(..., folds = NULL,
     if (verbose) cat("\n* fitting an initial tree ... ")
     initargs <- append(list(...), list(control = control))
     object <- do.call("tvcolmm", args = initargs)
-    if (verbose) cat("OK")
+    if (verbose) cat("OK\n")
     
     ## reset the depth parameter and set the verbose parameter
     object$info$control$maxdepth <- maxdepth
-    }
-
+  }
+  
   if (is.null(folds)) folds <- tvcolmm_folds(object)
   
   ## compute trees for subsamples
@@ -83,6 +75,24 @@ fvcolmm <- function(..., folds = NULL,
   ## modifiy class attribute to allow methods
   class(object) <- append("fvcolmm", class(object))
   return(object)
+}
+
+fvcolmm_control <- function(alpha = 1.0, bonferroni = TRUE,
+                            minsplit = 50L, minbucket = 25L,
+                            maxdepth = Inf, maxwidth = 10L,
+                            mtry = 5L, nselect = Inf,
+                            estfun = list(), sctest = TRUE, 
+                            maxevalsplit = 20, lossfun = neglogLik,
+                            fast = 0L, verbose = FALSE,...) {
+
+  return(tvcolmm_control(
+           alpha = alpha, bonferroni = bonferroni,
+           minsplit = minsplit, minbucket = minbucket,
+           maxdepth = maxdepth, maxwidth = maxwidth,
+           mtry = mtry, nselect = nselect,
+           estfun = estfun, sctest = sctest, 
+           maxevalsplit = maxevalsplit, lossfun = lossfun,
+           fast = fast, verbose = verbose, ...))
 }
 
 logLik.fvcolmm <- function(object, ...) {
@@ -155,7 +165,8 @@ predict.fvcolmm <- function(object, newdata = NULL,
     } else {
       args$data$Part <-
         tvcolmm_get_part(object, object$data, object$fitted[, "(weights)"])
-      args$contrasts <- appendDefArgs(list(Part = contrasts(args$data$Part)), args$contrasts)
+      args$contrasts <- appendDefArgs(list(Part = contrasts(args$data$Part)),
+                                      args$contrasts)
       args$formula <- object$info$formula$tree
     }
     object$info$model <- suppressWarnings(do.call("olmm", args))

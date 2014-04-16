@@ -16,9 +16,7 @@
 
 \usage{
 
-fvcolmm(..., folds = NULL,
-        control = tvcolmm_control(alpha = 1.0,
-        bonferroni = FALSE, mtry = 5), add = TRUE)
+fvcolmm(..., folds = NULL, control = fvcolmm_control(), add = TRUE)
 
 \method{logLik}{fvcolmm}(object, ...)
 \method{neglogLik}{fvcolmm}(object, ...)
@@ -41,7 +39,7 @@ fvcolmm(..., folds = NULL,
   \item{folds}{a matrix of integers defining the folds for
     cross-validation. See \code{\link{cv.tvcolmm}}.}
   \item{control}{a \code{list} that specifies the maximum control
-    parameters to evaluate. See \code{\link{tvcolmm_control}}.}
+    parameters to evaluate. See \code{\link{fvcolmm_control}}.}
   \item{add}{logical scalar. Indicates if a existing forest should be
     extended with additional trees.}
   \item{newdata}{an optional data frame in which to look for variables
@@ -56,13 +54,15 @@ fvcolmm(..., folds = NULL,
 
 \details{
   Implements "bagging" (Breiman, 1996) and "random forests" (Breiman,
-  2001) for \code{\link{tvcolmm}} objects.
+  2001) for \code{\link{tvcolmm}} objects. The pre-decorrelation method
+  which is used for \code{\link{tvcolmm}} is switched off (default)
+  because it is slower an likely instable in cases of large trees. 
 
   For bagging, use \code{control = list(alpha = 1L, mtry = Inf)}.
 
   Prediction for \code{forest.vcolmm} objects works in the same manner
-  as \code{\link{predict.tvcolmm}}. The only current restriction is that
-  the \code{ranef} argument must be logical.
+  as for \code{\link{predict.tvcolmm}}. The only current restriction is
+  that the \code{ranef} argument must be logical.
 }
 
 \references{
