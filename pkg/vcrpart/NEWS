@@ -1,0 +1,14 @@
+		 CHANGES IN tbvc VERSION 0.1-12
+
+NEW FEATURES
+
+     o   changed several methods for 'olmm' class from S4 to S3 
+     
+     o   modifications for gefp.olmm and estfun.olmm
+
+IMPROVEMENTS
+
+     o	 C implementation for updating the marginal Likelihood
+     	 and predicting random-effects was stabilized by 
+	 replacing many alloca's by the R built-in function
+	 Calloc, which may slow the estimation

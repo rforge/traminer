@@ -1,0 +1,990 @@
+\documentclass[nojss]{jss}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{natbib}
+
+\SweaveOpts{engine=R}
+
+<<setup, echo = FALSE, results = hide>>=
+require("vcrpart")
+options(useFancyQuotes = FALSE)
+@
+
+%% author/title
+\author{Reto B\"urgin and Gilbert Ritschard\\Universit\'e de Gen\`eve}
+\Plainauthor{Reto B\"urgin and Gilbert Ritschard}
+
+\title{\pkg{vcrpart}: Tree-based learning of varying coefficients in
+  ordinal 2-stage linear mixed models} 
+\Plaintitle{Ordinal Linear Mixed Models with Varying Coefficients}
+\Shorttitle{Ordinal Linear Mixed Models with Varying Coefficients}
+
+\Keywords{linear mixed models, ordinal longitudinal data, recursive
+  partitioning} 
+
+%% abstract
+\Abstract{
+  The \pkg{vcrpart} package aims at learning varying fixed coefficients
+  in ordinal 2-stage linear mixed models (OLMM) based on model-based
+  recursive partitioning. The package includes a fitting function for
+  OLMMs and a partitioning algorithm for varying fixed effects in
+  OLMMs. This document is a guideline for the use of these functions. 
+}
+  
+\Address{
+  Reto B\"urgin\\
+  Institute for Demographic and Life Course Studies\\
+  Uni Mail\\
+  40 Bd du Pont-d'Arve\\
+  1211 Gen\`eve, Switzerland\\
+  E-mail: \email{reto.buergin@unige.ch}, \email{rbuergin@gmx.ch}\\
+  URL: \url{http://www.unige.ch/ses/demog/Equipe/RetoBurgin.html},\\
+}
+
+\begin{document}
+
+%\VignetteIndexEntry{vcrpart}
+%\VignetteDepends{vcrpart}
+%\VignetteKeywords{recursive partitioning}
+%\VignettePackage{vcrpart}
+
+
+% <<eval = FALSE>>=
+% library(vcrpart)
+% @ 
+
+% <<eval = FALSE, echo = FALSE>>=
+% load("vcrpart.RData")
+% run <- FALSE
+% @ 
+
+% \section{Introduction}
+
+% \paragraph{Organisation of the article} In the first part we introduce
+% the implemented ordinal regression models. This introduction ignores
+% random effects for simplicity. In the subsequent parts, we will mainly
+% focus on the cumulative logit mixed model and our tree-based
+% extensions. 
+
+% \clearpage
+
+% \section{Overview}
+
+% \subsection{Regression models}
+
+% \begin{table}[htbp]
+%   \centering
+%   \begin{tabular}{rlp{1cm}lll} 
+%     \hline
+%     & Model & Link & Responses & FE-types & RE-types \\ \hline
+%     1 & Cumulative link & logit, & ordinal, & non-p.o., & p.o. \\
+%     && probit, & binary & p.o. & \\ 
+%     && cauchy & & & \vspace{0.25cm} \\ 
+%     2 & Adjacent-Category & logit & ordinal, & non-p.o., & non-p.o., \\
+%     && & binary & p.o. & p.o. \vspace{0.25cm} \\ 
+%     3 & Baseline-Category & logit & ordinal, & non-p.o., & non-p.o., \\
+%     && & nominal & p.o. & p.o. \\
+%     && & binary \\
+%     \hline
+%   \end{tabular}
+%   \caption{List of implemented regression models in the \code{olmm}
+%     function. Abbreviations: FE = fixed-effects (-coefficients), RE =
+%     2nd-stage random-effects (-coefficients),  p.o. = proportional
+%     odds, non-p.o. = non-proportional, logit-specific odds.}
+% \end{table}
+
+% \subsection{Algorithms for tree-based varying coefficient regression}
+
+% \begin{table}[htbp]
+%   \centering
+%   \begin{tabular}{rlp{10cm}}
+%     & Function name & Description \\ \hline
+%     1 & \code{tvcolmm} & fits a model with \code{olmm} with piecewise
+%     constant coefficient functions based on model-based recursive partitioning \\
+%     2 & \code{fvcolmm} & implements a random forest version of
+%     \code{tvcolmm} \\ \hline
+%   \end{tabular}
+% \end{table}
+
+% \clearpage
+
+% \section{Fitting ordinal regression models}
+
+% \code{olmm} is the main fitting function:
+  
+% \begin{verbatim}
+% olmm(formula, data, weights, start, subset, na.action,
+%      offset, contrasts, 
+%      family = c("cumulative", "baseline", "adjacent"),
+%      link = c("logit", "probit", "cauchy"),
+%      doFit = TRUE, optim = list(),
+%      numGrad = FALSE, numHess = numGrad, nGHQ = 7L,
+%      restricted, verbose = FALSE, ...)
+% \end{verbatim}
+
+% The arguments are documented and some are used in the examples
+% below. In the following, we explain the models that can be fitted with
+% \code{olmm}. 
+
+% \par
+
+% First we focus on 1-stage models and explain the implemented model
+% families. Let $Y_i$ denote the $i$-th ordinal response, $i = 1, \ldots, N_T$,
+% taking values in $\{ 1, \ldots, R \}$. Denote by ${\boldsymbol\beta}$
+% a $P \times (R-1)$ coefficient matrix corresponding to a $P \times 1$
+% vector of predictors and ${\boldsymbol\beta}_r$ the $r$-th column of
+% this matrix. Further,  let ${\boldsymbol\pi}_{it} = (P(Y_{it} = 1|
+% \mathbf{b}_i; \mathbf{x}_{it}, \mathbf{w}_{it}), \ldots, P(Y_{it} =
+% R-1| \mathbf{b}_i; \mathbf{x}_{it}, \mathbf{w}_{it}))^T$ a $(R-1)
+% \times 1$ vector of conditional probabilities for the response
+% categories $1$ to $R-1$. The general ordinal (categorical) model can
+% be written as 
+
+% \begin{equation}
+%   \mathcal{M}_{1}: g_r({\boldsymbol\pi}_{it}) =
+%   \beta_{0r} + \mathbf{x}_{it}^T {\boldsymbol\beta}_r , \quad r = 1, \ldots, R-1, 
+%   \label{eq:common}
+% \end{equation}
+
+% where $g_r$ is a link function to be specified. 
+
+% \paragraph{Proportional odds assumption}  For most ordinal models, e.g.,
+% the cumulative- or the adjacent-category model, it is common to assume
+% that some coefficients of predictors are constant across the index
+% $r$, i.e., the rows of $ {\boldsymbol\beta}$ are restricted to a common
+% value. This assumption is known as proportional-odds assumption,
+% refering to models using logits as link functions. We will use this
+% term through the article even if it the term may be wrong for some
+% models, e.g., the cumulative probit model.
+
+
+% \paragraph{Formula interface} For the model specification it is
+% necessary to indicate which coefficients follow the proportional odds
+% assumptions. With \code{olmm}, this is done via the formula
+% interface. The right hand of the \code{formula} argument is
+% interpreted as two-piece formula of form \code{y ~ x1 + x2 | x3 + x4}
+% where \code{x1} and \code{x2} are proportional odds- and \code{x3} and
+% \code{x3} category-specific coefficients. Correspondingly, \code{y ~
+%   x1 + x2} is a model with proportional odds coefficients only and
+% \code{y ~ | x3 + x3} a model with non-proportional odds coefficients
+% only. 
+
+% \par
+
+% In the following we introduce the implemented models.
+
+% \subsection{Cumulative link models}
+
+% Cumulative link (CL) models are based on cumulative probabilities. The
+% model class has the general form
+
+% \begin{equation}
+%   \mathcal{M}_{CL}: g(P(Y_i \le r | \mathbf{x}_i)) = \beta_{0r} +
+%   \mathbf{x}_i^T  {\boldsymbol\beta}_r, \quad r = 1, \ldots, R-1
+%   \label{eq:cumulative}
+% \end{equation}
+
+% where $g(\ldots)$ is a link function to be specified. Our
+% implementation provides the following three links:
+
+% \begin{eqnarray}
+%   \text{logit}(x) &=& \log{ \left(\frac{P(Y \le r | x)}{1-P(Y \le r |
+%         x)} \right)} \\
+%   \text{probit}(x) &=& \phi^{-1}(P(Y \le r | x))) \\
+%   \text{gumbel}(x) &=& \log (-\log( P(Y \le r | x)))
+% \end{eqnarray}
+
+% The cumulative logit model may be the most popular among ordinal
+% regression models models in general. It is therefore implemented as
+% the default. 
+
+% \subsubsection{An application: knee injuries}
+
+% To demonstrate the \code{olmm} function, we replicate example 9.3 of
+% \citet[][p. 245]{Tutz2012}. 
+
+% \small
+% <<eval = FALSE>>=
+% path <- "http://www.statistik.lmu.de/~tutz/catdata/datasets/knee.txt"
+% knee <- read.table(path, row.names = NULL, header = TRUE)
+% knee$y <- ordered(knee$R4)
+% knee$Age.P2 <- knee$Age^2
+% @ 
+% \normalsize
+
+% After reading the data from the webpage and converting the response
+% variable \textsl{pain after ten days of treatment} into an
+% \code{ordered} factor variable, we fit the proposed cumulative logit
+% model with proportional odds assumption for several covariates by: 
+
+% \small
+% <<eval = FALSE>>=
+% mKnee <- olmm(formula = y ~ Th + Sex + Age + Age.P2, data = knee, 
+%               family = cumulative(), verbose = TRUE)
+% summary(mKnee)
+% @ 
+% \normalsize
+
+% The \code{summary} method overviews the fitted model. The standard
+% deviations are based on the expected Fisher information
+% matrix. Alternatively, you can use \code{numHess = TRUE} to compute
+% the standard deviation based on a numerical approximation of the
+% Fisher information. For alternative link functions, use the
+% \code{link} argument. To avoid the proportional odds assumption, you
+% can add the term after a vertical bar \code{|}. For example if the
+% treatment effect is supposed to vary across logits, use 
+
+% \small
+% <<eval = FALSE>>=
+% mKnee <- olmm(formula = y ~ Sex + Age + Age.P2 + ce(Th), data = knee, 
+%               family = cumulative(), verbose = TRUE)
+% @ 
+% \normalsize
+
+% Note that alternative functions for cumulative logit models, such as
+% \code{polr} of \pkg{MASS} and \code{clm} of \pkg{ordinal} have
+% opposite signed coefficients.
+
+% \subsection{Baseline-category logit models}
+
+% Baseline-category logit (BCL) models are principally popular for
+% nominal responsesl. The model is defined as
+
+% \begin{equation}
+%   \mathcal{M}_{BCL}:\text{logit}(P(Y_i = r |Y_{i} \in \{ r, R\}, \mathbf{x}_i)) =
+%   \beta_{0r} + \mathbf{x}_i^T {\boldsymbol\beta}_r, \quad r = 1, \ldots, R-1
+%   \label{eq:baseline}
+% \end{equation}
+
+% where $R$, the baseline category, i.e. the highest category in
+% \code{olmm}. Even if it is technically possible, it is very rare to
+% specify proportional odds coefficients in this model.
+
+% \subsection{Adjacent-categories logit model}
+
+% \begin{equation}
+%   \mathcal{M}_{ACL}:\text{logit}(P(Y_i = r |Y_{i} \in \{ r, r + 1\}, \mathbf{x}_i)) =
+%   \beta_{0r} + \mathbf{x}_i^T {\boldsymbol\beta}_r, \quad r = 1, \ldots, R-1
+%   \label{eq:adjacent}
+% \end{equation}
+
+% \paragraph{Estimation} As described in \cite{Agresti2010}, the
+% estimation of adjacent.category logit model can be based on the
+% estimation of baseline-category logit models. Therefore, the raw
+% coefficients of a fitted \code{olmm} object will refer to the baseline
+% model, but outputs produced by \code{summary} etc. transform the
+% coefficients for an adjacent-category logit model. 
+
+% \subsection{Ordinal 2-stage linear mixed models}
+
+% The \code{olmm} function is principally designed for ordinal 2-stage 
+% mixed models, e.g., for modeling longitudinal or multivariate
+% ordinal responses. Let $Y_{it}$ be the response $t$ of individual $i$,
+% taking values in $\{ 1, \ldots, R\}$. Let $\mathbf{x}_{it}$ and
+% $\mathbf{w}_{it}$ be $P \times 1$ and $Q \times 1$ predictor vectors
+% with corresponding fixed coefficients $ {\boldsymbol\beta}$ and
+% individual specific random coefficients $\mathbf{b}_i$. In analogous
+% to above, ${\boldsymbol\beta}$ is a $P \times (R - 1)$ matrix and
+% $\mathbf{b}_i$ a $Q \times (R - 1)$ matrix. We consider models of form 
+
+% \begin{equation}
+%   \mathcal{M}_{2}: g_r({\boldsymbol\pi}_{it}) =
+%   \beta_{0r} + \mathbf{x}_{it}^T {\boldsymbol\beta}_r +
+%   \mathbf{w}_{it}^T \mathbf{b}_{ri}, \quad r = 1, \ldots, R-1, 
+%   \label{eq:mixed}
+% \end{equation}
+
+% assuming that $\mathbf{b}_i \stackrel{i.i.d.}{\sim} \mathcal{N}
+% (\mathbf{0}, {\boldsymbol\Sigma_b})$. Several link functions from
+% above can be applied for $g_r(\ldots)$. The only restriction in the
+% current implementation is that random coefficients in cumulative link
+% models must follow the proportional odds assumption. The \code{olmm}
+% function fits $\mathcal{M}_{2}$ by maximizing the marginal likelihood,
+% approximating the integral involved by Gauss-Hermite quadrature, see
+% \cite{Tutz2012}.  
+
+% \subsubsection{Data preparation}
+
+% \code{olmm} expects the \code{data} to be in the ``long'' format in which
+% each observations has a separate row. The individual corresponding to
+% the observation is defined by a separate \code{factor} vector, which
+% is indicated in the model specification. See the example below. If the
+% raw data are in the ``wide'' format, i.e., there is one row for each
+% individual and repeated observations are stored in different columns,
+% the command \code{reshape} can be used for the transformation.
+
+% \subsubsection{An application of the cumulative logit mixed model: Schizophrenia}
+
+% As a first illustration, we replicate the two cumuv1lative logit mixed
+% models of Example~10.3 in \cite{Agresti2010}. The data origin
+% from a randomized controlled trial with patients assigned to either
+% a drug or placebo group, see \cite{Hedeker1994}. The responses measure
+% ``Severity of Illness'' on a ordinal four category ordered scale, at weeks 0,
+% 1, \ldots, 6 of 437 individuals.  Both models considered assume
+% proportional odds for several coefficients.  
+
+% \small
+% <<eval = FALSE>>=
+% data(schizo)
+% levels(schizo$imps79o)
+% model.10.3.1 <-
+%   olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + re(1 | id),
+%        data = schizo, family = cumulative(), control = olmm_control(verbose = TRUE, control = list(trace = 1)))
+% @ 
+% <<eval = FALSE>>=
+% model.10.3.3 <-
+%     olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + re(1 + sqrt(week) | id),
+%        data = schizo, family = cumulative(), verbose = TRUE)
+% @ 
+% \normalsize
+
+% Random intercepts are specified with \code{(1|id)}, where \code{id}
+% identifies the individual $i$. The second model specifies an
+% additional random slope for \code{sqrt(week)}. 
+
+% \par
+
+% In some applications, the covariance between random coefficients,
+% ${\boldsymbol\Sigma}_b$ may be assumed to be zero. This can be
+% specified using the \code{restricted} and the \code{start}
+% arguments. For instance, if we want to restrict the covariance between
+% the random intercept and the random slope to of the second model
+% above, we indicate that the coefficient \code{"ranefCholFac2"} is to
+% be restricted, which is the second element of the lower triangle of
+% ${\boldsymbol\Sigma}_b^{1/2}$. 
+
+
+% \small
+% <<eval = FALSE>>=
+% model.10.3.3 <-
+%   olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + re(1 + sqrt(week) | id),
+%        data = schizo, family = cumulative(), 
+%        control = olmm_control(start = c("ranefCholFac2" = 0), 
+%            restricted = "ranefCholFac2", 
+%            verbose = TRUE))
+% @ 
+% \normalsize
+
+% The \code{restricted} argument can naturally be used for several
+% coefficients. 
+
+
+% \subsubsection{An application of the adjacent-category logit mixed model: Movie critics}
+
+% As a second illustration, we replicate two adjacent-category logit
+% mixed models of \cite{Hartzel2001} on movie critics, denoted by
+% $(22)$ and $(24)$ in that article. The analysis involves critics on 93
+% movies of 4 reviews. The interest are differences between the
+% reviews. The heterogeneity between the movies is accounted by random
+% intercepts.  
+
+% \par
+
+% Model $(22)$ specifies that both the coefficient of \code{review} and
+% individual specific effects of \code{movie} follow the proportional
+% odds assumption. In contrasts,  $(24)$ specifies both the coefficients
+% of \code{review}  and \code{movie} to be odds-specific
+% coefficients. With \code{olmm}, the two models are fitted with the
+% following commands
+
+% \small
+% <<eval = FALSE>>=
+% data(movie)
+% levels(movie$critic)
+% model.22 <- olmm(critic ~ review + re(1 | movie), data = movie,
+%                  family = adjacent(), verbose = TRUE)
+% @ 
+% <<eval = FALSE>>=
+% model.24 <- olmm(critic ~ ce(review) + re(1 | movie, intercept = "ce"), 
+%                  data = movie, family = adjacent(), verbose = TRUE)
+% @ 
+% \normalsize
+%  As a limitation, coefficients cannot be restricted for the
+%  adjacent-category logit model.
+ 
+% \section{Tree-based varying coefficient OLMMs}
+
+% \subsection{Growing a tree}
+
+% \subsubsection{Default method}
+
+% <<eval = FALSE, echo = FALSE>>=
+% if (run) {
+  
+%   q("no")
+%   library(vcrpart)
+  
+%   data <- data.frame(x = rnorm(10))
+  
+%   ## Baum mit einem Root-Node
+%   obj1 <- party(node = partynode(id = 1L), data = data)
+  
+%   ## Baum mit zwei Endknoten
+%   obj2 <- party(node = partynode(id = 1L,
+%                   split = partysplit(varid = 1L, breaks = c(0.0)),
+%                   kids = list(
+%                     partynode(id = 2L),
+%                     partynode(id = 3L))), 
+%                   data = data)
+  
+%   ## neue Print-Funktion
+%   printFun <- function(x, ...) {
+%     tpFun <- function(node) return(paste("\n\tNode", node$id))
+%     print.party(x, terminal_panel = tpFun, ...)
+%   }
+  
+  
+%   printFun(obj1)
+%   printFun(obj2)
+
+  
+  
+%   data(tvcm_1)
+%   training <- 1:1000
+%   m <- olmm(y~time+treat+re(1|id),data = tvcm_1,doFit=TRUE,control=olmm_control(doFit=FALSE,numHess=FALSE))
+%   m
+  
+%   source("~/UNIGE/traminer/pkg/vcrpart/R/olmm.R")
+%   source("~/UNIGE/traminer/pkg/vcrpart/R/utils.R")
+%    source("~/UNIGE/traminer/pkg/vcrpart/R/olmm-utils.R")
+%   source("~/UNIGE/traminer/pkg/vcrpart/R/tvcm-methods.R")
+%    source("~/UNIGE/traminer/pkg/vcrpart/R/tvcm-utils.R")
+  
+%   m <- tvcolmm(y~time+treat, data = tvcm_1,subset=training,control = tvcm_control(verbose = TRUE))
+  
+  
+%   m <- tvcolmm(y ~ time  + vc(z1, z2, z3, z4, z5, z6, by = treat, intercept = "ge") + re(1|id, intercept = "ge"), data = tvcm_1, family = cumulative(), control = tvcm_control(verbose = TRUE, maxevalsplit = 3L), subset = training)
+
+%   plot(m)
+  
+% training <- 1:1000
+%   folds <- cvfolds(tvcm_1$id, "subsampling", 3)
+%   m <- fvcm(y ~ time + vc(z1, z2, z3, z4, z5, z6, by = treat) + re(1|id),
+%             control = fvcm_control(maxwidth = 4, verbose = TRUE,
+%                    mtry = 2L), data = tvcm_1, folds = folds,
+%             family = cumulative())
+
+%   debug(predict)
+  
+%   library(vcolmm)
+%   data(tvcolmm_1)
+%   load("m1.RData")
+  
+%   p1 <- predict(m, ranef = FALSE, verbose = TRUE, type = "response")
+%   p2 <- predict(m, ranef = TRUE, verbose = TRUE, type = "response")
+%   re <- matrix(0,500,1,dimnames = list(levels(tvcm_1$id), "ranefCholFac1"))
+%   newdata <- model.frame(m)
+%   p3 <- predict(m, ranef = re, newdata = newdata, verbose = TRUE, type = "response")
+  
+%   oobrisk(m, verbose = TRUE)
+  
+  
+  
+%   AIC(m, sub = TRUE)
+%   BIC(m, sub = TRUE)
+
+%   oobrisk(m, newdata = tvcm_1[-training, ])
+  
+%   folds <- cvfolds(m)
+%   cv <- cvrisk(m, folds = folds, maxalpha = 0.2, verbose = TRUE)
+  
+%   data <- model.frame(m)
+%   m2 <- tvcolmm(y ~ time  + vc(z1, z2, z3, z4, z5, z6, by = treat, intercept = "ge") + re(1|id, intercept = "ge"), data = data[folds[,1] == 1L, ], fit = "olmm", family = cumulative(), control = tvcolmm_control(alpha = 0.2, verbose = TRUE, maxevalsplit = 3L))
+  
+  
+%   n <- 500
+%   data <- data.frame(x1 = sample(c("A.1","B"), n, replace = TRUE), 
+%                      x2.5 = rnorm(n), 
+%                      z1 = sample(c("A.1","B"), n, replace = TRUE),
+%                      z2 = sample(c("A.1","B","C"), n, replace = TRUE), 
+%                      z3 = rnorm(n), 
+%                      z4 = rnorm(n))
+%   mm <- model.matrix(~ x1 + z1:x2.5, data)
+%   data$y <- mm %*% c(0,1,-2,2) + rnorm(n)
+%   data$y <- cut(data$y, c(-Inf, median(data$y), Inf))  
+%   m11 <- tvcolmm(y ~ x1 + vc(z1, z2, z3, z4, by = x2.5, intercept = FALSE), data = data, fit = glm, family = binomial(), control = tvcolmm_control(verbose = TRUE, method = "partreg", maxwidth = 5))
+  
+%   coef(m11)
+%   coefficients(m11)
+%   deviance(m11)
+%   extract(m11, "control")
+%   extract(m11, "model")
+%   extract(m11, "sctest")
+%   extract(m11, "p.value")
+%   extract(m11, "selected")
+%   extract(m11, "riskgrid")
+%   extract(m11, "riskgrid", 1:2)
+%   extract(m11, "coef")
+%   extract(m11, "sd")
+%   extract(m11, "var")
+%   fitted(m11)
+%   formula(m11)
+%   getCall(m11)
+%   logLik(m11)
+%   head(model.frame(m11))
+%   neglogLik(m11)
+%   nobs(m11)
+%   head(predict(m11, newdata = data, type = "link"))
+%   head(predict(m11, newdata = data, type = "response"))
+%   head(predict(m11, newdata = data, type = "prob"))
+%   ranef <- ranef(m11)
+%   ranef[] <- 0
+%   head(predict(m11, newdata = data, type = "prob", ranef = ranef))
+%   head(predict(m11, newdata = data, type = "class"))
+%   head(predict(m11, newdata = data, type = "node"))
+%   head(predict(m11, newdata = data, type = "coef"))
+%   print(m11)
+%   summary(m11)
+%   prune(m11, alpha = 1e-10)
+%   prune(m11, minsplit = 3000L)
+%   head(ranef(m11))
+%   splitpath(m11, step = 4)
+%   head(weights(m11))
+  
+%   library(vcolmm)
+%   data(tvcolmm_1)
+%   load("m1.RData")
+%   m11p <- prune(m, maxwidth = 1L)
+%   risk(1, newdata = tvcolmm_1)
+  
+%   ## simulate data
+%   n <- 500
+%   data <- data.frame(x = rnorm(n),
+%                      z1 = runif(n, -1, 1),
+%                      z2 = runif(n, -1, 1))
+%   beta <- data$z1 + sin(pi / 2 * data$z2)
+%   data$y <- data$x * beta + rnorm(n)
+  
+%   folds <- cvfolds(factor(1:n), type = "subsampling", K = 25)
+  
+%   control <- fvcolmm_control(mtry = 1, maxwidth = 10L, 
+%                              minbucket = 5L, verbose = TRUE)
+  
+%   forest <- fvcolmm(y ~ vc(z1, z2, by = x, intercept = FALSE), data = data,
+%                     fit = glm, family = gaussian, 
+%                     folds = folds, control = control)
+  
+%   zVals <- seq(-1, 1, 0.05)
+%   newdata <- expand.grid(z1 = zVals, z2 = zVals)
+%   pred <- predict(forest, newdata = newdata, type = "coef", verbose = TRUE)
+
+%   par(mfrow = c(1, 2))
+%   plot(zVals, tapply(pred[, "x"], newdata$z1, mean), ylim = c(-1, 1), 
+%        type = "l", col = "red", xlab = "z1", ylab = "coef(z1)")
+%   abline(a = 0, b = 1)
+%   legend("topleft", c("true", "estimated"), lty = 1, col = c("black", "red"))
+%   plot(zVals, tapply(pred[, "x"], newdata$z2, mean), ylim = c(-1, 1), 
+%        type = "l", col = "red", xlab = "z2", ylab = "coef(z2)")
+%   lines(zVals, sin(pi / 2 * zVals))
+  
+%   head(pred)
+  
+  
+%   n <- 500
+%   data <- data.frame(x1 = sample(c("A.1","B"), n, replace = TRUE), 
+%                      x2.5 = rnorm(n), 
+%                      z1 = sample(c("A.1","B"), n, replace = TRUE),
+%                      z2 = sample(c("A.1","B","C"), n, replace = TRUE), 
+%                      z3 = rnorm(n), 
+%                      z4 = rnorm(n))
+%   beta <- data$z3^2
+%   data$y <- data$x2.5^2 + rnorm(n)
+
+%   data$y <- cut(data$y, c(-Inf, median(data$y), Inf))  
+  
+%   m <- glm(y~x1,family=gaussian(),data = data,control=glm.control(trace = TRUE))
+%   start <- m$coefficients
+%   start[2] <- 0
+%   m <- glm(y~x1,family=gaussian(),data = data,control=glm.control(trace = TRUE,maxit=1),start = start)
+  
+%   folds <- cvfolds(factor(1:n), type = "subsampling", K = 10)
+  
+%   m11 <- tvcolmm(y ~ vc(x2.5, intercept = TRUE), data = data, fit = glm, family = gaussian(), control = tvcolmm_control(verbose = TRUE, method = "mob", maxwidth = 10, alpha = 1))
+  
+%   m11 <- fvcolmm(y ~ vc(x2.5, intercept = TRUE), data = data, fit = glm, family = gaussian(), control = fvcolmm_control(verbose = TRUE, method = "mob", maxwidth = 10, alpha = 1), folds = folds)
+  
+%   p1 <- predict(m11, verbose = TRUE, type = "response")
+%   newdata <- model.frame(m11)
+%   p3 <- predict(m11, newdata = newdata, verbose = TRUE, type = "response")
+
+%   undebug(predict)
+%   debug(predict.fvcolmm)
+%   p11 <- predict.fvcolmm(m11, type = "response", verbose = TRUE)
+  
+%   logLik(m11, verbose=TRUE)
+  
+%     source("~/UNIGE/traminer/pkg/vcolmm/R/fvcolmm.R")
+%     source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-utils.R")
+%     source("~/UNIGE/traminer/pkg/vcolmm/R/utils.R")
+%   logLik(m11, verbose=TRUE)
+
+  
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/utils.R")
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-utils.R")
+%   fam <- cumulative()
+%   formList <- vcolmm_formula(y ~ fe(x, intercept = FALSE) + vc(z1,z2, intercept = "none"), family = fam)
+%   formList
+%   tvcolmm_formula(formList, family = fam)
+  
+%   mm <- model.matrix(~ x1 + z1:x2.5, data)
+%   data$y <- mm %*% c(0,1,-2,2) + rnorm(n)
+%   data$y <- cut(data$y, c(-Inf, median(data$y), Inf))  
+%   m11 <- tvcolmm(y ~ x1 + vc(z1, z2, z3, z4, by = x2.5, intercept = FALSE), data = data, fit = glm, family = binomial(), control = tvcolmm_control(verbose = TRUE, method = "partreg", maxwidth = 5))
+  
+  
+  
+  
+  
+  
+%   cv <- cvrisk(m11, vcolmm_folds(m11, "kfold", K = 10), maxalpha = 0.05, verbose = TRUE)
+  
+%   plot(m11, "coef")
+  
+%   m12 <- tvcolmm(y ~ time  + vc(z1, z2, z3, z4, z5, z6, by = ge(treat) + x1 + x2, intercept = "ce") + re(1|id, intercept = "ge"), data = tvcolmm_1, fit = olmm, family = cumulative, control = tvcolmm_control(verbose = TRUE, maxevalsplit = 3L))
+%   summary(m12)
+%   plot(m12)
+  
+%   m21 <- tvcolmm(y ~ time  + vc(z1, z2, z3, z4, z5, z6, by = ge(treat), intercept = "ge") + re(1|id, intercept = "ge"), data = tvcolmm_1, family = cumulative(), control = tvcolmm_control(method = "partreg", verbose = TRUE, maxevalsplit = 3L, maxwidth = 4))
+%   summary(m21)
+%   plot(m21)
+  
+%   n <- 300
+%   data <- data.frame(x1 = sample(c("A.1","B"), n, replace = TRUE), 
+%                      x2.5 = rnorm(n), 
+%                      z1 = sample(c("A.1","B"), n, replace = TRUE),
+%                      z2 = sample(c("A.1","B","C"), n, replace = TRUE), 
+%                      z3 = rnorm(n), 
+%                      z4 = rnorm(n))
+%   mm <- model.matrix(~ x1 + z1:x2.5, data)
+%   data$y <- mm %*% c(0,1,-2,2) + rnorm(n)
+%   #data$y <- cut(data$y, c(-Inf, median(data$y), Inf))
+%   m31 <- tvcolmm(y ~ x1 + vc(z1, z2, z3, by = x2.5, intercept = FALSE), data = data, fit = glm, family = gaussian(), control = tvcolmm_control(verbose = TRUE, method = "partreg"), subset = 1:200)
+  
+%   summary(m31)
+%   plot(m31)
+%   AIC(m31,sub = TRUE)
+%   BIC(m31,sub = TRUE)
+  
+%   oobrisk(m31, newdata = data[201:300, ])
+%   cv <- cvrisk(m31, verbose = TRUE)
+%   plot(cv)
+  
+  
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-utils.R")
+
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/utils.R")
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-cv.R")
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-methods.R")
+%   folds <- vcolmm_folds(m31, "kfold", K = 10)
+%   cv <- cvrisk(m11, vcolmm_folds(m11, "kfold", K = 10), maxalpha = 0.05, verbose = TRUE)
+  
+  
+%   model <- extract(m31, "model")
+%   predict(model, type = "response")
+  
+%   data$y <- cut(data$y, 0)
+%   m32 <- tvcolmm(y ~ x1 + vc(z1, z2, z3, by = x2.5, intercept = FALSE), data = data, fit = glm, family = binomial(), control = tvcolmm_control(verbose = TRUE, method = "partreg"))
+%   summary(m32)
+%   plot(m32)
+
+%   predict(m32, type = "coef")
+  
+%   predict(m32, newdata = data, type = "link")
+  
+%   model <- extract(m31, "model")
+  
+%   sum(binomial()$dev.resids(c(yMat), predict(m32, newdata = data, type = "response"), weights(model)))
+%   deviance(m32)
+  
+%   m2 <- tvcolmm(y ~ time  + treat + (1|id) | z1 + z2 + z3, data = tvcolmm_1, control = tvcolmm_control(verbose = TRUE, maxevalsplit = 3L))
+  
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/utils.R")
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-utils.R")
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-methods.R")
+  
+%   source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-plot.R")
+%   plot.party(m32, terminal_panel = panel_coef)
+  
+%   debug(vcolmm_formula)
+%   vcolmm_formula(y ~ time + sex + ce(income) + vc(z1, z2, z3, z5, by = ce(married) + treat + sex, intercept = "ge") + re(1 + w + ce(w2)|id, intercept = "ce"), family = adjacent())
+  
+%   formList <- vcolmm_formula(y ~ ce(time) + sex + income + vc(z1, z2, z3, z5, by = married + ce(treat) + sex, intercept = TRUE) + re(1 + w + w2|id, intercept = "ge"), family = adjacent())
+%   formList
+
+%   formula <- tvcolmm_formula(formList, family = adjacent())$tree
+
+%   get_fixef <- function(formList) {
+%     terms <- terms(formula, specials = c("fe", "re", "vc", "ce", "ge"))
+%     if (!all(unlist(lapply(attr(terms, "specials"), is.null)))) {
+%       feTerm <- rownames(attr(terms, "factors"))[attr(terms, "specials")$fe]
+%     }
+%   }
+  
+%   library(vcolmm)
+  
+%   n <- 200
+%   data <- data.frame(x1 = sample(c("A.1","B"), n, replace = TRUE), 
+%                      x2.5 = sample(c("A.1","B", "C"), n, replace = TRUE), 
+%                      z1 = sample(c("A.1","B"), n, replace = TRUE),
+%                      z2 = sample(c("A.1","B","C"), n, replace = TRUE), 
+%                      z3 = rnorm(n), 
+%                      z4 = rnorm(n))
+%   mm <- model.matrix(~ x1 + z1:x2.5, data)
+%   y <- mm %*% c(1,1,rep(c(-1,1), each = 3)) + rnorm(n)
+
+%   debug(tvcolmm)
+%   m <- tvcolmm(y ~ x1 + vc(z1, z2, z3, by = x2.5), data = data, fit = glm, family = gaussian(), control = tvcolmm_control(verbose = TRUE))
+  
+% }
+
+% logLik(m1)
+% logLik(m1, cv = TRUE, vcolmm_folds(m1, "kfold", K = 2), verbose = TRUE)
+
+
+% p <- predict(m1)
+% head(p)
+% p <- predict(m1, newdata = tvcolmm_1[1:20, ])
+% head(p)
+% p <- predict(m1, newdata = tvcolmm_1[1:20, ], type = "terms")
+% head(p)
+
+
+% predict(m1, newdata = tvcolmm_1[1:20, ], type = "coef")
+
+% tvcolmm_get_estimates(m1, "var")
+
+% y ~ time  + vc(z1, z2, z3, by = treat + treat2) + re(1|id)
+
+
+% @ 
+
+
+% <<eval = FALSE>>=
+% library(vcolmm)
+% data(tvcolmm_1)
+% m1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z4, 
+%               tvcolmm_1, vi = "po", linear = "time")
+% @ 
+
+% \subsubsection{Grid search maximum likelihood maximization}
+
+
+% <<eval = FALSE>>=
+
+% library(vcolmm)
+% data(tvcolmm_1)
+
+% m1 <- tvcolmm(y ~ time + vc(z1,z2,z3,z4,z5,z6,by=treat,intercept="ge") + re(1|id), 
+%               data = tvcolmm_1, 
+%               control = tvcolmm_control(method = "mob", verbose = TRUE))
+
+% AIC(m1, sub = TRUE)
+% AIC(m1, sub = TRUE, maxalpha = 0.1, verbose = TRUE)
+
+% m2 <- tvcolmm(y ~ time + vc(z1,z2,z3,z4,z5,z6,by=treat,intercept="ge") + re(1|id), 
+%               data = tvcolmm_1,
+%               control = tvcolmm_control(method = "partreg", 
+%                 verbose = TRUE, maxwidth = 3, maxevalsplit = 3L))
+
+% AIC(m2, sub = TRUE)
+% AIC(m2, sub = TRUE, maxwidth = 4, verbose = TRUE)
+
+% so <- summary(extract(m2, "model"))
+
+% x <- m2
+
+% coefMat <- cbind("Estimate" = extract(x, "coef")$restricted,
+%                  "Std. Error" = extract(x, "sd")$restricted,
+%                  "t value" = extract(x, "coef")$restricted / 
+%                  extract(x, "sd")$restricted)
+
+
+% coefMat[, "t value"] <- apply(coefMat, 1, function(x) x[1] / x[2])
+
+% m2
+
+% source("~/UNIGE/traminer/pkg/vcolmm/R/utils.R")
+% source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-utils.R")
+% source("~/UNIGE/traminer/pkg/vcolmm/R/tvcolmm-methods.R")
+
+% m1
+% print(m2, digits = 1)
+
+% folds <- vcolmm_folds(tvcolmm_1$id, type = "kfold", K = 3)
+
+% cv1 <- cv.tvcolmm(m1, folds = folds, maxalpha = 0.2, verbose = TRUE)
+% plot(cv1)
+
+% cv2 <- cv.tvcolmm(m2, folds = folds, maxwidth = 4, verbose = TRUE)
+% plot(cv2)
+
+% sb1 <- stabpath.tvcolmm(m1, folds = folds, maxalpha = 0.3, q = 2, verbose = TRUE)
+% plot(sb1)
+% sb2 <- stabpath.tvcolmm(m2, folds = folds, maxwidth = 4, q = 2, verbose = TRUE)
+
+% save(folds, m1,m2, file = "m1.RData")
+
+% N <- nlevels(tvcolmm_1$id)
+% subs <- sort(sample(N, round(2 / 3 * N)))
+% subs <- tvcolmm_1$id %in% levels(tvcolmm_1$id)[subs]
+% m1 <- tvcolmm(y ~ time + treat + (1|id) | z1 + z2 + z3 + z4 + z5 + z6, 
+%               tvcolmm_1, subset = subs, vi = "po", linear = "time",
+%               control = tvcolmm_control(type = "ML", verbose = TRUE, 
+%                   maxstep = 11L))
+
+% AIC <- AIC.tvcolmm(m2, sub = TRUE, maxwidth = 7, verbose = TRUE)
+
+% @ 
+
+% \subsection{Analyze a fitted model}
+
+% \subsubsection{Print methods}
+
+% \footnotesize
+% <<eval = FALSE>>=
+% print(m1, digits = 2)
+% @ 
+% \normalsize
+
+% <<eval = FALSE>>=
+% splitpath(m1)
+% @ 
+
+% \subsubsection{Plot methods}
+
+% <<eval = FALSE>>=
+% plot(m1, conf.int = TRUE, mean = TRUE, dims = "n")
+% @ 
+
+% \begin{figure}[htbp]
+%   \centering
+% <<eval = FALSE, fig = TRUE, echo = FALSE>>=
+% plot(m1, conf.int = TRUE, mean = TRUE,
+%      dims = "n",
+%      conf.int_gp = list(length = unit(1.5, "mm")),
+%      margins = c(1,1,0,0))
+% @ 
+% \end{figure}
+
+% \subsubsection{Estimating the error}
+
+% <<eval = FALSE>>=
+% logLik(m1)
+% logLik(m1, cv = TRUE)
+% @ 
+
+% \subsubsection{Cross-validation and pruning} 
+
+% The $\alpha$ parameter may be interpreted as a hyper-tuning parameter
+% and chosen using cross-validation. With the following commands, we
+% first create a 10-fold individual-wise cross-validation matrix, then
+% compute the out-of-bag loss for varying $\alpha$'s up to 0.5, for each
+% fold, and finally we prune the tree accoring to the optimal $\alpha$
+% from the cross-validation.
+
+% <<eval = FALSE>>=
+% folds <- tvcolmm_folds(m1, type = "kfold", K = 10)
+% cv <- cv.tvcolmm(m1, folds, alpha.max = 0.5)
+% m1 <- prune(m1, alpha = cv$alpha.best)
+% @ 
+
+% <<eval = FALSE, echo = FALSE>>=
+% if (run) {
+%   m1.ll.1 <- logLik(m1)
+%   m1.ll.2 <- logLik(m1, cv = TRUE, verbose = TRUE)
+  
+%   m1.cv.folds <- tvcolmm_folds(m1, type = "kfold", K = 10)
+%   m1.cv <- cv.tvcolmm(m1, m1.cv.folds, verbose = TRUE, alpha.max = 0.5)
+%   m1 <- prune(m1, alpha = m1.cv$alpha.best)
+  
+%   m1.sb.folds <- tvcolmm_folds(m1, type = "subsampling", K = 10)
+%   m1.sb <- stabpath.tvcolmm(m1, q = 1, alpha.max = 0.2, m1.sb.folds, verbose = TRUE)
+% }
+% @ 
+
+% \subsubsection{Pruning}
+
+% <<echo = TRUE, eval = FALSE>>=
+% if (run) {
+%   m1.prune <- prune(m1, alpha = 1e-6) #
+%   m1.prune <- prune(m1, minsplit = 2000) 
+%   m1.prune <- prune(m1, nselect = 0)
+%   m1.prune <- prune(m1, depth = 1)
+%   m1.prune <- prune(m1, width = 1)
+%   m1.prune <- prune(m1, maxstep = 1)
+%   m1.prune <- prune(m1, minbucket = 800)
+% }
+% @ 
+
+% \section{Random forests varying coefficient OLMMs}
+ 
+
+% <<echo = FALSE, eval = FALSE>>=
+% if (run) {
+%   data(tvcolmm_1)
+%   f1.folds <- tvcolmm_folds(tvcolmm_1$id, K = 20, type = "subsampling")
+%   f1 <- fvcolmm(formula = y ~ time + treat + (1|id) | z1 + z2 + z3 + z4 + z5 + z6, 
+%                 data = tvcolmm_1, vi = "po", linear = "time", 
+%                 control = fvcolmm_control(verbose = TRUE, 
+%                   mtry = 2, maxwidth = 4),
+%                 folds = f1.folds)
+% } 
+% @ 
+
+% <<echo = TRUE, eval = FALSE>>=
+% data(tvcolmm_1)
+% folds <- tvcolmm_folds(tvcolmm_1$id, K = 5, type = "subsampling")
+% f1 <- fvcolmm(formula = y ~ time + treat + (1|id) | z1 + z2 + z3 + z4 + z5 + z6, 
+%               data = tvcolmm_1, vi = "po", linear = "time", 
+%               control = fvcolmm_control(verbose = TRUE, 
+%                 mtry = 2, maxwidth = 4), 
+%               folds = folds)
+% @
+
+% \subsection{Diagnosis}
+
+% <<eval = FALSE, echo = FALSE>>=
+% if (run) {  
+%   f1.fitted.p <- fitted(f1, type = "prob", verbose = TRUE)
+%   f1.fitted.t <- fitted(f1, type = "terms", verbose = TRUE)  
+%   newdata <- tvcolmm_1[1:20, ]
+%   f1.pred.p <- predict(f1, newdata, type = "prob", verbose = TRUE)
+%   f1.pred.t <- predict(f1, newdata, type = "terms", verbose = TRUE)
+%   f1.ll <- logLik(f1, verbose = TRUE)
+% }
+% @ 
+
+% <<eval = FALSE, echo = FALSE>>=
+% save.image(file = "vcolmm.RData")
+% @ 
+% <<echo = FALSE, eval = FALSE>>=
+
+% load("~/Desktop/Pain/data-ALL.RData")
+% pain <- data.LONG
+
+% mod <- olmm(PainInt.6 ~ Time + re(1|ID), pain)
+
+% library(vcrpart)
+% mod <- tvcolmm(formula = PainInt.3 ~ Time + vc(Sex, Age, by = Time, intercept = "ce") + re(1|ID), data = pain, family = cumulative(), control = tvcm_control(verbose = TRUE, method = "partreg", maxwidth = 3, minbucket = 25L, maxevalsplit = 10L))
+
+% folds <- cvfolds(pain$ID, type = "subsampling", K = 2)
+% mod <- fvcm(PainInt.3 ~ Sex + Age + Time + vc(Sex, Age, by = Time, intercept = "ge") + re(1|ID), data = pain, family = cumulative(), control = tvcm_control(verbose = TRUE, method = "partreg", maxwidth = 3, minbucket = 25L, maxevalsplit = 10L), folds = folds)
+
+% pain$PainInt.2 <- pain$PainInt.3
+% levels(pain$PainInt.2) <- c(1,2,2)
+% m <- glm(PainInt.2 ~ Time, data = pain, family = binomial())
+
+% library(ordinal)
+% data <- model.frame(mod)
+% mod2 <- clmm(PainInt.3 ~ Sex + Age + Node:Time + (1|ID), data = data)
+% AIC(mod, sub = TRUE)
+% cv <- cvrisk(mod, verbose = TRUE)
+
+% @ 
+
+% \bibliography{literature}
+
+\end{document}
+

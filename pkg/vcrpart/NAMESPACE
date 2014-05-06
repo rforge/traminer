@@ -1,0 +1,131 @@
+useDynLib(vcrpart, .registration = TRUE)
+
+import("methods", "partykit")
+
+## Generics for which we define new methods
+importFrom("graphics", plot)
+importFrom("mboost", cvrisk, extract)
+importFrom("nlme", fixef, ranef, VarCorr)
+importFrom("numDeriv", hessian)
+importFrom("rpart", prune)
+importFrom("sandwich", estfun)
+importFrom("stats",
+           AIC, BIC, anova, coef, coefficients, deviance,
+           extractAIC, fitted, formula, getCall, logLik,
+           model.frame, model.matrix, nobs, predict, resid, residuals,
+           terms, update, vcov, weights)
+importFrom("strucchange", gefp, sctest, supLM, catL2BB, root.matrix)
+importFrom("ucminf", ucminf)
+importFrom("zoo", zoo)
+
+## Exported S4 classes
+exportClasses(olmm)
+
+## Exports
+export(
+  fe, re, vc, ge, ce,
+  adjacent,
+  baseline,
+  cumulative,
+  cvrisk,
+  extract,
+  fixef,
+  prune,
+  ranef,
+  ranefCov,
+  oobrisk,
+  splitpath, 
+  stabpath,
+  VarCorr,
+  otsplot, 
+  olmm,
+  olmm_control,
+  estfun.olmm,
+  gefp.olmm,
+  decormat.olmm,
+  tvcm_control, 
+  tvcm,
+  tvcolmm,
+  tvcglm, 
+  fvcm, 
+  fvcm_control,
+  cvfolds)
+
+## Exports for olmm (S3)
+S3method(anova, olmm)
+S3method(coef, olmm)
+S3method(coefficients, olmm)
+S3method(deviance, olmm)
+S3method(estfun, olmm)
+S3method(extractAIC, olmm)
+S3method(fitted, olmm)
+S3method(fixef, olmm)
+S3method(formula, olmm)
+S3method(getCall, olmm)
+S3method(gefp, olmm)
+S3method(logLik, olmm)
+S3method(model.frame, olmm)
+S3method(model.matrix, olmm)
+S3method(nobs, olmm)
+S3method(predict, olmm)
+S3method(print, olmm)
+S3method(ranef, olmm)
+S3method(ranefCov, olmm)
+S3method(resid, olmm)
+S3method(residuals, olmm)
+S3method(summary, olmm)
+S3method(print, summary.olmm)
+S3method(terms, olmm)
+S3method(update, olmm)
+S3method(VarCorr, olmm)
+S3method(print, VarCorr.olmm)
+S3method(vcov, olmm)
+S3method(weights, olmm)
+S3method(print, family.olmm)
+
+## Exports for olmm (S4)
+exportMethods(show)
+
+## Exports for otsplot (S3)
+S3method(otsplot, default)
+S3method(print, otsplot)
+
+## Exports for tvcm (S3)
+S3method(AIC, tvcm)
+S3method(print, AIC.tvcm)
+S3method(BIC, tvcm)
+S3method(coef, tvcm)
+S3method(coefficients, tvcm)
+S3method(cvrisk, tvcm)
+S3method(plot, cvrisk.tvcm)
+S3method(print, cvrisk.tvcm)
+S3method(deviance, tvcm)
+S3method(extract, tvcm)
+S3method(fitted, tvcm)
+S3method(formula, tvcm)
+S3method(getCall, tvcm)
+S3method(logLik, tvcm)
+S3method(model.frame, tvcm)
+S3method(nobs, tvcm)
+S3method(model.frame, tvcm)
+S3method(oobrisk, tvcm)
+S3method(plot, tvcm)
+S3method(predict, tvcm)
+S3method(print, tvcm)
+S3method(prune, tvcm)
+S3method(ranef, tvcm)
+S3method(resid, tvcm)
+S3method(residuals, tvcm)
+S3method(splitpath, tvcm)
+S3method(print, splitpath.tvcm)
+S3method(stabpath, tvcm)
+S3method(plot, stabpath.tvcm)
+S3method(print, stabpath.tvcm)
+S3method(summary, tvcm)
+S3method(weights, tvcm)
+
+## Exports for fvcm (S3)
+S3method(fitted, fvcm)
+S3method(predict, fvcm)
+S3method(print, fvcm)
+S3method(oobrisk, fvcm)
