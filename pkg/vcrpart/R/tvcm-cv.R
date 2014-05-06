@@ -101,7 +101,7 @@ AIC.tvcm <- function(object, sub = FALSE, maxalpha = NULL, maxwidth = NULL,
   par <- if (control$method == "mob") alpha else width
   bestpar <- unlist(par[which.min(AICtab[,criterion])])
   rval <- list(AICtab = AICtab,
-               call = deparse(getCall(object), nlines = 1, width.cutoff = 45)[1],
+               call = deparseCall(getCall(object)),
                criterion = criterion,
                par = par,
                bestpar = bestpar,
@@ -429,7 +429,7 @@ cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
       rval$maxpar <- maxwidth
       rval$parname <- "maxwidth"
     }   
-    rval$call <- deparse(getCall(object), nlines = 1, width.cutoff = 45)[1]
+    rval$call <- deparseCall(getCall(object))
     
   } else if (type == "forest") {
     

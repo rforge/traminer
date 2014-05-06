@@ -88,7 +88,7 @@ tvcm_terms_plot <- function(object, terms = NULL,
   if (!all(terms %in% allTerms))
     warnings("some 'terms' were not recognized.")
   terms <- intersect(terms, allTerms)
-  if (length(variable) == 0L) stop("no valid 'terms's.")
+  if (length(terms) == 0L) stop("no valid 'terms's.")
   
   ## set and check 'variable'
   data <- object$data
