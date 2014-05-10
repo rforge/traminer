@@ -1,8 +1,9 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
-\section{Changes in version 0.3.3 [2013-10-30]}{
-\itemize{
-    \item{No changes}
+\section{Changes in version 0.3.3 [2014-05-10]}{
+\subsection{Changes in existing functions}{
+  \itemize{
+    \item{\code{seqgranularity()}: new method \code{"mostfreq"}}
 }
 }
 \section{Changes in version 0.2.2 [2013-10-30]}{

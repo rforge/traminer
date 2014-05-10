@@ -1,11 +1,11 @@
 ﻿                CHANGES IN TraMineRextras VERSION 0.3.3 [2013-10-30]
 
-    o   No changes
+    o   seqgranularity(): new method "mostfreq"
 
 
                 CHANGES IN TraMineRextras VERSION 0.2.2 [2013-10-30]
 
-    o   Fixed issue with calling Rinternals from within extern "C" {} 
+    o   Fixed issue with calling Rinternals from within extern "C" {}
         in seqstart.cpp (request of B. Ripley)
 
 
