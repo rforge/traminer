@@ -5,7 +5,7 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
         stop(" [!] method must be one of: ", paste(metlist, collapse = " "),
             call. = FALSE)
     }
-    
+
     n <- nrow(seqdata)
     lgth <- max(seqlength(seqdata))
 
@@ -23,15 +23,8 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
     }
     if (method=="mostfreq") {
         for(i in 1:new.lgth.f) {
-            print(i)
             st.freq <- seqistatd(seqdata[,(tspan*(i-1) + 1):(tspan*i)])
-            alph <- colnames(st.freq)
-            idmax <- apply(st.freq,1,which.max)
-            st <- vector(mode="character",length(idmax))
-            for (j in 1:length(idmax)){
-               st[j] <- alph[idmax[j]]
-            }
-            newseq[,i] <- st
+            newseq[,i] <- apply(st.freq,1,function(x){names(which.max(x))})
         }
 }
     if (new.lgth > new.lgth.f){
@@ -39,14 +32,8 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
             newseq[,new.lgth] <- seqdata[,tspan*new.lgth.f + 1]
         } else if (method=="mostfreq") {
             st.freq <- seqistatd(seqdata[,(tspan*new.lgth.f+1):lgth])
-            alph <- colnames(st.freq)
-            idmax <- apply(st.freq,1,which.max)
-            st <- vector(mode="character",length(idmax))
-            for (j in 1:length(idmax)){
-              st[j] <- alph[idmax[j]]
-            }
-            newseq[,new.lgth] <- st
-        } else { # method=="last"  
+            newseq[,new.lgth] <- apply(st.freq,1,function(x){names(which.max(x))})
+        } else { # method=="last"
             newseq[,new.lgth] <- seqdata[,lgth]
         }
         newcnames[new.lgth] <- cnames[lgth]
