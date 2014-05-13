@@ -12,7 +12,7 @@
 ##
 ## Overview:
 ## plot.tvcm:   generic plot for tree.tvcm objects
-## tvcm_terms_plot:  partial coefficient plots
+## panel_terms:  partial coefficient plots
 ## panel_get_main:
 ## panel_coef:
 ## panel_empty:
@@ -22,18 +22,14 @@ plot.tvcm <- function(x, type = c("default", "coef",
                            "simple", "terms"),
                       main = NULL, drop_terminal = TRUE,
                       tnex = 1, newpage = TRUE,
-                      pop = TRUE, gp = gpar(),
-                      terminal = FALSE, 
-                      legend = TRUE, legend_gp = gpar(),
-                      terms = NULL, variable = NULL, ...) {
+                      pop = TRUE, gp = gpar(), ...) {
   
   type <- match.arg(type)
   
   if (type == "terms") {
     
-    fun <- tvcm_terms_plot
-    args <- list(object = x, terms = terms,
-                 variable = variable)
+    fun <- panel_terms
+    args <- list(object = x)
     args <- append(args, list(...))
     do.call("fun", args)
   } else {
@@ -48,8 +44,7 @@ plot.tvcm <- function(x, type = c("default", "coef",
              "simple" = panel_empty)
     tp_args <-
       list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
-    if (type == "coef" | type == "default" && depth(x) <= 3L)
-      tp_args$terms <- terms
+    tp_args$gp <- gp
       
     ## inner panel
     ip_fun <-
@@ -78,9 +73,9 @@ plot.tvcm <- function(x, type = c("default", "coef",
   }
 }
 
-tvcm_terms_plot <- function(object, terms = NULL,
-                            variable = NULL, ask = NULL,
-                            prob = NULL, neval = 50L, add = FALSE, ...) {
+panel_terms <- function(object, terms = NULL,
+                        variable = NULL, ask = NULL,
+                        prob = NULL, neval = 50L, add = FALSE, ...) {
   
   ## set and check 'terms'
   allTerms <- colnames(extract(object, "coef")$vc)
@@ -176,25 +171,26 @@ tvcm_terms_plot <- function(object, terms = NULL,
   }
 }
 
-panel_get_main <- function(obj, node, id, nobs) {
+panel_get_main <- function(object, node, id, nobs) {
   rval <- ""
   if (id) rval <-
-    paste(rval, paste(names(obj)[id_node(node)], sep = ""))
+    paste(rval, paste(names(object)[id_node(node)], sep = ""))
   if (id && nobs) rval <- paste(rval, ": ", sep = "")
   rval <- paste(rval, "nobs = ", node$info$dims["n"], sep = "")
   return(rval)
 }
 
-panel_coef <- function(obj, terms = NULL, id = TRUE, nobs = TRUE,
-                       margins = c(3, 2, 0, 0), gp = gpar(),
-                       mean = TRUE, conf.int = TRUE, plot_gp = list(),
-                       mean_gp = list(), conf.int_gp = list(), ...) {
+panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
+                       plot_gp = list(),
+                       margins = c(3, 2, 0, 0),
+                       mean = TRUE, mean_gp = list(),
+                       conf.int = TRUE, conf.int_gp = list(),
+                       ...) {
 
   gp_def <- gpar(cex = 0.75)
-  class(gp) <- "gpar"
-
+  
   ## extract coefficients
-  coef <- extract(obj, "coef")$vc
+  coef <- extract(object, "coef")$vc
   if (length(coef) < 1L) return(function(node) return(NULL))
   if (is.null(terms)) terms <- colnames(coef)
   if (!is.list(terms)) terms <- list(terms)
@@ -202,7 +198,7 @@ panel_coef <- function(obj, terms = NULL, id = TRUE, nobs = TRUE,
   coefList <- lapply(terms, function(trms) coef[, trms, drop = FALSE])
   
   if (conf.int) {
-    sd <- extract(obj, "sd")$vc
+    sd <- extract(object, "sd")$vc
     sd <- sd[, unlist(terms), drop = FALSE]
     sdList <- lapply(terms, function(trms) sd[, trms, drop = FALSE])
   }
@@ -271,7 +267,8 @@ panel_coef <- function(obj, terms = NULL, id = TRUE, nobs = TRUE,
     mean_gp <- lapply(1:length(terms),
                       function(i) appendDefArgs(mean_gp[[i]], mean_gp_def))
 
-    w <- tapply(weights(obj), predict(obj, type = "node"), sum) / sum(weights(obj))
+    w <- tapply(weights(object), predict(object, type = "node"), sum) /
+      sum(weights(object))
     meanCoef <- colSums(coef * matrix(w, nrow(coef), ncol(coef)))
     meanCoef <- lapply(terms, function(trms) meanCoef[trms, drop = FALSE])
     if (conf.int) {
@@ -289,7 +286,7 @@ panel_coef <- function(obj, terms = NULL, id = TRUE, nobs = TRUE,
     grid.rect(gp = gpar(fill = "white", col = 0))
     
     pushViewport(viewport(layout.pos.row = 1L)) # 2
-    grid.text(panel_get_main(obj, node, id, nobs))
+    grid.text(panel_get_main(object, node, id, nobs))
     upViewport()
     
     pushViewport(viewport(layout.pos.row = 2L)) # 2
@@ -375,7 +372,7 @@ panel_coef <- function(obj, terms = NULL, id = TRUE, nobs = TRUE,
                    gp = plot_gp[[i]]$gp)
       }
       
-      if (id_node(node) == min(nodeids(obj, terminal = TRUE))) {
+      if (id_node(node) == min(nodeids(object, terminal = TRUE))) {
         grid.yaxis(gp = gpar(lineheight = 0.5))
         grid.text(plot_gp[[i]]$ylab, unit(-2, "lines"), unit(0.5, "npc"),
                   rot = 90)
@@ -397,14 +394,14 @@ panel_coef <- function(obj, terms = NULL, id = TRUE, nobs = TRUE,
 class(panel_coef) <- "grapcon_generator"
 
 
-panel_empty <- function(obj, id = TRUE, nobs = TRUE, ...) {
+panel_empty <- function(object, id = TRUE, nobs = TRUE, ...) {
     
   rval <- function(node) {
     
     nid <- id_node(node)
     pushViewport(viewport(height = unit(3, "strheight", "A")))
     grid.rect(gp = gpar(fill = "white", col = 0))
-    grid.text(panel_get_main(obj, node, id, nobs))
+    grid.text(panel_get_main(object, node, id, nobs))
     upViewport()
   }
   return(rval)

@@ -6,10 +6,10 @@
 
 \title{Methods for empirical processes of \code{\link{olmm}} objects}
 
-\description{Methods to extract the estimating equations i.e. the
-  negative maximum likelihood scores and the empirical fluctuation
-  process i.e. the coefficient-wise decorrelated, cumulative score
-  process from a fitted \code{\link{olmm}} object.  
+\description{Methods to extract and pre-decorrelate the estimating
+  equations (the negative maximum likelihood scores) and compute the
+  empirical fluctuation process (the decorrelated, cumulative score
+  process) from a fitted \code{\link{olmm}} object.
 } 
 
 \usage{
@@ -22,13 +22,11 @@ estfun.olmm(x, level = c("observation", "subject"),
 
 gefp.olmm(object, scores = NULL, predecor = TRUE,
           order.by = NULL, parm = NULL, subset = NULL,
-          center = TRUE, drop = TRUE,
-          silent = FALSE, ...)
+          center = TRUE, drop = TRUE, silent = FALSE, ...)
 
 decormat.olmm(object, method = c("symmetric", "unconstraint"),
-	      Nmax = NULL, parm = NULL, control = list(),
-              verbose = FALSE, drop = TRUE,
-              silent = FALSE)
+              Nbal = NULL, parm = NULL, control = list(),
+              verbose = FALSE, drop = TRUE, silent = FALSE)
 }
 
 \arguments{
@@ -46,15 +44,15 @@ decormat.olmm(object, method = c("symmetric", "unconstraint"),
   \item{subset}{a vector to extract the subset of scores to be used. For
     \code{estfun.olmm}, this argument can be used to specify which
     observations of an individual with more than Nbal observations
-    should be dropped.}
+    should be kept / dropped. See examples.}
   \item{nuisance}{integer vector. Defines the coefficients which are
     regarded as nuisance and therefore omitted from the transformation.}
-  \item{control}{list. Control parameter for optimization algorithms. To 
+  \item{control}{a list. Control parameter for optimization algorithms. To 
     control the algorithm to handle unbalanced data, you can specify 
    \code{abstol} and \code{Rmax} and to control the algorithm computing
    the transformation matrix you can specify \code{reltol}, 
    \code{maxreltol}, \code{maxit} and \code{stopreltol}.}
-  \item{verbose}{logical. Produces messages.}	 
+  \item{verbose}{logical scalar. Produces messages.}	 
   \item{silent}{logical scalar. Should the report of warnings be suppressed?}
   \item{scores}{function or matrix. Function to extract the estimating
     equations from a \code{\link{olmm}} object or a matrix representing
@@ -69,10 +67,8 @@ decormat.olmm(object, method = c("symmetric", "unconstraint"),
     observations are assumed to be ordered.}
    \item{method}{character. \code{"symmetric"} (default) forces the transformation 
     matrix to be symmetric.}
-  \item{Nmax}{integer. The number of observation per subject for which the 
-    transformation matrix should be computed.}
   \item{drop}{logical. Whether singularities should be handled
-    automatically.}
+    automatically (otherwise singularities yield an error).}
   \item{...}{arguments passed to other functions. Specifically,
     \code{\link{estfun.olmm}} passes the arguments to
     \code{\link{decormat.olmm}} and \code{\link{gefp.olmm}} to
@@ -90,59 +86,43 @@ decormat.olmm(object, method = c("symmetric", "unconstraint"),
 \details{
   Complements the \code{estfun} method of the package \code{sandwich}
   and the \code{gefp} method of the package \code{strucchange} for
-  \code{\link{olmm}} objects. The implementation is different from
-  originals to allow the score function to be pre-decorrelated with
-  respect to intra-subject correlation. The value returned by
+  \code{\link{olmm}} objects. \code{\link{estfun.olmm}} allows to
+  pre-decorrelate the intra-individual correlation of observation
+  scores, see argument \code{predecor}. The value returned by
   \code{gefp.olmm} may be used for testing coefficient constancy
   regarding an explanatory variable \code{order.by} by the \code{sctest}
-  function of package \code{strucchange}.
+  function of package \code{strucchange}, see the examples below. 
 
   If \code{predecor = TRUE} in \code{estfun.olmm}, a linear
   within-subject transformation is applied that removes (approximately) 
-  the intra-subject correlation from the scores. Specifically, u_it, 
-  the ML score t'th observation of subject i, is transformed to 
-  u*_it = u_it + T sum(u_it'', t'' != t) such that Cov(u*_it, u*_it') = 
-  Cov(u*_it, u*_i't'') for all i != i' and t != t'. The transformation 
-  matrix T is computed with the \code{\link{decormat.olmm}}
-  function and involves a nonlinear optimization. According to our
-  simulations, the procedure works stable for models on balanced
-  data with about 100 subjects and between 3 and 10 observations per
-  subject. 
-
-  If \code{complete = TRUE} and \code{predecor = TRUE} and \code{level =
-  "observation"}, an algorithm is applied to handle unbalanced data:
-  First, the transformation matrix is estimated based on the scores of
-  subjects that share the same maximal number of observations. Then, for
-  the transformation of scores of subjects with fewer observations, we
-  repeat the following steps: (i) simulate responses based on the model
-  (including predicted random effects), (ii) recompute the score
-  function (iii) transform the scores (iv) delete the simulated
-  observations. The resulting scores are averaged.
+  the intra-subject correlation from the scores. Specifically,
+  \eqn{u_{it}}, the ML score of the \eqn{t}'th observation of subject
+  \eqn{i}, is transformed to \eqn{u^*_{it} = u_{it} + T \sum_{t'=1, t'
+  \neq t}^{T_i} u_{it'}} such that \eqn{\mathrm{Cov}(u*_{it},
+  u*_{it'}) =  \mathrm{Cov}(u*_{it}, u*_{i't''})} for all \eqn{i \neq
+  i'} and \eqn{t \neq t'}. The transformation matrix \eqn{T} is computed
+  with the \code{decormat.olmm} function and involves a nonlinear
+  optimization. 
   
-  \code{gefp.olmm} proceeds in the following sequence:
-
-  \enumerate{
-    \item Extract the estimating equations (EE) using the \code{scores}
-    argument (i.e. the negative ML scores).
-    \item If \code{subset} is not \code{NULL}, extract the specified
-    subset from the EE matrix and the \code{order.by} vector.
-    \item If \code{center = TRUE}, subtract the column means from the
-    EE.  
-    \item Divide the EE by the number of observations.
-    \item Multiply the EE by the inverse of the square root of their
-    crossproduct. 
-    \item Order the EE by the \code{order.by} vector and cumulate them.
-    \item If \code{terms} is not \code{NULL}, extract the specified
-    columns of the EE. 
-  }
-
-  The resulting estimating equations are stored in the \code{process}
-  slot, see above.
+  The pre-decorrelation approach above is prinicipally limited to
+  balanced data. Setting \code{complete = TRUE}, an algorithm is applied
+  to tackle this problem: First, the transformation matrix \eqn{T} is
+  computed based on the scores of subjects with equal or more than
+  \code{Nbal} observations. Second, the scores of subjects with fewer
+  observations are computed by repeating the following steps: (i)
+  simulate responses based \code{object} (including predicted random
+  effects) to have \code{Nbal} responses for each of these subjects,
+  (ii) recompute the score function (iii) transform the scores (iv)
+  delete the simulated observations. The resulting scores are averaged. 
   
-  The \code{subset} and the \code{terms} arguments are specifically
-  designed for the \code{\link{tvcm}} algorithm. Centering the scores
-  is necessary if the column sums of the estimating equations are
-  unequal 0, which may occurs if the scores are pre-decorrelated.
+  Given a score matrix produced by \code{\link{estfun.olmm}}, the
+  empirical fluctuation process can be computed by
+  \code{\link{gefp.olmm}}. See Zeileis and Hornik
+  (2007). \code{\link{gefp.olmm}} provides with \code{subset} and
+  \code{parm} arguments specifically designed for nodewise tests in the
+  \code{\link{tvcm}} algorithm. Using \code{subset} extracts the partial
+  fluctuation process of the selected subset. \code{center = TRUE} makes 
+  sure that the partial fluctuation process ends with zero. 
 }
 
 \references{
@@ -154,5 +134,35 @@ doi:10.1111/j.1467-9574.2007.00371.x.
 \author{Reto Buergin}
 
 \seealso{\code{\link{olmm}}, \code{\link{olmm-class}}}
+
+\examples{
+## ------------------------------------------------------------------- #
+## Dummy example 1:
+##
+## Testing coefficient constancy on 'z4' of the 'vcrpart_1' data.
+## ------------------------------------------------------------------- #
+
+data(vcrpart_1)
+
+## extract a unbalanced subset to show to the full functionality of estfun
+vcrpart_1 <- vcrpart_1[-c(seq(1, 100, 4), 2, 6),]
+subset <- vcrpart_1$wave != 1L ## obs. to keep for fluctuation tests
+table(table(vcrpart_1$id))
+
+## fit the model
+model <- olmm(y ~ treat + re(1|id), data = vcrpart_1)
+
+## extract and pre-decorrelate the scores
+scores <- estfun.olmm(model, predecor = TRUE, complete = TRUE,
+                      Nbal = 3, subset = subset, verbose = TRUE)
+attr(scores, "T") # transformation matrix
+
+## compute the empirical fluctuation process
+fp <- gefp.olmm(model, scores, order.by = vcrpart_1$z4)
+
+## process a fluctuation test
+library(strucchange)
+sctest(fp, functional = catL2BB(fp))
+}
 
 \keyword{methods}

@@ -25,7 +25,7 @@
 ## To do:
 ## --------------------------------------------------------- #
 
-AIC.tvcm <- function(object, sub = FALSE, maxalpha = NULL, maxwidth = NULL,
+AIC.tvcm <- function(object, sub = FALSE, alpha = NULL, maxwidth = NULL,
                         k = 2,  verbose = FALSE, ...) { 
 
   criterion <- list(...)$criterion
@@ -39,7 +39,7 @@ AIC.tvcm <- function(object, sub = FALSE, maxalpha = NULL, maxwidth = NULL,
   n <- nrow(data)
   partvar <- colnames(object$data)
   curDf <- attr(logLik(object), "df")
-  if (!is.null(maxalpha)) control$alpha <- maxalpha
+  if (!is.null(alpha)) control$alpha <- alpha
   if (!is.null(maxwidth)) control$maxwidth <- maxwidth
   
   ## refit the model if necessary
@@ -75,7 +75,8 @@ AIC.tvcm <- function(object, sub = FALSE, maxalpha = NULL, maxwidth = NULL,
         if (any(alpha[(i + 1):length(alpha)] > alpha[i])) steps <- steps[-i]
     alpha <- rev(alpha)[steps]
   } else {
-    width <- steps + 1L
+    steps <- steps
+    width <- steps
   }
   
   logLik <- unlist(lapply(splitpath[steps], function(x) x$logLik))
@@ -217,7 +218,7 @@ cvfolds <- function(x, type = c("kfold", "subsampling", "bootstrap"),
 }
 
 cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
-                           fun = NULL, maxalpha = NULL, maxwidth = NULL,
+                           fun = NULL, alpha = NULL, maxwidth = NULL,
                            verbose = FALSE, ...) {
   
   type <- list(...)$type
@@ -229,9 +230,13 @@ cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
   control <- object$info$control
   control$verbose <- FALSE
 
-  if (is.null(maxalpha)) maxalpha <- control$alpha
+  if (is.null(alpha)) alpha <- control$alpha
   if (is.null(maxwidth)) maxwidth <- control$maxwidth
-  if (type %in% c("risk", "stabpath")) control$alpha <- maxalpha
+  if (type %in% c("risk", "stabpath")) control$alpha <- alpha
+
+  control$alpha <- alpha
+  control$maxwidth <- maxwidth
+  control$maxstep <- maxwidth - 1L
   
   ## get data of 'object'
   data <- model.frame(object)
@@ -296,22 +301,24 @@ cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
 
         if (fixed) {
           steps <- 1
-          alpha <- control$alpha
+          alphaseq <- alpha
         } else {
-          alpha <- width <- NULL
-          steps <- rev(unlist(lapply(splitpath(object), function(x) x$step)))          
+          alphaseq <- width <- NULL
+          steps <- rev(unlist(lapply(splitpath(ibTree), function(x) x$step)))          
           if (control$method == "mob") {
-            alpha <- c(extract(object, "p.value", step = steps), 0.0)[-1L]
-            if (length(alpha) > 1)
-              for (j in 1:(length(alpha) - 1L))
-                if (any(alpha[(j + 1):length(alpha)] > alpha[j])) steps <- steps[-j]
-            alpha <- rev(alpha)[steps]
+            alphaseq <- c(extract(ibTree, "p.value", step = steps), 0.0)[-1L]
+            if (length(alphaseq) > 1)
+              for (j in 1:(length(alphaseq) - 1L))
+                if (any(alphaseq[(j + 1):length(alphaseq)] > alphaseq[j]))
+                  steps <- steps[-j]
+            alphaseq <- rev(alphaseq)[steps]
           } else {
+            steps <- c(steps, 0)
             width <- steps + 1L
           }
         }
         cv[[i]] <- vector(mode = "list", length = 2)   
-        cv[[i]][[1]] <- if (control$method == "mob") alpha else width
+        cv[[i]][[1]] <- if (control$method == "mob") alphaseq else width
         cv[[i]][[2]] <- matrix(, nr, length(cv[[i]][[1]]))
 
         if (length(steps) > 0L) {
@@ -423,7 +430,7 @@ cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
     }
     
     if (control$method == "mob") {
-      rval$maxpar <- maxalpha
+      rval$maxpar <- alpha
       rval$parname <- "alpha"
     } else {
       rval$maxpar <- maxwidth
@@ -502,16 +509,17 @@ plot.cvrisk.tvcm <- function(x, ...) {
        line = 1, tick = FALSE)   
 }
 
-stabpath.tvcm <- function(object, q, maxalpha = NULL, maxwidth = NULL, ...) {
+stabpath.tvcm <- function(object, q, alpha = NULL, maxwidth = NULL, ...) {
 
   object$info$control$nselect <- q
+  object$info$control$alpha <- alpha
   cv <- cvrisk(object, type = "stabpath", ...)
   if (max(cv$nselected) < q)
     warning(sQuote("alpha"), " too small, the average",
             "number of selected partitioning variables is ",
             max(cv$nselected))  
   mm <- apply(cv$phat, 1L, max)
-  rval <- append(cv, list(max = mm, q = q, maxalpha = maxalpha,
+  rval <- append(cv, list(max = mm, q = q, alpha = alpha,
                           maxwidth = maxwidth))
   class(rval) <- "stabpath.tvcm"
   return(rval)

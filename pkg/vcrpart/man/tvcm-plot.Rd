@@ -2,11 +2,13 @@
 
 \alias{tvcm-plot}
 \alias{plot.tvcm}
+\alias{panel_coef}
+\alias{panel_terms}
 
-\title{\code{plot} method for \code{tvcm} objects}
+\title{\code{plot} method for \code{tvcm} objects.}
 
 \description{
-  \code{plot} method for \code{tvcm} for diagnosis.
+  \code{plot} method and panel functions for \code{tvcm} and objects. 
 }
 
 \usage{
@@ -14,48 +16,117 @@
         "simple", "terms"),
      main = NULL, drop_terminal = TRUE,
      tnex = 1, newpage = TRUE,
-     pop = TRUE, gp = gpar(),
-     terminal = FALSE, 
-     legend = TRUE, legend_gp = gpar(),
-     terms = NULL, variable = NULL, ...)
+     pop = TRUE, gp = gpar(), ...)
+
+panel_terms(object, terms = NULL,
+            variable = NULL, ask = NULL,
+            prob = NULL, neval = 50L, add = FALSE, ...)
+
+panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
+           plot_gp = list(),
+           margins = c(3, 2, 0, 0), 
+           mean = TRUE, mean_gp = list(),
+           conf.int = TRUE, conf.int_gp = list(), ...)
 }
 
 \arguments{
-  \item{x}{An object of class \code{\link{tvcm}}.}
+  \item{x, object}{An object of class \code{\link{tvcm}}.}
   \item{type}{the type of the plot. Available types are
-    \code{"default"} \code{"simple"} and
-    \code{"terms"}.}  
+    \code{"default"}, \code{"simple"}, \code{"coef"} and
+    \code{"terms"}.}   
   \item{main}{character. A main title for the plot.}
   \item{drop_terminal}{a logical indicating whether all terminal nodes
-    should be plotted at the bottom. See also \code{plot.party}.}
+    should be plotted at the bottom. See also \code{\link{plot.party}}.}
   \item{tnex}{a numeric value giving the terminal node extension in
     relation to the inner nodes.}
   \item{newpage}{a logical indicating whether \code{grid.newpage()}
     should be called.}
   \item{pop}{a logical whether the viewport tree should be popped before
     return.}
-  \item{gp}{graphical parameters. See \code{gpar}.}
-  \item{terminal}{logical specifying if only plots for node models
-    should be shown.}
-  \item{legend}{logical specifying if a legend should be
-    added. Currently not supported by any \code{type}.}
-  \item{legend_gp}{graphical parameters for the legend. Currently not
-    supported by any \code{type}.}
-  \item{terms}{character string. Which coefficients to be
-    visualized in the \code{"terms"}-plot.}
-  \item{variable}{character string. Which partitioning covariates to
-    be visualized in the \code{"terms"} plot.}
-  \item{\ldots}{Additional arguments passed to the calls.}
+  \item{gp}{graphical parameters. See \code{\link{gpar}}.}
+  \item{terms}{character vector (\code{\link{panel_terms}} and
+    \code{\link{panel_coef}}) or list of character vectors
+    (\code{\link{panel_coef}}) with names of model
+    coefficients. Indicates which coefficients should be visualized. If
+    \code{terms} is a list, a separate panel is allocated for each list
+    component.}  
+  \item{variable}{character vector. Indicates the partitioning variables
+    to be visualized.}
+  \item{ask}{logical. Whether an input should be asked before printing
+    the next panel.}
+  \item{prob}{a probability between 0 and 1. Gives the size of the
+    random subsample over which the coefficients are averaged. May be
+    smaller than 1 if the sample is large.}
+  \item{neval}{the maximal number of distinct values of the variable to
+    be evaluated.}
+  \item{add}{whether the panel is to be added into an active plot.}
+  \item{id}{logical. Whether the node id should be displayed.}
+  \item{nobs}{logical. Whether the number of observations in each node
+    should be displayed.}
+  \item{plot_gp}{a list of graphical parameters for the panels. Includes
+    components \code{xlim}, \code{ylim}, \code{pch}, \code{ylab},
+    \code{type} (the type of symbols, e.g. \code{"b"}), \code{label}
+    (characters for ticks at the x axis), \code{height}, \code{width},
+    \code{gp} (a list produced by \code{\link{gpar}}). If terms is a
+    list, \code{plot_gp} may be a nested list specifying the graphical
+    parameters for each list component of \code{terms}.}
+  \item{margins}{a numeric vector \code{c(bottom, left, top, right)}
+    specifying the space on the margins for each panel.}
+  \item{mean}{logical. Whether the average coefficients over the
+    population should be visualized.}
+  \item{mean_gp}{list with graphical parameters for plotting the mean
+    coefficients. Includes a component \code{gp = gpar(...)} and a
+    component \code{pch}.}
+  \item{conf.int}{logical. Whether confidence intervals should be
+    visualized. Note that these intervals do not account for the error
+    of the algorithm,}
+  \item{conf.int_gp}{a list of graphical parameters for the confindence
+    intervals applied to \code{\link{arrow}}. Includes \code{angle},
+    \code{length}, \code{ends} and \code{type}.}
+  \item{\ldots}{additional arguments passed to \code{\link{panel_terms}}
+    or \code{\link{panel_coef}} or other methods.}
 }
 
 \details{
-  The available plot functions allow the inspection of fitted
-  \code{\link{tvcm}} objects. \code{"default"} and \code{"coef"} show
-  the tree structure and coefficients in the node. \code{"fluctest"}
-  shows the fluctuation tests in the nodes and terminal
-  nodes. \code{"simple"} shows the tree structure only. \code{"terms"}
-  plots the partial relationships between partitioning variables and
-  model coefficients. The last type may be very slow.
+  The plot functions allow the diagnosis of fitted \code{\link{tvcm}}
+  objects. \code{type = "default"}, \code{type = "coef"} and 
+  \code{type = "simple"} show the tree structure and coefficients in each
+  node. \code{type = "terms"} plots partial dependency plots, see Hastie
+  et al. (2001), section 10.13.2.
+
+  The functions \code{\link{panel_terms}} and \code{\link{panel_coef}}
+  are exported to show the additional arguments that can be passed to
+  \code{...} of a \code{\link{plot}} call.
+
+  Notice that user-defined plots can be generated by the use of the
+  \code{\link{plot.party}} function, see \pkg{partykit}.
+}
+
+\references{
+  T. Hastie, R. Tibshirani, J. Friedman (2001), The elements of
+  statistical learning, Springer.
+}
+
+\examples{
+## ------------------------------------------------------------------- #
+## Dummy example 1:
+##
+## Plotting the types "coef" and "terms" for a 'tvcm' object fitted on
+## artificial data.
+## ------------------------------------------------------------------- #
+
+data(vcrpart_2)
+
+## fit the model
+model <- tvcglm(y ~ vc(z1,z2,by=x1) + x2, vcrpart_2, gaussian(),
+                control = tvcm_control(alpha = 1, maxwidth = 3, minbucket = 5L))
+
+## plot type "coef"
+plot(model, "coef")
+
+## plot type "terms"
+par(mfrow = c(1, 2))
+plot(model, "terms", variable = "z1", ask = FALSE)
 }
 
 \seealso{\code{\link{tvcm}}, \code{\link{tvcm-methods}}}

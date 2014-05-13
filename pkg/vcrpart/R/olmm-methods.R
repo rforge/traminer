@@ -1,6 +1,6 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2014-05-02
+## Date:            2014-05-10
 ##
 ## Description:
 ## methods for olmm objects.
@@ -51,7 +51,6 @@
 ## - plot methods
 ## - estfun.olmm: handle equal zero random effects
 ## --------------------------------------------------------- #
-
 
 anova.olmm <- function(object, ...) {
 
@@ -144,31 +143,28 @@ coef.olmm <- function(object, which = c("all", "fe"), ...) {
 coefficients.olmm <- coef.olmm
 
 decormat.olmm <- function(object, method = c("symmetric", "unconstraint"),
-                          Nmax = NULL, parm = NULL, control = list(),
-                          verbose = FALSE, drop = TRUE,
-                          silent = FALSE) {
+                          Nbal = NULL, parm = NULL, control = list(),
+                          verbose = FALSE, drop = TRUE, silent = FALSE) {
 
   method <- match.arg(method)
-  control <- appendDefArgs(control,
-                           list(reltol = 1e-6,
-                                maxreltol = 1e-3,
-                                maxit = 100L,
-                                stopreltol = 1e100))
+
+  ## set default control parameters
+  control_def <- list(reltol = 1e-6, maxreltol = 1e-3,
+                      maxit = 100L, stopreltol = 1e100)
+  control <- appendDefArgs(control, control_def)
   
   ## get required characteristics of the model
   n <- nobs(object)
   Ni <- table(slot(object, "subject"))
-  if (is.null(Nmax)) Nmax <- max(Ni)
-  if (!any(Ni == Nmax))
-    stop("at least one subject must have ",
-         Nmax, " observations")
-  if (!silent && length(table(Ni)) > 1)
-        warning("computation is based on scores of the ", sum(Ni == Nmax),
-                " of ", slot(object, "dims")["N"], " subjects with ", Nmax,
-                " observations only. ")
+  if (is.null(Nbal)) Nbal <- max(Ni)
+  if (!any(Ni == Nbal))
+    stop("at least one subject should have ", Nbal, " observations")
+  if (verbose)
+    cat("\nT is based on scores of the", sum(Ni == Nbal),
+        "of", slot(object, "dims")["N"], "subjects with Ni >=", Nbal, " obs.")
   
-  sVar <- olmm_scoreVar(object, Nmax = Nmax)
-  sCovWin <- olmm_scoreCovWin(object, Nmax = Nmax)
+  sVar <- olmm_scoreVar(object, Nmax = Nbal)
+  sCovWin <- olmm_scoreCovWin(object, Nmax = Nbal)
   sCovBet <- olmm_scoreCovBet(object)
   
   ## reduce to coefficient subset if intended
@@ -205,8 +201,8 @@ decormat.olmm <- function(object, method = c("symmetric", "unconstraint"),
   ## optimize by Newton's algorithm
   while (!error && nit < control$maxit && eps >= control$reltol) {
     nit <- nit + 1
-    fEval <- olmm_f_decormat(T, Tindex, sVar, sCovWin, sCovBet, Nmax)
-    gEval <- olmm_g_decormat(T, Tindex, sVar, sCovWin, sCovBet, Nmax)
+    fEval <- olmm_f_decormat(T, Tindex, sVar, sCovWin, sCovBet, Nbal)
+    gEval <- olmm_g_decormat(T, Tindex, sVar, sCovWin, sCovBet, Nbal)
     par <- try(solve(gEval, -fEval) + par, silent = TRUE)
     eps <- max(abs(fEval / sCovBet[subs]))
     if (class(par) != "try-error") {
@@ -279,15 +275,12 @@ estfun.olmm <- function(x, level = c("observation", "subject"),
       Nbal <- sort(unique(Ni))[rev(which(table(Ni) > 50))[1]]
       if (is.na(Nbal)) Nbal <- max(Ni)
     }  
-    if (!silent && sum(Ni == Nbal) < 50)
-      warning("the number of subjects with ", Nbal, " observations is smaller ",
-              "than 50. The transformation may be inaccurate.")
     if (any(Ni > Nbal)) {
       FUN <- function(x) x[1:min(Nbal, length(x))]
       subs <- unlist(tapply(1:length(slot(x, "subject")), slot(x, "subject"), FUN))
       subs <- (1:slot(x, "dims")["n"]) %in% subs
-      if (!silent) warning("omit ", sum(!subs), " observation from individuals ",
-                           "with more than ", Nbal, " observations.")
+      if (verbose)
+        cat("\n\tomit ", sum(!subs), " obs. from subjects with Ni > ", Nbal)
       subset <- subset & subs
     }
 
@@ -310,6 +303,8 @@ estfun.olmm <- function(x, level = c("observation", "subject"),
       .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
     }
   }
+
+  if (verbose && !any(Ni > Nbal)) cat("OK")
   
   scores <-  -slot(x, "score_obs")
   subject <- slot(x, "subject")
@@ -327,9 +322,7 @@ estfun.olmm <- function(x, level = c("observation", "subject"),
     nuisance <- which(names(coef(x)) %in% nuisance)
   parm <- setdiff(parm, nuisance)
   scores <- scores[, parm, drop = FALSE]
-  
-  if (verbose) cat("OK")
-  
+    
   if (level == "observation") {
 
     n <- nrow(scores)
@@ -586,10 +579,10 @@ gefp.olmm <- function(object, scores = NULL, predecor = TRUE,
   rval <- list(process = suppressWarnings(zoo(process, time)),
                nreg = k,
                nobs = n,
-               ## call = match.call(), # is not necessary
+               call = match.call(),
                fit = NULL,
                scores = NULL, 
-               fitted.model = NULL,
+               fitted.model = getCall(object),
                par = NULL,
                lim.process = "Brownian bridge",
                type.name = "M-fluctuation test",
@@ -638,11 +631,17 @@ model.matrix.olmm <- function(object, which = c("fe", "fe-ce", "fe-ge",
 nobs.olmm <- function(object, ...) slot(object, "dims")[["n"]]
 
 predict.olmm <- function(object, newdata = NULL,
-                         type = c("link", "response", "prob", "class"),
+                         type = c("link", "response", "prob", "class", "ranef"),
                          ranef = FALSE, na.action = na.pass, ...) {
 
   ## extract data
   type <- match.arg(type) # retrieve type
+
+  ## resolve conflicts with the 'ranef' argument
+  if (type == "ranef" & !is.null(newdata))
+    stop("prediction for random effects for 'newdata' is not implemented.")
+  if (type == "ranef") return(ranef(object, ...))
+  
   if (type == "prob") type <- "response"
   formList <- vcrpart_formula(formula(object)) # extract formulas
   offset <- list(...)$offset
@@ -674,7 +673,7 @@ predict.olmm <- function(object, newdata = NULL,
     }
     
   } else {
-        
+    
     ## data preparation
     if (is.matrix(ranef)) {
       mfForm <- formList$all # whole equation
@@ -683,12 +682,12 @@ predict.olmm <- function(object, newdata = NULL,
       getTerms <- function(x) attr(terms(x, keep.order = TRUE), "term.labels")
       terms <- lapply(formList$fe$eta, getTerms)
       mfForm <- formula(paste("~", paste(unlist(terms), collapse = "+")))
-    } 
-    mf <- model.frame(mfForm, model.frame(object))
-    Terms <- delete.response(attr(mf, "terms"))
+    }
+    mf <- model.frame(object)
+    Terms <- delete.response(terms(mfForm))
     xlevels <- .getXlevels(attr(mf, "terms"), mf)
-    if (is.matrix(ranef)) # delete terms of subject vector
-      xlevels <- xlevels[names(xlevels) !=  slot(object, "subjectName")]
+    xlevels <- xlevels[names(xlevels) %in%  all.vars(Terms)]
+    
     newdata <- as.data.frame(model.frame(Terms, newdata,
                                          na.action = na.action,
                                          xlev = xlevels))    
@@ -799,7 +798,7 @@ predict.olmm <- function(object, newdata = NULL,
       
       ## return most probable category
       rval <- apply(probs, 1, which.max)
-      rval <- ordered(levels(yLevs)[rval],levels=levels(yLevs))
+      rval <- ordered(yLevs[rval], levels = yLevs)
       names(rval) <- rownames(X)
     }
     
@@ -813,7 +812,7 @@ predict.olmm <- function(object, newdata = NULL,
   return(rval)
 }
 
-print.olmm <- function(x, digits = max(3, getOption("digits") - 3), ...) {
+print.olmm <- function(x, ...) {
 
   so <- summary.olmm(x, silent = TRUE)
   
@@ -827,24 +826,23 @@ print.olmm <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   
   if (length(so$AICtab) > 0) {
     cat("\nGoodness of fit:\n")
-    print(so$AICtab, digits = digits)
+    print(so$AICtab, ...)
   }
 
   if (length(so$REmat) > 0) {
     cat("\nRandom effects:\n")
-    print.VarCorr.olmm(so$REmat, digits = digits, ...)
-    cat(sprintf("Number of obs: %d, subjects: %d\n", so$dims["n"],
-                so$dims["N"]))
+    print.VarCorr.olmm(so$REmat, ...)
+    cat(sprintf("Number of obs: %d, subjects: %d\n", so$dims["n"], so$dims["N"]))
   }
 
   if (length(so$feMatGe) > 0 && nrow(so$feMatGe) > 0) {
     cat("\nGlobal fixed effects:\n")
-    print(fixef(x, "ge"), digits = digits)
+    print(fixef(x, "ge"), ...)
   }
   
   if (length(so$feMatCe) > 0 && nrow(so$feMatCe) > 0) {
     cat("\nCategory-specific fixed effects:\n")
-    print(fixef(x, "ce"), digits = digits)
+    print(fixef(x, "ce"), ...)
   }
 }
 
@@ -1009,23 +1007,27 @@ summary.olmm <- function(object, silent = FALSE, ...) {
 
   na.action <- naprint(attr(model.frame(object), "na.action"))
   na.action <- if (na.action == "") character() else paste("(", na.action, ")", sep = "")
-  
-  ## build a summary.olmm object
   call <- getCall(object)
-  structure(list(methTitle = methTitle,
-                 family = family,
-                 formula = paste(deparse(formula(object)), collapse = "\n"),
-                 data = deparseCall(call$data),
-                 subset = deparseCall(call$subset),
-                 AICtab = AICtab,
-                 feMatCe = feMatCe,
-                 feMatGe = feMatGe,
-                 REmat = VarCorr,
-                 na.action = na.action,
-                 dims = dims), class = "summary.olmm")
+  
+  ## return a 'summary.olmm' object
+  return(structure(
+           list(methTitle = methTitle,
+                family = family,
+                formula = paste(deparse(formula(object)), collapse = "\n"),
+                data = deparseCall(call$data),
+                subset = deparseCall(call$subset),
+                AICtab = AICtab,
+                feMatCe = feMatCe,
+                feMatGe = feMatGe,
+                REmat = VarCorr,
+                na.action = na.action,
+                dims = dims,
+                dotargs = list(...)), class = "summary.olmm"))
 }
 
-print.summary.olmm <- function(x, digits = max(3, getOption("digits") - 3), ...) {
+print.summary.olmm <- function(x, ...) {
+
+  args <- appendDefArgs(list(...), x$dotargs)
   
   if (length(x$methTitle) > 0L) cat(x$methTitle, "\n\n")
   if (length(x$family) > 0L) cat(" Family:", x$family, "\n")
@@ -1035,26 +1037,27 @@ print.summary.olmm <- function(x, digits = max(3, getOption("digits") - 3), ...)
   
   if (length(x$AICtab) > 0L) {
     cat("\nGoodness of fit:\n")
-    print(x$AICtab, digits = digits)
+    args$x <- x$AICtab
+    do.call("print", args)
   }
   
   if (length(x$REmat) > 0L) {
     cat("\nRandom effects:\n")
-    print(x$REmat, digits = digits, ...)
-    cat(sprintf("Number of obs: %d, subjects: %d\n", x$dims["n"],
-                x$dims["N"]))
+    args$x <- x$REmat
+    do.call("print", args)
+    cat(sprintf("Number of obs: %d, subjects: %d\n", x$dims["n"], x$dims["N"]))
   }
 
   if (length(x$na.action) > 0L) cat(x$na.action, "\n")
   
   if (length(x$feMatGe) > 0 && nrow(x$feMatGe) > 0L) {
     cat("\nGlobal fixed effects:\n")
-    printCoefmat(x$feMatGe, digits = digits)
+    printCoefmat(x$feMatGe, digits = args$digits)
   }
   
   if (length(x$feMatCe) > 0 && nrow(x$feMatCe) > 0L) {
     cat("\nCategory-specific fixed effects:\n")
-    printCoefmat(x$feMatCe, digits = digits)
+    printCoefmat(x$feMatCe, digits = args$digits)
   }
 }
 
@@ -1147,8 +1150,8 @@ vcov.olmm <- function(object, ...) {
   ## parameter transformation for adjacent-category models
   if (slot(object, "family")$family == "adjacent") {
     
-    ## matrix T with partial derivates of transformation
-    T <- diag(dims["nPar"])
+    ## matrix T with partial derivates of transformation 
+    T <- diag(nrow(rval))
     subsRows <- seq(1, dims["pCe"] * (dims["nEta"] - 1L), 1L)
     subsCols <- seq(dims["pCe"] + 1L,
                     dims["pCe"] * dims["nEta"], 1L)

@@ -913,8 +913,16 @@ tvcm_get_terms <- function(names, ids, parm) {
   ## node:   the node to which a coefficient belongs to.
   ## ------------------------------------------------------- #
 
-  if (length(ids) == 1L && ids == 1L)
-      names[names %in% parm] <- paste("Node1", names[names %in% parm], sep = ":")
+  if (length(ids) == 1L && ids == 1L) {
+      names <- sapply(names, function(x) {
+          if (!x %in% parm) return(x)
+          if (grepl("(Intercept)", x)) return(gsub("(Intercept)", "Node1", x, fixed = TRUE))
+          x <- unlist(strsplit(x, ":"))
+          subs <- ifelse(grepl("Eta[1-9]+", x[1L]), 2L, 1L)
+          x[subs] <- paste("Node1", x[subs], sep = ":")
+          return(paste(x, collapse = ":"))
+      })
+  }
   nodes <- paste("Node", ids, sep = "")
   split <- strsplit(names, ":")
   type <-
@@ -989,11 +997,16 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
     }
     subs <- colnames(rval$vc) %in% c("")
     colnames(rval$vc)[subs] <- "(Intercept)"
+    
     if (inherits(object$info$family, "family.olmm")) {
-      subs <- substr(colnames(rval$vc), 1L, 3L) == "Eta"
+      tmp <- strsplit(colnames(rval$vc), ":")
+      subs <-
+        sapply(tmp, length) == 1L &
+        sapply(tmp, function(x) substr(x[1L], 1L, 3L) == "Eta")
       colnames(rval$vc)[subs] <-
         paste(colnames(rval$vc)[subs], "(Intercept)", sep = ":")
     }
+    
     if ("(Intercept)" %in% colnames(rval$vc)) {
       con <- vcrpart_slot(model, "contrasts")$Node
       if (is.character(con))

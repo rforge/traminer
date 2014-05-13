@@ -36,10 +36,10 @@ deviance.tvcm <- function(object, ...)
   return(deviance(extract(object, "model")))
 
 extract.tvcm <- function(object, what = c("control", "model", 
-                                      "sctest", "p.value",
-                                      "riskgrid", "selected", 
-                                      "coef", "sd", "var"),
-                            step = NULL, ...) {
+                                   "sctest", "p.value",
+                                   "riskgrid", "selected", 
+                                   "coef", "sd", "var"),
+                         step = NULL, ...) {
   
   what <- match.arg(what)
   splitpath <- object$info$splitpath
@@ -118,12 +118,23 @@ model.frame.tvcm <- function(formula, ...) {
 nobs.tvcm <- function(object, ...) nobs(extract(object, "model"), ...)
 
 predict.tvcm <- function(object, newdata = NULL,
-                           type = c("link", "response", "prob", "class",
-                             "node", "coef"), ...) {
+                         type = c("link", "response", "prob", "class",
+                           "node", "coef", "ranef"),
+                         ranef = FALSE, na.action = na.pass, ...) {
 
   ## match type
   type <- match.arg(type)
 
+  ## resolve conflicts with the 'ranef' argument
+  if (!is.null(newdata) && is.logical(ranef) && ranef)
+    stop("'ranef' should be 'FALSE' or a 'matrix' if 'newdata' is not 'NULL'.")
+  if (type == "ranef" & (!is.logical(ranef) | is.logical(ranef) && ranef))
+    stop("for 'type = 'ranef'' the argument 'ranef' must be 'FALSE'.")
+  if (type == "ranef" & !is.null(newdata))
+    stop("prediction for random effect for 'newdata' is not implemented.")
+  
+  if (type == "ranef") return(ranef(object$info$model, ...))
+  
   ## the terminal node identifiers
   ids <- nodeids(object, terminal = TRUE)
   
@@ -175,7 +186,8 @@ predict.tvcm <- function(object, newdata = NULL,
   } else {
 
     ## call predict.olmm
-    return(predict(object$info$model, newdata = newdata, type = type, ...))
+    return(predict(object$info$model, newdata = newdata, type = type,
+                   na.action = na.action, ...))
   }
   return(fitted)
 }
@@ -188,8 +200,8 @@ tvcm_print <- function(x, type = c("print", "summary"), ...) {
   
   header_panel <- function(x) {
     rval <- x$info$title
-    rval <- c(rval, paste("  Family: ", x$info$family$family,
-                          " ", x$info$family$link, sep = ""))
+    rval <- c(rval, "", paste("  Family: ", x$info$family$family,
+                              " ", x$info$family$link, sep = ""))
     if (length(x$info$formula$original) > 0L) {
       formula <- deparse(x$info$formula$original)
       formula[1L] <- paste(" Formula: ", formula[1L], sep = "")
@@ -204,12 +216,12 @@ tvcm_print <- function(x, type = c("print", "summary"), ...) {
       meth <- paste(meth, " (alpha = ", format(x$info$control$alpha, ...), sep = "")
       if (x$info$control$bonferroni) 
         meth <- paste(meth, ", Bonferroni corrected", sep = "")
-      meth <- paste(meth, ")", sep = "")
     } else {
-      meth <- paste(meth, " (maxwidth = ", format(x$info$control$maxwidth, ...),
-                    ")", sep = "")
-    }
-    rval <- c(rval, meth)
+      meth <-
+        paste(meth, " (maxwidth = ", format(x$info$control$maxwidth, ...), sep = "")
+    }                    
+    meth <- paste(meth, ", minbucket = ", x$info$control$minbucket, ")", sep = "")
+    rval <- c(rval, meth, "")
       
     if (type == "summary") {
       lLik <- logLik(x)
@@ -218,44 +230,43 @@ tvcm_print <- function(x, type = c("print", "summary"), ...) {
                       logLik = as.vector(lLik),
                       deviance = deviance(x))
       rval <- c(rval, "Goodness of fit:")
-      rval <- c(rval, unlist(strsplit(formatMatrix(AICtab, ...), "\n")))
+      rval <- c(rval, unlist(strsplit(formatMatrix(AICtab, ...), "\n")), "")
+    } 
+    
+    if (length(coef$re) > 0L) {
+      rval <- c(rval, "Random effects:")
+      VarCorr <- VarCorr(extract(x, "model"))
+      rval <- c(rval, attr(VarCorr, "title"))
+      rval <- c(rval, unlist(strsplit(formatMatrix(VarCorr, ...), "\n")), "")
+    }
+      
+    if (length(coef$fe) > 0L) {
+      rval <- c(rval, "Fixed effects:")
+      if (type == "print") {
+        coefMat <- matrix(coef$fe, 1)
+        colnames(coefMat) <- names(coef$fe)
       } else {
-        rval <- c(rval, "")
+        coefMat <- cbind("Estimate" = coef$fe,
+                         "Std. Error" = sd$fe,
+                         "t value" = coef$fe / sd$fe)
       }
+      rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")), "")
+    }
       
-      if (length(coef$re) > 0L) {
-          rval <- c(rval, "Random effects:")
-          VarCorr <- VarCorr(extract(x, "model"))
-          rval <- c(rval, attr(VarCorr, "title"))
-          rval <- c(rval, unlist(strsplit(formatMatrix(VarCorr, ...), "\n")))
-      }
-      
-      if (length(coef$fe) > 0L) {
-          rval <- c(rval, "Fixed effects:")
-          if (type == "print") {
-              coefMat <- matrix(coef$fe, 1)
-              colnames(coefMat) <- names(coef$fe)
-          } else {
-              coefMat <- cbind("Estimate" = coef$fe,
-                               "Std. Error" = sd$fe,
-                               "t value" = coef$fe / sd$fe)
-          }
-          rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")))
-      }
-      
-      rval <- c(rval, "Varying effects:", "")
-      if (depth(x) ==0L && length(coef$vc) > 0L) {
-          if (type == "print") {
+    rval <- c(rval, "Varying effects:")
+    if (depth(x) ==0L && length(coef$vc) > 0L) {
+      if (type == "print") {
               coefMat <- matrix(coef$vc["1", ], 1)
               colnames(coefMat) <- colnames(coef$vc)
-          } else {
+            } else {
               coefMat <- cbind("Estimate" = coef$vc["1",],
                                "Std. Error" = sd$vc["1",],
                                "t value" = coef$vc["1",] / sd$vc["1",])
-          }
-          rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")))
-      }
-      return(rval)
+            }
+      rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")))
+    }
+    rval <- c(rval, "")
+    return(rval)
   }
   
   terminal_panel <- function(node) {
@@ -275,8 +286,8 @@ tvcm_print <- function(x, type = c("print", "summary"), ...) {
   footer_panel <- function(x) {
       rval <- ""
       if (nzchar(mess <- naprint(attr(x$data, "na.action")))) 
-          rval <- c(rval, paste("(", mess, ")", sep = ""))
-      if (rval == "") rval <- character()
+          rval <- c(rval, paste("(", mess, ")", sep = ""), "")
+      if (length(rval) == 1 && rval == "") rval <- character()
       return(rval)
   }
   

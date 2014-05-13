@@ -54,7 +54,7 @@ tvcm <- function(formula, data, fit, family,
     if (is.function(fit)) fit <- deparse(mc$fit)
   }
   if (!fit %in% c("glm", "olmm")) stop("'fit' not recognized.")
-
+    
   ## set family
   if (missing(family)) stop("no 'family'.")
   if (is.character(family)) {
@@ -63,7 +63,7 @@ tvcm <- function(formula, data, fit, family,
       family <- family()
   }
   if (!class(family) %in% c("family", "family.olmm")) stop("'family' not recognized")
- 
+  if (fit != "olmm") control$estfun <- NULL
   
   ## set formulas
   if (control$verbose) cat("OK\n* setting formulas ... ")
@@ -285,45 +285,51 @@ tvcm <- function(formula, data, fit, family,
 tvcm_control <- function(method = c("mob", "partreg"),
                          alpha = 0.05, bonferroni = TRUE,
                          maxwidth = ifelse(method == "partreg", 10L, Inf),
-                         minsplit = 50L, minbucket = 25L, trim = 0.1,
-                         maxdepth = Inf, maxstep = Inf, mtry = Inf,
+                         minbucket = 50L, mtry = Inf,
+                         minsplit = 2 * minbucket, trim = 0.1,
+                         maxdepth = Inf, maxstep = maxwidth - 1L, 
                          nselect = Inf, estfun = list(),  
-                         maxevalsplit = 20, riskfun = deviance,
-                         fast = 0L, verbose = FALSE,...) {
+                         maxevalsplit = 20L, riskfun = deviance,
+                         fast = 0L, verbose = FALSE, ...) {
 
-  method = match.arg(method)
+  method <- match.arg(method)
     
   ## check available arguments
-  stopifnot(alpha >= 0 & alpha <= 1)
+  stopifnot(alpha >= 0.0 & alpha <= 1.0)
   stopifnot(is.logical(bonferroni))
   stopifnot(minsplit >= 0)
 
-  estfun <- appendDefArgs(estfun, list(predecor = TRUE, nuisance = NULL,silent = TRUE))
+  ## set the default parameters for 'gefp.estfun' calls
+  estfun <- appendDefArgs(estfun, list(predecor = TRUE,
+                                       nuisance = NULL,
+                                       silent = TRUE))
+  if (!is.null(estfun$level) && estfun$level != "observation")
+    warning("'level' argument for 'estfun' is set to 'observation'")
   estfun$level <- "observation"
-  
-  rval <- appendDefArgs(
-            list(...),
-            list(method = method,
-                 alpha = alpha,
-                 bonferroni = bonferroni,
-                 minsplit = minsplit,
-                 minbucket = minbucket,
-                 trim = trim,
-                 maxdepth = maxdepth,
-                 maxwidth = maxwidth,
-                 maxstep = maxstep,
-                 mtry = mtry,
-                 nselect = nselect,
-                 estfun = estfun,
-                 maxevalsplit = maxevalsplit,
-                 riskfun = riskfun,
-                 fast = fast, 
-                 verbose = verbose,
-                 parm = NULL, intercept = NULL,
-                 functional.factor = "LMuo",
-                 functional.ordered = "LMuo",
-                 functional.numeric = "supLM"))
-  
-  class(rval) <- "tvcm_control"
-  return(rval)
+
+  ## create a list of parameters of class 'tvcm_control'
+  return(structure(
+           appendDefArgs(
+             list(...),
+             list(method = method,
+                  alpha = alpha,
+                  bonferroni = bonferroni,
+                  maxwidth = maxwidth,
+                  minbucket = minbucket,
+                  mtry = mtry,
+                  minsplit = minsplit,                 
+                  trim = trim,
+                  maxdepth = maxdepth,
+                  maxstep = maxstep,
+                  nselect = nselect,
+                  estfun = estfun,
+                  maxevalsplit = maxevalsplit,
+                  riskfun = riskfun,
+                  fast = fast, 
+                  verbose = verbose,
+                  parm = NULL, intercept = NULL,
+                  functional.factor = "LMuo",
+                  functional.ordered = "LMuo",
+                  functional.numeric = "supLM")),
+          class = "tvcm_control"))
 }

@@ -11,6 +11,7 @@
 ## ranefCov:        extracts covariance matrixof models with
 ##                  random effects.
 ## oobrisk:         estimates out-of-bag risk.
+## otsplot:         ordinal time series plot.
 ## splitpath:       extracts the splitting path of a tree
 ##                  structure.
 ## stabpath:        computes stability paths for variable
@@ -21,7 +22,13 @@
 
 ranefCov <- function(object, ...) UseMethod("ranefCov")
 
+extract <- function(object, ...) UseMethod("extract")
+
+cvrisk <- function(object, ...) UseMethod("cvrisk")
+
 oobrisk <- function(object, ...) UseMethod("oobrisk")
+
+otsplot <- function(x, ...) UseMethod("otsplot")
 
 splitpath <- function(tree, ...) UseMethod("splitpath")
 

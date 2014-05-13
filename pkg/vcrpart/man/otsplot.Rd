@@ -2,11 +2,12 @@
 
 \alias{otsplot}
 \alias{otsplot.default}
-\alias{otsplot.formula}
+\alias{otsplot_control}
+\alias{otsplot_filter}
 
-\title{Time-series plot for ordinal longitudinal data}
+\title{Time-series plot for longitudinal ordinal data}
 
-\description{Plots ordinal sequences of subjects in a \eqn{x} (usually
+\description{Plots multiple ordinal sequences in a \eqn{x} (usually
   time) versus \eqn{y} (response variable) scatterplot. The sequences
   are displayed by jittered frequency-weighted parallel lines.}
 
@@ -14,81 +15,140 @@
 
 otsplot(x, ...)
 
-\method{otsplot}{default}(x, y, subject, weights = NULL, cond,
-        plot_gp = gpar(), grid_gp = gpar(),
-        strip_gp = gpar(),
-        filter = NULL, maxit = 200,
-        main, xlab, ylab, xlim, ylim,
-        layout = NULL, margins = c(5.1, 4.1, 4.1, 3.1),
-        pop = TRUE, newpage = TRUE, ...)
+\method{otsplot}{default}(x, y, subject, weights = NULL, groups,
+        control = otsplot_control(), filter = NULL, 
+        main, xlab, ylab, xlim, ylim, ...)
 
+otsplot_control(cex = 1, lwd = 1/4, col = NULL,
+                hide.col = grey(0.8),
+                lorder = c("background", "foreground") ,
+                lcourse = c("upwards", "downwards"),
+                grid.scale = 1/5, grid.lwd = 1/2,
+                grid.fill =  grey(0.95), grid.col = grey(0.6),          
+                layout = NULL, margins = c(5.1, 4.1, 4.1, 3.1),
+                strip.fontsize = 12, strip.fill =  grey(0.9),
+                pop = TRUE, newpage = TRUE, maxit = 500L)
+
+otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
 }
 
 \arguments{
-  \item{x}{a \code{numeric} or \code{factor} vector. Represents usually
-    time.} 
-  \item{y}{a ordered factor vector (see \code{ordered} in the base
-    package).} 
-  \item{subject}{a factor vector that allocates elements in \code{x} and
-    \code{y} to the observation unit.} 
+  \item{x}{a \code{numeric} or \code{factor} vector for the \code{x}
+    axis, e.g. time.}  
+  \item{y}{an \code{ordered} factor vector for the \code{y} axis.} 
+  \item{subject}{a \code{factor} vector that identifies the subject,
+    i.e., allocates elements in \code{x} and \code{y} to the subject
+    i.e. observation unit.} 
   \item{weights}{a numeric vector of weights of length equal the number
     of subjects.}
-  \item{cond}{a vector (\code{numeric} or \code{factor}) of group
+  \item{groups}{a \code{numeric} or \code{factor} vector of group
     memberships of length equal the number of subjects. When specified,
-    one panel is generated for each different membership value.}
-  \item{plot_gp}{graphical parameters for the plot.}
-  \item{grid_gp}{graphical parameters for the translation zones.}
-  \item{strip_gp}{graphical paramaters for the strips appearing when the
-    \code{cond} argument is used.}
-  \item{filter}{a list of line coloring options.}
+    one panel is generated for each distinct membership value.}
+  \item{control}{control parameters produced by \code{otsplot_control},
+    such as line colors or the scale of translation zones.}
+  \item{filter}{an \code{\link{otsplot_filter}} object which defines line 
+    coloring options. See details.} 
+  \item{main, xlab, ylab}{title and axis labels for the plot.}
+  \item{xlim, ylim}{the x limits \code{c(x1, x2)} resp. y limits
+    \code{(y1,y2)}.}
+  \item{\ldots}{additional undocumented arguments.}
+  \item{cex}{expansion factor for the squared symbols.}
+  \item{lwd}{expansion factor for line widths. The expansion is
+    relative to the size of the squared symbols.}
+  \item{col}{color palette vector for line coloring.}
+  \item{hide.col}{Color for ordinal time-series filtered-out by the
+    \code{filter} specification in \code{otsplot}.}
+  \item{lorder}{line ordering. Either \code{"background"} or
+    \code{"foreground"}.}
+  \item{lcourse}{Method to connect simultaneous elements with the
+    preceding and following ones. Either \code{"upwards"} (default) or
+    \code{"downwards"}.}
+  \item{grid.scale}{expansion factor for the translation zones.}
+  \item{grid.lwd}{expansion factor for the borders of translation
+    zones.}
+  \item{grid.fill}{the fill color for translation zones.}
+  \item{grid.col}{the border color for translation zones.}
+  \item{strip.fontsize}{fontsize of titles in stripes that appear
+    when a \code{groups} vector is assigned.}
+  \item{strip.fill}{color of strips that appear when a \code{groups}
+    vector is assigned.}
+  \item{layout}{an integer vector \code{c(nr, nc)} specifying the
+    number of rows and columns of the panel arrangement when the
+    \code{groups} argument is used.} 
+  \item{margins}{a numeric vector \code{c(bottom, left, top, right)}
+    specifying the space on the margins of the plot. See also
+    the argument \code{mar} in \code{\link{par}}.}
+  \item{pop}{logical scalar. Whether the viewport tree should be popped
+    before return.}
+  \item{newpage}{logical scalar. Whether \code{grid.newpage()} should be
+    called previous to the plot.}
   \item{maxit}{maximal number of iteration for the algorithm that
-    establishes the translation arrangement.}
-  \item{main}{a main title for the plot.}
-  \item{xlab}{label for the \code{x} axis.}
-  \item{ylab}{label for the \code{y} axis.}
-  \item{xlim}{a label for the \code{x} axis.}
-  \item{ylim}{a label for the \code{y} axis.}
-  \item{layout}{a integer vector of length 2 specifying the number of
-    rows and columns of the panel arrangement when the \code{cond}
-    argument is used.}
-  \item{margins}{a numeric vector interpreted in the same way as
-    the \code{mar} argument of function \code{\link{par}} in base
-    graphics.} 
-  \item{pop}{a logical whether the viewport tree should be popped before
-    return.}
-  \item{newpage}{a logical indicating whether \code{grid.newpage()}
-    should be called.}
-  \item{\ldots}{additional arguments passed to the calls.}
+    computes the translation arrangement.}
+   \item{method}{character string. Defines the filtering function. Available are 
+    \code{"minfreq"}, \code{"cumfreq"} and \code{"linear"}.}
+   \item{level}{numeric scalar between 0 and 1. The frequency threshold for the 
+    filtering methods \code{"minfreq"} and \code{"cumfreq"}.}
 }
 
 \details{
   The function is a scaled down version of the \code{seqpcplot}
   function of the \pkg{TraMineR} package, implemented in the \pkg{grid}
   graphics environment.
+
+  The \code{filter} argument serves to specify filters to gray less
+  interesting patterns. The filtered-out patterns are displayed in the
+  \code{hide.col} color. The \code{filter} argument expects an object 
+  produced by \code{\link{otsplot_filter}}.
+
+  \code{otsplot_filter("minfreq", level = 0.05)} colors patterns with a 
+  support of at least 5\% (within a group). \code{otsplot_filter("cumfreq", level = 0.75)}
+  highlight the 75\% most frequent patterns (within group). \code{otsplot_filter("linear")} 
+  linearly greys out patterns with low support.
 }
 
-\author{Reto Buergin}
+\author{Reto Buergin and Gilbert Ritschard}
 
 \references{
-  Reto Buergin and Gilbert Ritschard, G. (2012), Categorical parallel
-  coordinate plot,
-  \emph{In LaCOSA Lausanne Conference On Sequence Analysis, University of Lausanne, June 6th-8th 2012 (Poster)},
-  URL \url{http://www3.unil.ch/wpmu/sequences2012/files/2012/05/Buergin_LaCOSA_Poster.pdf}
+  Reto Buergin and Gilbert Ritschard, G. (2014). A decorated parallel
+  coordinate plot for categorical longitudinal data, \emph{The American
+    Statistician}, accepted.
 }
 
 \examples{
 ## ------------------------------------------------------------------- #
-## Example 1: Artificial ordinal longitudinal data
+## Dummy example 1: 
 ##
-## Applying the otsplot on a set of 4 artificial ordinal sequences. 
+## Plotting artificially generated ordinal longitudinal data
 ## ------------------------------------------------------------------- #
 
 ## load the data
-data(otsplot_1)
+data(vcrpart_1)
+vcrpart_1 <- vcrpart_1[1:40,]
+vcrpart_1$id <- droplevels(vcrpart_1$id)
 
 ## plot the data
-otsplot(x = otsplot_1$time, y = otsplot_1$y, subject = otsplot_1$id,
-        margins = c(4, 6, 1, 1), xlab = "time")
+otsplot(x = vcrpart_1$wave, y = vcrpart_1$y, subject = vcrpart_1$id)
+
+## using 'groups'
+groups <- rep(c("A", "B"), each = nrow(vcrpart_1) / 2L)
+otsplot(x = vcrpart_1$wave, y = vcrpart_1$y, subject = vcrpart_1$id,
+        groups = groups)
+
+## color series with supports over 30%
+otsplot(x = vcrpart_1$wave, y = vcrpart_1$y, subject = vcrpart_1$id,
+        filter = otsplot_filter("minfreq", level = 0.3))
+
+## highlight the 50% most frequent series
+otsplot(x = vcrpart_1$wave, y = vcrpart_1$y, subject = vcrpart_1$id,
+        filter = otsplot_filter("cumfreq", level = 0.5))
+
+## linearly grey out series with low support 
+otsplot(x = vcrpart_1$wave, y = vcrpart_1$y, subject = vcrpart_1$id,
+        filter = otsplot_filter("linear"))
+
+## subject-wise plot 
+otsplot(x = vcrpart_1$wave[1:12], y = vcrpart_1$y[1:12],
+        subject = vcrpart_1$id[1:12], groups = vcrpart_1$id[1:12])
 }
 
 \keyword{hplot}

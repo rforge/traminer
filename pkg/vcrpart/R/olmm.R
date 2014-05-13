@@ -227,8 +227,6 @@ olmm <- function(formula, data, family = cumulative(),
   
   subject <- fullmf[, subjectName, drop = TRUE]
   if (!is.factor(subject)) stop("subject variable must be a factor")
-  if (nlevels(subject) < 3L)
-    stop("subject variable must have 3 levels or more")
   
   ## extract random effect model matrix W
   ranefmf$formula <- terms(formList$re$eta$ce, keep.order = TRUE)
@@ -283,9 +281,10 @@ olmm <- function(formula, data, family = cumulative(),
   if (!missing(offset)) {
     if (!is.matrix(offset)) stop("'offset' must be a 'matrix'")
     if (ncol(offset) != dims["nEta"])
-      stop("'offset should be a 'matrix' with ", dims["nEta"], " colmuns")
+      stop("'offset should be a 'matrix' with ", dims["nEta"], " columns")
     if (nrow(offset) != nrow(fullmf))
       offset <- offset[-attr(fullmf, "na.action"), , drop = FALSE]
+    if (any(is.na(offset))) stop("'offset' contains NA's.")
     if (nrow(offset) != dims["n"]) stop("'offset' has wrong dimensions.")    
   } else {
     offset <- matrix(0.0, dims["n"], dims["nEta"],

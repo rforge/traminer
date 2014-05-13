@@ -4,7 +4,6 @@ import("methods", "partykit")
 
 ## Generics for which we define new methods
 importFrom("graphics", plot)
-importFrom("mboost", cvrisk, extract)
 importFrom("nlme", fixef, ranef, VarCorr)
 importFrom("numDeriv", hessian)
 importFrom("rpart", prune)
@@ -13,7 +12,7 @@ importFrom("stats",
            AIC, BIC, anova, coef, coefficients, deviance,
            extractAIC, fitted, formula, getCall, logLik,
            model.frame, model.matrix, nobs, predict, resid, residuals,
-           terms, update, vcov, weights)
+           simulate, terms, update, vcov, weights)
 importFrom("strucchange", gefp, sctest, supLM, catL2BB, root.matrix)
 importFrom("ucminf", ucminf)
 importFrom("zoo", zoo)
@@ -37,9 +36,13 @@ export(
   splitpath, 
   stabpath,
   VarCorr,
-  otsplot, 
+  otsplot,
+  otsplot_control,
+  otsplot_filter,
   olmm,
   olmm_control,
+  panel_coef,
+  panel_terms,
   estfun.olmm,
   gefp.olmm,
   decormat.olmm,
@@ -47,7 +50,9 @@ export(
   tvcm,
   tvcolmm,
   tvcglm, 
-  fvcm, 
+  fvcm,
+  fvcolmm,
+  fvcglm,
   fvcm_control,
   cvfolds)
 
@@ -73,6 +78,7 @@ S3method(ranef, olmm)
 S3method(ranefCov, olmm)
 S3method(resid, olmm)
 S3method(residuals, olmm)
+S3method(simulate, olmm)
 S3method(summary, olmm)
 S3method(print, summary.olmm)
 S3method(terms, olmm)
@@ -127,5 +133,7 @@ S3method(weights, tvcm)
 ## Exports for fvcm (S3)
 S3method(fitted, fvcm)
 S3method(predict, fvcm)
+S3method(plot, fvcm)
 S3method(print, fvcm)
 S3method(oobrisk, fvcm)
+S3method(ranef, fvcm)

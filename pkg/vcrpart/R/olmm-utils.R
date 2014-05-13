@@ -318,7 +318,7 @@ olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
     fixef[subs] <- start[subs]
 
     ## make a fixed effects matrix
-    fixef <- rbind(matrix(as.numeric(fixef[1:(dims["pCe"] * dims["nEta"])]), dims["pCe"] , dims["nEta"], byrow = FALSE), if (dims["pGe"] > 0) matrix(rep(as.numeric(fixef[(dims["pCe"] * dims["nEta"] + 1):dims["p"]]), each = dims["nEta"]), dims["pGe"], dims["nEta"], byrow = TRUE) else NULL)
+    fixef <- rbind(matrix(as.numeric(fixef[1:(dims["pCe"] * dims["nEta"])]), dims["pCe"], dims["nEta"], byrow = FALSE), if (dims["pGe"] > 0) matrix(rep(as.numeric(fixef[(dims["pCe"] * dims["nEta"] + 1):dims["p"]]), each = dims["nEta"]), dims["pGe"], dims["nEta"], byrow = TRUE) else NULL)
     rownames(fixef) <- colnames(X)
     colnames(fixef) <-  colnames(eta)
 

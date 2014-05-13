@@ -1,5 +1,6 @@
 \name{olmm}
 
+\alias{family.olmm}
 \alias{cumulative}
 \alias{adjacent}
 \alias{baseline}
@@ -10,13 +11,13 @@
 \description{
   Fits different types of 2-stage linear mixed models for clustered or
   longitudinal ordinal (or multinomial) responses. 1-stage data are 
-  allowed as well. Random effects are assumed to be multivariate normal 
+  also allowed. Random effects are assumed to be multivariate normal 
   distributed with expectation 0. At the time being, cumulative link 
   models with the logit, probit or cauchy link, the baseline-category 
-  logit (baseline category = superior category) and the adjacent-category
-  logit model are implemented. Coefficients can be category-specific
-  (i.e. non-proportional odds effects) or global (i.e. proportional odds, 
-  or parallel effects).
+  logit and the adjacent-category logit model are
+  implemented. Coefficients can be category-specific
+  (i.e. non-proportional odds effects) or global (i.e. proportional
+  odds, or parallel effects).
 
   The function solves the score function i.e. the partial derivates for
   coefficients of marginal likelihood using Gauss-Hermite quadrature 
@@ -36,18 +37,17 @@ olmm(formula, data, family = cumulative(),
 }
 
 \arguments{
-  \item{formula}{a symbolic description of the model. This should be of
-    form 
+  \item{formula}{a symbolic description of the model. This should something 
+    like
     
-    \code{y ~ ge(x1) + ce(x2) +re(1 + ce(w2) | id)} 
+    \code{y ~ ce(x1) + ge(x2) +re(1 + ge(w2) | id)} 
 
-    where \code{ge(x1)} specificies that the predictor \code{x1} has a 
-    global i.e. proportional odds fixed effect and \code{ce(x2)} has a
-    category-specific i.e. non-proportional odds effect on the logits of 
-    the response, see \code{\link{ge}}, resp. \code{\link{ce}}. Random 
-    effects are specified within the \code{\link{re}} term, where the 
-    variable \code{id} above behind the vertical bar \code{|} defines 
-    the subject i.e.cluster factor.} 
+    where \code{ce(x1)} specificies that the predictor \code{x1} has a 
+    category-specific i.e. non-proportional odds effect and \code{ge(x2)} 
+    has global i.e. proportional odds fixed effect, see \code{\link{ge}}, resp. 
+    \code{\link{ce}}. Random effects are specified within the \code{\link{re}} 
+    term, where the variable \code{id} above behind the vertical bar \code{|} 
+    defines  the subject i.e. cluster factor.} 
   \item{data}{an optional data frame with the variables
     in \code{formula}. By default the variables are taken from the 
     environment from which \code{olmm} is called.}
@@ -73,21 +73,16 @@ olmm(formula, data, family = cumulative(),
   logit model are extracted via coefficient transformation 
   (e.g. Agresti; 2010).
 
-  Initial values may decrease the computation time and avoid
-  divergence. The \code{start} argument accepts a vector with named
-  elements according to the column labels from the
-  \code{\link{model.matrix}}.At the time being, initial values for 
-  adjacent-categories models must be transformed into the 
-  baseline-category model form.
-
-  The argument \code{optim} may be used to modify the optimizer. For
-  example, the Nelder-Mead algorithm of \code{\link{optim}} function can
-  be called by \code{olmm(..., optim = list(method = "Nelder-Mead"))} or
-  the \code{\link{nlminb}} function by \code{olmm(..., optim =
-  list(method = "nlminb")).}
-
-  \code{weights} should be used with caution. \code{olmm} can handle
-  time-invariant weights only (one distinct weight per subject).
+  The three implemented families are defined as follows:
+  \code{\link{cumulative}} is defined as the link of the sum of
+  probabilities of lower categories, e.g., for \code{link = "logit"},
+  the logit of the sum of probabilities of lower
+  categories. \code{\link{adjacent}} is defined as the logit of 
+  the probability of the lower of two adjacent
+  categories. \code{\link{baseline}} is defined as the logit of the
+  probability of a category with reference to the highest
+  category. Notice that the estimated coefficients of cumulative models
+  may have the opposite sign those obtained with alternative software.  
   
   For alternative fitting functions, see fore example \code{clmm} of
   package \code{ordinal}, \code{cumlogitRE} of package \code{glmmAK},
@@ -97,8 +92,10 @@ olmm(formula, data, family = cumulative(),
   \code{OrdinalBoost} of package \code{GMMBoost}. 
 }
 
-\value{An object of class \code{\link{olmm}}. See
-  \code{\link{olmm-class}} for details.}
+\value{\code{\link{olmm}} yields an object of class \code{\link{olmm}}, 
+  see \code{\link{olmm-class}}. \code{\link{cumulative}}, 
+  \code{\link{adjacent}} and \code{\link{baseline}} yield an object 
+  of class \code{family.olmm}.}
 
 \author{Reto Buergin}
 
@@ -110,7 +107,7 @@ olmm(formula, data, family = cumulative(),
   Effect Models, \emph{Statistical Modelling} \bold{1}: 81--102
   
   Hedeker, D. and Gibbons, R. (1994). A random-effects ordinal
-  regression model for multilevel analysis. \emph{Biometrics} \bold{20}
+  regression model for multilevel analysis, \emph{Biometrics} \bold{20}
   (4): 933--944
 
   Tutz, G. and Hennevogl W. (1996). Random effects in ordinal regression
@@ -125,26 +122,16 @@ olmm(formula, data, family = cumulative(),
 ## Example 1: Schizophrenia
 ##
 ## Estimating the cumulative mixed models of
-## Agresti (2010) chapters 10.3.1 (random intercept
-## model) and 10.3.3 (random slope model)
+## Agresti (2010) chapters 10.3.1
 ## ------------------------------------------------------------------- #
 
 data(schizo)
 
-## model with random intercepts
 model.10.3.1 <-
   olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + re(1|id),
        data = schizo, family = cumulative())
 
 summary(model.10.3.1)
-
-## model with random slopes
-model.10.3.3 <-
-  olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + re(1 + sqrt(week)|id),
-       data = schizo, family = cumulative())
-
-summary(model.10.3.3)
-
 
 ## ------------------------------------------------------------------- #
 ## Example 2: Movie critics
@@ -155,20 +142,7 @@ summary(model.10.3.3)
 
 data(movie)
 
-## model with global random intercepts
-model.22.1 <- olmm(critic ~ review + re(1|movie),
-                   data = movie, family = adjacent())
-
-summary(model.22.1)
-
-
-## model with category-specific random intercepts
-model.22.2 <- olmm(critic ~ review + re(1|movie, intercept = "ce"),
-                   data = movie, family = adjacent())
-
-summary(model.22.2)
-
-## as model 22.1 but with category-specific effects for "review"
+## model with category-specific effects for "review"
 model.24.1 <- olmm(critic ~  ce(review) + re(1|movie, intercept = "ce"),
                    data = movie, family = adjacent())
 

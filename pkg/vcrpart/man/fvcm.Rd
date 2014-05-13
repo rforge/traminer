@@ -1,96 +1,111 @@
 \name{fvcm}
 
 \alias{fvcm}
-\alias{oobrisk.fvcm}
-\alias{plot.fvcm}
-\alias{predict.fvcm}
-\alias{print.fvcm}
+\alias{fvcm_control}
+\alias{fvcolmm}
+\alias{fvcglm}
 
 \title{Bagging and random forests based on \code{\link{tvcm}}.}
 
 \description{
-  Implements bagging and random forests for \code{\link{tvcm}}. 
+  Implements the bagging (Breiman, 1996) and random forest (Breiman, 2001) ensemble 
+  algorithms for \code{\link{tvcm}}.  
 }
 
 \usage{
 
-fvcm(..., folds = cvfolds(object, "subsampling", 50L), control = fvcm_control())
+fvcm(..., folds, control = fvcm_control())
 
-\method{oobrisk}{fvcm}(object, fun = NULL, ...)
-\method{predict}{fvcm}(object, newdata = NULL,
-        type = c("link", "response", "prob", "class", "coef"),
-        ranef = FALSE,  verbose = FALSE, ...)
-\method{print}{fvcm}(x, ...)
+fvcolmm(..., family = cumulative(), folds, control = fvcm_control())
+
+fvcglm(..., folds, control = fvcm_control())
+
+fvcm_control(alpha = 1.0, maxwidth = 10L, minbucket = 50L, mtry = 5L, ...)
 }
 
 \arguments{
-  \item{...}{for \code{\link{fvcm}}, this part is used to assign
-    arguments for \code{\link{tvcm}}, including \code{formula}, 
-    \code{data}, \code{family} and \code{fit}. For the other 
-    functions, ... are arguments to be passed to other methods.}
-  \item{object,x}{an object of class \code{\link{fvcm}}.}
-  \item{fun}{the risk function. The default risk function is defined
-    as the sum of the deviance residuals.}
-  \item{folds}{a matrix of integers defining the folds for
-    cross-validation. See \code{\link{cvrisk.tvcm}}.}
-  \item{control}{a \code{list} that specifies the maximum control
-    parameters to evaluate. See \code{\link{fvcm_control}}.}
-  \item{newdata}{an optional data frame in which to look for variables
-    with which to predict. If omitted, the fitted values are used.}
-  \item{type}{character string indicating the type of prediction. See
-    \code{\link{predict.tvcm}}.}  
-  \item{ranef}{logical scalar. This argument is used only if the
-    \code{\link{olmm}} function is used. See
-    \code{\link{predict.olmm}}.}  
-  \item{verbose}{logical scalar. If \code{TRUE} verbose output is
-    generated during the validation.}
+  \item{...}{for \code{\link{fvcm}}, \code{\link{fvcolmm}} and \code{\link{fvcglm}}, 
+    \code{...} are arguments to be passed to \code{\link{tvcm}}, see \code{\link{tvcm}}. 
+    This includes necessarily the arguments \code{formula}, \code{data} and
+    \code{family}. For \code{\link{fvcm_control}}, \code{...} are
+    further arguments to be passed to \code{\link{tvcm_control}}.}  
+  \item{folds}{a matrix of integers defining the rows of observations
+    in \code{data} on which single trees are fitted, e.g., a matrix produced by
+    \code{\link{cvfolds}}. See \code{\link{cvfolds}}.}  
+  \item{control}{control parameters as produced by
+    \code{\link{fvcm_control}}.} 
+  \item{family}{the model family, e.g., an object of class 
+    \code{\link{family.olmm}} or \code{\link{family}}.} 
+  \item{alpha}{numeric significance threshold between 0 and 1. A node is 
+    splitted when the smallest \eqn{p} value for any coefficient
+    coefficient test in the current step falls below \code{alpha}.}
+  \item{maxwidth}{integer. The maximum width of the tree.}
+  \item{minbucket}{integer. The minimum sum of weights in each node.}
+  \item{mtry}{integer. The number of input variables randomly sampled as
+    candidates at each node. Is to be set to \code{Inf} for bagging. See details.} 
 }
 
 \details{
-  Implements "bagging" (Breiman, 1996) and "random forests" (Breiman,
-  2001) for \code{\link{tvcm}} objects. The method consist in
-  growing multiple trees using \code{\link{tvcm}} and aggregating the
-  the predictor equations. For bagging, simply use 
-  \code{control = list(mtry = Inf)}. The implementation may be slow.
+  Implements the \emph{bagging} (Breiman, 1996) and \emph{random
+  forests} (Breiman, 2001) ensemble algorithms for the
+  \code{\link{tvcm}} algorithm. The method consist in growing multiple
+  trees using \code{\link{tvcm}} and aggregating the fitted coefficient
+  functions. For bagging, simply set \code{mtry = Inf} in \code{\link{fvcm_control}}. 
 
-  \code{oobrisk.fvcolmm} estimates the out-of-bag risk by aggregating 
-  the linear predictor for each observations with those trees in which
-  the observation didn't appear and using that aggregated predictor 
-  to predict the outcome.
+  \code{\link{fvcolmm}} and \code{\link{fvcglm}} are convenience
+  functions for whether a \code{\link{olmm}} or a \code{\link{glm}}
+  model is fitted. 
 
-  \code{predict.fvcolmm} aggregates the predictors of all fitted trees.  
-}
-
-\references{
-  Leo Breiman (1996). Bagging Predictors. \emph{Machine Learning},
-  123--140 
-  Leo Breiman (2001). Random Forests. \emph{Machine Learning},
-  \bold{45}(1), 5--32. 
-}
-
-\examples{
-
-\dontrun{
-## Extend Example 2 in '?tvcm'
-
-## load the data
-data(tvcm_2)
-
-## fit the model
-
-folds <- cvfolds(tvcm_2$id, type = "subsampling", K = 2)
-
-f1 <- fvcm(y ~ time + vc(z1,z2,z3,z4,by = treat) + re(1|id),
-              data = tvcm_1,
-              control = tvcm_control(mtry = 2,
-                minbucket = 50, maxevalsplit = 5,
-                verbose = TRUE),
-              folds = folds)
-}
+  \code{\link{fvcm_control}} is essentially \code{\link{tvcm_control}}
+  with other defaults for the main tuning parameters, which are
+  \code{maxwidth}, \code{minbucket} and \code{mtry}. \code{alpha} is set
+  to one so that the stopping parameter for \code{type = "mob"} is
+  skipped. The parameters \code{maxwidth} and \code{minbucket} are
+  discussed in the details section of \code{\link{tvcm}}. The
+  \code{mtry} argument, i.e., the number of randomly chosen variables
+  for splitting in each step, may be specified as the number of
+  partitioning  variables divided by 3, see Hastie et al. (2001),
+  sec. 15. 
 }
 
 \value{An object of class \code{fvcm}.}
 
 \author{Reto Buergin}
+
+\references{
+  Leo Breiman (1996). Bagging Predictors. \emph{Machine Learning},
+  123--140
+  
+  Leo Breiman (2001). Random Forests. \emph{Machine Learning},
+  \bold{45}(1), 5--32.
+
+  T. Hastie, R. Tibshirani, J. Friedman (2001), The elements of
+  statistical learning, Springer.
+}
+
+\seealso{\code{\link{fvcm-methods}}, \code{\link{tvcm}},
+  \code{\link{glm}}, \code{\link{olmm}}}
+
+\examples{
+## ------------------------------------------------------------------- #
+## Dummy example 1:
+##
+## Fitting a random forest 'tvcm' on artificially generated data.
+## ------------------------------------------------------------------- #
+
+## simulate data
+data(vcrpart_2)
+
+## set parameters
+control <- fvcm_control(mtry = 1, minbucket = 25, verbose = TRUE)
+folds <- cvfolds(factor(1:100), "subsampling", 3, 0.75)
+
+## fit the forest
+model <- fvcm(y ~ vc(z1, z2, by = x1) + x2, data = vcrpart_2,
+              family = gaussian(), 
+              folds = folds, control = control)
+
+model
+}
 
 \keyword{models}

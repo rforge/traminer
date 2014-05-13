@@ -18,15 +18,14 @@ olmm_control(fit = c("ucminf", "nlminb", "optim"),
 \arguments{
  \item{fit}{character string. The name of the function to be used for the 
     optimization.}
-  \item{doFit}{logical scalar. When \code{FALSE} an unfitted \code{olmm} 
+  \item{doFit}{logical scalar. When \code{FALSE} an unfitted \code{\link{olmm}}  
     object is returned. See details.}
   \item{numGrad}{logical scalar indicating whether the score function
     should be retrieved numerically.}
   \item{numHess}{logical scalar. Indicates whether the Hess matrix for
-    the variance-covariance matrix should be estimated numerically (this
-    is then an approximation of the observed fisher 
-    information). Must be \code{TRUE} if \code{numGrad} is
-    \code{TRUE}. See details.} 
+    the variance-covariance matrix should be estimated numerically,
+    which is an approximation of the observed fisher information). Must
+    be \code{TRUE} if \code{numGrad} is \code{TRUE}. See details.} 
   \item{nGHQ}{a positive integer specifying the number of quadrature
     points for the approximation of the marginal Likelihood by numerical
     integration.}
@@ -34,11 +33,25 @@ olmm_control(fit = c("ucminf", "nlminb", "optim"),
     parameters. The parameter must be named in exactly in the way as
     they appear when the model is fitted.}
   \item{restricted}{a character vector of names of coefficients to be
-    fixed during the optimization. The argument is ignored in case of
+    restricted to the initial values. The argument is ignored in case of
     adjacent category models.}
   \item{verbose}{logical scalar. If \code{TRUE} verbose output is
     generated during the optimization of the parameter estimates.}
   \item{...}{further arguments to be passed to \code{fit}.} 
+}
+
+\details{
+  Initial values may decrease the computation time and avoid
+  divergence. The \code{start} argument accepts a vector with named
+  elements according to the column names of the
+  \code{\link{model.matrix}}. At the time being, initial values for
+  adjacent-categories models must be transformed into the
+  baseline-category model form.
+
+  Notice that an additional argument \code{control}, e.g.,
+  \code{control = list(trace = 1)}, can be passed access control
+  parameters of the optimizers. For arguments, see \code{\link{ucminf}},
+  \code{\link{nlminb}} or \code{\link{nlminb}}. 
 }
 
 \value{
@@ -49,3 +62,7 @@ olmm_control(fit = c("ucminf", "nlminb", "optim"),
 \author{Reto Buergin}
 
 \seealso{\code{\link{olmm}}}
+
+\examples{
+olmm_control(doFit = FALSE)
+}
