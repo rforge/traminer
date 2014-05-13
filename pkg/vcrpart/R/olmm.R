@@ -164,6 +164,9 @@ olmm <- function(formula, data, family = cumulative(),
   if (control$verbose) cat("OK\n* extracting model frames ... ")
   
   ## decompose model formula
+  if (any(substr(all.vars(formula), 1, 3) == "Eta"))
+    stop("'Eta' is a reserved label and cannot be used as",
+         "variable name nor as prefix of a variable name (sorry).")
   formList <- vcrpart_formula(eval.parent(mc$formula),
                               family = family,
                               env = env)

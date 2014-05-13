@@ -15,7 +15,7 @@
 
 otsplot(x, ...)
 
-\method{otsplot}{default}(x, y, subject, weights = NULL, groups,
+\method{otsplot}{default}(x, y, subject, weights, groups,
         control = otsplot_control(), filter = NULL, 
         main, xlab, ylab, xlim, ylim, ...)
 
@@ -124,7 +124,6 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
 ## load the data
 data(vcrpart_1)
 vcrpart_1 <- vcrpart_1[1:40,]
-vcrpart_1$id <- droplevels(vcrpart_1$id)
 
 ## plot the data
 otsplot(x = vcrpart_1$wave, y = vcrpart_1$y, subject = vcrpart_1$id)
@@ -147,8 +146,8 @@ otsplot(x = vcrpart_1$wave, y = vcrpart_1$y, subject = vcrpart_1$id,
         filter = otsplot_filter("linear"))
 
 ## subject-wise plot 
-otsplot(x = vcrpart_1$wave[1:12], y = vcrpart_1$y[1:12],
-        subject = vcrpart_1$id[1:12], groups = vcrpart_1$id[1:12])
+otsplot(x = vcrpart_1$wave, y = vcrpart_1$y,
+        subject = vcrpart_1$id, groups = vcrpart_1$id)
 }
 
 \keyword{hplot}

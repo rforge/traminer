@@ -68,7 +68,7 @@ tvcm <- function(formula, data, fit, family,
   ## set formulas
   if (control$verbose) cat("OK\n* setting formulas ... ")
   if (any(substr(all.vars(formula), 1, 4) == "Node"))
-    stop("'Node' is a reserved variable name and cannot be used as",
+    stop("'Node' is a reserved label and cannot be used as",
          "variable name nor as prefix of a variable name (sorry).")
   formList <- vcrpart_formula(formula, family, env)
   ff <- tvcm_formula(formList, family, env)
