@@ -23,7 +23,7 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
     }
     if (method=="mostfreq") {
         for(i in 1:new.lgth.f) {
-            st.freq <- seqistatd(seqdata[,(tspan*(i-1) + 1):(tspan*i)])
+            st.freq <- suppressMessages(seqistatd(seqdata[,(tspan*(i-1) + 1):(tspan*i)]))
             newseq[,i] <- apply(st.freq,1,function(x){names(which.max(x))})
         }
 }
@@ -31,7 +31,7 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
         if (method=="first"){
             newseq[,new.lgth] <- seqdata[,tspan*new.lgth.f + 1]
         } else if (method=="mostfreq") {
-            st.freq <- seqistatd(seqdata[,(tspan*new.lgth.f+1):lgth])
+            st.freq <- suppressMessages(seqistatd(seqdata[,(tspan*new.lgth.f+1):lgth]))
             newseq[,new.lgth] <- apply(st.freq,1,function(x){names(which.max(x))})
         } else { # method=="last"
             newseq[,new.lgth] <- seqdata[,lgth]
