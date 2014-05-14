@@ -1027,8 +1027,8 @@ summary.olmm <- function(object, silent = FALSE, ...) {
 
 print.summary.olmm <- function(x, ...) {
 
-  args <- appendDefArgs(list(...), x$dotargs)
-  
+  args <- appendDefArgs(list(...), x$dotargs)  
+
   if (length(x$methTitle) > 0L) cat(x$methTitle, "\n\n")
   if (length(x$family) > 0L) cat(" Family:", x$family, "\n")
   if (length(x$formula) > 0L) cat("Formula:", x$formula, "\n")
@@ -1051,6 +1051,7 @@ print.summary.olmm <- function(x, ...) {
   if (length(x$na.action) > 0L) cat(x$na.action, "\n")
   
   if (length(x$feMatGe) > 0 && nrow(x$feMatGe) > 0L) {
+    
     cat("\nGlobal fixed effects:\n")
     printCoefmat(x$feMatGe, digits = args$digits)
   }

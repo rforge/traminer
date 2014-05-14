@@ -4,18 +4,18 @@ import("methods", "partykit")
 
 ## Generics for which we define new methods
 importFrom("graphics", plot)
-importFrom("nlme", fixef, ranef, VarCorr)
-importFrom("numDeriv", hessian)
-importFrom("rpart", prune)
-importFrom("sandwich", estfun)
 importFrom("stats",
            AIC, BIC, anova, coef, coefficients, deviance,
            extractAIC, fitted, formula, getCall, logLik,
            model.frame, model.matrix, nobs, predict, resid, residuals,
            simulate, terms, update, vcov, weights)
-importFrom("strucchange", gefp, sctest, supLM, catL2BB, root.matrix)
+importFrom("nlme", fixef, ranef, VarCorr)
+importFrom("rpart", prune)
+importFrom("numDeriv", hessian)
 importFrom("ucminf", ucminf)
 importFrom("zoo", zoo)
+importFrom("sandwich", estfun)
+importFrom("strucchange", gefp, sctest, supLM, catL2BB, root.matrix)
 
 ## Exported S4 classes
 exportClasses(olmm)
