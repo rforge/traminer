@@ -9,7 +9,7 @@
 }
 
 \usage{
-olmm_control(fit = c("ucminf", "nlminb", "optim"), 
+olmm_control(fit = c("nlminb", "ucminf", "optim"), 
              doFit = TRUE, numGrad = FALSE, 
              numHess = numGrad, nGHQ = 7L,
              start = NULL, restricted = NULL, verbose = FALSE, ...)

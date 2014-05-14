@@ -99,7 +99,7 @@ print.family.olmm <- function(x, ...) {
   invisible(x)
 }
 
-olmm_control <- function(fit = c("ucminf", "nlminb", "optim"), doFit = TRUE,
+olmm_control <- function(fit = c("nlminb", "ucminf", "optim"), doFit = TRUE,
                          numGrad = FALSE, numHess = numGrad, nGHQ = 7L,
                          start = NULL, restricted = NULL, verbose = FALSE, ...) {
     fit <- match.arg(fit)
