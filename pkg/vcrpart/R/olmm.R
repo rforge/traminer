@@ -124,8 +124,9 @@ olmm <- function(formula, data, family = cumulative(),
   ## append '...' arguments to control
   cArgs <- list(...)
   cArgs <- cArgs[intersect(names(cArgs), names(formals(olmm_control)))]
+  cArgsNames <- names(cArgs)
   cArgs <- do.call("olmm_control", cArgs)
-  control <- appendDefArgs(cArgs, control)
+  control[cArgsNames] <- cArgs[cArgsNames]
   
   if (control$verbose) cat("* checking arguments ... ")
   mc <- match.call(expand.dots = FALSE)
@@ -155,7 +156,8 @@ olmm <- function(formula, data, family = cumulative(),
   
   ## optimizer control option
   optim <- olmm_optim_setup(x = control, env = environment())
-
+  control$numGrad <- control$numHess <- is.null(optim$gr)
+  
   ## set environment
   env <- if (!is.null(list(...)$env)) list(...)$env else parent.frame(n = 1L)
   
@@ -322,7 +324,7 @@ olmm <- function(formula, data, family = cumulative(),
   ll <- c(0.0)
   
   ## score function
-  if (control$numGrad == 0L) {
+  if (!control$numGrad) {
     score_obs <- matrix(0, dims["n"], dims["nPar"])
     rownames(score_obs) <- rownames(X)
     colnames(score_obs) <- unlist(parNames)
@@ -490,6 +492,7 @@ olmm <- function(formula, data, family = cumulative(),
     if (dims["hasRanef"] > 0) {
       if (dims["verb"] > 0L) cat("\n* predicting random effects ... ")
       .Call("olmm_update_u", object, PACKAGE = "vcrpart")
+      if (dims["verb"] > 0L) cat("OK")
     }
     
     ## reset environment of estimation equations
@@ -497,7 +500,7 @@ olmm <- function(formula, data, family = cumulative(),
     if (dims["numGrad"] < 1L)
       environment(slot(object, "optim")[[3]]) <- baseenv()
     
-    if (dims["verb"] > 0L) cat("OK\n* computations finished, return model object\n")
+    if (dims["verb"] > 0L) cat("\n* computations finished, return model object\n")
     
   } else {
 

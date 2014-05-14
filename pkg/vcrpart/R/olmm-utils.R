@@ -109,6 +109,9 @@ olmm_optim_setup <- function(x, env = parent.frame()) {
   ## ------------------------------------------------------- #
 
   numGrad <- x$numGrad
+  if (x$fit == "optim" && is.null(x$method)) x$method <- "Nelder-Mead"
+  if (x$fit == "optim" && !x$method %in% c("BFGS", "CG", "L-BFGS-B"))
+    numGrad <- TRUE
   x <- x[!names(x) %in% c("start", "restricted")]
   rval <- list(par = NULL, # first 4 arguments must be exactly in that order!
                fn = olmm_fn,

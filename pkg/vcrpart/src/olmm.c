@@ -308,8 +308,11 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     AllocVal(logLikCond_obs, n, zero);
     AllocVal(logLikCond_sbj, N, zero);
 
-    AllocVal(scoreCond_obs, (1 - numGrad) * n * nPar + numGrad, zero);
-    AllocVal(scoreCond_sbj, (1 - numGrad) * N * nPar + numGrad, zero);
+    if (numGrad == 0) {
+
+      AllocVal(scoreCond_obs, (1 - numGrad) * n * nPar + numGrad, zero);
+      AllocVal(scoreCond_sbj, (1 - numGrad) * N * nPar + numGrad, zero);
+    }
 
     if (family == 2 | family == 3) AllocVal(sumBL, n, zero);
 
