@@ -185,9 +185,16 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
                        margins = c(3, 2, 0, 0),
                        mean = TRUE, mean_gp = list(),
                        conf.int = TRUE, conf.int_gp = list(),
+                       labels = c("integer", "category", "predictor"),
                        ...) {
 
-  gp_def <- gpar(cex = 0.75)
+  ## get arguments for setting tick labels
+  labels <- match.arg(labels)
+  if (object$info$fit == "olmm") {
+    yLevs <- levels(slot(object$info$model, "y"))
+  } else {
+    yLevs <- all.vars(object$info$formula$root)[1]
+  }
   
   ## extract coefficients
   coef <- extract(object, "coef")$vc
@@ -206,12 +213,15 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
   ## plot parameters
   if (length(plot_gp) == 0L) {
     plot_gp <- vector("list", length(terms))
-  } else if (any(!unlist(lapply(plot_gp, is.list)))) {
-    plot_gp <- lapply(1:length(terms), function(i) plot_gp)
+  } else {
+    if (!(length(terms) > 1L && length(plot_gp) == length(terms) &&
+          (is.null(names(plot_gp)) |
+           !is.null(names(plot_gp)) && names(plot_gp) == names(terms))))
+      plot_gp <- lapply(seq_along(terms), function(i) plot_gp)
   }
-  
+
   plot_gp <-
-    lapply(1:length(coefList),
+    lapply(seq_along(coefList),
            function(i) {
              if (conf.int) {
                ylim <- range(c(c(coefList[[i]] - 2 * sdList[[i]]),
@@ -221,14 +231,18 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
                ylim <- range(coefList[[i]], na.rm = TRUE)
              }
              ylim <- ylim + c(-1, 1) * 0.1 * diff(ylim)
-             cn <- colnames(coefList[[i]])
-             cn <- gsub("[[:punct:]]", " ", cn)
-             cn <- gsub("Eta", "E", cn)
-             cn <- abbreviate(cn)
+             cn <- renameCoefs(coefList[[i]], yLevs, object$info$family, labels)
+             cn <- colnames(cn)
+             cn <- unlist(lapply(cn,
+                                 function(x) {
+                                   x <- unlist(strsplit(x, ":"))
+                                   x <- abbreviate(x)
+                                   return(paste(x, collapse = ":"))
+                                 }))
              rval <- list(xlim = c(0.75, ncol(coefList[[i]]) + 0.25),
                           pch = 1L, ylim = ylim,
                           ylab = "coef",  type = "b",
-                          label = abbreviate(cn),
+                          label = cn,
                           height = 1, width = 0.6, 
                           gp = gpar(cex = 1L, fontsize = 8))
              rval$ylim <- rval$ylim + 0.1 * c(-1, 1) * diff(rval$ylim)
@@ -242,14 +256,17 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
 
     if (length(conf.int_gp) == 0L) {
       conf.int_gp <- vector("list", length(terms))
-    } else if (any(!unlist(lapply(conf.int_gp, is.list)))) {
-      conf.int_gp <- lapply(1:length(terms), function(i) conf.int_gp)
+    } else {
+      if (!(length(terms) > 1L && length(conf.int_gp) == length(terms) &&
+            (is.null(names(conf.int_gp)) |
+             !is.null(names(conf.int_gp)) && names(conf.int_gp) == names(terms))))
+        conf.int_gp <- lapply(seq_along(terms), function(i) conf.int_gp)
     }    
     conf.int_gp_def <- list(angle = 90,
                             length = unit(1, "mm"),
                             ends = "both",
                             type = "open")
-    conf.int_gp <- lapply(1:length(terms),
+    conf.int_gp <- lapply(seq_along(terms),
                           function(i) appendDefArgs(conf.int_gp[[i]],
                                                     conf.int_gp_def))
   }
@@ -259,12 +276,15 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
 
     if (length(mean_gp) == 0L) {
       mean_gp <- vector("list", length(terms))
-    } else if (any(!unlist(lapply(mean_gp, is.list)))) {
-      mean_gp <- lapply(1:length(terms), function(i) mean_gp)
+    } else {
+      if (!(length(terms) > 1L && length(mean_gp) == length(terms) &&
+            (is.null(names(mean_gp)) |
+             !is.null(names(mean_gp)) && names(mean_gp) == names(terms))))
+        mean_gp <- lapply(seq_along(terms), function(i) mean_gp)
     }    
     mean_gp_def <- list(gp = gpar(col = "grey50", lty = 1,
                           lwd = 0.75, fontsize = 8), pch = 1L)
-    mean_gp <- lapply(1:length(terms),
+    mean_gp <- lapply(seq_along(terms),
                       function(i) appendDefArgs(mean_gp[[i]], mean_gp_def))
 
     w <- tapply(weights(object), predict(object, type = "node"), sum) /

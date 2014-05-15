@@ -58,8 +58,9 @@
 
   The plot and the prediction methods are analogous to handle as
   \code{\link{plot.tvcm}} resp. \code{\link{predict.tvcm}}. Notice that
-  the plot options \code{mean} and \code{conf.int} for \code{type =
-  "coef"} resp are not available (and internally set to \code{FALSE}).
+  the plot options \code{mean} and \code{conf.int} for
+  \code{type = "coef"} resp are not available (and internally set to
+  \code{FALSE}). 
 
   Further undocumented, available methods are \code{\link{fitted}},
   \code{\link{print}} and \code{\link{ranef}}. All these latter methods 

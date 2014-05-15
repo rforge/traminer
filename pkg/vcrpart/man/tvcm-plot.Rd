@@ -26,7 +26,9 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
            plot_gp = list(),
            margins = c(3, 2, 0, 0), 
            mean = TRUE, mean_gp = list(),
-           conf.int = TRUE, conf.int_gp = list(), ...)
+           conf.int = TRUE, conf.int_gp = list(),
+           labels = c("integer", "category", "predictor"),
+           ...)
 }
 
 \arguments{
@@ -69,20 +71,23 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
     (characters for ticks at the x axis), \code{height}, \code{width},
     \code{gp} (a list produced by \code{\link{gpar}}). If terms is a
     list, \code{plot_gp} may be a nested list specifying the graphical
-    parameters for each list component of \code{terms}.}
+    parameters for each list component of \code{terms}. See examples.}
   \item{margins}{a numeric vector \code{c(bottom, left, top, right)}
     specifying the space on the margins for each panel.}
   \item{mean}{logical. Whether the average coefficients over the
     population should be visualized.}
   \item{mean_gp}{list with graphical parameters for plotting the mean
     coefficients. Includes a component \code{gp = gpar(...)} and a
-    component \code{pch}.}
+    component \code{pch}. See examples.}
   \item{conf.int}{logical. Whether confidence intervals should be
     visualized. Note that these intervals do not account for the error
     of the algorithm,}
   \item{conf.int_gp}{a list of graphical parameters for the confindence
     intervals applied to \code{\link{arrow}}. Includes \code{angle},
-    \code{length}, \code{ends} and \code{type}.}
+    \code{length}, \code{ends} and \code{type}. See examples.}
+  \item{labels}{character. Whether category-specific effects should be
+    labeled by integers of categories (default), the labels of the
+    categories or the index of the predictor.}
   \item{\ldots}{additional arguments passed to \code{\link{panel_terms}}
     or \code{\link{panel_coef}} or other methods.}
 }
@@ -123,6 +128,22 @@ model <- tvcglm(y ~ vc(z1,z2,by=x1) + x2, vcrpart_2, gaussian(),
 
 ## plot type "coef"
 plot(model, "coef")
+
+## add various (stupid) plot parameters
+plot(model, "coef",
+     plot_gp = list(type = "p", pch = 2, ylim = c(-4, 4),
+       label = c("par1", "par2"), gp = gpar(col = "blue")),
+     conf.int_gp = list(angle = 45, length = unit(2, "mm"),
+       ends = "last", type = "closed"),
+     mean_gp = list(pch = 16,
+       gp = gpar(fontsize = 16, cex = 2, col = "red")))
+
+## separate plots with separate plot parameters
+plot(model, "coef", terms = list("(Intercept)", "x1"), tnex = 2,
+     plot_gp = list(list(gp = gpar(col = "red")),
+                    list(gp = gpar(col = "blue"))),
+     mean_gp = list(list(gp = gpar(col = "green")),
+                    list(gp = gpar(col = "yellow"))))
 
 ## plot type "terms"
 par(mfrow = c(1, 2))

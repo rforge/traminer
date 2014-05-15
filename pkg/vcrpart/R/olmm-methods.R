@@ -812,12 +812,14 @@ predict.olmm <- function(object, newdata = NULL,
   return(rval)
 }
 
-print.olmm <- function(x, ...) {
+print.olmm <- function(x, labels = c("integer", "category", "predictor"), ...) {
 
+  labels <- match.arg(labels)
+  
   so <- summary.olmm(x, silent = TRUE)
   
   if (length(so$methTitle) > 0) cat(so$methTitle, "\n\n")
-  if (length(so$family) > 0) cat(" Family:", so$family, "\n")
+  if (length(so$family) > 0) cat(" Family:", so$family$family, so$family$link, "\n")
   if (length(so$formula) > 0) cat("Formula:", so$formula, "\n")
   if (length(so$data) > 0) cat("   Data:", so$data, "\n")
   if (length(so$subset) > 0) cat(" Subset:", so$subset ,"\n")
@@ -831,18 +833,18 @@ print.olmm <- function(x, ...) {
 
   if (length(so$REmat) > 0) {
     cat("\nRandom effects:\n")
-    print.VarCorr.olmm(so$REmat, ...)
+    print.VarCorr.olmm(renameCoefs(so$REmat, so$yLevs, so$family, labels), ...)
     cat(sprintf("Number of obs: %d, subjects: %d\n", so$dims["n"], so$dims["N"]))
   }
 
   if (length(so$feMatGe) > 0 && nrow(so$feMatGe) > 0) {
     cat("\nGlobal fixed effects:\n")
-    print(fixef(x, "ge"), ...)
+    print(so$feMatGe[, 1], ...)
   }
   
   if (length(so$feMatCe) > 0 && nrow(so$feMatCe) > 0) {
     cat("\nCategory-specific fixed effects:\n")
-    print(fixef(x, "ce"), ...)
+    print(renameCoefs(so$feMatCe[, 1], so$yLevs, so$family, labels), ...)
   }
 }
 
@@ -933,8 +935,10 @@ simulate.olmm <- function(object, nsim = 1, seed = NULL,
   return(rval)
 }
 
-summary.olmm <- function(object, silent = FALSE, ...) {
-            
+summary.olmm <- function(object, labels = c("integer", "category", "predictor"),
+                         silent = FALSE, ...) {
+
+  labels <- match.arg(labels)
   dims <- slot(object, "dims")
             
   ## goodness of fit measures
@@ -1003,7 +1007,6 @@ summary.olmm <- function(object, silent = FALSE, ...) {
   if (dims["hasRanef"] > 0L)
     paste(methTitle, " fit by marginal maximum\n",
           "likelihood with Gauss-Hermite quadrature", sep = "")
-  family <- paste(slot(object, "family")$family, slot(object, "family")$link)
 
   na.action <- naprint(attr(model.frame(object), "na.action"))
   na.action <- if (na.action == "") character() else paste("(", na.action, ")", sep = "")
@@ -1012,7 +1015,7 @@ summary.olmm <- function(object, silent = FALSE, ...) {
   ## return a 'summary.olmm' object
   return(structure(
            list(methTitle = methTitle,
-                family = family,
+                family = slot(object, "family"),
                 formula = paste(deparse(formula(object)), collapse = "\n"),
                 data = deparseCall(call$data),
                 subset = deparseCall(call$subset),
@@ -1022,6 +1025,8 @@ summary.olmm <- function(object, silent = FALSE, ...) {
                 REmat = VarCorr,
                 na.action = na.action,
                 dims = dims,
+                yLevs = levels(slot(object, "y")),
+                labels = labels,
                 dotargs = list(...)), class = "summary.olmm"))
 }
 
@@ -1030,7 +1035,7 @@ print.summary.olmm <- function(x, ...) {
   args <- appendDefArgs(list(...), x$dotargs)  
 
   if (length(x$methTitle) > 0L) cat(x$methTitle, "\n\n")
-  if (length(x$family) > 0L) cat(" Family:", x$family, "\n")
+  if (length(x$family) > 0L) cat(" Family:", x$family$family, x$family$link, "\n")
   if (length(x$formula) > 0L) cat("Formula:", x$formula, "\n")
   if (length(x$data) > 0L) cat("   Data:", x$data, "\n")
   if (length(x$subset) > 0L) cat(" Subset:", x$subset ,"\n")
@@ -1043,22 +1048,23 @@ print.summary.olmm <- function(x, ...) {
   
   if (length(x$REmat) > 0L) {
     cat("\nRandom effects:\n")
-    args$x <- x$REmat
+    args$x <- renameCoefs(x$REmat, x$yLevs, x$family, x$labels)
     do.call("print", args)
     cat(sprintf("Number of obs: %d, subjects: %d\n", x$dims["n"], x$dims["N"]))
   }
 
   if (length(x$na.action) > 0L) cat(x$na.action, "\n")
   
-  if (length(x$feMatGe) > 0 && nrow(x$feMatGe) > 0L) {
-    
+  if (length(x$feMatGe) > 0 && nrow(x$feMatGe) > 0L) {   
     cat("\nGlobal fixed effects:\n")
-    printCoefmat(x$feMatGe, digits = args$digits)
+    args$x <- x$feMatGe
+    do.call("printCoefmat", args)
   }
   
   if (length(x$feMatCe) > 0 && nrow(x$feMatCe) > 0L) {
     cat("\nCategory-specific fixed effects:\n")
-    printCoefmat(x$feMatCe, digits = args$digits)
+    args$x <- renameCoefs(x$feMatCe, x$yLevs, x$family, x$labels)
+    do.call("printCoefmat", args)
   }
 }
 

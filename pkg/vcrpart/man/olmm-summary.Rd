@@ -11,13 +11,18 @@
 }
 
 \usage{
-\method{summary}{olmm}(object, silent = FALSE, ...)
+\method{summary}{olmm}(object,
+        labels = c("integer", "category", "predictor"),
+        silent = FALSE, ...)
 
-\method{print}{olmm}(x, ...)
+\method{print}{olmm}(x, labels = c("integer", "category", "predictor"), ...)
 }
 
 \arguments{
   \item{object, x}{a fitted \code{\link{olmm}} object.}
+  \item{labels}{character. Whether category-specific effects should be
+    labeled by integers of categories (default), the labels of the
+    categories or the index of the predictor.}
   \item{silent}{logical: should a warning be reported if the computation
     of the covariance matrix for the estimated coefficients failed.}
   \item{...}{additional arguments passed to print.}

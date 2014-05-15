@@ -192,12 +192,18 @@ predict.tvcm <- function(object, newdata = NULL,
   return(fitted)
 }
 
-tvcm_print <- function(x, type = c("print", "summary"), ...) {
+tvcm_print <- function(x, type = c("print", "summary"),
+                       labels = c("integer", "category", "predictor"), ...) {
 
   type <- match.arg(type)
+  labels <- match.arg(labels)
   coef <- extract(x, "coef")
   sd <- extract(x, "sd")
-  
+  if (x$info$fit == "olmm") {
+    yLevs <- levels(slot(x$info$model, "y"))
+  } else {
+    yLevs <- all.vars(x$info$formula$root)[1]
+  }
   header_panel <- function(x) {
     rval <- x$info$title
     rval <- c(rval, "", paste("  Family: ", x$info$family$family,
@@ -236,6 +242,7 @@ tvcm_print <- function(x, type = c("print", "summary"), ...) {
     if (length(coef$re) > 0L) {
       rval <- c(rval, "Random effects:")
       VarCorr <- VarCorr(extract(x, "model"))
+      VarCorr <- renameCoefs(VarCorr, yLevs, x$info$family, labels)
       rval <- c(rval, attr(VarCorr, "title"))
       rval <- c(rval, unlist(strsplit(formatMatrix(VarCorr, ...), "\n")), "")
     }
@@ -250,19 +257,21 @@ tvcm_print <- function(x, type = c("print", "summary"), ...) {
                          "Std. Error" = sd$fe,
                          "t value" = coef$fe / sd$fe)
       }
+      coefMat <- renameCoefs(coefMat, yLevs, x$info$family, labels)
       rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")), "")
     }
       
     rval <- c(rval, "Varying effects:")
-    if (depth(x) ==0L && length(coef$vc) > 0L) {
+    if (depth(x) == 0L && length(coef$vc) > 0L) {
       if (type == "print") {
-              coefMat <- matrix(coef$vc["1", ], 1)
-              colnames(coefMat) <- colnames(coef$vc)
-            } else {
-              coefMat <- cbind("Estimate" = coef$vc["1",],
-                               "Std. Error" = sd$vc["1",],
-                               "t value" = coef$vc["1",] / sd$vc["1",])
-            }
+        coefMat <- matrix(coef$vc["1", ], 1)
+        colnames(coefMat) <- colnames(coef$vc)
+      } else {
+        coefMat <- cbind("Estimate" = coef$vc["1",],
+                         "Std. Error" = sd$vc["1",],
+                         "t value" = coef$vc["1",] / sd$vc["1",])
+      }
+      coefMat <- renameCoefs(coefMat, yLevs, x$info$family, labels)
       rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")))
     }
     rval <- c(rval, "")
@@ -280,6 +289,7 @@ tvcm_print <- function(x, type = c("print", "summary"), ...) {
                        "Std. Error" = sd$vc[nid, ],
                        "t value" = coef$vc[nid, ] / sd$vc[nid, ])
     }
+    coefMat <- renameCoefs(coefMat, yLevs, x$info$family, labels)
     return(c("", unlist(strsplit(formatMatrix(coefMat, ...), "\n"))))
   }
 

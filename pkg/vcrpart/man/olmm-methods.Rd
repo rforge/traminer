@@ -46,7 +46,7 @@
 \method{ranefCov}{olmm}(object, ...) 
 
 \method{simulate}{olmm}(object, nsim = 1, seed = NULL,
-        newdata = NULL, ranef = TRUE, ...)
+         newdata = NULL, ranef = TRUE, ...)
 
 \method{terms}{olmm}(x, which = c("fe-ce", "fe-ge", "re-ce", "re-ge"), ...)
 

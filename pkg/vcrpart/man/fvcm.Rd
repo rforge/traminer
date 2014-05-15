@@ -5,7 +5,7 @@
 \alias{fvcolmm}
 \alias{fvcglm}
 
-\title{Bagging and random forests based on \code{\link{tvcm}}.}
+\title{Bagging and random forests based on \code{\link{tvcm}}}
 
 \description{
   Implements the bagging (Breiman, 1996) and random forest (Breiman, 2001) ensemble 

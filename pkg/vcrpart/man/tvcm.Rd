@@ -67,7 +67,7 @@ tvcglm(formula, data, family,
   step, there are two options (see the \code{method} argument in
   \code{\link{tvcm_control}}). The default option \code{method
   = "mob"} selects first the node and the variable based on nodewise
-  M-fluctuation coefficient constancy tests (cf. Zeileis and Hornink,
+  M-fluctuation coefficient constancy tests (cf. Zeileis and Hornik,
   2007) and the cutpoint is selected via grid search risk minimization 
   over the selected variable and node. By default, the \code{deviance} 
   is used as risk function (see the \code{riskfun} argument in
