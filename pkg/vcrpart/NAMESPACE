@@ -5,7 +5,7 @@ import("methods", "partykit")
 ## Generics for which we define new methods
 importFrom("graphics", plot)
 importFrom("stats",
-           AIC, BIC, anova, coef, coefficients, deviance,
+           AIC, BIC, anova, coef, coefficients,
            extractAIC, fitted, formula, getCall, logLik,
            model.frame, model.matrix, nobs, predict, resid, residuals,
            simulate, terms, update, vcov, weights)
@@ -36,6 +36,7 @@ export(
   splitpath, 
   stabpath,
   VarCorr,
+  neglogLik,
   otsplot,
   otsplot_control,
   otsplot_filter,
@@ -43,9 +44,9 @@ export(
   olmm_control,
   panel_coef,
   panel_terms,
+  predecor_control,
   estfun.olmm,
   gefp.olmm,
-  decormat.olmm,
   tvcm_control, 
   tvcm,
   tvcolmm,
@@ -60,7 +61,6 @@ export(
 S3method(anova, olmm)
 S3method(coef, olmm)
 S3method(coefficients, olmm)
-S3method(deviance, olmm)
 S3method(estfun, olmm)
 S3method(extractAIC, olmm)
 S3method(fitted, olmm)
@@ -71,6 +71,7 @@ S3method(gefp, olmm)
 S3method(logLik, olmm)
 S3method(model.frame, olmm)
 S3method(model.matrix, olmm)
+S3method(neglogLik, olmm)
 S3method(nobs, olmm)
 S3method(predict, olmm)
 S3method(print, olmm)
@@ -92,6 +93,8 @@ S3method(print, family.olmm)
 ## Exports for olmm (S4)
 exportMethods(show)
 
+S3method(neglogLik, default)
+
 ## Exports for otsplot (S3)
 S3method(otsplot, default)
 S3method(print, otsplot)
@@ -105,7 +108,6 @@ S3method(coefficients, tvcm)
 S3method(cvrisk, tvcm)
 S3method(plot, cvrisk.tvcm)
 S3method(print, cvrisk.tvcm)
-S3method(deviance, tvcm)
 S3method(extract, tvcm)
 S3method(fitted, tvcm)
 S3method(formula, tvcm)
@@ -113,6 +115,7 @@ S3method(getCall, tvcm)
 S3method(logLik, tvcm)
 S3method(model.frame, tvcm)
 S3method(nobs, tvcm)
+S3method(neglogLik, tvcm)
 S3method(model.frame, tvcm)
 S3method(oobrisk, tvcm)
 S3method(plot, tvcm)

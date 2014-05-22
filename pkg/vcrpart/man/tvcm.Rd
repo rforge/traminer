@@ -98,7 +98,7 @@ tvcglm(formula, data, family,
   of observations in \code{'data'} the number of partitioning variables
   (as specified by the \code{by} argument in the \code{vc} term). For 
   selecting the final model, \code{maxwidth} may be selected empirically
-  via the in-sample AIC or cross-validation, see \code{\link{tvcm-cv}}. 
+  via the in-sample AIC or cross-validation, see \code{\link{tvcm-assessment}}. 
 
   Special attention is given to the \code{intercept} argument in
   \code{\link{vc}}. Conceptually, the intercepts incorporate direct
@@ -157,7 +157,7 @@ tvcglm(formula, data, family,
 
 \seealso{\code{\link{tvcm_control}}, \code{\link{tvcm-methods}},
   \code{\link{tvcm-plot}}, \code{\link{tvcm-plot}},
-  \code{\link{tvcm-cv}}}
+  \code{\link{tvcm-assessment}}}
 
 \examples{
 
@@ -200,8 +200,10 @@ schizo$id <- droplevels(schizo$id)
 model.2 <- tvcolmm(imps79o ~ vc(week, by = tx, intercept = "ce") + re(1|id),
                    data = schizo, control = tvcm_control(verbose = TRUE))
 
-plot(model.2, "coef", terms = list(paste("Eta", 1:3, ":(Intercept)", sep = ""), "tx"), 
-     tnex = 2)
+
+plot(model.2, "coef",
+     terms = list(paste("Eta", 1:3, ":(Intercept)", sep = ""), "tx"), 
+     exp = list(FALSE, TRUE), tnex = 2)
 }
 
 \author{Reto Buergin}

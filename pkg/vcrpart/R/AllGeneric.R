@@ -8,6 +8,7 @@
 ##
 ## Overview:
 ## S3 Methods for olmm:
+## neglogLik:       log likelihood times minus one of a fitted model
 ## ranefCov:        extracts covariance matrixof models with
 ##                  random effects.
 ## oobrisk:         estimates out-of-bag risk.
@@ -25,6 +26,11 @@ ranefCov <- function(object, ...) UseMethod("ranefCov")
 extract <- function(object, ...) UseMethod("extract")
 
 cvrisk <- function(object, ...) UseMethod("cvrisk")
+
+neglogLik <- function(object, ...) UseMethod("neglogLik")
+
+neglogLik.default <- function(object, ...)
+  return(-as.numeric(logLik(object)))
 
 oobrisk <- function(object, ...) UseMethod("oobrisk")
 

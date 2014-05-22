@@ -12,6 +12,8 @@
 \alias{logLik.olmm}
 \alias{model.frame.olmm}
 \alias{model.matrix.olmm}
+\alias{neglogLik}
+\alias{neglogLik.olmm}
 \alias{ranef}
 \alias{ranef.olmm}
 \alias{ranefCov}
@@ -40,6 +42,8 @@
 
 \method{model.matrix}{olmm}(object, which = c("fe", "fe-ce", "fe-ge",
              "re", "re-ce", "re-ge"), ...)
+
+\method{neglogLik}{olmm}(object, ...)
 
 \method{ranef}{olmm}(object, norm = FALSE, ...)
 
@@ -85,6 +89,9 @@
   \code{\link{anova}} implements log-likelihood ratio tests for model 
   comparisons, based on the marginal likelihood. At the time being, 
   at least two models must be assigned.
+
+  \code{\link{neglogLik}} is simply the likelihood of the fitted model
+  times minus one.
 
   \code{ranefCov} extracts the variance-covariance matrix of the random
   effects. Similarly, \code{VarCorr} extracts the estimated variances,

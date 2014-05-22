@@ -1,6 +1,6 @@
-\name{tvcm-cv}			
+\name{tvcm-assessment}			
 
-\alias{tvcm-cv}
+\alias{tvcm-assessment}
 \alias{AIC.tvcm}
 \alias{BIC.tvcm}
 \alias{cvfolds}

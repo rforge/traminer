@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:      Reto Buergin
 ## E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:        2014-05-03
+## Date:        2014-05-15
 ##
 ## Description:
 ## The tvcm function
@@ -289,7 +289,7 @@ tvcm_control <- function(method = c("mob", "partreg"),
                          minsplit = 2 * minbucket, trim = 0.1,
                          maxdepth = Inf, maxstep = maxwidth - 1L, 
                          nselect = Inf, estfun = list(),  
-                         maxevalsplit = 20L, riskfun = deviance,
+                         maxevalsplit = 20L, riskfun = neglogLik,
                          fast = 0L, verbose = FALSE, ...) {
 
   method <- match.arg(method)

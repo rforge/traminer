@@ -10,6 +10,7 @@
 \alias{getCall.tvcm}
 \alias{logLik.tvcm}
 \alias{model.frame.tvcm}
+\alias{neglogLik.tvcm}
 \alias{nobs.tvcm}
 \alias{predict.tvcm}
 \alias{print.tvcm}
@@ -38,6 +39,8 @@
         step = NULL, ...)
 
 \method{formula}{tvcm}(x, which = c("original", "root", "tree"), ...)
+
+\method{neglogLik}{tvcm}(object, ...)
 
 \method{predict}{tvcm}(object, newdata = NULL,
         type = c("link", "response", "prob", "class",
@@ -110,9 +113,8 @@
 }
 
 \seealso{
-  \code{\link{cvrisk.tvcm}}, \code{\link{prune.tvcm}},
-  \code{\link{tvcm}}, \code{\link{tvcm-plot}},
-  \code{\link{olmm-class}} 
+  \code{\link{tvcm}}, \code{\link{tvcm-assessment}},
+  \code{\link{tvcm-plot}} \code{\link{olmm-class}} 
 }
 
 \author{Reto Buergin}

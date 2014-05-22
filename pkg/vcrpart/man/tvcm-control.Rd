@@ -16,7 +16,7 @@ tvcm_control(method = c("mob", "partreg"),
              minsplit = 2 * minbucket, trim = 0.1,
              maxdepth = Inf, maxstep = maxwidth - 1L, 
              nselect = Inf, estfun = list(),  
-             maxevalsplit = 20, riskfun = deviance,
+             maxevalsplit = 20, riskfun = neglogLik,
              fast = 0L, verbose = FALSE, ...)
 }
 
@@ -47,7 +47,7 @@ tvcm_control(method = c("mob", "partreg"),
   \item{maxevalsplit}{integer. The maximum number of evaluation for
     splits on numeric partitioning variables.}
   \item{riskfun}{function. A function that extracts a risk measure from a
-    fitted object, e.g. \code{\link{deviance}} (default).}
+    fitted object, e.g., the negative log likelihood (default).}
   \item{fast}{integer. Whether the algorithm should be
     accelerated. Currently, for values larger than 1, optimizations use
     coefficients from the most actual estimation as initial values.}

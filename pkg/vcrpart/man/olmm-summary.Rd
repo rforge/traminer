@@ -11,16 +11,15 @@
 }
 
 \usage{
-\method{summary}{olmm}(object,
-        labels = c("integer", "category", "predictor"),
+\method{summary}{olmm}(object, etalab = c("int", "char", "eta"),
         silent = FALSE, ...)
 
-\method{print}{olmm}(x, labels = c("integer", "category", "predictor"), ...)
+\method{print}{olmm}(x, etalab = c("int", "char", "eta"), ...)
 }
 
 \arguments{
   \item{object, x}{a fitted \code{\link{olmm}} object.}
-  \item{labels}{character. Whether category-specific effects should be
+  \item{etalab}{character. Whether category-specific effects should be
     labeled by integers of categories (default), the labels of the
     categories or the index of the predictor.}
   \item{silent}{logical: should a warning be reported if the computation

@@ -17,23 +17,21 @@
 ## formula:
 ## getCall:             extract original call
 ## logLik:              extract log Likelihood
-## model.frame:
-## nobs:
+## model.frame:         extract the total model frame including model
+##                      and partitioning variables
+## nobs:                extract the number of observations
 ## predict:             predict responses (see prediction of 'olmm' class)
 ## print:               print tvcm objects
-## prune:
-## ranef:
+## prune:               prune the tree
+## ranef:               extract the predicted random effects
 ## resid, residuals:    extract residuals
-## splitpath:
-## weights:
+## splitpath:           show information of the splitting procedure
+## weights:             extract the weights
 ## --------------------------------------------------------- #
 
 coef.tvcm <- function(object, ...) tvcm_get_estimates(object, ...)
 
 coefficients.tvcm <- coef.tvcm 
-
-deviance.tvcm <- function(object, ...)
-  return(deviance(extract(object, "model")))
 
 extract.tvcm <- function(object, what = c("control", "model", 
                                    "sctest", "p.value",
@@ -115,6 +113,9 @@ model.frame.tvcm <- function(formula, ...) {
     return(rval)
 }
 
+neglogLik.tvcm <- function(object, ...)
+  return(-as.numeric(logLik(extract(object, "model"))))
+
 nobs.tvcm <- function(object, ...) nobs(extract(object, "model"), ...)
 
 predict.tvcm <- function(object, newdata = NULL,
@@ -187,23 +188,20 @@ predict.tvcm <- function(object, newdata = NULL,
 
     ## call predict.olmm
     return(predict(object$info$model, newdata = newdata, type = type,
-                   na.action = na.action, ...))
+                   ranef = ranef, na.action = na.action, ...))
   }
   return(fitted)
 }
 
 tvcm_print <- function(x, type = c("print", "summary"),
-                       labels = c("integer", "category", "predictor"), ...) {
+                       etalab = c("int", "char", "eta"), ...) {
 
   type <- match.arg(type)
-  labels <- match.arg(labels)
+  etalab <- match.arg(etalab)
   coef <- extract(x, "coef")
   sd <- extract(x, "sd")
-  if (x$info$fit == "olmm") {
-    yLevs <- levels(slot(x$info$model, "y"))
-  } else {
-    yLevs <- all.vars(x$info$formula$root)[1]
-  }
+  yLevs <- if (x$info$fit == "olmm") levels(slot(x$info$model, "y")) else NULL
+  
   header_panel <- function(x) {
     rval <- x$info$title
     rval <- c(rval, "", paste("  Family: ", x$info$family$family,
@@ -231,10 +229,10 @@ tvcm_print <- function(x, type = c("print", "summary"),
       
     if (type == "summary") {
       lLik <- logLik(x)
-      AICtab <- cbind(AIC = AIC(lLik),
-                      BIC = BIC(lLik),
-                      logLik = as.vector(lLik),
-                      deviance = deviance(x))
+      AICtab <- data.frame(AIC = AIC(lLik),
+                           BIC = BIC(lLik),
+                           logLik = as.vector(lLik),
+                           row.names = "")
       rval <- c(rval, "Goodness of fit:")
       rval <- c(rval, unlist(strsplit(formatMatrix(AICtab, ...), "\n")), "")
     } 
@@ -242,7 +240,8 @@ tvcm_print <- function(x, type = c("print", "summary"),
     if (length(coef$re) > 0L) {
       rval <- c(rval, "Random effects:")
       VarCorr <- VarCorr(extract(x, "model"))
-      VarCorr <- renameCoefs(VarCorr, yLevs, x$info$family, labels)
+      if (x$info$fit == "olmm")
+        VarCorr <- olmm_rename(VarCorr, yLevs, x$info$family, etalab)
       rval <- c(rval, attr(VarCorr, "title"))
       rval <- c(rval, unlist(strsplit(formatMatrix(VarCorr, ...), "\n")), "")
     }
@@ -257,7 +256,8 @@ tvcm_print <- function(x, type = c("print", "summary"),
                          "Std. Error" = sd$fe,
                          "t value" = coef$fe / sd$fe)
       }
-      coefMat <- renameCoefs(coefMat, yLevs, x$info$family, labels)
+      if (x$info$fit == "olmm")
+        coefMat <- olmm_rename(coefMat, yLevs, x$info$family, etalab)
       rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")), "")
     }
       
@@ -271,7 +271,8 @@ tvcm_print <- function(x, type = c("print", "summary"),
                          "Std. Error" = sd$vc["1",],
                          "t value" = coef$vc["1",] / sd$vc["1",])
       }
-      coefMat <- renameCoefs(coefMat, yLevs, x$info$family, labels)
+      if (x$info$fit == "olmm")
+        coefMat <- olmm_rename(coefMat, yLevs, x$info$family, etalab)
       rval <- c(rval, unlist(strsplit(formatMatrix(coefMat, ...), "\n")))
     }
     rval <- c(rval, "")
@@ -289,7 +290,8 @@ tvcm_print <- function(x, type = c("print", "summary"),
                        "Std. Error" = sd$vc[nid, ],
                        "t value" = coef$vc[nid, ] / sd$vc[nid, ])
     }
-    coefMat <- renameCoefs(coefMat, yLevs, x$info$family, labels)
+    if (x$info$fit == "olmm")
+      coefMat <- olmm_rename(coefMat, yLevs, x$info$family, etalab)
     return(c("", unlist(strsplit(formatMatrix(coefMat, ...), "\n"))))
   }
 

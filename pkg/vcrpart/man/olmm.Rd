@@ -37,8 +37,8 @@ olmm(formula, data, family = cumulative(),
 }
 
 \arguments{
-  \item{formula}{a symbolic description of the model. This should something 
-    like
+  \item{formula}{a symbolic description of the model. This should be
+    something like
     
     \code{y ~ ce(x1) + ge(x2) +re(1 + ge(w2) | id)} 
 

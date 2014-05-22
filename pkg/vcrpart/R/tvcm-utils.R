@@ -326,14 +326,9 @@ tvcm_fit_sctest <- function(model, nodes, partvar, control, call) {
                        format(rval$p.value, digits = 2))))
 
     ## add notes if necessary
-    if (!is.null(attr(scores, "conv.T")) && attr(scores, "conv.T") == 0L)
+    if (!is.null(conv <- attr(attr(scores, "T"), "conv")) && conv == 0L)
       cat("\nNote: Computation of transformation matrix failed.",
           "\nTests are based on raw scores and may be inaccurate.\n")
-
-    if (!is.null(attr(scores, "conv.T")) && attr(scores, "conv.complete") == 0L)
-      cat("\nNote: Imputation method for complete data failed.",
-          "\nThe p-values may be different in a replication.\n")
-    
   }
   return(rval)
 }

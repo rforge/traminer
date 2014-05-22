@@ -1,8 +1,8 @@
 \name{olmm-gefp}
 
-\alias{estfun.olmm}
 \alias{gefp.olmm}
-\alias{decormat.olmm}
+\alias{predecor_control}
+\alias{estfun.olmm}
 
 \title{Methods for empirical processes of \code{\link{olmm}} objects}
 
@@ -13,74 +13,73 @@
 } 
 
 \usage{
+estfun.olmm(x, predecor = FALSE, control = predecor_control(),
+            nuisance = NULL, ...)
 
-estfun.olmm(x, level = c("observation", "subject"),
-            predecor = FALSE, complete = predecor,
-            Nbal = NULL, subset = NULL,
-            nuisance = NULL, control = list(),
-            verbose = FALSE, silent = FALSE, ...)
+predecor_control(impute = TRUE, seed = NULL, nit = 1L,
+                 symmetric = TRUE, drop = TRUE,
+                 reltol = 1e-6, maxit = 100L,
+                 verbose = FALSE, silent = FALSE)
 
-gefp.olmm(object, scores = NULL, predecor = TRUE,
-          order.by = NULL, parm = NULL, subset = NULL,
-          center = TRUE, drop = TRUE, silent = FALSE, ...)
-
-decormat.olmm(object, method = c("symmetric", "unconstraint"),
-              Nbal = NULL, parm = NULL, control = list(),
-              verbose = FALSE, drop = TRUE, silent = FALSE)
+gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
+          predecor = TRUE, parm = NULL, center = TRUE, drop = TRUE,
+          silent = FALSE, ...)
 }
 
 \arguments{
-  \item{object, x}{a fitted \code{olmm} object.}
-  \item{level}{character string. Indicates whether the returned values
-    should on the observation level (\code{level = "observation"}) or on 
-    the subject level (\code{level = "subject"}).}
+  \item{x, object}{a fitted \code{\link{olmm}} object.}
   \item{predecor}{logical scalar. Indicates whether the within-subject
-    correlation of scores should be removed by a linear
+    correlation of the estimating equations should be removed by a linear
     transformation. See details.}
-  \item{complete}{logical scalar. If \code{TRUE} and the data are
-    unbalanced, the estimation equations are adjusted. See details.}
-  \item{Nbal}{scalar integer. The number of observations per subject for
-    which the transformation should be performed when data are unbalanced.}
-  \item{subset}{a vector to extract the subset of scores to be used. For
-    \code{estfun.olmm}, this argument can be used to specify which
-    observations of an individual with more than Nbal observations
-    should be kept / dropped. See examples.}
+  \item{control}{a list of control parameter as produced by
+    \code{\link{predecor_control}}.}
   \item{nuisance}{integer vector. Defines the coefficients which are
     regarded as nuisance and therefore omitted from the transformation.}
-  \item{control}{a list. Control parameter for optimization algorithms. To 
-    control the algorithm to handle unbalanced data, you can specify 
-   \code{abstol} and \code{Rmax} and to control the algorithm computing
-   the transformation matrix you can specify \code{reltol}, 
-   \code{maxreltol}, \code{maxit} and \code{stopreltol}.}
-  \item{verbose}{logical scalar. Produces messages.}	 
-  \item{silent}{logical scalar. Should the report of warnings be suppressed?}
-  \item{scores}{function or matrix. Function to extract the estimating
-    equations from a \code{\link{olmm}} object or a matrix representing
-    the estimating equations. Commonly this is a matrix produced by
-   \code{\link{estfun}}.}	       
-  \item{center}{logical scalar. \code{TRUE} subtracts, if necessary, the
-    column means of the estimating equations.} 
-  \item{parm}{integer, logical or a character vector. Extracts the
-    columns of the estimating equations.} 
-  \item{order.by}{a vector of a single explanatory variable to be used
-    to order the estimating equations. If set to \code{NULL} (the default) the
-    observations are assumed to be ordered.}
-   \item{method}{character. \code{"symmetric"} (default) forces the transformation 
-    matrix to be symmetric.}
+  \item{impute}{logical scalar. Whether missing values should be
+    replaced using imputation.}
+  \item{seed}{an integer scalar. Specifies the random number used for
+    the \code{set.seed} call before the imputation. If set to
+    \code{NULL}, \code{set.seed} is not processed.}
+  \item{nit}{integer scalar. Specifies the number of score matrices to
+    be imputed. Higher numbers will reduce the randomness of the
+    imputations.}
+  \item{symmetric}{logical scalar. Whether the transformation matrix
+    should be symmetric.} 
   \item{drop}{logical. Whether singularities should be handled
     automatically (otherwise singularities yield an error).}
-  \item{...}{arguments passed to other functions. Specifically,
-    \code{\link{estfun.olmm}} passes the arguments to
-    \code{\link{decormat.olmm}} and \code{\link{gefp.olmm}} to
-    \code{\link{estfun.olmm}}. }
+  \item{reltol}{convergence tolerance used to compute the transformation
+    matrix.} 
+  \item{maxit}{the maximum number of iterations used to compute the
+    transformation matrix.}
+  \item{silent}{logical scalar. Should the report of warnings be suppressed?}
+  \item{verbose}{logical scalar. Produces messages.}
+  \item{scores}{a function or a matrix. Function to extract the
+    estimating equations from \code{object}, e.g.
+    \code{\link{estfun.olmm}}, or a matrix representing the estimating
+    equations.} 
+  \item{order.by}{a numeric or factor vector. The explanatory variable to 
+    be used to order the entries in the estimating equations. If set to 
+    \code{NULL} (the default) the observations are assumed to be ordered.}
+  \item{subset}{logical vector. For \code{\link{gefp.olmm}}, this argument
+    extracts the subset of the estimating equations to be used. For 
+    \code{estfun.olmm}, the argument specifies which observations of an 
+    individual with more than \code{Nbal} observations should be kept / dropped. 
+    See examples.}
+  \item{parm}{integer, logical or a character vector. Extracts the
+    columns of the estimating equations.}
+  \item{center}{logical scalar. \code{TRUE} subtracts, if necessary, the
+    column means of the estimating equations.} 
+  \item{...}{arguments passed to other
+    functions. \code{\link{gefp.olmm}} passes these arguments to
+    \code{scores} if \code{scores} is a function.}
 }
 
 \value{
-  \code{\link{decormat.olmm}} returns a matrix for a linear 
-  within-subject transformation of the estimating equations (i.e., the
-  negative maximum likelihood scores), \code{\link{estfun.olmm}} a
-  \code{\link{matrix}} with the estimating equations and
-  \code{\link{gefp.olmm}} a list of class class \code{"gefp"}. 
+  \code{\link{predecor_control}} returns a list of control parameters
+  for computing the pre-decorrelation transformation
+  matrix. \code{\link{estfun.olmm}} returns a \code{\link{matrix}} with
+  the estimating equations and \code{\link{gefp.olmm}} a list of class class
+  \code{"gefp"}.  
 }
 
 \details{
@@ -100,20 +99,24 @@ decormat.olmm(object, method = c("symmetric", "unconstraint"),
   \eqn{i}, is transformed to \eqn{u^*_{it} = u_{it} + T \sum_{t'=1, t'
   \neq t}^{T_i} u_{it'}} such that \eqn{\mathrm{Cov}(u*_{it},
   u*_{it'}) =  \mathrm{Cov}(u*_{it}, u*_{i't''})} for all \eqn{i \neq
-  i'} and \eqn{t \neq t'}. The transformation matrix \eqn{T} is computed
-  with the \code{decormat.olmm} function and involves a nonlinear
-  optimization. 
+  i'} and \eqn{t \neq t'}.
   
   The pre-decorrelation approach above is prinicipally limited to
-  balanced data. Setting \code{complete = TRUE}, an algorithm is applied
-  to tackle this problem: First, the transformation matrix \eqn{T} is
-  computed based on the scores of subjects with equal or more than
-  \code{Nbal} observations. Second, the scores of subjects with fewer
-  observations are computed by repeating the following steps: (i)
-  simulate responses based \code{object} (including predicted random
-  effects) to have \code{Nbal} responses for each of these subjects,
-  (ii) recompute the score function (iii) transform the scores (iv)
-  delete the simulated observations. The resulting scores are averaged. 
+  balanced data. If the data of \code{object} are not balanced, a
+  multiple immputation algorithm is applied to estimate values the
+  scores would take if the data were balanced. Specifically, in each
+  iteration of the imputation, (i) a set of predictors is drawn from the 
+  empirical distribution of the model matrices in \code{object}, (ii) 
+  responses are drawn based on predictors of (i) and \code{object}
+  (cf. \code{\link{simulate.olmm}}) and (iii) the predictors of (i) and
+  the responses of (ii) are added \code{object} and the scores are
+  recomputed. The obtained sets of scores are averaged and then used to
+  for transforming the scores instead of the original scores. The
+  imputation algorithm can be controlled with \code{maxit.impute} (the
+  number of imputation iterations), \code{abstol.impute} the maximum
+  permitted quantile of differences between scores of the previous and
+  the current step and \code{ratio.impute} specifies the quantile to be
+  taken.
   
   Given a score matrix produced by \code{\link{estfun.olmm}}, the
   empirical fluctuation process can be computed by
@@ -145,7 +148,7 @@ doi:10.1111/j.1467-9574.2007.00371.x.
 data(vcrpart_1)
 
 ## extract a unbalanced subset to show to the full functionality of estfun
-vcrpart_1 <- vcrpart_1[-c(seq(1, 100, 4), 2, 6),]
+vcrpart_1 <- vcrpart_1[-seq(1, 100, 4),]
 subset <- vcrpart_1$wave != 1L ## obs. to keep for fluctuation tests
 table(table(vcrpart_1$id))
 
@@ -153,8 +156,9 @@ table(table(vcrpart_1$id))
 model <- olmm(y ~ treat + re(1|id), data = vcrpart_1)
 
 ## extract and pre-decorrelate the scores
-scores <- estfun.olmm(model, predecor = TRUE, complete = TRUE,
-                      Nbal = 3, subset = subset, verbose = TRUE)
+scores <- estfun.olmm(model, predecor = TRUE,
+                      control = predecor_control(verbose = TRUE,
+                                                 nit = 5))
 attr(scores, "T") # transformation matrix
 
 ## compute the empirical fluctuation process

@@ -20,15 +20,15 @@
 
 panel_terms(object, terms = NULL,
             variable = NULL, ask = NULL,
-            prob = NULL, neval = 50L, add = FALSE, ...)
+            prob = NULL, neval = 50L, add = FALSE,
+            etalab = c("int", "char", "eta"), ...)
 
 panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
-           plot_gp = list(),
+           exp = FALSE, plot_gp = list(),
            margins = c(3, 2, 0, 0), 
            mean = TRUE, mean_gp = list(),
            conf.int = TRUE, conf.int_gp = list(),
-           labels = c("integer", "category", "predictor"),
-           ...)
+           etalab = c("int", "char", "eta"), ...)
 }
 
 \arguments{
@@ -61,10 +61,12 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
     smaller than 1 if the sample is large.}
   \item{neval}{the maximal number of distinct values of the variable to
     be evaluated.}
-  \item{add}{whether the panel is to be added into an active plot.}
+  \item{add}{logical. Whether the panel is to be added into an active plot.}
   \item{id}{logical. Whether the node id should be displayed.}
   \item{nobs}{logical. Whether the number of observations in each node
     should be displayed.}
+  \item{exp}{logical. Whether the labels in the y-axes should be the
+    exponential of coefficients.}
   \item{plot_gp}{a list of graphical parameters for the panels. Includes
     components \code{xlim}, \code{ylim}, \code{pch}, \code{ylab},
     \code{type} (the type of symbols, e.g. \code{"b"}), \code{label}
@@ -85,9 +87,10 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
   \item{conf.int_gp}{a list of graphical parameters for the confindence
     intervals applied to \code{\link{arrow}}. Includes \code{angle},
     \code{length}, \code{ends} and \code{type}. See examples.}
-  \item{labels}{character. Whether category-specific effects should be
+  \item{etalab}{character. Whether category-specific effects should be
     labeled by integers of categories (default), the labels of the
-    categories or the index of the predictor.}
+    categories (\code{"char"}) or the index of the predictor
+    (\code{"eta"}).} 
   \item{\ldots}{additional arguments passed to \code{\link{panel_terms}}
     or \code{\link{panel_coef}} or other methods.}
 }

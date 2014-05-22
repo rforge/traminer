@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-05-02
+## Date:            2014-05-15
 ##
 ## Description:
 ## General utility functions 
@@ -15,6 +15,7 @@
 ## vcrpart_formula_eta:    extracts a list of predictor formulas
 ## vcrpart_formula_cond:   extracts a list of predictor formulas
 ## vcrpart_formula:        extracts a list of predictor formulas
+## renameCoefs:            modify coefficient labels
 ## --------------------------------------------------------- #
 
 appendDefArgs <- function(args, default) {
@@ -458,40 +459,4 @@ vcrpart_formula <- function(formula, family = cumulative(), env = parent.frame()
   fAll <- formula(fAll, env = env)
   rval$all <- fAll
   return(rval)
-}
-
-renameCoefs <- function(coef, levels, family,
-                        method = c("integer", "category", "predictor")) {
-  method <- match.arg(method)
-  if (method == "integer") levels <- 1L:length(levels)
-  
-  if (method %in% c("integer", "category") &&
-      family$family %in% c("cumulative", "adjacent", "baseline")) {
-    
-    FUN <- function(x) {
-      x <- strsplit(x, ":") 
-      x <- lapply(x, function(y) {
-        if (substr(y[1L], 1, 3) == "Eta") {
-          cat <- as.numeric(substr(y[1L], 4, nchar(y[1])))
-          y[1L] <-
-            switch(family$family,
-                   cumulative = paste(levels[cat:(cat + 1L)], collapse = "|"),
-                   adjacent = paste(levels[cat:(cat + 1L)], collapse = "|"),
-                   baseline = paste(c(levels[cat], rev(levels)[1L]), collapse = "|"),
-                   y[1L])
-        }
-        y <- paste(y, collapse = ":")
-        return(y)
-      })
-      return(unlist(x))
-    }
-    
-    if (is.matrix(coef)) {
-      if (!is.null(rownames(coef))) rownames(coef) <- FUN(rownames(coef))
-      if (!is.null(colnames(coef))) colnames(coef) <- FUN(colnames(coef))
-    } else {
-      if (!is.null(names(coef))) names(coef) <- FUN(names(coef))
-    }
-  }
-  return(coef)  
 }

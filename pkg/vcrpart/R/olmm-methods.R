@@ -142,319 +142,190 @@ coef.olmm <- function(object, which = c("all", "fe"), ...) {
 
 coefficients.olmm <- coef.olmm
 
-decormat.olmm <- function(object, method = c("symmetric", "unconstraint"),
-                          Nbal = NULL, parm = NULL, control = list(),
-                          verbose = FALSE, drop = TRUE, silent = FALSE) {
-
-  method <- match.arg(method)
-
-  ## set default control parameters
-  control_def <- list(reltol = 1e-6, maxreltol = 1e-3,
-                      maxit = 100L, stopreltol = 1e100)
-  control <- appendDefArgs(control, control_def)
-  
-  ## get required characteristics of the model
-  n <- nobs(object)
-  Ni <- table(slot(object, "subject"))
-  if (is.null(Nbal)) Nbal <- max(Ni)
-  if (!any(Ni == Nbal))
-    stop("at least one subject should have ", Nbal, " observations")
-  if (verbose)
-    cat("\nT is based on scores of the", sum(Ni == Nbal),
-        "of", slot(object, "dims")["N"], "subjects with Ni >=", Nbal, " obs.")
-  
-  sVar <- olmm_scoreVar(object, Nmax = Nbal)
-  sCovWin <- olmm_scoreCovWin(object, Nmax = Nbal)
-  sCovBet <- olmm_scoreCovBet(object)
-  
-  ## reduce to coefficient subset if intended
-  if (!is.null(parm)) {
-    sVar <- sVar[parm, parm, drop = FALSE]
-    sCovWin <- sCovWin[parm, parm, drop = FALSE]
-    sCovBet <- sCovBet[parm, parm, drop = FALSE]
-  } else {
-    parm <- 1:ncol(sVar)
-  } 
-  k <- length(parm)
-  
-  ## set initial values (currently omitted)
-  start <- NULL
-  T <- if (is.null(start)) {
-    matrix(0, k, k, dimnames = list(rownames(sVar), colnames(sVar)))
-  } else {
-    start
-  }
-  Tindex <- matrix(0, k, k, dimnames = list(rownames(sVar), colnames(sVar)))
-  subs <- if (method == "symmetric") lower.tri(T, TRUE) else matrix(TRUE, k, k)
-  ## omit off-diagonal terms which are zero
-  if (drop) {
-    subs[abs(sVar) + abs(sCovWin) + abs(sCovBet) < .Machine$double.eps] <- FALSE
-  }  
-  nPar <- sum(subs)
-  Tindex[subs] <- 1:nPar
-  if (method == "symmetric")
-    Tindex[upper.tri(Tindex, FALSE)] <- t(Tindex)[upper.tri(Tindex, FALSE)]
-  par <- rep(0, nPar)
-  fEval <- rep(Inf, nPar)
-  nit <- 0; error <- FALSE; eps <- 2 * control$reltol;
-  
-  ## optimize by Newton's algorithm
-  while (!error && nit < control$maxit && eps >= control$reltol) {
-    nit <- nit + 1
-    fEval <- olmm_f_decormat(T, Tindex, sVar, sCovWin, sCovBet, Nbal)
-    gEval <- olmm_g_decormat(T, Tindex, sVar, sCovWin, sCovBet, Nbal)
-    par <- try(solve(gEval, -fEval) + par, silent = TRUE)
-    eps <- max(abs(fEval / sCovBet[subs]))
-    if (class(par) != "try-error") {
-      T[] <- c(0, par)[Tindex + 1]
-      if (verbose & nit > 1)
-        cat("\nnit =", nit,
-            "max|f| =", format(max(abs(fEval)), digits = 3, scientific = TRUE),
-            "max|diff/f| =", format(eps, digits = 3, scientific = TRUE))
-    }
-    if (class(par) == "try-error" || eps > control$stopreltol || is.nan(eps))
-      error <- TRUE
-  } 
-  
-  ## check convergence
-  if (nit >= control$maxit | error) {
-    mess <- paste("optimization not converged: nit =", nit,
-                  "reltol =", format(eps, digits = 3, scientific = TRUE), "\n")
-    if (verbose) { cat("\n"); cat(mess); }
-    if (!silent) warning(mess)
-  } else {
-    if (verbose)
-      cat("\noptimization converged: nit =", nit,
-          "max|diff/f| =", format(eps, digits = 3, scientific = TRUE), "\n")
-  }
-  
-  attr(T, "conv") <- as.integer((nit != control$maxit) & !error)
-  attr(T, "nit") <- nit
-  attr(T, "eps") <- eps
-  rownames(T) <- colnames(T) <- colnames(sVar)
-  
-  ## return transformation matrix
-  return(T)
+predecor_control <- function(impute = TRUE, seed = NULL, nit = 1L,
+                             symmetric = TRUE, drop = TRUE,
+                             reltol = 1e-6, maxit = 100L, 
+                             verbose = FALSE, silent = FALSE) {
+  stopifnot(is.logical(impute))
+  stopifnot(is.null(seed) | is.numeric(seed))
+  stopifnot(is.numeric(nit) && nit > 0L)
+  stopifnot(is.logical(symmetric))
+  stopifnot(is.logical(drop))
+  stopifnot(is.numeric(reltol) && reltol > 0)
+  stopifnot(is.numeric(maxit) && maxit > 0)
+  stopifnot(is.logical(verbose))
+  stopifnot(is.logical(silent))
+  return(structure(list(impute = impute[1L], seed = seed[1L], nit = nit[1L],
+                        symmetric = symmetric[1L], drop = drop[1L],
+                        reltol = reltol[1L], maxit = maxit[1L], 
+                        verbose = verbose[1L], silent = silent[1L]),
+                   class = "predecor_control"))
 }
 
-deviance.olmm <- function(object, ...) {
-  return(-2 * slot(object, "logLik"))
-}
-
-estfun.olmm <- function(x, level = c("observation", "subject"),
-                        predecor = FALSE, complete = predecor,
-                        Nbal = NULL, subset = NULL,
-                        nuisance = NULL, control = list(),
-                        verbose = FALSE, silent = FALSE, ...) {
-
-  level <- match.arg(level)
-  if (verbose) cat("* extract scores from fitted object ... ")
-  xold <- x
+estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
+                        nuisance = NULL, ...) {
   
-  ## set subset
-  if (is.null(subset)) {
-    subset <- rep(TRUE, slot(x, "dims")["n"])
-  } else {
-    if (is.character(subset)) subset <- rownames(model.frame(x)) %in% subset
-    if (is.numeric(subset) && length(subset) == slot(x, "dims")["n"] &&
-        all(subset %in% c(1, 0))) subset <- as.logical(subset)
-    if (is.numeric(subset)) subset <- (1:slot(x, "dims")["n"]) %in% subset
-  }
+  if (control$verbose) cat("* extract scores from fitted object ... ")
   
-  ## check for balanced data and automatically modify subset
-  if (complete) {
+  ## check 'x'
+  stopifnot(inherits(x, "olmm"))
+  Ni <- table(slot(x, "subject"))
+  Nmax <- as.integer(max(Ni))
+  xOld <- x # store the original model for restoring at the end
 
-    Ni <- table(slot(x, "subject")[subset])
+  ## check 'predecor'
+  if (slot(x, "dims")["hasRanef"] == 0L) predecor <- FALSE
+  stopifnot(is.logical(predecor))
+  predecor <- predecor[1L]
 
-    ## set Nbal
-    if (!is.null(Nbal)) {
-      if (Nbal > max(Ni))
-        stop("at least one subject must have equal or more than ",
-             Nbal, " observations.")
-    } else {
-      Nbal <- sort(unique(Ni))[rev(which(table(Ni) > 50))[1]]
-      if (is.na(Nbal)) Nbal <- max(Ni)
-    }  
-    if (any(Ni > Nbal)) {
-      FUN <- function(x) x[1:min(Nbal, length(x))]
-      subs <- unlist(tapply(1:length(slot(x, "subject")), slot(x, "subject"), FUN))
-      subs <- (1:slot(x, "dims")["n"]) %in% subs
-      if (verbose)
-        cat("\n\tomit ", sum(!subs), " obs. from subjects with Ni > ", Nbal)
-      subset <- subset & subs
-    }
-
-    ## recompute the scores for the subset
-    if (any(!subset)) {
-      slot(x, "frame") <- model.frame(x)[subset,,drop = FALSE]
-      slot(x, "y") <- slot(x, "y")[subset]
-      slot(x, "subject") <- slot(x, "subject")[subset]
-      attrX <- attributes(slot(x, "X"))
-      slot(x, "X") <- slot(x, "X")[subset,,drop=FALSE]
-      attributes(slot(x, "X")) <- appendDefArgs(attributes(slot(x, "X")), attrX)
-      attrW <- attributes(slot(x, "W"))
-      slot(x, "W") <- slot(x, "W")[subset,,drop=FALSE]
-      attributes(slot(x, "W")) <- appendDefArgs(attributes(slot(x, "W")), attrW)
-      slot(x, "weights") <- slot(x, "weights_sbj")[as.integer(slot(x, "subject"))]
-      slot(x, "offset") <- slot(x, "offset")[subset,,drop=FALSE]
-      slot(x, "dims")["n"] <- nrow(slot(x, "frame"))
-      slot(x, "eta") <- slot(x, "eta")[subset,,drop=FALSE]
-      slot(x, "score_obs") <- slot(x, "score_obs")[subset,,drop=FALSE]
-      .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
-    }
-  }
-
-  if (verbose && !any(Ni > Nbal)) cat("OK")
+  ## check 'control'
+  stopifnot(inherits(control,"predecor_control"))
   
-  scores <-  -slot(x, "score_obs")
-  subject <- slot(x, "subject")
-  Ni <- table(subject)
-  
-  ## checks
-  if (slot(x, "dims")["hasRanef"] == 0L) {
-    predecor <- FALSE
-    complete <- FALSE
-  }
-  
-  ## get terms
-  parm <- 1:slot(x, "dims")["nPar"] # internal variable
+  ## check 'nuisance'
+  if (is.character(nuisance))
+    nuisance <- which(colnames(slot(x, "score_obs")) %in% nuisance)
+  stopifnot(all(nuisance %in% seq_along(colnames(slot(x, "score_obs")))))
+  parm <- seq_along(slot(x, "coefficients")) # internal variable
   if (!is.null(nuisance) & is.character(nuisance))
     nuisance <- which(names(coef(x)) %in% nuisance)
   parm <- setdiff(parm, nuisance)
-  scores <- scores[, parm, drop = FALSE]
+  attr <- list() # default attributes
+  
+  scores <- slot(x, "score_obs")
+  subsImp <- rep(FALSE, nrow(scores))
+  
+  ## impute data
+  
+  if (predecor && any(Ni != Nmax)) {
     
-  if (level == "observation") {
+    Ninpute <- Nmax - Ni
+    subsImp <- c(rep(FALSE, slot(x, "dims")["n"]), rep(TRUE, sum(Ninpute)))
+    sbjImp <- factor(rep(names(Ni), Ninpute), names(Ni))
+    ranef <- ranef(x)
+    ranefImp <- ranef[rownames(ranef) %in% unique(sbjImp),,drop = FALSE]
 
-    n <- nrow(scores)
-    k <- ncol(scores)
-    
-    if (predecor) {
-        
-      ## compute transformation matrix
-      if (verbose) cat("\n* compute transformation matrix ...")
-      T <- decormat.olmm(object = x, parm = parm, verbose = verbose,
-                         control = control, silent = silent, ...)
+    ## get predictors from empirical distribution
+    newX <- olmm_simPredictors(x, sum(Ninpute))
+    yName <- all.vars(formula(x))[1L]
+    yLevs <- levels(slot(x, "y"))
+    newX$frame[, yName] <- factor(rep(yLevs[1L], sum(subsImp)), yLevs)
+    newX$frame[, slot(x, "subjectName")] <- sbjImp
+    newX$frame <- newX$frame[, colnames(slot(x, "frame"))]
+
+    ## add imputations to model
+    slot(x, "frame") <- rbind(slot(x, "frame"), newX$frame)
+    slot(x, "y") <- ordered(c(as.character(slot(x, "y")),
+                              as.character(newX$frame[, yName])), yLevs)
+    slot(x, "X") <- rbind(slot(x, "X"), newX$X)
+    slot(x, "W") <- rbind(slot(x, "W"), newX$W)
+    slot(x, "subject") <-
+      factor(c(as.character(slot(x, "subject")),
+               as.character(newX$frame[, slot(x, "subjectName")])),
+             levels = names(Ni))
+    slot(x, "weights") <- slot(x, "weights_sbj")[as.integer(slot(x, "subject"))]
+    slot(x, "offset") <-
+      rbind(slot(x, "offset"),
+            matrix(0.0, sum(Ninpute), slot(x, "dims")["nEta"]))
+    slot(x, "dims")["n"] <- nrow(slot(x, "frame"))
+    slot(x, "eta") <-
+      rbind(slot(x, "eta"),
+            matrix(0, sum(Ninpute), slot(x, "dims")["nEta"]))
+    slot(x, "score_obs") <-
+      rbind(slot(x, "score_obs"),
+            matrix(0, sum(Ninpute), slot(x, "dims")["nPar"]))    
+
+    ## simulate responses
+    if (control$impute) {
       
-      ## if transformation failed, return raw scores
-      if (attr(T, "conv") > 0L) {
+      if (control$verbose) cat("\n* impute scores ... ")
+
+      scoreMean <- 0.0 * slot(x, "score_obs")[!subsImp,,drop=FALSE]
+      scoreImp <- list()
+
+      subsW <- c(rep(which(attr(slot(xOld, "W"), "merge") == 1L),
+                     slot(x, "dims")["nEta"]),
+                 which(attr(slot(xOld, "W"), "merge") == 2L))
+      tmatW <- rbind(kronecker(diag(slot(x, "dims")["nEta"]),
+                               rep(1,slot(x, "dims")["qCe"])),
+                     matrix(1, slot(x, "dims")["qGe"], slot(x, "dims")["nEta"]))
+
+      if (!is.null(control$seed)) set.seed(control$seed)
+
+      for (i in 1:control$nit) {
+
+        if (control$verbose) cat(".")
         
-        if (verbose) cat("\n* transforming scores ... ")
+        ## impute missings
+        newX <- olmm_simPredictors(x, sum(Ninpute)) # simulate predictors
+        slot(x, "frame")[subsImp, colnames(newX$frame)] <- newX$frame
+        slot(x, "X")[subsImp, colnames(newX$X)] <- newX$X
+        slot(x, "W")[subsImp, colnames(newX$W)] <- newX$W
+        etaFixef <- slot(x, "X")[subsImp, ] %*% slot(x, "fixef")     
+        etaRanef <- (slot(x, "W")[subsImp, subsW,drop = FALSE] *
+                     ranef[as.integer(slot(x, "subject")[subsImp])]) %*% tmatW
+        eta <- etaFixef + etaRanef
+        probs <- slot(x, "family")$linkinv(eta)
+        slot(x, "y")[subsImp] <- # simulate responses
+          ordered(apply(probs, 1L, function(x) sample(yLevs, 1L, prob = x)), yLevs)
         
-        ## transformation matrix for one subject
-        Ti <- kronecker(matrix(1, Nbal, Nbal) - diag(Nbal), T)
-        diag(Ti) <- 1
-      
-        if (all(Ni == Nbal) | !complete) {
-
-          if (!silent && any(Ni < Nbal))
-            warning("the transformation method works only with balanced data.")
-
-          sbj <- factor(c(as.character(subject), rep(levels(subject), Nbal - Ni)),
-                        levels = levels(subject))
-          subsAdd <- c(sapply(Ni, function(n) 1:Nbal > n))
-          sT <- rbind(scores, matrix(0, length(sbj) - length(subject), k))
-          subsOrd <- order(sbj)
-          sTmp <- matrix(c(t(sT[subsOrd,,drop=FALSE])), Nbal * k, nlevels(subject))
-          sTmp <- matrix(c(Ti %*% sTmp), nrow(sT), k, byrow = TRUE)
-          sTmp <- sTmp[!subsAdd,,drop=FALSE]        
-          scores[rownames(scores)[order(subject)],] <- sTmp
-          if (verbose) cat("OK")
-          
-        } else {
-
-          sT <- 0.0 * scores
-
-          ## transform complete cases
-          subsSbj <- which(Ni == Nbal)
-          subsObs <- which(subject %in% levels(subject)[subsSbj])
-          subsOrd <- subsObs[order(subject[subsObs])]
-          sTmp <- matrix(c(t(scores[subsOrd,,drop=FALSE])), Nbal * k, length(subsSbj))
-          sTmp <- matrix(c(Ti %*% sTmp), length(subsObs), k, byrow = TRUE)
-          sT[rownames(sT)[subsOrd],] <- sTmp
-          
-          ## repeatedly transform incomplete cases
-          if (verbose) cat("\n* data are unbalanced.",
-                           "Apply imputation algorithm with Nbal =", Nbal, "...")
-          subsSbj <- which(Ni < Nbal)
-          subsObs <- which(subject %in% levels(subject)[subsSbj])
-          subsOrd <- subsObs[order(subject[subsObs])]
-          sTmp <- 0.0 * scores[subsObs, ]
-          subsAdd <- c(sapply(Ni[subsSbj], function(n) 1:Nbal > n))
-          control <-
-            appendDefArgs(control,
-                          list(Rmax = 100L,
-                               abstol = sd(scores[abs(scores) > 0]) / 100))
-          eps <- 2 * control$abstol
-          r <- 0L
-          while (r < control$Rmax & eps > control$abstol) { 
-            r <- r + 1L
-            sAdd <- olmm_addScores(x)
-            sR <- rbind(scores[subsObs,, drop = FALSE],
-                        -sAdd$score_obs[, parm, drop = FALSE])
-            if (r == 1L) # is always the same for a fixed data set
-              sbj <- factor(c(as.character(subject[subsObs]),
-                              as.character(sAdd$subject)),
-                            levels = levels(subject))
-            sR <- matrix(c(t(sR[order(sbj),,drop=FALSE])), Nbal*k,length(subsSbj))
-            sR <- matrix(c(Ti %*% sR), Nbal * length(subsSbj), k, byrow = TRUE)
-            sR <- sR[!subsAdd,,drop=FALSE]
-            sR <- sTmp + sR
-            if (r > 1) eps <- max(abs(sR / r - sTmp / (r - 1)))
-            if (verbose && r > 1)
-              cat("\nnit = ", r,
-                  "max|diff| =", format(eps, digits = 3, scientific = TRUE))
-            sTmp <- sR
-          }
-          if (eps <= control$abstol) {
-            if (verbose)
-              cat("\nalgorithm converged: nit =", r,
-                  "max|diff| =", format(eps, digits = 3, scientific = TRUE), "\n")
-          } else {
-            if (!silent) warning("imputation algorithm did not converge.")
-          }
-          sT[rownames(sT)[subsOrd],] <- (sTmp / r)
-          scores[] <- sT[]
-          ## add information about the completing data method
-          attr(scores, "conv.complete") <- as.integer(eps <= control$abstol)
-          attr(scores, "nit.complete") <- r
-          attr(scores, "eps.complete") <- eps
-        }
+        ## recompute scores
+        .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
+        scoreImp[[i]] <- slot(x, "score_obs")[!subsImp,,drop=FALSE]
+        scoreMean <- scoreMean + scoreImp[[i]]
       }
+      scoreMean <- scoreMean / control$nit
+      eps <- sapply(1:control$nit, function(i) {
+        apply((scoreImp[[i]] - scoreMean)^2, 1, sum)
+      })
+      subs <- apply(eps, 1, which.min)
+      scores <- 0.0 * slot(x, "score_obs")
+      scores[!subsImp, ] <-
+        t(sapply(1:length(subs), function(i) scoreImp[[subs[i]]][i,,drop=FALSE]))
       
-      ## add attributes about the transformation matrix
-      attr(scores, "T") <- T
-      attr(scores, "conv.T") <- attr(T, "conv")
-      attr(scores, "nit.T") <- attr(T, "nit")
-      attr(scores, "eps.T") <- attr(T, "eps")
-      
+      if (control$verbose) cat(" OK")
     }
-
-    if (!complete && any(!subset)) scores <- scores[subset,,drop=FALSE]
-    
-  } else {
-
-    scores <- apply(scores, 2, tapply, subject, sum)
-    
-    if (!silent && complete)
-      warning("handling unbalanced data for subject level scores has ",
-              "yet not been implemented.")
-    if (verbose) cat("OK")
   }
 
-  ## append attributes
-  defAttr <- list(T = matrix(0,k,k), conv.T = 1L, nit.T = 0L,
-                  eps.T = 0.05, conv.complete = 1L, nit.complete = 0L,
-                  eps.complete = 0.0, predecor = as.integer(predecor))
-  attributes(scores) <- appendDefArgs(attributes(scores), defAttr)
-  colnames(attr(scores, "T")) <- rownames(attr(scores, "T")) <- colnames(scores)
-
-  x <- xold
+  ## drop the nuisance coefficients
+  scores <- scores[, parm, drop = FALSE]
+  
+  if (predecor) {    
+    
+    ## compute transformation matrix
+    if (control$verbose) cat("\n* compute transformation matrix ...")
+    T <- olmm_decormat(scores = scores[!subsImp,,drop = FALSE],
+                       subject = slot(x, "subject")[!subsImp],
+                       control = control)
+    
+    ## if transformation failed, return raw scores
+    if (attr(T, "conv") > 0L) {
+      
+      if (control$verbose) cat("\n* transforming scores ... ")
+      
+      ## transformation matrix for one subject
+      Ti <- kronecker(matrix(1, Nmax, Nmax) - diag(Nmax), T)
+      diag(Ti) <- 1
+      subsOrd <- order(slot(x, "subject"))      
+      sTmp <- matrix(c(t(scores[subsOrd,,drop=FALSE])),
+                     Nmax * ncol(scores),length(Ni))
+      sTmp <- matrix(c(Ti %*% sTmp), nrow(scores), ncol(scores), byrow = TRUE)
+      sTmp <- sTmp[order(subsOrd),,drop = FALSE]
+      scores[] <- sTmp
+      
+      if (control$verbose) cat("OK")
+    }
+    scores <- subset(scores, !subsImp)
+    attr(scores, "T") <- T
+  }
+   
+  ## ^hack: recompute old model
+  x <- xOld
   .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
   
-  if (verbose) cat("\n* return negative scores\n")
+  if (control$verbose) cat("\n* return negative scores\n")
   
   ## return scores
-  return(scores)
+  return(-scores)
 }
     
 
@@ -495,19 +366,16 @@ fixef.olmm <- function(object, which = c("all", "ce", "ge"), ...) {
 
 formula.olmm <- function(x, ...) as.formula(slot(x, "formula"), env = parent.frame())
 
-gefp.olmm <- function(object, scores = NULL, predecor = TRUE,
-                      order.by = NULL, parm = NULL, subset = NULL,
-                      center = TRUE, drop = TRUE,
+gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
+                      predecor = TRUE, parm = NULL, center = TRUE, drop = TRUE,
                       silent = FALSE, ...) {
   
   ## extract scores (if scores is not a matrix)
   if (is.null(scores)) {
-    estfunArgs <-
-      appendDefArgs(list(...),
-                    list(silent = silent, force = force,
-                         predecor = predecor, complete = TRUE))
-    estfunArgs$x <- object
-    scores <- try(do.call("estfun.olmm", estfunArgs))
+    estfunCall <- call(name = "estfun.olmm", x = quote(object), predecor = predecor)
+    dotargs <- list(...)[names(formals(estfun.olmm))]
+    for (arg in names(dotargs)) estfunCall[arg] <- dotargs[[arg]]
+    scores <- try(eval(estfunCall))
   } else if (is.function(scores)) {    
     scores <- scores(object)
   } else if (is.matrix(scores)) {
@@ -627,6 +495,7 @@ model.matrix.olmm <- function(object, which = c("fe", "fe-ce", "fe-ge",
   return(rval)
 }
 
+neglogLik.olmm <- function(object, ...) return(-as.numeric(logLik(object)))
 
 nobs.olmm <- function(object, ...) slot(object, "dims")[["n"]]
 
@@ -774,12 +643,16 @@ predict.olmm <- function(object, newdata = NULL,
       
     } else {
       ## or conditional probabilities (or linear predictor)
+
+      subsW <- c(rep(which(attr(W, "merge") == 1L), dims["nEta"]),
+                 which(attr(W, "merge") == 2L))
+      tmatW <- rbind(kronecker(diag(dims["nEta"]), rep(1,dims["qCe"])),
+                     matrix(1, dims["qGe"], dims["nEta"]))
       
       ## extend linear predictor
       if (is.matrix(ranef))
         eta <- eta +
-          matrix(rowSums(W * ranef[as.integer(subject), , drop = FALSE]),
-                 nrow(X), ncol(eta))
+          (W[, subsW,drop = FALSE] * ranef[as.integer(subject),,drop=FALSE]) %*% tmatW
       rownames(eta) <- rownames(X)
       colnames(eta) <- colnames(slot(object, "eta"))
         
@@ -812,9 +685,9 @@ predict.olmm <- function(object, newdata = NULL,
   return(rval)
 }
 
-print.olmm <- function(x, labels = c("integer", "category", "predictor"), ...) {
+print.olmm <- function(x, etalab = c("int", "char", "eta"), ...) {
 
-  labels <- match.arg(labels)
+  etalab <- match.arg(etalab)
   
   so <- summary.olmm(x, silent = TRUE)
   
@@ -833,7 +706,7 @@ print.olmm <- function(x, labels = c("integer", "category", "predictor"), ...) {
 
   if (length(so$REmat) > 0) {
     cat("\nRandom effects:\n")
-    print.VarCorr.olmm(renameCoefs(so$REmat, so$yLevs, so$family, labels), ...)
+    print.VarCorr.olmm(olmm_rename(so$REmat, so$yLevs, so$family, etalab), ...)
     cat(sprintf("Number of obs: %d, subjects: %d\n", so$dims["n"], so$dims["N"]))
   }
 
@@ -844,7 +717,7 @@ print.olmm <- function(x, labels = c("integer", "category", "predictor"), ...) {
   
   if (length(so$feMatCe) > 0 && nrow(so$feMatCe) > 0) {
     cat("\nCategory-specific fixed effects:\n")
-    print(renameCoefs(so$feMatCe[, 1], so$yLevs, so$family, labels), ...)
+    print(olmm_rename(so$feMatCe[, 1], so$yLevs, so$family, etalab), ...)
   }
 }
 
@@ -935,10 +808,10 @@ simulate.olmm <- function(object, nsim = 1, seed = NULL,
   return(rval)
 }
 
-summary.olmm <- function(object, labels = c("integer", "category", "predictor"),
+summary.olmm <- function(object, etalab = c("int", "char", "eta"),
                          silent = FALSE, ...) {
 
-  labels <- match.arg(labels)
+  etalab <- match.arg(etalab)
   dims <- slot(object, "dims")
             
   ## goodness of fit measures
@@ -946,7 +819,6 @@ summary.olmm <- function(object, labels = c("integer", "category", "predictor"),
   AICtab <- data.frame(AIC = AIC(lLik),
                        BIC = BIC(lLik),
                        logLik = as.vector(lLik),
-                       deviance = deviance(object),
                        row.names = "")
   
   ## fixed-effect coefficients
@@ -1026,7 +898,7 @@ summary.olmm <- function(object, labels = c("integer", "category", "predictor"),
                 na.action = na.action,
                 dims = dims,
                 yLevs = levels(slot(object, "y")),
-                labels = labels,
+                etalab = etalab,
                 dotargs = list(...)), class = "summary.olmm"))
 }
 
@@ -1048,7 +920,7 @@ print.summary.olmm <- function(x, ...) {
   
   if (length(x$REmat) > 0L) {
     cat("\nRandom effects:\n")
-    args$x <- renameCoefs(x$REmat, x$yLevs, x$family, x$labels)
+    args$x <- olmm_rename(x$REmat, x$yLevs, x$family, x$etalab)
     do.call("print", args)
     cat(sprintf("Number of obs: %d, subjects: %d\n", x$dims["n"], x$dims["N"]))
   }
@@ -1063,7 +935,7 @@ print.summary.olmm <- function(x, ...) {
   
   if (length(x$feMatCe) > 0 && nrow(x$feMatCe) > 0L) {
     cat("\nCategory-specific fixed effects:\n")
-    args$x <- renameCoefs(x$feMatCe, x$yLevs, x$family, x$labels)
+    args$x <- olmm_rename(x$feMatCe, x$yLevs, x$family, x$etalab)
     do.call("printCoefmat", args)
   }
 }

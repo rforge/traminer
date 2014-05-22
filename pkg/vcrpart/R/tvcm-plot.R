@@ -75,7 +75,10 @@ plot.tvcm <- function(x, type = c("default", "coef",
 
 panel_terms <- function(object, terms = NULL,
                         variable = NULL, ask = NULL,
-                        prob = NULL, neval = 50L, add = FALSE, ...) {
+                        prob = NULL, neval = 50L, add = FALSE,
+                        etalab = c("int", "char", "eta"),
+                        ...) {
+
   
   ## set and check 'terms'
   allTerms <- colnames(extract(object, "coef")$vc)
@@ -83,7 +86,14 @@ panel_terms <- function(object, terms = NULL,
   if (!all(terms %in% allTerms))
     warnings("some 'terms' were not recognized.")
   terms <- intersect(terms, allTerms)
-  if (length(terms) == 0L) stop("no valid 'terms's.")
+  if (length(terms) == 0L) stop("no valid 'terms'.")
+  etalab <- match.arg(etalab)
+
+  ## labels for coefficients
+  termLabs <- terms
+  if (object$info$fit == "olmm") 
+    termLabs <- olmm_rename(terms, levels(slot(object$info$model, "y")),
+                            object$info$family, etalab)
   
   ## set and check 'variable'
   data <- object$data
@@ -139,7 +149,7 @@ panel_terms <- function(object, terms = NULL,
 
       ## define arguments for plot or points call
       ylab <-
-        paste("coef(", terms[j], "|", variable[i], ")", sep = "")
+        paste("coef(", termLabs[j], "|", variable[i], ")", sep = "")
 
       if (is.numeric(z)) {
         args <- appendDefArgs(dotList, list(type = "s"))
@@ -181,15 +191,15 @@ panel_get_main <- function(object, node, id, nobs) {
 }
 
 panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
-                       plot_gp = list(),
+                       exp = FALSE, plot_gp = list(),
                        margins = c(3, 2, 0, 0),
                        mean = TRUE, mean_gp = list(),
                        conf.int = TRUE, conf.int_gp = list(),
-                       labels = c("integer", "category", "predictor"),
+                       etalab = c("int", "char", "eta"),
                        ...) {
-
-  ## get arguments for setting tick labels
-  labels <- match.arg(labels)
+  
+  ## get arguments for setting y tick labels
+  etalab <- match.arg(etalab)
   if (object$info$fit == "olmm") {
     yLevs <- levels(slot(object$info$model, "y"))
   } else {
@@ -209,17 +219,21 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
     sd <- sd[, unlist(terms), drop = FALSE]
     sdList <- lapply(terms, function(trms) sd[, trms, drop = FALSE])
   }
-  
-  ## plot parameters
-  if (length(plot_gp) == 0L) {
-    plot_gp <- vector("list", length(terms))
-  } else {
-    if (!(length(terms) > 1L && length(plot_gp) == length(terms) &&
-          (is.null(names(plot_gp)) |
-           !is.null(names(plot_gp)) && names(plot_gp) == names(terms))))
-      plot_gp <- lapply(seq_along(terms), function(i) plot_gp)
+
+  argsToList <- function(x) {
+    if (!(is.list(x) &&
+          length(x) == length(terms) &&
+          (is.null(names(x)) |
+           !is.null(names(x)) && all(names(x) == names(terms)))))
+      x <- lapply(seq_along(terms), function(i) x)
+    return(x)
   }
 
+  ## whether y labels should be the exponential of their actual values
+  exp <- argsToList(exp)
+  
+  ## plot parameters
+  plot_gp <- argsToList(plot_gp)
   plot_gp <-
     lapply(seq_along(coefList),
            function(i) {
@@ -230,38 +244,35 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
              } else {
                ylim <- range(coefList[[i]], na.rm = TRUE)
              }
+             ylim <- range(c(0, ylim))
              ylim <- ylim + c(-1, 1) * 0.1 * diff(ylim)
-             cn <- renameCoefs(coefList[[i]], yLevs, object$info$family, labels)
-             cn <- colnames(cn)
-             cn <- unlist(lapply(cn,
-                                 function(x) {
-                                   x <- unlist(strsplit(x, ":"))
-                                   x <- abbreviate(x)
-                                   return(paste(x, collapse = ":"))
-                                 }))
+             xlabel <- colnames(coefList[[i]])
+             if (object$info$fit == "olmm")
+               xlabel <- olmm_rename(xlabel, yLevs, object$info$family, etalab)
+             xlabel <- unlist(lapply(xlabel,
+                                     function(x) {
+                                       x <- unlist(strsplit(x, ":"))
+                                       x <- abbreviate(x)
+                                       return(paste(x, collapse = ":"))
+                                     }))
              rval <- list(xlim = c(0.75, ncol(coefList[[i]]) + 0.25),
                           pch = 1L, ylim = ylim,
-                          ylab = "coef",  type = "b",
-                          label = cn,
+                          ylab = if (exp[[i]]) "exp(coef)" else "coef",
+                          type = "b",
+                          xlabel = xlabel, 
                           height = 1, width = 0.6, 
                           gp = gpar(cex = 1L, fontsize = 8))
-             rval$ylim <- rval$ylim + 0.1 * c(-1, 1) * diff(rval$ylim)
-             rval$ylim <- range(c(0, rval$ylim))
              if (length(plot_gp) > 0L)
                rval <- appendDefArgs(plot_gp[[i]], rval)
+             rval$yat <- axisTicks(rval$ylim, log = FALSE, nint = 3)
+             rval$ylabel <- if (exp[[i]]) exp(rval$yat) else rval$yat
+             rval$ylabel <- format(rval$ylabel, digits = 2L)
              return(rval)
            })
 
   if (conf.int) {
 
-    if (length(conf.int_gp) == 0L) {
-      conf.int_gp <- vector("list", length(terms))
-    } else {
-      if (!(length(terms) > 1L && length(conf.int_gp) == length(terms) &&
-            (is.null(names(conf.int_gp)) |
-             !is.null(names(conf.int_gp)) && names(conf.int_gp) == names(terms))))
-        conf.int_gp <- lapply(seq_along(terms), function(i) conf.int_gp)
-    }    
+    conf.int_gp <- argsToList(conf.int_gp)
     conf.int_gp_def <- list(angle = 90,
                             length = unit(1, "mm"),
                             ends = "both",
@@ -274,14 +285,7 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
   ## population mean
   if (mean) {
 
-    if (length(mean_gp) == 0L) {
-      mean_gp <- vector("list", length(terms))
-    } else {
-      if (!(length(terms) > 1L && length(mean_gp) == length(terms) &&
-            (is.null(names(mean_gp)) |
-             !is.null(names(mean_gp)) && names(mean_gp) == names(terms))))
-        mean_gp <- lapply(seq_along(terms), function(i) mean_gp)
-    }    
+    mean_gp <- argsToList(mean_gp)
     mean_gp_def <- list(gp = gpar(col = "grey50", lty = 1,
                           lwd = 0.75, fontsize = 8), pch = 1L)
     mean_gp <- lapply(seq_along(terms),
@@ -393,12 +397,15 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
       }
       
       if (id_node(node) == min(nodeids(object, terminal = TRUE))) {
-        grid.yaxis(gp = gpar(lineheight = 0.5))
-        grid.text(plot_gp[[i]]$ylab, unit(-2, "lines"), unit(0.5, "npc"),
-                  rot = 90)
+        grid.yaxis(at = plot_gp[[i]]$yat,
+                   label = plot_gp[[i]]$ylabel,
+                   gp = gpar(lineheight = 0.5))
+        grid.text(plot_gp[[i]]$ylab,
+                  unit(-0.75 - 0.6 * max(nchar(plot_gp[[i]]$ylabel)), "char"),
+                  unit(0.5, "npc"), rot = 90)
       }
       
-      grid.xaxis(at = 1:ncol(coefList[[i]]), label = plot_gp[[i]]$label,
+      grid.xaxis(at = 1:ncol(coefList[[i]]), label = plot_gp[[i]]$xlabel,
                  gp = gpar(lineheight = 0.5))
       
       grid.rect()

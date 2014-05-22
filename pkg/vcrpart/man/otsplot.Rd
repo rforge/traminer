@@ -13,8 +13,6 @@
 
 \usage{
 
-otsplot(x, ...)
-
 \method{otsplot}{default}(x, y, subject, weights, groups,
         control = otsplot_control(), filter = NULL, 
         main, xlab, ylab, xlim, ylim, ...)
