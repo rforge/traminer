@@ -152,14 +152,14 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
   \code{seqpcplot} returns an object of \code{class} \code{"seqpcplot"}
   with various information for constructing the plot,
   e.g. coordinates. There is also a \code{summary} method for such
-  objects.  
+  objects.
 }
 
 
 \seealso{ \code{\link{seqplot}}, \code{\link{seqdef}}, \code{\link{seqecreate}}}
 
 \references{
-  Bürgin, R., G. Ritschard and E. Rousseaux (2012), Exploration graphique de donnéees séquentielles. In Atelier Fouille Visuelle de Données : méthodologie et évaluation, EGC 2012, Bordeaux. Association EGC: http://www.egc.asso.fr/sdoc-237-egc2012_atelier_fvd.pdf.
+  Bürgin, R. and G. Ritschard (2014), A decorated parallel coordinate plot for categorical longitudinal data, \emph{The American Statistician} 68(2), 98-103.
 }
 
 \examples{
