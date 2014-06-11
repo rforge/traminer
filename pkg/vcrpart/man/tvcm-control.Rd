@@ -15,7 +15,7 @@ tvcm_control(method = c("mob", "partreg"),
              minbucket = 50L, mtry = Inf,
              minsplit = 2 * minbucket, trim = 0.1,
              maxdepth = Inf, maxstep = maxwidth - 1L, 
-             nselect = Inf, estfun = list(),  
+             nselect = Inf, estfun = list(), ninpute = 5L,
              maxevalsplit = 20, riskfun = neglogLik,
              fast = 0L, verbose = FALSE, ...)
 }
@@ -43,7 +43,11 @@ tvcm_control(method = c("mob", "partreg"),
     \code{"maxwidth"} minus 1.} 
   \item{nselect}{integer. The maximum number of distinct variables to be
     selected.}
-  \item{estfun}{list of arguments to be passed to \code{\link{gefp.olmm}}.}
+  \item{estfun}{list of arguments to be passed to
+    \code{\link{gefp.olmm}}.}
+  \item{ninpute}{integer. The number of times the coefficient constancy
+    tests should be repeated in each step in cases of unbalanced data
+    where inputing missing values is required.}
   \item{maxevalsplit}{integer. The maximum number of evaluation for
     splits on numeric partitioning variables.}
   \item{riskfun}{function. A function that extracts a risk measure from a

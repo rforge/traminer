@@ -142,22 +142,21 @@ coef.olmm <- function(object, which = c("all", "fe"), ...) {
 
 coefficients.olmm <- coef.olmm
 
-predecor_control <- function(impute = TRUE, seed = NULL, nit = 1L,
-                             symmetric = TRUE, drop = TRUE,
-                             reltol = 1e-6, maxit = 100L, 
+predecor_control <- function(impute = TRUE, seed = NULL,
+                             symmetric = TRUE,  reltol = 1e-6,
+                             maxit = 250L, minsize = 1L, 
                              verbose = FALSE, silent = FALSE) {
   stopifnot(is.logical(impute))
   stopifnot(is.null(seed) | is.numeric(seed))
-  stopifnot(is.numeric(nit) && nit > 0L)
   stopifnot(is.logical(symmetric))
-  stopifnot(is.logical(drop))
   stopifnot(is.numeric(reltol) && reltol > 0)
   stopifnot(is.numeric(maxit) && maxit > 0)
+  stopifnot(is.numeric(minsize) && minsize > 0)
   stopifnot(is.logical(verbose))
   stopifnot(is.logical(silent))
-  return(structure(list(impute = impute[1L], seed = seed[1L], nit = nit[1L],
-                        symmetric = symmetric[1L], drop = drop[1L],
-                        reltol = reltol[1L], maxit = maxit[1L], 
+  return(structure(list(impute = impute[1L], seed = seed[1L], 
+                        symmetric = symmetric[1L], reltol = reltol[1L],
+                        maxit = maxit[1L], minsize = minsize[1L], 
                         verbose = verbose[1L], silent = silent[1L]),
                    class = "predecor_control"))
 }
@@ -165,7 +164,7 @@ predecor_control <- function(impute = TRUE, seed = NULL, nit = 1L,
 estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
                         nuisance = NULL, ...) {
   
-  if (control$verbose) cat("* extract scores from fitted object ... ")
+  if (control$verbose) cat("* extract original scores ... ")
   
   ## check 'x'
   stopifnot(inherits(x, "olmm"))
@@ -205,22 +204,21 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
     ranefImp <- ranef[rownames(ranef) %in% unique(sbjImp),,drop = FALSE]
 
     ## get predictors from empirical distribution
-    newX <- olmm_simPredictors(x, sum(Ninpute))
     yName <- all.vars(formula(x))[1L]
     yLevs <- levels(slot(x, "y"))
-    newX$frame[, yName] <- factor(rep(yLevs[1L], sum(subsImp)), yLevs)
-    newX$frame[, slot(x, "subjectName")] <- sbjImp
-    newX$frame <- newX$frame[, colnames(slot(x, "frame"))]
+    newFrame <- slot(x, "frame")[rep(1L, sum(Ninpute)),,drop=FALSE]
+    newFrame[, slot(x, "subjectName")] <- rep(names(Ninpute), Ninpute)
+    newX <- slot(x, "X")[rep(1L, sum(Ninpute)),,drop=FALSE]
+    newW <- slot(x, "W")[rep(1L, sum(Ninpute)),,drop=FALSE]
 
     ## add imputations to model
-    slot(x, "frame") <- rbind(slot(x, "frame"), newX$frame)
+    slot(x, "frame") <- rbind(slot(x, "frame"), newFrame)
     slot(x, "y") <- ordered(c(as.character(slot(x, "y")),
-                              as.character(newX$frame[, yName])), yLevs)
-    slot(x, "X") <- rbind(slot(x, "X"), newX$X)
-    slot(x, "W") <- rbind(slot(x, "W"), newX$W)
+                              as.character(newFrame[, yName])), yLevs)
+    slot(x, "X") <- rbind(slot(x, "X"), newX)
+    slot(x, "W") <- rbind(slot(x, "W"), newW)
     slot(x, "subject") <-
-      factor(c(as.character(slot(x, "subject")),
-               as.character(newX$frame[, slot(x, "subjectName")])),
+      factor(c(as.character(slot(x, "subject")), newFrame[, slot(x, "subjectName")]),
              levels = names(Ni))
     slot(x, "weights") <- slot(x, "weights_sbj")[as.integer(slot(x, "subject"))]
     slot(x, "offset") <-
@@ -229,58 +227,46 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
     slot(x, "dims")["n"] <- nrow(slot(x, "frame"))
     slot(x, "eta") <-
       rbind(slot(x, "eta"),
-            matrix(0, sum(Ninpute), slot(x, "dims")["nEta"]))
+            matrix(0.0, sum(Ninpute), slot(x, "dims")["nEta"]))
     slot(x, "score_obs") <-
       rbind(slot(x, "score_obs"),
-            matrix(0, sum(Ninpute), slot(x, "dims")["nPar"]))    
+            matrix(0.0, sum(Ninpute), slot(x, "dims")["nPar"]))    
 
     ## simulate responses
     if (control$impute) {
       
       if (control$verbose) cat("\n* impute scores ... ")
+      
+      ## set seed
 
-      scoreMean <- 0.0 * slot(x, "score_obs")[!subsImp,,drop=FALSE]
-      scoreImp <- list()
+      ## impute predictors
+      times <- Ninpute[slot(x, "subject")[!subsImp]]
+      rows <- unlist(tapply(1:sum(Ni), slot(x, "subject")[!subsImp], function(x) sample(x, times[x[1L]], replace = TRUE)))
+      slot(x, "frame")[subsImp,] <- slot(x, "frame")[rows,,drop=FALSE]
+      slot(x, "X")[subsImp, ] <- slot(x, "X")[rows,,drop=FALSE]
+      slot(x, "W")[subsImp, ] <- slot(x, "W")[rows,,drop=FALSE]
 
+      ## draw responses
       subsW <- c(rep(which(attr(slot(xOld, "W"), "merge") == 1L),
                      slot(x, "dims")["nEta"]),
                  which(attr(slot(xOld, "W"), "merge") == 2L))
       tmatW <- rbind(kronecker(diag(slot(x, "dims")["nEta"]),
                                rep(1,slot(x, "dims")["qCe"])),
                      matrix(1, slot(x, "dims")["qGe"], slot(x, "dims")["nEta"]))
-
+      etaFixef <- slot(x, "X")[subsImp, ] %*% slot(x, "fixef")     
+      etaRanef <- (slot(x, "W")[subsImp, subsW,drop = FALSE] *
+                   ranef[as.integer(slot(x, "subject")[subsImp])]) %*% tmatW
+      eta <- etaFixef + etaRanef
+      probs <- slot(x, "family")$linkinv(eta)
       if (!is.null(control$seed)) set.seed(control$seed)
+      slot(x, "y")[subsImp] <- # simulate responses
+        ordered(apply(probs, 1L, function(x) sample(yLevs, 1L, prob = x)), yLevs)
+      
+      ## recompute scores
+      .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
 
-      for (i in 1:control$nit) {
-
-        if (control$verbose) cat(".")
-        
-        ## impute missings
-        newX <- olmm_simPredictors(x, sum(Ninpute)) # simulate predictors
-        slot(x, "frame")[subsImp, colnames(newX$frame)] <- newX$frame
-        slot(x, "X")[subsImp, colnames(newX$X)] <- newX$X
-        slot(x, "W")[subsImp, colnames(newX$W)] <- newX$W
-        etaFixef <- slot(x, "X")[subsImp, ] %*% slot(x, "fixef")     
-        etaRanef <- (slot(x, "W")[subsImp, subsW,drop = FALSE] *
-                     ranef[as.integer(slot(x, "subject")[subsImp])]) %*% tmatW
-        eta <- etaFixef + etaRanef
-        probs <- slot(x, "family")$linkinv(eta)
-        slot(x, "y")[subsImp] <- # simulate responses
-          ordered(apply(probs, 1L, function(x) sample(yLevs, 1L, prob = x)), yLevs)
-        
-        ## recompute scores
-        .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
-        scoreImp[[i]] <- slot(x, "score_obs")[!subsImp,,drop=FALSE]
-        scoreMean <- scoreMean + scoreImp[[i]]
-      }
-      scoreMean <- scoreMean / control$nit
-      eps <- sapply(1:control$nit, function(i) {
-        apply((scoreImp[[i]] - scoreMean)^2, 1, sum)
-      })
-      subs <- apply(eps, 1, which.min)
       scores <- 0.0 * slot(x, "score_obs")
-      scores[!subsImp, ] <-
-        t(sapply(1:length(subs), function(i) scoreImp[[subs[i]]][i,,drop=FALSE]))
+      scores[!subsImp, ] <- slot(x, "score_obs")[!subsImp,,drop=FALSE]
       
       if (control$verbose) cat(" OK")
     }
@@ -712,11 +698,12 @@ print.olmm <- function(x, etalab = c("int", "char", "eta"), ...) {
 
   if (length(so$feMatGe) > 0 && nrow(so$feMatGe) > 0) {
     cat("\nGlobal fixed effects:\n")
-    print(so$feMatGe[, 1], ...)
+    text <- so$feMatGe[, 1]; names(text) <- rownames(so$feMatGe)
+    print(text, ...)
   }
   
   if (length(so$feMatCe) > 0 && nrow(so$feMatCe) > 0) {
-    cat("\nCategory-specific fixed effects:\n")
+    cat("\nCategory-specific fixed effects:\n")    
     print(olmm_rename(so$feMatCe[, 1], so$yLevs, so$family, etalab), ...)
   }
 }

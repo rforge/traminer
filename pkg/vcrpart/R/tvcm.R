@@ -83,6 +83,7 @@ tvcm <- function(formula, data, fit, family,
   mf <- eval.parent(mf)
   
   ## create a call
+  if (control$verbose) cat("OK\n* set fitting arguments ... ")
   start <- list(...)$start
   weights <- model.weights(mf)
   if (is.null(weights)) weights <- rep(1.0, nrow(mf))  
@@ -104,17 +105,26 @@ tvcm <- function(formula, data, fit, family,
 
   ## get coefficients to be used in the root node test
   control <- tvcm_update_control(control, model, formList)
+
+  ## specify which coefficients are considered as 'nuisance' parameters
+  if (control$verbose && control$method == "mob") {
+    if (length(control$estfun$nuisance) > 0L) {
+      cat("\n\tset", paste(paste("'", control$estfun$nuisance, "'", sep = ""), collapse = ", ", sep = ""), "\n\tas nuisance parameter(s) in coefficient constancy tests.")
+    } else {
+      cat("OK")
+    }
+  }
   
   ## define model data
   mf <- mf[rownames(model.frame(model)),, drop = FALSE]
-
+  
   ## define partitioning data
   partForm <- if (!is.null(formList$vc)) formList$vc$cond else formula(~ 1)
   partvar <- model.frame(partForm, mf)
   attr(partvar, "terms") <- attr(mf, "terms")
   attr(partvar, "na.action") <- attr(mf, "na.action")
   
-  if (control$verbose) cat("OK\n* starting partitioning ...\n")
+  if (control$verbose) cat("\n* starting partitioning ...\n")
   
   ## set the root node
   nodes <- partynode(id = 1L, info = list(dims = nobs(model), depth = 0L))
@@ -288,7 +298,7 @@ tvcm_control <- function(method = c("mob", "partreg"),
                          minbucket = 50L, mtry = Inf,
                          minsplit = 2 * minbucket, trim = 0.1,
                          maxdepth = Inf, maxstep = maxwidth - 1L, 
-                         nselect = Inf, estfun = list(),  
+                         nselect = Inf, estfun = list(), ninpute = 5L,
                          maxevalsplit = 20L, riskfun = neglogLik,
                          fast = 0L, verbose = FALSE, ...) {
 
@@ -323,6 +333,7 @@ tvcm_control <- function(method = c("mob", "partreg"),
                   maxstep = maxstep,
                   nselect = nselect,
                   estfun = estfun,
+                  ninpute = ninpute,
                   maxevalsplit = maxevalsplit,
                   riskfun = riskfun,
                   fast = fast, 

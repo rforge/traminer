@@ -16,9 +16,9 @@
 estfun.olmm(x, predecor = FALSE, control = predecor_control(),
             nuisance = NULL, ...)
 
-predecor_control(impute = TRUE, seed = NULL, nit = 1L,
-                 symmetric = TRUE, drop = TRUE,
-                 reltol = 1e-6, maxit = 100L,
+predecor_control(impute = TRUE, seed = NULL, 
+                 symmetric = TRUE, reltol = 1e-6,
+                 maxit = 250L, minsize = 1L,
                  verbose = FALSE, silent = FALSE)
 
 gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
@@ -40,13 +40,11 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   \item{seed}{an integer scalar. Specifies the random number used for
     the \code{set.seed} call before the imputation. If set to
     \code{NULL}, \code{set.seed} is not processed.}
-  \item{nit}{integer scalar. Specifies the number of score matrices to
-    be imputed. Higher numbers will reduce the randomness of the
-    imputations.}
   \item{symmetric}{logical scalar. Whether the transformation matrix
     should be symmetric.} 
-  \item{drop}{logical. Whether singularities should be handled
-    automatically (otherwise singularities yield an error).}
+  \item{minsize}{integer scalar. The minimum number of observations for
+    which entries in the transformation should be computed. Higher
+    values will lead to lower accuracy but stabilize the computation.}
   \item{reltol}{convergence tolerance used to compute the transformation
     matrix.} 
   \item{maxit}{the maximum number of iterations used to compute the
@@ -68,7 +66,9 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   \item{parm}{integer, logical or a character vector. Extracts the
     columns of the estimating equations.}
   \item{center}{logical scalar. \code{TRUE} subtracts, if necessary, the
-    column means of the estimating equations.} 
+    column means of the estimating equations.}
+  \item{drop}{logical. Whether singularities should be handled
+    automatically (otherwise singularities yield an error).}
   \item{...}{arguments passed to other
     functions. \code{\link{gefp.olmm}} passes these arguments to
     \code{scores} if \code{scores} is a function.}
@@ -157,8 +157,7 @@ model <- olmm(y ~ treat + re(1|id), data = vcrpart_1)
 
 ## extract and pre-decorrelate the scores
 scores <- estfun.olmm(model, predecor = TRUE,
-                      control = predecor_control(verbose = TRUE,
-                                                 nit = 5))
+                      control = predecor_control(verbose = TRUE))
 attr(scores, "T") # transformation matrix
 
 ## compute the empirical fluctuation process

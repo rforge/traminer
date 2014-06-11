@@ -40,13 +40,10 @@
 ##                       intra-subject covariance and the adjusted
 ##                       between-subject covariance of likelihood scores.
 ## olmm_g_decormat:      the derivation of olmm_fDecorrelate.
-## decormat.olmm:        computes the transformation matrix for
+## olmm_rename:
+## olmm_decormat:        computes the transformation matrix for
 ##                       removing the intra-subject
 ##                       correlation of ML scores.
-## olmm_simPredictors:   extracts randomly observed predictor
-##                       combinations
-## olmm_addObsScores:    computes scores to complete an unbalance
-##                       data set 
 ##
 ## To do:
 ## - replace ranefChol fac initial value with covariance matrix
@@ -479,40 +476,6 @@ olmm_g_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
   return(rval)
 }
 
-
-olmm_simPredictors <- function(object, nobs) {
-
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Simulate predictors based on the data of a fitted 'olmm'
-  ## object.
-  ##
-  ## Arguments:
-  ## object:    an 'olmm' object
-  ## nobs:      the number of observations to be simulated
-  ##
-  ## Value:
-  ## A list with the frame and model matrices of the simulated
-  ## predictors
-  ## ------------------------------------------------------- #
-
-  if (nobs > 0L) {
-    frame <- model.frame(object)
-    X <- model.matrix(object, "fe")
-    W <- model.matrix(object, "re")
-    index <- sample(1:nrow(frame), nobs, replace = TRUE)
-    frame <- frame[index,,drop = FALSE]
-    frame <- frame[, -c(1, which(colnames(frame) == slot(object, "subjectName"))), drop = FALSE]
-    X <- X[index,,drop = FALSE]
-    W <- W[index,,drop = FALSE]
-    rownames(frame) <- rownames(X) <- rownames(W) <- 1:nrow(frame)
-    rval <- list(frame = frame, X = X, W = W)
-  } else {
-    rval <- list()
-  }
-  return(rval)
-}
-
 olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
   
   ## ------------------------------------------------------- #
@@ -603,8 +566,8 @@ olmm_decormat <- function(scores, subject, control = predecor_control()) {
   T <- matrix(0, k, k, dimnames = list(rownames(sVar), colnames(sVar)))
   Tindex <- matrix(0, k, k, dimnames = list(rownames(sVar), colnames(sVar)))
   subs <- if (control$symmetric) lower.tri(T, TRUE) else matrix(TRUE, k, k)  
-  if (control$drop) # omit off-diagonal terms which are zero
-    subs[abs(sVar) + abs(sCovWin) + abs(sCovBet) < .Machine$double.eps] <- FALSE  
+  if (control$minsize > 0L) # omit off-diagonal terms which are zero
+    subs[crossprod(apply(abs(scores) > 0, 2, tapply, subject, sum)) <= control$minsize & crossprod(abs(scores) > 0) <= control$minsize] <- FALSE  
   nPar <- sum(subs)
   Tindex[subs] <- 1:nPar
   if (control$symmetric)

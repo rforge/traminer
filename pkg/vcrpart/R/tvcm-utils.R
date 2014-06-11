@@ -75,7 +75,11 @@ tvcm_fit_model <- function(call, control) {
     terms <- tvcm_get_terms(names = names(coef(object)),
                             ids = levels(eval(call$data, env)$Node),
                             parm = control$parm)
-    print(data.frame(Estimate = coef(object)[terms$node != ""]), digits = 2)
+    if (any(terms$node != "")) {
+      print(data.frame(Estimate = coef(object)[terms$node != ""]), digits = 2)
+    } else {
+      cat("<no varying-coefficients>\n")
+    }
   }
   
   ## return model
@@ -187,13 +191,11 @@ tvcm_fit_sctest <- function(model, nodes, partvar, control, call) {
   
   
   ## prepare list with arguments for 'sctest'
+  dim <- c(nlevels(Node), ncol(partvar), control$ninpute)
   dn <- list(paste("Node", levels(Node), sep = ""), colnames(partvar))
-  rval <- list(statistic = matrix(, nlevels(Node), ncol(partvar),
-                 dimnames = dn),
-               p.value = matrix(, nlevels(Node), ncol(partvar),
-                 dimnames = dn),
+  rval <- list(p.value = array(, dim = dim, dimnames = dn),
                method = "M-fluctuation test")
-
+  
   ## get depths of nodes for the check
   depth <- unlist(nodeapply(nodes, nodeids(nodes, terminal = TRUE),
                             function(node) info_node(node)$depth))
@@ -202,7 +204,7 @@ tvcm_fit_sctest <- function(model, nodes, partvar, control, call) {
   eCall <- call(ifelse(inherits(model, "olmm"),"estfun.olmm", "estfun"))
   eCall$x <- quote(model)
   for (arg in names(control$estfun)) eCall[[arg]] <- control$estfun[[arg]]
-  scores <- eval(eCall)
+  scores <- replicate(control$ninpute, eval(eCall))
   
   ## hack^1: if intercept = "ge" fit a second model with the second level of
   ## 'Node' as reference level
@@ -230,7 +232,7 @@ tvcm_fit_sctest <- function(model, nodes, partvar, control, call) {
                           parm = control$parm)  
 
   gCall <- call(name = "tvcm_fit_gefp", object = quote(model),
-                scores = quote(scores), center = TRUE, silent = TRUE)
+                scores = quote(scores[,,k]), center = TRUE, silent = TRUE)
   
   ## apply test for each variable and partition separately  
   for (i in 1:ncol(partvar)) {    
@@ -265,35 +267,36 @@ tvcm_fit_sctest <- function(model, nodes, partvar, control, call) {
         gCall$order.by <- quote(z)
         gCall$parm <- quote(cols)
         gCall$subset <- quote(rows)
-        gefp <- try(eval(gCall), TRUE)
-                                    
-        if (!inherits(gefp, "try-error")) {
 
-          order.by <- z[rows]
-
-          if (is.character(functional)) {
-            functional <- tolower(functional)
-            fi <- switch(functional[i],
-                         "suplm" = supLM(from = control$trim),
-                         "lmuo" = catL2BB(gefp),
-                         stop("Unknown efp functional."))
-          } else {
-            fi <- functional[i]
-          }
-          test <- try(sctest(x = gefp, functional = fi), TRUE)
-      } else {
-          test <- gefp
-      }
-        
-        if (!inherits(test, "try-error")) {
+        for (k in 1:control$ninpute) {
           
-          ## extract information from test
-          rval$statistic[j, i] <- test$statistic
-          rval$p.value[j, i] <- test$p.value
+          gefp <- try(eval(gCall), TRUE)
+                                    
+          if (!inherits(gefp, "try-error")) {
+
+            if (is.character(functional)) {
+              functional <- tolower(functional)
+              fi <- switch(functional[i],
+                           "suplm" = supLM(from = control$trim),
+                           "lmuo" = catL2BB(gefp),
+                           stop("Unknown efp functional."))
+            } else {
+              fi <- functional[i]
+            }
+            test <- try(sctest(x = gefp, functional = fi), TRUE)
+          } else {
+            test <- gefp
+          }
+        
+          if (!inherits(test, "try-error")) 
+            rval$p.value[j, i, k] <- test$p.value
         }
       }
     }
   }
+
+  rval$p.value <- apply(rval$p.value, c(1L, 2L), mean, na.rm = TRUE)
+  rval$p.value[is.nan(rval$p.value)] <- NA
 
   if (control$verbose && all(depth) == control$maxdepth)
     cat("\n\nMaximal depth reached. Return object.")
@@ -647,7 +650,11 @@ tvcm_formula <- function(formList, family = cumulative(),
     if (is.null(x$fe) & is.null(x$vc)) {
       x$fe$intercept <- "ce"
     } else if (is.null(x$fe)) {
-      x$fe$intercept <- x$vc$intercept
+       if (root && x$vc$intercept == "ge") {
+        x$fe$intercept <- "ce"
+      } else {
+        x$fe$intercept <- x$vc$intercept
+      }    
     } else if (is.null(x$vc)) {
       x$vc$intercept <- "none"
     } 
@@ -763,6 +770,11 @@ tvcm_update_control <- function(control, model, formList) {
       control$parm <- c("(Intercept)", control$parm)
     }
   }
+
+  ## set 'ninpute' slot
+  if (!inherits(model, "olmm") | inherits(model, "olmm") &&
+      length(unique(table(slot(model, "subject")))) == 1L)
+    control$ninpute <- 1L
 
   ## set 'nuisance' slot for estfun
   control$estfun$nuisance <- setdiff(names(coef(model)), control$parm)
@@ -1230,8 +1242,6 @@ tvcm_update_splitpath <- function(splitpath, nodes, partvar, control) {
     splitpath[[step]]$ids <- kidids
     if (control$method == "mob") {
       if (!is.null(splitpath[[step]]$sctest)) {
-        rownames(splitpath[[step]]$sctest$statistic) <-
-          paste("Node", kidids, sep = "")
         rownames(splitpath[[step]]$sctest$p.value) <-
           paste("Node", kidids, sep = "")
       }
