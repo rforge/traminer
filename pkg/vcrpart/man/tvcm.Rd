@@ -162,7 +162,7 @@ tvcglm(formula, data, family,
 \examples{
 
 ## ------------------------------------------------------------------- # 
-## Example 1: Moderated treatment effect
+## Example: Moderated treatment effect
 ##
 ## Fitting a varying coefficient olmm on the synthetic ordinal 
 ## longitudinal data 'vcrpart_1'. 'z1', 'z2', 'z3' and 'z4' are the 
@@ -174,36 +174,10 @@ tvcglm(formula, data, family,
 data(vcrpart_1)
 
 ## fit the model
-model.1 <- tvcolmm(y ~ fe(wave) + vc(z1, z2, z3, z4, by = treat) + re(1|id),
-                  data = vcrpart_1, control = tvcm_control(verbose = TRUE))
+model <- tvcolmm(y ~ fe(wave) + vc(z1, z2, z3, z4, by = treat) + re(1|id),
+                 data = vcrpart_1, control = tvcm_control(verbose = TRUE))
 
-plot(model.1)
-
-## ------------------------------------------------------------------- # 
-## Example 2: Schizophrenia
-##
-## The algorithm is used to find out whether 'week' influences the
-## coefficient of 'tx' (treatment) and if 'week' has a direct impact on the
-## responses.
-## ------------------------------------------------------------------- #
-
-data(schizo)
-
-subs <- schizo$week == 0 | schizo$week == 1 | schizo$week == 3
-schizo <- schizo[subs,]
-schizo$id <- droplevels(schizo$id)
-
-subs <- (table(schizo$id) == 3)[schizo$id]
-schizo <- schizo[subs,]
-schizo$id <- droplevels(schizo$id)
-
-model.2 <- tvcolmm(imps79o ~ vc(week, by = tx, intercept = "ce") + re(1|id),
-                   data = schizo, control = tvcm_control(verbose = TRUE))
-
-
-plot(model.2, "coef",
-     terms = list(paste("Eta", 1:3, ":(Intercept)", sep = ""), "tx"), 
-     exp = list(FALSE, TRUE), tnex = 2)
+plot(model)
 }
 
 \author{Reto Buergin}
