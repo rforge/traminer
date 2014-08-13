@@ -187,6 +187,7 @@ plot.clustrange <- function(x, stat="noCH", legendpos="bottomright", norm="none"
 			stop(" [!] You should specify at least one color per quality measure to plot.")
 		}
 		cols <- col
+		names(cols) <- colnames(stats)
 	}
 	plot.ci <-  ci.method!="none" && !is.null(x$boot)
 	if(plot.ci) {
