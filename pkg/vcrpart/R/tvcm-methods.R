@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-02
+##' Date:            2014-09-05
 ##'
 ##' Description:
 ##' S3 methods for tvcm objects
@@ -331,9 +331,19 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = 2.0,
                        alpha = NULL, maxstep = NULL, terminal = NULL,
                        papply = mclapply, keeploss = FALSE, ...) {
 
+  mc <- match.call()
+  
   ## checking arguments
   direction <- match.arg(direction)
   stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
+  stopifnot(is.character(papply) | is.function(papply))
+  if (is.function(papply)) {
+    if ("papply" %in% names(mc)) {
+      papply <- deparse(mc$papply)
+    } else {
+      papply <- deparse(formals(fvcm_control)$papply)
+    }
+  }
   papplyArgs <- list(...)[names(list(...)) %in% names(formals(papply))]
   stopifnot((is.logical(keeploss) | is.numeric(keeploss)) &&
             length(keeploss) == 1L)

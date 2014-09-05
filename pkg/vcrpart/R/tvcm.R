@@ -12,6 +12,8 @@
 ##' tvcm_control control function for 'tvcm'
 ##'
 ##' Last modifications:
+##' 2014-09-04: - assign only those arguments of '...' to 'fit'
+##'               that appear in 'formals(fit)'
 ##' 2014-08-02: - the 'formula' slot is now a list of formulas as
 ##'               produced by 'vcrpart_formula'. The modification
 ##'               was due to acceleration techniques ('vcrpart_formula'
@@ -129,6 +131,7 @@ tvcm <- function(formula, data, fit, family,
                start = quote(start))
   mce <- match.call(expand.dots = TRUE)
   dotargs <- setdiff(names(mce), names(mc))
+  dotargs <- intersect(dotargs, names(formals(fit)))
   for (arg in dotargs) call[[arg]] <- mce[[arg]]
   environment(call) <- environment()
   

@@ -75,7 +75,8 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
     when no new split would improve the model.}
   \item{papply}{(parallel) apply function, defaults to
     \code{\link[parallel]{mclapply}}. To run \code{cvloss} sequentially
-    (i.e. not in parallel), use \code{\link{lapply}}.}
+    (i.e. not in parallel), use \code{\link{lapply}}. Special arguments
+    for that apply function can be assigned as well.}
   \item{newdata}{a data.frame of out-of-bag data (including the response
     variable). See also \code{\link{predict.tvcm}}.}
   \item{verbose}{logical scalar. If \code{TRUE} verbose output is

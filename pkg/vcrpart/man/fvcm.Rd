@@ -14,15 +14,19 @@
 
 \usage{
 
-fvcm(..., folds = folds_control("subsampling", 5), control = fvcm_control())
+fvcm(..., folds = folds_control("subsampling", 5),
+     control = fvcm_control())
 
-fvcolmm(..., family = cumulative(), folds = folds_control("subsampling", 5),
+fvcolmm(..., family = cumulative(),
+        folds = folds_control("subsampling", 5),
         control = fvcm_control())
 
-fvcglm(..., family, folds = folds_control("subsampling", 5), control = fvcm_control())
+fvcglm(..., family,
+       folds = folds_control("subsampling", 5),
+       control = fvcm_control())
 
 fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
-             ntry = 1, vtry = 5L, ...)
+             ntry = 1, vtry = 5L, papply = mclapply, ...)
 }
 
 \arguments{
@@ -59,7 +63,12 @@ fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
     variables of each component randomly sampled as candidates at each
     step. If \code{0 < vtry < 1}, \code{ntry} is interpreted as the
     relative number of variables to select relative to the total number
-    of variables for the corresponding component.} 
+    of variables for the corresponding component.}
+  \item{papply}{(parallel) apply function, defaults to
+    \code{\link[parallel]{mclapply}}. To run \code{cvloss} sequentially
+    (i.e. not in parallel), use \code{\link{lapply}}. Special arguments 
+    for that apply function can be assigned as well to
+    \code{\link{fvcm_control}}.} 
 }
 
 \details{
@@ -119,13 +128,15 @@ fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
 data(vcrpart_2)
 
 ## set parameters
-control <- fvcm_control(sctest = TRUE, vtry = 1, minsize = 25, verbose = TRUE)
+control <- fvcm_control(sctest = TRUE, vtry = 1, minsize = 25, verbose=TRUE)
 
 ## fit the forest
 model <- fvcm(y ~ -1 + vc(z1, z2, by = x1, intercept = TRUE) + x2,
               data = vcrpart_2, family = gaussian(), 
               folds = folds_control("subsampling", 3, 0.75), control = control)
 model
+
+
 }
 
 \keyword{models}

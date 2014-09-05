@@ -184,14 +184,21 @@ cvloss.tvcm <- function(object, folds = folds_control(),
                         fun = NULL, dfpar = 2, direction = c("backward", "forward"),
                         papply = mclapply, verbose = FALSE, ...) {
 
-  
+  mc <- match.call()
   stopifnot(inherits(folds, "folds"))
   stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
   type <- list(...)$type
   direction <- match.arg(direction)
   if (is.null(type)) type <- "loss"
   folds <- tvcm_folds(object, folds)
-  
+  stopifnot(is.character(papply) | is.function(papply))
+  if (is.function(papply)) {
+    if ("papply" %in% names(mc)) {
+      papply <- deparse(mc$papply)
+    } else {
+      papply <- deparse(formals(fvcm_control)$papply)
+    }
+  }
   papplyArgs <- list(...)[names(list(...)) %in% names(formals(papply))]
   keeploss <- list(...)$keeploss
   if (is.null(keeploss)) keeploss <- formals(prune.tvcm)$keeploss
@@ -236,8 +243,8 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     cv <- vector(mode = "list", length = 2)
     
     if (verbose) {
-      if (!identical(papply, mclapply) && i > 1L) cat("\n")
-      if (identical(papply, mclapply)) cat("[", i, "]") else cat("* fold", i, "...")
+      if (papply == "lapply" && i > 1L) cat("\n")
+      if (papply != "lapply") cat("[", i, "]") else cat("* fold", i, "...")
     }
     
     ## extract subset
@@ -269,7 +276,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
         
         while (run > 0L) {
           ibTree <- try(prune(ibTree, dfsplit, dfpar, direction,
-                              papply = lapply, keeploss = keeploss), TRUE)
+                              papply = "lapply", keeploss = keeploss), TRUE)
           if (!inherits(ibTree, "try-error")) {
             ## save the out-of-bag loss and the current tuning parameter
             oobLoss <- oobloss(ibTree, newdata = data[oobSubs,,drop = FALSE],
@@ -292,7 +299,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
         }
   
       } else if (type == "forest") {        
-        if (verbose && !identical(papply, mclapply)) cat("...")
+        if (verbose && papply == "lapply") cat("...")
         ibTreePr <- ibTree
         cv[[1]] <- ibTree$info$node
         cv[[2]] <- coef(extract(ibTree, "model"))
@@ -304,7 +311,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
 
     }
     if (verbose) {
-      if (identical(papply, mclapply)) {
+      if (papply != "lapply") {
         if (is.null(cv)) cat("failed")
       } else {
         if (is.null(cv)) cat("failed") else cat(" OK")

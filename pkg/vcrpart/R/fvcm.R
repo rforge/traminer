@@ -71,9 +71,12 @@ fvcm <- function(..., folds = folds_control("subsampling", 5),
   args$object <- object
   args$folds <- folds
   args$type <- "forest"
-  args$fixed <- TRUE
   args$verbose <- verbose
-  
+  args$papply <- control$papply
+  papplyArgs <- intersect(names(formals(args$papply)), names(control))
+  papplyArgs <- setdiff(papplyArgs, names(args))
+  args[papplyArgs] <- control[papplyArgs]
+    
   cv <- do.call("cvloss", args = args)
   fails <- cv$error$which  
   
@@ -96,10 +99,21 @@ fvcm <- function(..., folds = folds_control("subsampling", 5),
 }
 
 fvcm_control <- function(alpha = 1.0, maxstep = 10L,
-                         minsize = NULL, ptry = 1, ntry = 1, vtry = 5L, ...)
+                         minsize = NULL, ptry = 1, ntry = 1, vtry = 5L,
+                         papply = mclapply, ...) {
+  mc <- match.call()
+  stopifnot(is.character(papply) | is.function(papply))
+  if (is.function(papply)) {
+    if ("papply" %in% names(mc)) {
+      papply <- deparse(mc$papply)
+    } else {
+      papply <- deparse(formals(fvcm_control)$papply)
+    }
+  }
   return(tvcm_control(alpha = alpha, maxstep = maxstep,
                       minsize = minsize, ptry = ptry, ntry = ntry,
-                      vtry = vtry, ...))
+                      vtry = vtry, papply = papply, ...))
+}
 
 fitted.fvcm <- function(object, ...) predict(object, ...)
 
