@@ -1,6 +1,6 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2014-05-03
+## Date:            2014-06-17
 ##
 ## Description:
 ## Utility functions for the olmm function (see olmm.R). Some
@@ -19,7 +19,6 @@
 ## olmm_optim_setup:     set up algorithm function
 ## olmm_optim_warnings:
 ## olmm_coefShortLabs:   short labels for coefficient names
-## olmm_formula:         extract model matrix formula from input formula
 ## olmm_check_mm:        check and modify model matrix
 ## olmm_start:           set initial values
 ## olmm_mergeMm:         merge the predictor-variable and predictor-invariant
@@ -76,15 +75,15 @@ olmm_expandQP <- function(x, q) {
 
 olmm_fn <- function(par, restricted) {
   if (!exists("object")) object <- new(Class = "olmm")
-  parNew <- slot(object, "coefficients")
+  parNew <- object$coefficients
   parNew[!restricted] <- par[!restricted]
   .Call("olmm_update_marg", object, as.numeric(parNew), PACKAGE = "vcrpart")
-  return(-slot(object, "logLik"))
+  return(-object$logLik)
 }
 
 olmm_gr <- function(par, restricted) {
-  if (!exists("object")) object <- new(Class = "olmm")
-  scoreNew <- slot(object, "score")
+  if (!exists("object")) object <- structure(list(), class = "olmm")
+  scoreNew <- object$score
   scoreNew[restricted] <- c(0.0)
   return(-scoreNew)
 }
@@ -146,11 +145,13 @@ olmm_optim_warnings <- function(output, FUN) {
 
         switch(as.character(output$convergence),
                "2" =
-               if (output$info["maxgradient"] > 1e-3) warning("Stopped by small step (xtol)."),
+               if (output$info["maxgradient"] > 1e-3)
+               warning("Stopped by small step (xtol)."),
                "3" = 
                warning("Stopped by function evaluation limit (maxeval)."),
                "4" =
-               if (output$info["maxgradient"] > 1e-3) warning("Stopped by zero step from line search."),
+               if (output$info["maxgradient"] > 1e-3)
+               warning("Stopped by zero step from line search."),
                "-2" =
                warning("Computation did not start: length(par) = 0."),
                "-4" =
@@ -186,7 +187,7 @@ olmm_coefShortLabs <- function(object) {
   abbGe <- abbreviate(abbGe)
 
   ## abbreviations for Choleski factors
-  q <- slot(object, "dims")["q"]
+  q <- object$dims["q"]
   abbReCF <- paste("reCF", 1:(q * (q + 1L) / 2L), sep = "")
   
   return(c(abbCe, abbGe, abbReCF))
@@ -522,7 +523,11 @@ olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
     if (is.character(x)) {
       x <- rename(x)
     } else if (is.matrix(x)) {
-      if (!is.null(rownames(x))) rownames(x) <- rename(rownames(x))
+      if (!is.null(rownames(x))) {
+        rownames(x) <- rename(rownames(x))
+      } else {
+        if (nrow(x) > 0L) rownames(x) <- rep("", nrow(x))
+      }
       if (!is.null(colnames(x))) colnames(x) <- rename(colnames(x))
     } else if (is.numeric(x)) {
       if (!is.null(names(x))) names(x) <- rename(names(x))

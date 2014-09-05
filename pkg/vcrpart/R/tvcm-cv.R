@@ -1,136 +1,52 @@
 ## --------------------------------------------------------- #
-## Author:          Reto Buergin
-## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-05-02
-##
-## Description:
-## Cross-validation, stability paths and random forests for
-## 'tvcm' objects.
-##
-## Contents:
-## AIC.tvcm:
-## print.AIC.tvcm:
-## BIC.tvcm
-## oobrisk.tvcm
-## cvfolds:             create cross-validation folds
-## cvrisk.tvcmm:        cross-validation for 'tvcm' objects
-## print.cvrisk.tvcm:   print for 'cv.tvcm' objects
-## plot.cvrisk.tvcm:    plot fot 'cv.tvcm' objects
-## stabpath.tvcm:       stability selection for 'tvcm' objects
-## print.stabpath.tvcm: print for 'stabpath.tvcm' objects
-## plot.stabpath.tvcm:  plot for 'stabpath.tvcm' objects
-##
-## Last modifications:
-##
-## To do:
+##' Author:          Reto Buergin
+##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' Date:            2014-09-02
+##'
+##' Description:
+##' Function for model selection and assessment for 'tvcm' objects.
+##'
+##' Contents:
+##' oobloss.tvcm:        computes the out.of-bag loss
+##' folds:               parameters for cross-validation folds
+##' tvcm_folds:          create cross-validation folds
+##' cvloss.tvcm:         cross-validation for 'tvcm' objects
+##' print.cvloss.tvcm:   print for 'cv.tvcm' objects
+##' plot.cvloss.tvcm:    plot fot 'cv.tvcm' objects
+##'
+##' Last modifications:
+##' 2014-09-02: - modifications on 'tvcm_get_node'. The former
+##'               implementation was a time-killer an therefore
+##'               there is a new argument 'formList' and a
+##'               auxiliary function 'tvcm_get_fitted' was added
+##' 2014-08-30: - deleted 'nsplit' extension of in 'cvloss'. Reason:
+##'               cross-validation for number of split would
+##'               require a different pruning procedure
+##'             - small justifications for the plot
+##' 2014-08-06: - substituted 'cvfolds' by 'folds', which defines
+##'               a list of parameters for the new function
+##'               'tvcm_folds' that creates the cross-validation
+##'               matrix
+##'               matrix
+##' 2014-07-29: - defined 'cvfolds' as method for 'tvcm' objects
+##'             - added new argument 'weights' to 'cvfolds' to
+##'               allow for models where the weights represent
+##'               counts
+##' 2014-07-22: - removed AIC and BIC methods since they do
+##'               not apply to the 'tvcm' framework
+##' 2014-07-17: - change the column names of the cross-validation
+##'               output matrix
+##'             - improve the desciption
+##' 2014-07-08: - remove the 'sub' argument of AIC.tvcm, BIC.tvcm
+##'             - remove additional methods for AIC.tvcm and BIC.tvcm
+##'             - remove stabsel.tvcm and and corresponding methods
+##'             - cvloss: set 'cp' as the only tuning parameter
+##'             - cvloss: add 'direction' as new parameter 
 ## --------------------------------------------------------- #
 
-AIC.tvcm <- function(object, sub = FALSE, alpha = NULL, maxwidth = NULL,
-                        k = 2,  verbose = FALSE, ...) { 
 
-  criterion <- list(...)$criterion
-  if (is.null(criterion)) criterion <- "AIC"
-  
-  if (!sub) return(AIC(extract(object, "model"), k = k))
-  
-  control <- object$info$control
-  control$verbose <- FALSE
-  data <- model.frame(object)
-  n <- nrow(data)
-  partvar <- colnames(object$data)
-  curDf <- attr(logLik(object), "df")
-  if (!is.null(alpha)) control$alpha <- alpha
-  if (!is.null(maxwidth)) control$maxwidth <- maxwidth
-  
-  ## refit the model if necessary
-  if (any(c(control$alpha != object$info$control$alpha,
-            control$maxwidth != object$info$control$maxwidth))) {
-    
-    ## prepare formulas and calls
-    args <- list()
-    args$formula <- formula(object, "original")
-    args$control <- control
-    args$fit <- object$info$fit
-    args$family <- object$info$family
-    args <- append(args, object$info$dotargs)
-    args$data <- data
-    args$weights <- weights(object)
-    if (verbose) cat("* refitting the model ...")
-    object <- try(do.call("tvcm", args), silent = TRUE)
-    if (class(object)[1] == "try-error") stop("refitting failed.")
-    if (verbose) cat("OK\n")
-  }
-  
-  ## get steps to evaluate
-  nstep <- object$info$nstep
-  alpha <- width <- NULL
-
-  splitpath <- object$info$splitpath
-  steps <- rev(unlist(lapply(splitpath, function(x) x$step)))
-  
-  if (control$method == "mob") {
-    alpha <- c(extract(object, "p.value", step = steps), 0.0)[-1L]
-    if (length(alpha) > 1)
-      for (i in 1:(length(alpha) - 1L))
-        if (any(alpha[(i + 1):length(alpha)] > alpha[i])) steps <- steps[-i]
-    alpha <- rev(alpha)[steps]
-  } else {
-    steps <- steps
-    width <- steps
-  }
-  
-  logLik <- unlist(lapply(splitpath[steps], function(x) x$logLik))
-  df <- unlist(lapply(splitpath[steps], function(x) attr(x$logLik, "df")))
-  
-  ## output
-  AICtab <- data.frame(Df = df, AIC = - 2 * logLik + k * df)
-  colnames(AICtab)[2L] <- criterion
-  if (control$method == "mob") {
-    maxpar <- control$alpha
-    parname <- "alpha"
-    rownames(AICtab) <- paste("alpha", format(alpha, digits = 2))
-  } else {
-    maxpar <- control$maxwidth
-    parname <- "maxwidth"
-    rownames(AICtab) <- paste("width", width)
-  }
-  if (any(subs <- AICtab$Df == curDf))
-    rownames(AICtab)[subs] <- paste(rownames(AICtab)[subs], "<current>")
-  if (verbose) {
-    cat("\n\n"); print(AICtab[order(AICtab[,criterion]),,drop=FALSE]);
-  }
-  par <- if (control$method == "mob") alpha else width
-  bestpar <- unlist(par[which.min(AICtab[,criterion])])
-  rval <- list(AICtab = AICtab,
-               call = deparseCall(getCall(object)),
-               criterion = criterion,
-               par = par,
-               bestpar = bestpar,
-               maxpar = maxpar,
-               parname = parname)
-  class(rval) <- "AIC.tvcm"
-  return(rval)
-}
-
-print.AIC.tvcm <- function(x, ...) {
-    cat("In-Sample", x$criterion, "\n\n")
-    cat("Call:", x$call, "\n\n")
-    print(x$AICtab[order(x$AICtab[,x$criterion]),,drop=FALSE], ...)
-    cat(paste("\nOptimal ",x$parname, ": ",
-              format(x$bestpar, digits = 2), "\n", sep = ""))
-    return(invisible(x))
-}
-
-BIC.tvcm <- function(object, ...) {
-    args <- list(...)
-    args$object <- object
-    args$k <- log(nobs(object))
-    args$criterion <- "BIC"
-    return(do.call("AIC.tvcm", args))
-}
-
-oobrisk.tvcm <- function(object, newdata = NULL, weights = NULL, 
-                            fun = NULL, ...) {
+oobloss.tvcm <- function(object, newdata = NULL, weights = NULL, 
+                         fun = NULL, ...) {
   
   if (is.null(fun)) {
     fun <- function(y, mu, wt)
@@ -141,109 +57,156 @@ oobrisk.tvcm <- function(object, newdata = NULL, weights = NULL,
   if (is.null(weights)) weights <- rep(1.0, nrow(newdata))
   yName <- all.vars(object$info$formula$original)[1]
   yMat <- model.matrix(formula(paste("~ -1 + ", yName)), data = newdata)
-  if (object$info$family$family == "binomial" && nrow(yMat) > 1L)
+  if (object$info$family$family == "binomial" && ncol(yMat) > 1L)
     yMat <- yMat[,2L,drop = FALSE]
-  mu <- predict(object, newdata, type = "response", ...)
+  mu <- suppressWarnings(predict(object, newdata, type = "response", ...))
   rval <- fun(yMat, mu, weights)
   
   return(rval)
 }
 
 
-cvfolds <- function(x, type = c("kfold", "subsampling", "bootstrap"),
-                    K = ifelse(type == "kfold", 10L, 50L),
-                    prob = 0.5) {
-  
-  ## check input
+folds_control<- function(type = c("kfold", "subsampling", "bootstrap"),
+                         K = ifelse(type == "kfold", 5, 30),
+                         prob = 0.5, weights = c("case", "freq"),
+                         seed = NULL) {
   if ("bootstrapping" %in% type) type <- "bootstrap"
   type <- match.arg(type)
-  
-  if (K < 0) stop("'K' must be a positive number.")
+  stopifnot(is.numeric(K) && length(K) == 1L)
+  if (round(K) < 1L) stop("'K' must be a positive number.")
+  if (type == "kfold" && K < 2L)
+    stop("'K' must be larger than 1 for 'type = 'kfold''")
   if (K != as.integer(round(K)))
     warning(paste("'K' has been set to ", K, ".", sep = ""))
   K <- as.integer(round(K))
+  stopifnot(is.numeric(prob))
   if (prob <= 0 | prob >= 1)
     stop("'prob' must be within the interval (0, 1).")
+  K <- round(K)
+  stopifnot(is.numeric(prob) && length(prob) == 1L)
+  weights <- match.arg(weights)
+  return(structure(list(type = type,
+                        K = K,
+                        prob = prob,
+                        weights = weights,
+                        seed = seed),
+                   class = "folds"))
+}
 
-  if (inherits(x, "tvcm")) {
-      subject <- vcrpart_slot(extract(x, "model"), "subject")
-      if (is.null(subject)) subject <- factor(1:nobs(x))
-  } else if (is.factor(x)) {
-      subject <- x
-  } else {
-      subject <- factor(1:nobs(x))
-  }
+
+## --------------------------------------------------------- #
+##' Creates a cross-validation matrix
+##'
+##' @param object  an object of class \code{tvcm}
+##' @param args    a list of arguments as produced by
+##'    \code{\link{folds}}.
+##'
+##' @return A matrix.
+## --------------------------------------------------------- #
+
+tvcm_folds <- function(object, control) {
+
+  stopifnot(inherits(control, "folds"))
   
-  subject <- droplevels(subject)
+  ## detach input
+  type <- control$type
+  K <- control$K
+  prob <- control$prob
+  weights <- control$weights
+  seed <- control$seed
+
+  subject <- extract(object, "model")$subject
+  if (!is.null(subject) && weights == "freq")
+    stop("option 'weights = 'freq'' is not available for 2-stage data")
+
+  freq <- switch(weights,
+                 case = rep(1, nobs(extract(object, "model"))),
+                 freq = weights(extract(object, "model")))
+  if (weights == "freq" && any(!freq == round(freq)))
+    stop("some of the weights are not integers.")
+
+  if (is.null(subject)) subject <- factor(rep(1:length(freq), freq))
   N <- nlevels(subject)
-  
-  getSample <- function(x, prob, replace) {
-      x <- factor(x)
-      xLevs <- levels(x)
-      nLevs <- nlevels(x)
-      rSample <- sample(x = xLevs,
-                        size = ceiling(prob * nLevs),
-                        replace = replace)
-    return(table(factor(rSample, levels = xLevs)))
+    
+  getSample <- function(subject, freq, prob, replace, weights) {
+    levs <- if (weights == "case") 1:nlevels(subject) else freq = 1:length(subject)
+    rSample <- sample(x = levs,
+                      size = ceiling(prob * length(levs)),
+                      replace = replace)
+    rSample <- table(factor(rSample, levels = levs))
+    if (weights == "case") rSample <- rSample[subject]
+    if (weights == "freq") rSample <- tapply(rSample, subject, sum)
+    return(rSample)
   }
-  
+
+  if (!exists(".Random.seed", envir = .GlobalEnv)) runif(1)
+  oldSeed <- get(".Random.seed", mode="numeric", envir=globalenv())
+  if (!is.null(seed)) set.seed(seed)
+  RNGstate <- .Random.seed
   
   if (type == "subsampling") {
     
-    selected <- replicate(K, getSample(subject, prob, FALSE))
-    folds <- 1L * selected[subject, , drop = FALSE]
-    dimnames(folds) <- NULL
+    folds <- replicate(K, getSample(subject, freq, prob, FALSE, weights))
     
   } else if (type == "kfold") {
     
     if (type == "kfold" & (K > length(subject)) || (K <= 1)) 
       stop("'K' outside allowable range")
-    
-    selected <- sample(levels(subject), N)
-    folds <- matrix(, length(subject), K)
+
+    levs <- if (weights == "case") 1:nlevels(subject) else 1:length(subject)
+    selected <- sample(levs, length(levs))
+    split <- c(0, quantile(levs, (1:(K - 1)) / K, type = 1L), max(levs))
+    folds <- matrix(, length(levs), K)
     for (i in 1:K) {
-      subs <- seq(ceiling(N / K) * (i - 1) + 1,
-                  min(ceiling(N / K) * i, N), 1)
-      folds[, i] <- 1.0 * (!subject %in% selected[subs])
+      subs <- levs > split[i] & levs <= split[i + 1L]
+      folds[, i] <- 1.0 * (!levs %in% selected[subs])
     }
+    if (weights == "case") folds <- folds[subject, ]
+    if (weights == "freq") folds <- apply(folds, 2, tapply, subject, sum)
     
   } else if (type == "bootstrap") {
     
-    selected <- replicate(K, getSample(levels(subject), 1, TRUE))
-    folds <- 1L * selected[subject, , drop = FALSE]
-    dimnames(folds) <- NULL
+    folds <- replicate(K, getSample(subject, freq, prob = 1, TRUE, weights))
   }
-  
+
+  colnames(folds) <- 1:K
+  rownames(folds) <- rownames(model.frame(extract(object, "model")))
+
+  assign(".Random.seed", oldSeed, envir=globalenv())
+  attr(folds, "type") <- type
+  attr(folds, "value") <- ifelse(weights == "freq", "weights", "freq")
+  attr(folds, "seed") <- RNGstate
   return(folds)
 }
 
-cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
-                           fun = NULL, alpha = NULL, maxwidth = NULL,
-                           verbose = FALSE, ...) {
+
+cvloss.tvcm <- function(object, folds = folds_control(),
+                        fun = NULL, dfpar = 2, direction = c("backward", "forward"),
+                        papply = mclapply, verbose = FALSE, ...) {
+
   
+  stopifnot(inherits(folds, "folds"))
+  stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
   type <- list(...)$type
-  if (is.null(type)) type <- "risk"
+  direction <- match.arg(direction)
+  if (is.null(type)) type <- "loss"
+  folds <- tvcm_folds(object, folds)
   
-  fixed <- list(...)$fixed
-  if (is.null(fixed)) fixed <- FALSE
+  papplyArgs <- list(...)[names(list(...)) %in% names(formals(papply))]
+  keeploss <- list(...)$keeploss
+  if (is.null(keeploss)) keeploss <- formals(prune.tvcm)$keeploss
   
   control <- object$info$control
   control$verbose <- FALSE
-
-  if (is.null(alpha)) alpha <- control$alpha
-  if (is.null(maxwidth)) maxwidth <- control$maxwidth
-  if (type %in% c("risk", "stabpath")) control$alpha <- alpha
-
-  control$alpha <- alpha
-  control$maxwidth <- maxwidth
-  control$maxstep <- maxwidth - 1L
-  
+  control$center <- FALSE
+      
   ## get data of 'object'
   data <- model.frame(object)
+  
   weights <- weights(object)
   partvar <- colnames(object$data)
   modelvar <- colnames(model.frame(extract(object, "model")))
-  subjectName <- vcrpart_slot(extract(object, "model"), "subjectName")
+  subjectName <- extract(object, "model")$subjectName
   
   ## check folds
   if (!is.matrix(folds) | (is.matrix(folds) && nrow(folds) != nrow(data)))
@@ -258,184 +221,183 @@ cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
   }
   
   ## prepare formulas and calls
-  ibArgs <- list()
-  ibArgs$formula <- formula(object, "original")
-  ibArgs$fit <- object$info$fit
-  ibArgs$family <- object$info$family
-  ibArgs$control <- control
-  ibArgs <- append(ibArgs, object$info$dotargs)
-
-  ## number of rows of output matrices
-  nr <- switch(type,
-               risk = 1,
-               stabpath = length(partvar),
-               forest = 1)
-  
-  cv <- vector(mode = "list", length = K)
-  
+  ibCall <- call(name = "tvcm",
+                 formula = quote(object$info$formula$original),
+                 data = quote(ibData),
+                 fit = quote(object$info$fit),
+                 family = quote(object$info$family),
+                 control = quote(control))
+  for (arg in names(object$info$dotargs)) ibCall[[arg]] <- object$info$dotargs[[arg]]
+    
   ## process cross-validation
-  nfails <- 0L
-  for (i in 1:K) {
 
+  cvFun <- function(i) {
+
+    cv <- vector(mode = "list", length = 2)
+    
     if (verbose) {
-      if (i > 1L) cat("\n")
-      cat("* evaluating fold", i, "")
+      if (!identical(papply, mclapply) && i > 1L) cat("\n")
+      if (identical(papply, mclapply)) cat("[", i, "]") else cat("* fold", i, "...")
     }
     
+    ## extract subset
+    if (attr(folds, "value") == "weights") {
+      ibSubs <- folds[, i] > 0.0
+      ibData <- data[ibSubs,, drop = FALSE]
+      ibCall$weights <- folds[ibSubs, i]
+      oobSubs <- rep(TRUE, nrow(folds))
+      oobWeights <- weights - folds[, i]
+    } else {
+      ibSubs <- folds[, i]
+      ibSubs <- rep(1:length(ibSubs), ibSubs) # rep. bootstrap replications
+      ibData <- data[ibSubs, , drop = FALSE] # learning data
+      if (!is.null(subjectName))
+        ibData[, subjectName] <- factor(paste(ibData[, subjectName], unlist(lapply(folds[, i], function(x) if (x > 0) 1:x)), sep = ".")) # treat replicated subjects as distinct
+      ibCall$weights <- weights[ibSubs]
+      oobSubs <- folds[, i] <= 0
+      oobWeights <- weights[oobSubs]
+    }
+
     ## re-fit the tree with training sample (in-bag)
-    ibSubs <- folds[, i]
-    ibSubs <- rep(1:length(ibSubs), ibSubs) # rep. bootstrap replications
-    ibArgs$data <- data[ibSubs, , drop = FALSE] # learning data
-    if (!is.null(subjectName))
-      ibArgs$data[, subjectName] <- factor(paste(ibArgs$data[, subjectName], unlist(lapply(folds[, i], function(x) if (x > 0) 1:x)), sep = ".")) # treat replicated subjects as distinct
-    ibArgs$weights <- weights[ibSubs]        
-    ibTree <- try(do.call("tvcm", ibArgs), silent = TRUE)
+    ibTree <- try(eval(ibCall), silent = TRUE)
+    dfsplit <- switch(direction, backward = 0.0, forward = 0.0)
     
-    ## prepare call for model with test sample (out-of-bag)
-    oobSubs <- folds[, i] <= 0
-    
-    ## get sequence of alpha values
     if (!inherits(ibTree, "try-error")) {
       
-      if (type %in% c("risk", "stabpath")) {
-
-        if (fixed) {
-          steps <- 1
-          alphaseq <- alpha
-        } else {
-          alphaseq <- width <- NULL
-          steps <- rev(unlist(lapply(splitpath(ibTree), function(x) x$step)))          
-          if (control$method == "mob") {
-            alphaseq <- c(extract(ibTree, "p.value", step = steps), 0.0)[-1L]
-            if (length(alphaseq) > 1)
-              for (j in 1:(length(alphaseq) - 1L))
-                if (any(alphaseq[(j + 1):length(alphaseq)] > alphaseq[j]))
-                  steps <- steps[-j]
-            alphaseq <- rev(alphaseq)[steps]
-          } else {
-            steps <- c(steps, 0)
-            width <- steps + 1L
-          }
-        }
-        cv[[i]] <- vector(mode = "list", length = 2)   
-        cv[[i]][[1]] <- if (control$method == "mob") alphaseq else width
-        cv[[i]][[2]] <- matrix(, nr, length(cv[[i]][[1]]))
-
-        if (length(steps) > 0L) {
-          for (j in 1:length(steps)) {
-            
-            ibTreePr <- if (!fixed) try(prune(ibTree, maxstep = steps[j])) else ibTree
-            
-            if (inherits(ibTreePr, "try-error")) {
-              
-              nfails <- nfails + 1L
-              cv[[i]] <- vector(mode = "list", length = 2L)
-              warning("computations for fold ", i, " failed. Omit.")
-              break;
-              
-            } else if (type %in% c("risk")) {        
-              
-              cv[[i]][[2]][, j] <-
-                oobrisk(ibTreePr, newdata = data[oobSubs, ,drop = FALSE],
-                        weights = weights[oobSubs], fun = fun)        
-              
-            } else if (type == "stabpath") {
-              
-              ## get selected variables in current tree
-              cv[[i]][[2]][, j] <-
-                as.integer(partvar %in% extract(ibTreePr, "selected"))
-            }
-            
-            if (verbose) cat(".")
-            
-          }
-        }
-      } else if (type == "forest") {
+      if (type == "loss") {
+        run <- 1L
         
-        if (verbose) cat("...")
+        while (run > 0L) {
+          ibTree <- try(prune(ibTree, dfsplit, dfpar, direction,
+                              papply = lapply, keeploss = keeploss), TRUE)
+          if (!inherits(ibTree, "try-error")) {
+            ## save the out-of-bag loss and the current tuning parameter
+            oobLoss <- oobloss(ibTree, newdata = data[oobSubs,,drop = FALSE],
+                               weights = oobWeights, fun = fun)
+            cv[[1L]] <-
+              cbind(cv[[1L]], c(dfsplit))
+            cv[[2L]] <-
+              cbind(cv[[2L]], c(control$lossfun(ibTree), oobLoss))
+
+            ## set a new and stronger tuning parameter
+            tab <- ibTree$info$prunepath[[length(ibTree$info$prunepath)]]$tab
+            if (nrow(tab) > 1L) dfsplit <- min(tab$dfsplit[-1L])
+            if (nrow(tab) == 1L) run <- 0L
+            
+          } else {
+            cv <- NULL
+            run <- 0L
+
+          }
+        }
+  
+      } else if (type == "forest") {        
+        if (verbose && !identical(papply, mclapply)) cat("...")
         ibTreePr <- ibTree
-        cv[[i]] <- vector(mode = "list", length = 2)
-        cv[[i]][[1]] <- ibTree$node
-        cv[[i]][[2]] <- coef(extract(ibTree, "model"))        
+        cv[[1]] <- ibTree$info$node
+        cv[[2]] <- coef(extract(ibTree, "model"))
+        
+      }
+
+    } else {
+      cv <- NULL
+
+    }
+    if (verbose) {
+      if (identical(papply, mclapply)) {
+        if (is.null(cv)) cat("failed")
+      } else {
+        if (is.null(cv)) cat("failed") else cat(" OK")
       }
     }
-    
-    if (verbose)
-      if (inherits(ibTreePr, "try-error")) cat("failed") else cat(" OK")
+    ## return output
+    return(cv)
   }
-  if (type %in% c("risk", "stabpath")) {
+
+  cv <- do.call(papply, append(list(X = 1:ncol(folds), FUN = cvFun), papplyArgs))
+  
+  if (type %in% c("loss")) {
     
     ## delete fails
-    cv <- cv[!sapply(cv, function(x) sum(sapply(x, length)) == 0)]
-    if (length(cv) < 1L) stop("no valid results.")
+    fails <- sapply(cv, function(x) sum(sapply(x, length)) == 0)
+    if (all(fails)) stop("no valid results.")
+    cv <- cv[!fails]
     
-    ## function that evaluates the risk at each alpha of 'grid'
-    getVals <- function(x, grid) {
-      rval <- matrix(0, nrow(x[[2]]), length(grid))
-      for (i in 1:length(grid)) {
-        subs <- which(x[[1L]] <= grid[i])
-        if (length(subs) > 1) subs <- which(x[[1L]] == max(x[[1L]][subs]))
-        if (length(subs) > 0) rval[, i] <- x[[2L]][,subs]
+    if (type == "loss") {
+
+      ## function that evaluates the loss at each alpha of 'grid'
+      getVals <- function(x, grid, rowsG = 1L, rowsL = 1L) {
+        rval <- matrix(NA, length(row), length(grid))
+        for (i in 1:length(grid)) {
+          cols <- which(x[[1L]][rowsG,] <= grid[i])
+          if (length(cols) > 1)
+            cols <- which(x[[1L]][rowsG, ] == max(x[[1L]][rowsG, cols]))
+          if (length(cols) > 0)
+            rval[, i] <- x[[2L]][rowsL, cols]
+        }
+        return(rval)
       }
-      return(rval)
-    }
     
-    ## compute results
-    grid <- sort(unique(c(unlist(lapply(cv, function(x) x[[1]])))))      
-    rval <- list(par = grid)
-    
-    if (type == "risk") {
+      ## compute results
+      grid <- sort(unique(c(unlist(lapply(cv, function(x) x[[1]][1, ])))))
+      rval <- list(grid = grid)
       
-      ## make a matrix with the 'risk' for each fold
-      ## at each alpha in 'grid'
+      ## column names
+      if (length(grid) > 1L) {
+        cn <- c(paste("<=", round(grid[2L], 2)), paste(">", round(grid[-1L], 2)))
+      } else {
+        cn <- "0"
+      }
+     
+      ## make a matrix with the 'loss' for each fold
+      ## at each dfsplit in 'grid'
       
       cv <- lapply(cv, function(x) {
         x[[2]][is.nan(x[[2]]) | is.infinite(x[[2]])] <- NA;
         return(x)
       })
-      oobRisk <- t(sapply(cv, getVals, grid = grid))
-      if (length(grid) == 1) oobRisk <- t(oobRisk)
       
-      oobWeights <- matrix(rep(weights, ncol(folds)), ncol = ncol(folds))
-      oobWeights[folds > 0] <- 0
-      oobRisk <- oobRisk / colSums(oobWeights)
-      rownames(oobRisk) <- paste("fold", 1L:length(cv), sep = "")
-      colnames(oobRisk) <- 1:length(grid)
-      rval <- append(rval, list(risk = oobRisk))
-      meanRisk <- colMeans(rval$risk, na.rm = TRUE)
-      subs <- which(meanRisk == min(meanRisk))
-      if (length(subs) > 1L) subs <- max(subs)
-      rval$bestpar <- rval$par[subs]    
-      class(rval) <- "cvrisk.tvcm"
-      
-    } else if (type == "stabpath") {
-      
-      ## make a matrix with the probability of each variable
-      ## to be selected at each alpha in 'grid'
-      
-      tmp <- lapply(cv, getVals, grid = grid)
-      phat <- nValid <- matrix(0, ncol(object$data), length(grid))
-      for (i in 1:length(cv)) {
-        nValid <- nValid + 1 * !is.na(tmp[[i]])
-        tmp[[i]][is.na(tmp[[1]])] <- 0
-        phat <- phat + tmp[[i]]
+      ## ib-loss
+      ibLoss <- t(sapply(cv, getVals, grid = grid, rowsG = 1L, rowsL = 1L))
+      if (length(grid) == 1L) ibLoss <- t(ibLoss)
+     
+      if (attr(folds, "value") == "weights") {
+        ibWeights <- folds
+      } else {
+        ibWeights <- matrix(rep(weights, ncol(folds)), ncol = ncol(folds))
+        ibWeights[folds <= 0] <- 0
       }
-      phat <- phat / nValid
-      rownames(phat) <- colnames(object$data)
-      colnames(phat) <- 1:length(grid)
-      rval <- append(rval, list(phat = phat))
+      ibLoss <- ibLoss / colSums(ibWeights)[!fails]
+      rownames(ibLoss) <- paste("fold", 1L:length(cv))
+      colnames(ibLoss) <- cn
       
-      nselected <- rowMeans(sapply(tmp, function(x) colSums(x)))
-      rval <- append(rval, list(nselected = nselected))
+      ## oob-loss
+      oobLoss <- t(sapply(cv, getVals, grid = grid, rowsG = 1L, rowsL = 2L))
+      if (length(grid) == 1L) oobLoss <- t(oobLoss)
+       
+      oobWeights <- matrix(rep(weights, ncol(folds)), ncol = ncol(folds))
+      if (attr(folds, "value") == "weights") {
+        oobWeights <- oobWeights - folds
+      } else {
+        oobWeights[folds > 0] <- 0
+      }
+      oobLoss <- oobLoss / colSums(oobWeights)[!fails]
+      rownames(oobLoss) <- paste("fold", 1L:length(cv))
+      colnames(oobLoss) <- cn
+      
+      rval <- append(rval, list(ibloss = ibLoss, oobloss = oobLoss))
+      meanLoss <- colMeans(rval$oobloss, na.rm = TRUE)
+
+      ## dfsplit with minimal loss
+      minSubs <- which(meanLoss == min(meanLoss))
+      if (length(minSubs) > 1L) minSubs <- max(minSubs)
+      rval$dfsplit.hat <- max(0, mean(c(rval$grid, Inf)[minSubs:(minSubs + 1)]))
+
+      rval$folds <- folds
+      class(rval) <- "cvloss.tvcm"     
     }
-    
-    if (control$method == "mob") {
-      rval$maxpar <- alpha
-      rval$parname <- "alpha"
-    } else {
-      rval$maxpar <- maxwidth
-      rval$parname <- "maxwidth"
-    }   
+
+    rval$direction <- direction
     rval$call <- deparseCall(getCall(object))
     
   } else if (type == "forest") {
@@ -448,6 +410,7 @@ cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
     cv[rval$error$which] <- NULL
     rval$node <- lapply(cv, function(x) x[[1]])
     rval$coefficients <- lapply(cv, function(x) x[[2]])
+    rval$folds <- folds
   }
   
   if (verbose) cat("\n")
@@ -455,119 +418,73 @@ cvrisk.tvcm <- function(object, folds = cvfolds(object, "kfold", 10),
   return(rval)
 }
 
-print.cvrisk.tvcm <- function(x, ...) {
-  cat("Cross-validated observation-mean risk", "\n\n")
+
+print.cvloss.tvcm <- function(x, ...) {
+  cat(ifelse(x$direction == "backward", "Backwards", "Forward"),
+      "cross-validated average loss", "\n\n")
   cat("Call: ", x$call, "\n\n")
-  rval <- colMeans(x$risk)
-  names(rval) <- format(x$par, digits = 2)
+  rval <- colMeans(x$oobloss, na.rm = TRUE)
+  if (length(rval) > 10L)
+    rval <- rval[seq(1L, length(rval), length.out = 10)]
   print(rval)
-  cat(paste("\nOptimal ",x$parname, ": ", format(x$bestpar, digits = 2),
-            "\n", sep = ""))
+  cat("\n")
+  cat("dfsplit with minimal loss:", format(x$dfsplit.hat, digits = 3), "\n")
   return(invisible(x))
 }
 
-plot.cvrisk.tvcm <- function(x, ...) {
+
+plot.cvloss.tvcm <- function(x, legend = TRUE, details = TRUE, ...) {
   
+  xlab <- "dfsplit"
+  ylab <- "average loss(dfsplit)"
+  type <- "s"
+  lpos <- "topleft"
+  lsubs <- if (details) 1L:3L else 1L
+  if (x$dfsplit.hat < Inf) lsubs <- c(lsubs, 4L)
+  lcol <- c("black", "grey80", "black", "black")
+  llty <- c(1, 1, 3, 2)
+
   dotList <- list(...)
-  if (x$parname == "alpha") {
-      defArgs <- list(type = "S", xlab = expression(alpha),
-                      col = "grey", lty = 1,
-                      ylab = expression(paste("observation-mean risk(",
-                          alpha, ")", sep = "")))
-  } else {
-      defArgs <- list(type = "S", xlab = "maxwidth",
-                      col = "grey", lty = 1,
-                      ylab = "observation-mean risk(maxwidth)")
-  }
+  defArgs <- list(type = type, xlab = xlab, ylab = ylab,
+                  col = lcol[1], lty = llty[1])
+  
+  xx <- matrix(x$grid, length(x$grid), nrow(x$oobloss))  
+  xx <- rbind(xx, 1.1 * xx[nrow(xx),])
 
-  yy <- t(x$risk)
-  xx <- matrix(x$par, nrow(yy), ncol(yy))
-
-  ## delete zeros if 'log = "x"' is called
-  if ("log" %in% names(dotList) && dotList$log %in% c("x", "xy")) {
-    xx <- xx[-1, ]
-    yy <- yy[-1, ]
-  }   
-
+  yy2 <- t(cbind(x$oobloss, x$oobloss[,ncol(x$oobloss)]))
+  yy1 <- rowMeans(yy2, na.rm = TRUE)
+  yy3 <- rowMeans(t(cbind(x$ibloss, x$ibloss[,ncol(x$ibloss)])), na.rm = TRUE)
+  
+  defArgs$ylim <- range(if (details) c(yy2, yy3) else yy1, na.rm = TRUE)
+  
   ## set plot arguments
-  plotArgs <- appendDefArgs(list(x = xx, y = yy), list(...))
+  plotArgs <- appendDefArgs(list(x = xx[, 1], y = yy1), list(...))
   plotArgs <- appendDefArgs(plotArgs, defArgs)
-    
-  ## plot 
-  do.call("matplot", plotArgs)
-      
-  ## mean curve for 'type = "risk"'
-  meanRisk <- colMeans(x$risk, na.rm = TRUE)
-  points(x = x$par, meanRisk, type = "S")
-    
-  ## best alpha parameter
-  bestPar <- x$bestpar
-  bestRisk <- min(meanRisk)
-
-  segments(bestPar, par()$usr[3], bestPar, bestRisk, lty = 2)
-  axis(1, bestPar, format(bestPar, digits = 2),
-       line = 1, tick = FALSE)   
-}
-
-stabpath.tvcm <- function(object, q, alpha = NULL, maxwidth = NULL, ...) {
-
-  object$info$control$nselect <- q
-  object$info$control$alpha <- alpha
-  cv <- cvrisk(object, type = "stabpath", ...)
-  if (max(cv$nselected) < q)
-    warning(sQuote("alpha"), " too small, the average",
-            "number of selected partitioning variables is ",
-            max(cv$nselected))  
-  mm <- apply(cv$phat, 1L, max)
-  rval <- append(cv, list(max = mm, q = q, alpha = alpha,
-                          maxwidth = maxwidth))
-  class(rval) <- "stabpath.tvcm"
-  return(rval)
-}
-
-print.stabpath.tvcm <- function(x, ...) {
-
-  cat("Stability path\n\n")
-  cat("call:", x$call, "\n")
-  cat("q:", x$q, "\n")
-  cat("Selection probabilities:\n\n")
-  print(x$max)
-  return(invisible(x))
-}
-
-plot.stabpath.tvcm <- function(x, ...) {
-
-  dotList <- list(...)
+  llty[1L] <- plotArgs$lty
+  lcol[1L] <- plotArgs$col
   
-  col <- rep(rainbowPalette, length.out = length(x$max))
-  lty <- rep(1:4, length.out = length(x$max))
-
-  if (x$parname == "alpha") {
-      defArgs <- list(type = "S", xlab = expression(alpha),
-                      col = "grey", lty = 1,
-                      ylab = expression(paste("observation-mean risk(",
-                          alpha, ")", sep = "")))
-  } else {
-      defArgs <- list(type = "S", xlab = "maxwidth",
-                      col = "grey", lty = 1,
-                      ylab = "risk(maxwidth)")
+  ## plot mean validated prediction error
+  do.call("plot", plotArgs)
+  
+  ## plot details
+  if (details) {
+    matplot(x = xx, yy2, type = type, lty = llty[2L], col = lcol[2L], add = TRUE)
+    points(x = xx[,1], yy3, type = type, lty = llty[3L], col = lcol[3L])
   }
   
-  yy <- t(x[["phat"]])
-  xx <- matrix(x[["par"]], nrow(yy), ncol(yy))
+  if (legend) {
+    ltext <- c("average oob estimate",
+               "foldwise oob estimates",
+               "in-sample estimate",
+               "dfsplit with minimal oob-loss")
+    legend(lpos, ltext[lsubs], col = lcol[lsubs], lty = llty[lsubs])
+  }
   
-  ## delete zeros if 'log = "x"' is called
-  if ("log" %in% names(dotList) && dotList$log %in% c("x", "xy")) {
-    xx <- xx[-1, ]
-    yy <- yy[-1, ]
+  if (x$dfsplit.hat < Inf) {
+    subsMin <- max(which(x$grid <= x$dfsplit.hat))
+    minLoss <- colMeans(x$oobloss, na.rm = TRUE)[subsMin]
+    segments(x$dfsplit.hat, par()$usr[3], x$dfsplit.hat, minLoss, lty = 2)
+    axis(1, x$dfsplit.hat, format(x$dfsplit.hat, digits = 3),
+         line = 1, tick = FALSE)
   } 
-  
-  ## set plot arguments
-  plotArgs <- appendDefArgs(list(x = xx, y = yy), list(...))
-  plotArgs <- appendDefArgs(plotArgs, defArgs)
-  
-  ## plot 
-  do.call("matplot", plotArgs)
-  max <- apply(x[["phat"]], 1L, max)
-  axis(4, max, rownames(x[["phat"]]), las = 1)
 }

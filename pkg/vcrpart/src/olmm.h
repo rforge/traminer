@@ -1,5 +1,5 @@
-#ifndef OMOB_OLMM_H
-#define OMOB_OLMM_H
+#ifndef VCRPART_OLMM_H
+#define VCRPART_OLMM_H
 
 #include <R.h>
 #include <Rdefines.h>

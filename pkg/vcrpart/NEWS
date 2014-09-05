@@ -1,14 +1,23 @@
-		 CHANGES IN tbvc VERSION 0.1-12
+		 CHANGES IN tvcm VERSION 0.1-15
+
+GENERAL
+
+    o    complete revision of the syntax, argument names and 
+         default parameters. R codes of version 0.1-14 will likely 
+         not work anymore.
+    o    the default splitting criterion of 'tvcm' was changed from 
+         coefficient constancy tests combined with greedy loss 
+         minimization to exclusive greedy loss minimization. Splitting 
+         based on the former default require to set the argument 
+         'sctest' in 'tvcm_control'
 
 NEW FEATURES
-
-     o   changed several methods for 'olmm' class from S4 to S3 
      
-     o   modifications for gefp.olmm and estfun.olmm
+     o   'tvcm' and 'fvcm' allow for multiple 'vc' terms.
+     
 
 IMPROVEMENTS
 
-     o	 C implementation for updating the marginal Likelihood
-     	 and predicting random-effects was stabilized by 
-	 replacing many alloca's by the R built-in function
-	 Calloc, which may slow the estimation
+     o	 the greedy loss reduction minimization stage of 'tvcm' does now 
+         fixate coefficients which are not splitted at the estimates of 
+         the current model. The technique intends acceleration.

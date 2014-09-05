@@ -4,9 +4,6 @@
 #include <R_ext/Lapack.h>
 #include <R_ext/BLAS.h>
 
-extern
-#include "Syms.h"
-
 #ifdef __GNUC__
 # undef alloca
 # define alloca(x) __builtin_alloca((x))
@@ -25,57 +22,50 @@ extern
 
 /* positions in the dims vector */
 enum dimP {
-  n_POS = 0,      /* number of observations */
-    N_POS,        /* number of subject clusters */
-    p_POS,        /* number of fixed effects */ 
-    pEta_POS,     /* number of columns of X */
-    pInt_POS,     /* number of colums that takes the intercept in X */
-    pCe_POS,  /* number of predictor-variable fixef */
-    pGe_POS,  /* number of predictor-invariant fixef */
-    q_POS,        /* number of random coefficients */
-    qEta_POS,     /* number of columns of W */
-    qCe_POS,  /* number of predictor-variable ranef */
-    qGe_POS,  /* number of predictor-invariant ranef */
-    J_POS,        /* number of ordinal response levels */
-    nEta_POS,     /* number of predictors = J - 1 */
-    nPar_POS,     /* total number of parameters */
-    nGHQ_POS,     /* number of quadrature points per dimension */
-    nQP_POS,      /* number of quadrature points total */
-    fTyp_POS,     /* model family (1 = cumulative, 2 = ...) */
-    lTyp_POS,     /* link function (1 = logit, 2 = ...)*/
-    verb_POS,     /* verbose */
-    numGrad_POS,  /* whether scores are computed numerically */
-    numHess_POS   /* whether Hessian is computed numerically */
-    };
+  n_POS = 0,    /* number of observations */
+  N_POS,        /* number of subject clusters */
+  p_POS,        /* number of fixed effects */ 
+  pEta_POS,     /* number of columns of X */
+  pInt_POS,     /* number of colums that takes the intercept in X */
+  pCe_POS,      /* number of predictor-variable fixef */
+  pGe_POS,      /* number of predictor-invariant fixef */
+  q_POS,        /* number of random coefficients */
+  qEta_POS,     /* number of columns of W */
+  qCe_POS,      /* number of predictor-variable ranef */
+  qGe_POS,      /* number of predictor-invariant ranef */
+  J_POS,        /* number of ordinal response levels */
+  nEta_POS,     /* number of predictors = J - 1 */
+  nPar_POS,     /* total number of parameters */
+  nGHQ_POS,     /* number of quadrature points per dimension */
+  nQP_POS,      /* number of quadrature points total */
+  fTyp_POS,     /* model family (1 = cumulative, 2 = ...) */
+  lTyp_POS,     /* link function (1 = logit, 2 = ...)*/
+  verb_POS,     /* verbose */
+  numGrad_POS,  /* whether scores are computed numerically */
+  numHess_POS   /* whether Hessian is computed numerically */
+};
 
-static R_INLINE double *SLOT_REAL_NULL(SEXP obj, SEXP nm)
-{
-  SEXP pt = GET_SLOT(obj, nm);
-  return LENGTH(pt) ? REAL(pt) : (double*) NULL;
-}
-
-#define Y_SLOT(x) INTEGER(GET_SLOT(x, olmm_ySym))
-#define X_SLOT(x) SLOT_REAL_NULL(x, olmm_XSym)
-#define W_SLOT(x) SLOT_REAL_NULL(x, olmm_WSym)
-#define WEIGHTS_SLOT(x) SLOT_REAL_NULL(x, olmm_weightsSym)
-#define WEIGHTSSBJ_SLOT(x) SLOT_REAL_NULL(x, olmm_weightsSbjSym)
-#define OFFSET_SLOT(x) SLOT_REAL_NULL(x, olmm_offsetSym)
-#define DIMS_SLOT(x) INTEGER(GET_SLOT(x, olmm_dimsSym))
-#define FIXEF_SLOT(x) SLOT_REAL_NULL(x, olmm_fixefSym)
-#define RANEFCHOLFAC_SLOT(x) SLOT_REAL_NULL(x, olmm_ranefCholFacSym)
-#define COEFFICIENTS_SLOT(x) SLOT_REAL_NULL(x, olmm_coefficientsSym)
-#define ETA_SLOT(x) SLOT_REAL_NULL(x, olmm_etaSym)
-#define U_SLOT(x) SLOT_REAL_NULL(x, olmm_uSym)
-#define LOGLIKOBS_SLOT(x) SLOT_REAL_NULL(x, olmm_logLikObsSym)
-#define LOGLIKSBJ_SLOT(x) SLOT_REAL_NULL(x, olmm_logLikSbjSym)
-#define LOGLIK_SLOT(x) SLOT_REAL_NULL(x, olmm_logLikSym)
-#define SCOREOBS_SLOT(x) SLOT_REAL_NULL(x, olmm_scoreObsSym)
-#define SCORESBJ_SLOT(x) SLOT_REAL_NULL(x, olmm_scoreSbjSym)
-#define SCORE_SLOT(x) SLOT_REAL_NULL(x, olmm_scoreSym)
-#define INFO_SLOT(x) SLOT_REAL_NULL(x, olmm_infoSym)
-#define GHX_SLOT(x) SLOT_REAL_NULL(x, olmm_ghxSym)
-#define GHW_SLOT(x) SLOT_REAL_NULL(x, olmm_ghwSym)
-#define RANEFELMAT_SLOT(x) SLOT_REAL_NULL(x, olmm_ranefElMatSym)
+#define X_SLOT(x) REAL(getListElement(x, "X"))
+#define W_SLOT(x) REAL(getListElement(x, "W"))
+#define WEIGHTS_SLOT(x) REAL(getListElement(x, "weights"))
+#define WEIGHTSSBJ_SLOT(x) REAL(getListElement(x, "weights_sbj"))
+#define OFFSET_SLOT(x) REAL(getListElement(x, "offset"))
+#define DIMS_SLOT(x) INTEGER(getListElement(x, "dims"))
+#define FIXEF_SLOT(x) REAL(getListElement(x, "fixef"))
+#define RANEFCHOLFAC_SLOT(x) REAL(getListElement(x, "ranefCholFac"))
+#define COEFFICIENTS_SLOT(x) REAL(getListElement(x, "coefficients"))
+#define ETA_SLOT(x) REAL(getListElement(x, "eta"))
+#define U_SLOT(x) REAL(getListElement(x, "u"))
+#define LOGLIKOBS_SLOT(x) REAL(getListElement(x, "logLik_obs"))
+#define LOGLIKSBJ_SLOT(x) REAL(getListElement(x, "logLik_sbj"))
+#define LOGLIK_SLOT(x) REAL(getListElement(x, "logLik"))
+#define SCOREOBS_SLOT(x) REAL(getListElement(x, "score_obs"))
+#define SCORESBJ_SLOT(x) REAL(getListElement(x, "score_sbj"))
+#define SCORE_SLOT(x) REAL(getListElement(x, "score"))
+#define INFO_SLOT(x) REAL(getListElement(x, "info"))
+#define GHX_SLOT(x) REAL(getListElement(x, "ghx"))
+#define GHW_SLOT(x) REAL(getListElement(x, "ghw"))
+#define RANEFELMAT_SLOT(x) REAL(getListElement(x, "ranefElMat"))
 
 /**
  * ---------------------------------------------------------
@@ -113,6 +103,16 @@ double olmm_GLink(double x, int link) {
   }
 }
 
+SEXP getListElement(SEXP list, const char *str) {
+  SEXP elmt = R_NilValue, 
+    names = getAttrib(list, R_NamesSymbol); 
+  for (int i = 0; i < length(list); i++)
+    if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
+      elmt = VECTOR_ELT(list, i);
+      break;
+    }
+  return elmt;
+}
 
 /**
  * ---------------------------------------------------------
@@ -142,8 +142,6 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
 
   const double zero = 0.0, one = 1.0; /* for matrix manipulations */
   
-  double *tmpVec = Alloca(pGe, double);
-
   /* overwrite coefficients slot */
   Memcpy(coefficients, newPar, nPar);
 
@@ -173,9 +171,9 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   		  &one, ranefElMat, 
 		  &lenVRanefCholFac, vRanefCholFac, &i1, 
 		  &zero, vecRanefCholFac, &i1);
-
+  
   return R_NilValue;
-  }
+}
 
 
 /**
@@ -190,12 +188,14 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
 
 SEXP olmm_update_marg(SEXP x, SEXP par) {
 
+  SEXP newPar = PROTECT(duplicate(par));
+
   /* get subject slot */  
-  SEXP subject_0 = GET_SLOT(x, olmm_subjectSym), subject_1;
+  SEXP subject_0 = getListElement(x, "subject"), subject_1;
   PROTECT(subject_1 = coerceVector(subject_0, INTSXP));
 
-  /* get targed variable slot */
-  SEXP y_0 = GET_SLOT(x, olmm_ySym), y_1;
+  /* get response variable slot */
+  SEXP y_0 = getListElement(x, "y"), y_1;
   PROTECT(y_1 = coerceVector(y_0, INTSXP));
 
   /* integer valued slots and pointer to factor valued slots */
@@ -223,16 +223,16 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     q = dims[q_POS], qEta = dims[qEta_POS], 
     qCe = dims[qCe_POS], qGe = dims[qGe_POS],
     J = dims[J_POS], nPar = dims[nPar_POS], 
-    nEta = dims[nEta_POS], nGHQ = dims[nGHQ_POS], nQP = dims[nQP_POS], 
+    nEta = dims[nEta_POS], nQP = dims[nQP_POS], 
     family = dims[fTyp_POS], link = dims[lTyp_POS], 
-    verb = dims[verb_POS], numGrad = dims[numGrad_POS],
+    numGrad = dims[numGrad_POS],
     numHess = dims[numHess_POS],
     lenVecRanefCholFac = q * q, lenVRanefCholFac = q * (q + 1) / 2;
 
   /* variables for matrix operations etc. */
   int i1 = 1, tmpJ, subsTmp; 
   double one = 1.0, zero = 0.0, 
-    gq_weight = 1, scoreCondInv, scTermBL, 
+    gq_weight = 1, scoreCondInv = 0.0, 
     logLikCond_modified;
       
   /* define internal objects */
@@ -240,7 +240,6 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     *etaRanefCLM = (double*) NULL,
     *sumBL = (double*) NULL,
     *etaRanef = Calloc(n * nEta, double),
-    *ranefTmp = Alloca(qGe, double),
     *gq_nodes = Alloca(q, double),
     *ranefVec = Alloca(q, double),
     *ranef = Alloca(qEta * nEta, double),
@@ -262,7 +261,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   AllocVal(etaRanef, n * nEta, zero);
   
   /* update parameters */
-  olmm_setPar(x, par);
+  olmm_setPar(x, newPar);
   
   /* initialize eta = offset */
   for (int i = 0; i < (n * nEta); i++) eta[i] = offset[i];
@@ -314,7 +313,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
       AllocVal(scoreCond_sbj, (1 - numGrad) * N * nPar + numGrad, zero);
     }
 
-    if (family == 2 | family == 3) AllocVal(sumBL, n, zero);
+    if ((family == 2) | (family == 3)) AllocVal(sumBL, n, zero);
 
     /* prepare integration nodes and weights */    
     for (int i = 0; i < q; i++) {
@@ -514,11 +513,11 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	      
 	      switch (family) {
 	      case 1: 
-		if (y[i] < J & y[i] == tmpJ) {
+		if ((y[i] < J) & (y[i] == tmpJ)) {
 		  scoreCond_obs[n * (p + subsTmp) + i] +=
 		    scoreCondVar[2] * vRanefTerm[subsTmp];
 		}
-		if (y[i] > 1 & y[i] == tmpJ) {
+		if ((y[i] > 1) & (y[i] == tmpJ)) {
 		  scoreCond_obs[n * (p + subsTmp) + i] += 
 		    scoreCondVar[1] * vRanefTerm[subsTmp];
 		}
@@ -570,7 +569,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   Free(logLikCond_sbj);
   if (family == 1) Free(etaCLM);
   if (family == 1) Free(etaRanefCLM);
-  if (family == 2 | family == 3) Free(sumBL);
+  if ((family == 2) | (family == 3)) Free(sumBL);
   Free(scoreCond_obs);
   Free(scoreCond_sbj);
 
@@ -622,7 +621,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     logLik[0] += logLik_sbj[i];
   }
 
-  UNPROTECT(2);
+  UNPROTECT(3);
   return R_NilValue;
 }
 
@@ -639,13 +638,12 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 SEXP olmm_update_u(SEXP x) {
 
   /* get grouping factor slot */  
-  SEXP subject_0 = GET_SLOT(x, olmm_subjectSym), subject_1;
+  SEXP subject_0 = getListElement(x, "subject"), subject_1;
   PROTECT(subject_1 = coerceVector(subject_0, INTSXP));
 
   /* get targed variable slot */
-  SEXP y_0 = GET_SLOT(x, olmm_ySym), y_1;
+  SEXP y_0 = getListElement(x, "y"), y_1;
   PROTECT(y_1 = coerceVector(y_0, INTSXP));
-  R_CheckStack();
 
   /* integer valued slots and pointer to factor valued slots */
   int *y = INTEGER(y_1), *subject = INTEGER(subject_1),
@@ -653,29 +651,24 @@ SEXP olmm_update_u(SEXP x) {
   R_CheckStack();
 
   /* numeric valued objects */
-  double *X = X_SLOT(x), *W = W_SLOT(x), *u = U_SLOT(x),
+  double *W = W_SLOT(x), *u = U_SLOT(x),
     *eta = ETA_SLOT(x), 
-    *fixef = FIXEF_SLOT(x), *ranefCholFac = RANEFCHOLFAC_SLOT(x), 
-    *logLik_sbj = LOGLIKSBJ_SLOT(x), *logLik = LOGLIK_SLOT(x), 
-    *info = INFO_SLOT(x),
+    *ranefCholFac = RANEFCHOLFAC_SLOT(x), 
+    *logLik_sbj = LOGLIKSBJ_SLOT(x), 
     *ghw = GHW_SLOT(x), *ghx = GHX_SLOT(x);
   R_CheckStack();
 
   /* set constants (dimensions of vectors etc.) */
   const int n = dims[n_POS], N = dims[N_POS], 
-    p = dims[p_POS], 
-    pCe = dims[pCe_POS], pGe = dims[pGe_POS], 
     q = dims[q_POS], qEta = dims[qEta_POS], 
     qCe = dims[qCe_POS], qGe = dims[qGe_POS],
-    J = dims[J_POS], nPar = dims[nPar_POS], nEta = dims[nEta_POS],
-    nGHQ = dims[nGHQ_POS], nQP = dims[nQP_POS], 
-    family = dims[fTyp_POS], link = dims[lTyp_POS], 
-    verb = dims[verb_POS],
-    lenVecRanefCholFac = q * q, lenVRanefCholFac = q * (q + 1) / 2;
+    J = dims[J_POS], nEta = dims[nEta_POS],
+    nQP = dims[nQP_POS], 
+    family = dims[fTyp_POS], link = dims[lTyp_POS];
 
   /* variables for matrix operations */
   int i1 = 1; 
-  double one = 1.0, zero = 0.0, tmp;
+  double one = 1.0, zero = 0.0;
 
   /* define internal vectors */
   double *etaCLM = (double*) NULL,
@@ -718,7 +711,7 @@ SEXP olmm_update_u(SEXP x) {
     /* clear temporary objects */
     AllocVal(logLikCond_obs, n, zero);
     AllocVal(logLikCond_sbj, N, zero);
-    if (family == 2 | family == 3) AllocVal(sumBL, n, zero);
+    if ((family == 2) | (family == 3)) AllocVal(sumBL, n, zero);
 
     /* prepare integration nodes and weights */    
     for (int i = 0; i < q; i++) {
@@ -807,7 +800,7 @@ SEXP olmm_update_u(SEXP x) {
   Free(logLikCond_sbj);
   if (family == 1) Free(etaCLM);
   if (family == 1) Free(etaRanefCLM);
-  if (family == 2 | family == 3) Free(sumBL);
+  if ((family == 2) | (family == 3)) Free(sumBL);
 
   UNPROTECT(2);
   return R_NilValue;
@@ -844,9 +837,8 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
   const int q = dims[q_POS], qEta = dims[qEta_POS], 
     qCe = dims[qCe_POS], qGe = dims[qGe_POS],
     J = dims[J_POS], 
-    nEta = dims[nEta_POS], nGHQ = dims[nGHQ_POS], nQP = dims[nQP_POS], 
-    family = dims[fTyp_POS], link = dims[lTyp_POS], 
-    verb = dims[verb_POS];
+    nEta = dims[nEta_POS], nQP = dims[nQP_POS], 
+    family = dims[fTyp_POS], link = dims[lTyp_POS];
 
   /* variables for matrix operations etc. */
   int i1 = 1;

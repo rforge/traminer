@@ -1,5 +1,6 @@
 \name{olmm-gefp}
 
+\alias{olmm-gefp}
 \alias{gefp.olmm}
 \alias{predecor_control}
 \alias{estfun.olmm}
@@ -136,7 +137,7 @@ doi:10.1111/j.1467-9574.2007.00371.x.
 
 \author{Reto Buergin}
 
-\seealso{\code{\link{olmm}}, \code{\link{olmm-class}}}
+\seealso{\code{\link{olmm}}}
 
 \examples{
 ## ------------------------------------------------------------------- #

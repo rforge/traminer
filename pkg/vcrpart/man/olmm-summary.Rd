@@ -1,5 +1,6 @@
 \name{olmm-summary}
 
+\alias{olmm-summary}
 \alias{summary.olmm}
 \alias{print.summary.olmm}
 \alias{print.olmm}
@@ -32,7 +33,7 @@
   \code{"summary.olmm"}.
 }
 
-\seealso{\code{\link{olmm}}, \code{\link{olmm-class}}}
+\seealso{\code{\link{olmm}}, \code{\link{olmm-methods}}}
 
 \author{Reto Buergin}
  

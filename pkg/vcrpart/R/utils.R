@@ -1,59 +1,56 @@
-## --------------------------------------------------------- #
-## Author:          Reto Buergin
-## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-05-15
-##
-## Description:
-## General utility functions 
-##
-## Overview:
-## appendDefArgs:          over-write default arguments.
-## addEmptyChar:           add empty spaces to a character.
-## formatMatrix:           format matrices for print functions.
-## vcrpart_slot
-## vcrpart_value_space:    extract the values space of data data.frame.
-## vcrpart_formula_eta:    extracts a list of predictor formulas
-## vcrpart_formula_cond:   extracts a list of predictor formulas
-## vcrpart_formula:        extracts a list of predictor formulas
-## renameCoefs:            modify coefficient labels
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Author:          Reto Buergin
+##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' Date:            2014-08-29
+##'
+##' Description:
+##' General utility functions for the 'vcrpart' package.
+##' most of the functions are not exported and documented inline.
+##'
+##' Functions:
+##' addEmptyChar:         add empty spaces to a character
+##' appendDefArgs:        over-write default arguments
+##' deparseCall:          convert a 'call' into a 'character'
+##' formatMatrix:         format matrices for print functions
+##' vcrpart_copy:         duplicate R objects
+##' vcrpart_value_space:  extract the values space of data data.frame
+##' fe, vc, re, ce, ge    special terms for formulas. Are exported.
+##' vcrpart_formula_eta:  constructs a formula for linear predictors
+##' vcrpart_formula_cond: constructs a formula for contitioning variables
+##' vcrpart_formula:      extracts a list of predictor formulas
+##'
+##' Last modifications:
+##' 2014-09-04: removed 'adj' option
+##' 2014-08-29: add the 'adj' argument to vc() to adjust the selection
+##'             if the number of predictors per vc() term varies.
+##' 2014-08-27: allow character vectors in 'vc' terms
+##' 2014-07-31: - added to possibility to remove the intercept
+##'               directly in the formula by a '-1'
+##'             - now more than one varying intercepts are
+##'               allowed to be specificed (the only case in which
+##'               this was critical was when using 'sctest = TRUE',
+##'               and this is not checked in 'tvcm' itself)
+##' 2014-06-17: modified documentation style:
+##' 2014-06-17: new function 'vcrpart_copy' that duplicates objects
+##' 2014-06-17: removed 'vcrpart_slot' after converting 'olmm'
+##'             class to a S3 class
+##' 2014-06-03: modify 'tvcm_formula' to allow component-wise
+##'             trees
+##' -------------------------------------------------------- #
 
-appendDefArgs <- function(args, default) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Over-writes default- with user-specified arguments
-  ##
-  ## Arguments:
-  ## args:    a list of user-specified arguments.
-  ## default: a list of default arguments.
-  ##
-  ## Value:
-  ## A list with arguments.
-  ## ------------------------------------------------------- #
-  
-  if (is.null(args)) return(default)
-  subs <- setdiff(names(default), names(args))
-  if (length(subs) > 0)
-    for (i in subs) args[[i]] <- default[[i]] 
-  return(args)
-}
+## --------------------------------------------------------- #
+##' Add empty spaces to characters to have the same length.
+##'
+##' @param x       character vector.
+##' @param nchar   integer. The size per string.
+##' @param justify "left" or "right". The place where the spaces
+##'                should be added.
+##'
+##' @return A character vector.
+## --------------------------------------------------------- #
 
 addEmptyChar <- function(x, nchar, justify = "left") {
-
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Add empty spaces to characters to have the same length.
-  ##
-  ## Arguments:
-  ## x:       character vector.
-  ## nchar:   integer. The size per string.
-  ## justify: "left" or "right". The place where the spaces
-  ##          should be added.
-  ##
-  ## Value:
-  ## a character vector.
-  ## ------------------------------------------------------- #
   
   for (i in 1:length(x))
     if (justify == "left") {
@@ -66,39 +63,53 @@ addEmptyChar <- function(x, nchar, justify = "left") {
   return(x)
 }
 
-deparseCall <- function(x) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Converts a call slot into a character. The function is
-  ## used for summary and print functions.
-  ##
-  ## Arguments:
-  ## x:       slot of a call, e.g., call$formula.
-  ##
-  ## Value:
-  ## a character.
-  ## ------------------------------------------------------- #
-    
+## --------------------------------------------------------- #
+##' Over-writes default- with user-specified arguments
+##'
+##' @param args    a list of user-specified arguments.
+##' @param default a list of default arguments.
+##'
+##' @return A list with arguments.
+## --------------------------------------------------------- #
+
+appendDefArgs <- function(args, default) {
+  
+  if (is.null(args)) return(default)
+  subs <- setdiff(names(default), names(args))
+  if (length(subs) > 0)
+    for (i in subs) args[[i]] <- default[[i]] 
+  return(args)
+}
+
+
+## --------------------------------------------------------- #
+##' Converts a call slot into a character. The function is
+##' used for summary and print functions.
+##'
+##' @param x slot of a call, e.g., call$formula.
+##'
+##' @return A character.
+## --------------------------------------------------------- #
+
+deparseCall <- function(x) {
+  
     if (is.null(x)) return(character())
       rval <- paste(deparse(x), collapse = "\n")
       if (grepl("structure(list(", rval, fixed = TRUE)) rval <- character()
     return(rval)
 }
 
+
+## --------------------------------------------------------- #
+##' Format colnames etc. of a matrix for pretty prints.
+##'
+##' @param x a matrix
+##'
+##' @return A matrix.
+## --------------------------------------------------------- #
+
 formatMatrix <- function(x, ...) {
-  
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Format colnames etc. of a matrix to prettify the
-  ## print functions.
-  ##
-  ## Arguments:
-  ## x: a matrix
-  ##
-  ## Value:
-  ## a matrix.
-  ## ------------------------------------------------------- #
   
   rowNames <- rownames(x)
   colNames <- colnames(x)
@@ -123,42 +134,38 @@ formatMatrix <- function(x, ...) {
   return(rval)
 }
 
-vcrpart_slot <- function(object, name) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Extract a slot from a S3 or a S4 object.
-  ##
-  ## Arguments:
-  ## object: a fitted model of class 'glm' or 'olmm'. 
-  ## name:   character. The name of the slot to access.
-  ##
-  ## Value:
-  ## The contents of the slot 'name'.
-  ## ------------------------------------------------------- #
-    
-  rval <- NULL
-  if (isS4(object) && .hasSlot(object, name))
-    rval <- slot(object, name)
-  if (!isS4(object) && name %in% names(object)) 
-    rval <- object[[name]]
-  return(rval)
-}
+## --------------------------------------------------------- #
+##' Duplicate R objects
+##'
+##' Duplicates an R object such that any modification on the
+##' values of the copied object will not change the values
+##' of the original object. This function may be used to
+##' protect values of the source object when modifying the
+##' copied object within a '.Call' call.
+##' 
+##' @param x the R object to be duplicated.
+##' 
+##' @return A list with arguments.
+##'
+##' @details used in 'tvcm_fit_loss'
+## --------------------------------------------------------- #
+
+vcrpart_copy <- function(x)
+  return(.Call("vcrpart_duplicate", x, PACKAGE = "vcrpart"))
+
+
+## --------------------------------------------------------- #
+##' Extract the values space of data data.frame.
+##'
+##' @param data  a data.frame.
+##' @param neval the maximum number of values to be evaluated
+##'    for numeric vectors. 
+##'
+##' @return A list with values of the variables in 'data'
+## --------------------------------------------------------- #
 
 vcrpart_value_space <- function(data, neval = 50L) {
-
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Extract the values space of data data.frame.
-  ##
-  ## Arguments:
-  ## data:  a data.frame.
-  ## neval: the maximum number of values to be evaluated
-  ##        for numeric vectors.
-  ##
-  ## Value:
-  ## A list with values of the variables in 'data'
-  ## ------------------------------------------------------- #
   
   FUN <- function(x, neval) {
     rval <- sort(unique(x))
@@ -171,56 +178,73 @@ vcrpart_value_space <- function(data, neval = 50L) {
   return(lapply(as.list(data), FUN, neval = neval))
 }
 
+
 fe <- function(formula, intercept = TRUE) {
+  stopifnot(is.logical(intercept) | is.character(intercept))
+  stopifnot(length(intercept) == 1L)
   if (is.logical(intercept))
     intercept <- ifelse(intercept, "ce", "none")
-  if (!intercept %in% c("none", "ce"))
-    stop("'intercept' in 'fe' must be one of 'none' or 'ce'")
   mc <- match.call()
   if (missing(formula)) {
     formula <- if (intercept == "none") "-1" else "1"
   } else {
     formula <- deparse(mc$formula, 500L)
   }
-  eta <- as.formula(paste("~", formula))
+  eta <- formula(paste("~", formula))
   return(list(eta = eta, cond = ~1, intercept = intercept, type = "fe"))
 }
 
-re <- function(formula, intercept = TRUE) {
-  if (is.logical(intercept))
-    intercept <- ifelse(intercept, "ge", "none")
-  if (!intercept %in% c("none", "ce", "ge"))
-    stop("'intercept' in 'fe' must be one of 'none', 'ce' or 'ge'")
-  mc <- match.call()
-  formula <- deparse(mc$formula)
-  formula <- strsplit(formula, "|", fixed = TRUE)[[1L]]
-  if (length(formula) < 2L) stop("no grouping factor 'subject' in 're'.")
-  if (length(formula) > 2L) stop("'formula' in 're' is missspecified.")
-  cond <- formula(paste("~", formula[2]))
-  if (length(all.vars(cond)) > 1L)
-    stop("maximum one grouping factor 'subject' is allowed in 're'")
-  if (formula[1L] == "") formula[1L] <- "1"
-  eta <- as.formula(paste("~", formula[1L]))
-  return(list(eta = eta, cond = cond, intercept = intercept, type = "re"))
-}
 
-vc <- function(..., by, intercept = TRUE) {
+vc <- function(..., by, intercept = missing(by), 
+               nuisance = character()) {
+  stopifnot(is.logical(intercept) | is.character(intercept))
+  stopifnot(is.character(nuisance))
   if (is.logical(intercept))
     intercept <- ifelse(intercept, "ce", "none")
   if (!intercept %in% c("none", "ce", "ge"))
-    stop("'intercept' in 'fe' must be one of 'none', 'ce' or 'ge'")
+    stop("'intercept' in 'fe' must be a logical or one of 'none', 'ce' or 'ge'.")
   mc <- match.call()
   eta <- if (missing(by)) formula(~1) else formula(paste("~", deparse(mc$by, 500L)))
-  subs <- if(is.null(names(mc))) 2:length(mc) else which(names(mc) == "")[-1L]
+  if ((intercept == "ce" & length(all.vars(eta)) == 0L) |
+      (intercept == "none")) nuisance <- setdiff(nuisance, "(Intercept)")
+  nuisance <- intersect(nuisance, c("(Intercept)", all.vars(eta)))
+  subs <- if (is.null(names(mc))) 2:length(mc) else which(names(mc) == "")[-1L]
   if (length(subs) < 1L) stop("no effect modifiers in 'vc'.")
   cond <- "~"
   for (i in subs) {
     if (i != subs[1L]) cond <- paste(cond, "+")
-    cond <- paste(cond, deparse(mc[[i]]))
+    isChar <- inherits(try(eval.parent(mc[[i]]), silent = TRUE), "character")
+    if (isChar) {
+      cond <- paste(cond, paste(eval.parent(mc[[i]]), collapse = "+"))
+    } else {
+      cond <- paste(cond, deparse(mc[[i]], 500L))
+    }
   }
   cond <- formula(cond)
-  return(list(eta = eta, cond = cond, intercept = intercept, type = "vc"))
+  return(list(eta = eta, cond = cond, intercept = intercept,
+              nuisance = nuisance, type = "vc"))
 }
+
+
+re <- function(formula, intercept = TRUE) {
+  stopifnot(is.logical(intercept) | is.character(intercept))
+  if (is.logical(intercept))
+    intercept <- ifelse(intercept, "ge", "none")
+  if (!intercept %in% c("none", "ce", "ge"))
+    stop("'intercept' in 'fe' must be a logical or one of 'none', 'ce' or 'ge'")
+  mc <- match.call()
+  formula <- gsub(" ", "", deparse(mc$formula, 500L))
+  formula <- strsplit(formula, "|", fixed = TRUE)[[1L]]
+  if (length(formula) < 2L) stop("no grouping factor 'subject' in 're'.")
+  if (length(formula) > 2L) stop("'formula' in 're' is missspecified.")
+  cond <- formula(paste("~", formula[2]))
+  if (length(all.vars(formula(paste("~", cond)))) > 1L)
+    stop("maximum one grouping factor 'subject' is allowed in 're'")
+  if (formula[1L] == "") formula[1L] <- "1"
+  eta <- formula(paste("~", formula[1L]))
+  return(list(eta = eta, cond = cond, intercept = intercept, type = "re"))
+}
+
 
 ce <- function(formula) {
   mc <- match.call()
@@ -228,6 +252,7 @@ ce <- function(formula) {
   formula <- formula(paste("~", formula))
   return(attr(terms(formula, keep.order = TRUE), "term.labels"))
 }
+
 
 ge <- function(formula) {
   mc <- match.call()
@@ -237,20 +262,21 @@ ge <- function(formula) {
 }
 
 
-vcrpart_formula_eta <- function(x, family, env) {
+## --------------------------------------------------------- #
+##' Utility function for \code{vcrpart_formula}
+##' 
+##' Constructs a formula for the linear predictor.
+##'
+##' @param x       a formula.
+##' @param family  the model family, e.g., cumulative()
+##' @param env     environment for evaluating the formula.
+##'
+##' @return A formula.
+##'
+##' @details Used in \code{vcrpart_formula}.
+## --------------------------------------------------------- #
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Sets up a list with predictor formulas.
-  ##
-  ## Arguments:
-  ## x:      a list of formula produced by 'fe', 're'  or 'vc'
-  ## family: the model family, e.g. cumulative etc.
-  ## env:    environment for evaluating the formula.
-  ##
-  ## Value:
-  ## A list with sublists for formulas. For internal use only.
-  ## ------------------------------------------------------- #
+vcrpart_formula_eta <- function(x, family, env) {
 
   terms <- terms(x$eta, specials = c("fe", "vc", "re", "ce", "ge"), keep.order = TRUE)
   if (length(unlist(attr(terms, "specials")[c("fe", "vc", "re")])) > 0)
@@ -266,12 +292,27 @@ vcrpart_formula_eta <- function(x, family, env) {
     ## extract terms
     if (length(rval) > 0L) {
 
+      checkOperators <- function(x) {
+        x <- gsub(" ", "", x)
+        return(grepl(":", x, fixed = TRUE) |
+               grepl("*", x, fixed = TRUE) |
+               grepl("%in%", x))
+      }
+      
       subsCe <- rval %in% termFact[attr(terms, "specials")$ce]
       ceTerms <- unlist(lapply(rval[subsCe], function(x) eval(parse(text = x))))
-
+      
+      if (x$type == "vc" && any(sapply(ceTerms, checkOperators)))
+        stop("the ':', '*' and '%in%' operators are not allowed for the 'by' ",
+             "argument in 'vc' terms.")
+      
       subsGe <- rval %in% termFact[attr(terms, "specials")$ge]
       geTerms <- unlist(lapply(rval[subsGe], function(x) eval(parse(text = x)))) 
-
+      
+      if (x$type == "vc" && any(sapply(geTerms, checkOperators)))
+        stop("the ':', '*' and '%in%' operators are not allowed for the 'by' ",
+             "argument in 'vc' terms.")
+      
       if (family$family %in% c("cumulative", "adjacent")) {
         geTerms <- c(geTerms, rval[!subsGe & !subsCe])
       } else {
@@ -291,30 +332,33 @@ vcrpart_formula_eta <- function(x, family, env) {
       int <- list(switch(x$type, fe = "-1", re = "-1", vc = "1"),
                   switch(x$type, fe = "1", re = "-1", vc = "1"))
     } else if (x$intercept == "ge") {
+      ## notice that this option is disabled for 'fe' and 'vc' terms
       int <- list(switch(x$type, fe = "1", re = "-1", vc = "1"),
-                  switch(x$type, fe = "1", re = "1", vc = "Node"))
+                  switch(x$type, fe = "1", re = "1",
+                         vc = paste("Node", x$name, sep = "")))
     } else if (x$intercept == "ce") {
-      int <- list(switch(x$type, fe = "1", re = "1", vc = "Node - 1"),
+      int <- list(switch(x$type, fe = "1", re = "1",
+                         vc = paste("Node", x$name, sep = "")),
                   switch(x$type, fe = "1", re = "-1", vc = "1"))
     }
-
+    
     rval <- lapply(1L:2L, function(i) {
       if (rval[[i]] == "") return(int[[i]])
       if (int[[i]] != "1") return(paste(int[[i]], rval[[i]], sep = "+"))
       return(rval[[i]])
     })
     
-    if (x$type == "re" && family$family == "cumulative" && rval[[1L]] != "-1")
+    if (x$type == "re" && family$family == "cumulative" && x$intercept == "ce")
       stop("category-specific random effects are not ",
            "available for the cumulative model.")
 
-    if (rval[[1L]] == "-1" & rval[[2L]] == "-1")
+    if (x$type %in% c("vc", "re") && (rval[[1L]] == "-1" & rval[[2L]] == "-1"))
       stop("the term '", x$type, "' is misspecified any may be dropped from ",
            "the specification")
     
     ## set formulas
     rval <- lapply(paste("~", rval, sep = "") , as.formula)
-
+    
     if (x$type == "re") {
       int <- sapply(rval, function(x) attr(terms(x), "intercept"))
       if (all(int == 1L)) rval[[1L]] <- update(rval[[1L]], ~ . - 1)
@@ -324,24 +368,26 @@ vcrpart_formula_eta <- function(x, family, env) {
     if (x$type == "vc") {
 
       ## add 'Node' to all terms
-      addNode <- function(x) {
+      addNode <- function(x, name) {
         terms <- attr(terms(x, keep.order = TRUE), "term.labels")
-        termsNew <- paste("Node", terms, sep = ":")
+        termsNew <- paste("Node", name, ":", terms, sep = "")
         if (length(terms) > 0L) {
           x <- update(x, paste("~.-",paste(terms, collapse = "-")))
           x <- update(x, paste("~.+",paste(termsNew, collapse = "+")))
         }
         return(x)
       }
-      rval <- lapply(rval, addNode)
+      rval <- lapply(rval, addNode, name = x$name)
     }
-    
+
   } else {
 
     if (x$type == "vc") {
       terms <- attr(terms(x$eta, keep.order = TRUE), "term.labels")
-      if (length(terms) > 0L) terms <- paste("Node", terms, sep = ":")
-      if (x$intercept != "none") terms <- c("Node", terms)
+      if (length(terms) > 0L) terms <- paste("Node", x$name, ":", terms, sep = "")
+      intercept <- x$intercept
+      if (x$intercept != "none")
+        terms <- c(paste("Node", x$name, sep = ""), terms)
       if (length(terms) == 0L) terms <- "1"
       rval <- list(~1, as.formula(paste("~", paste(terms, collapse = "+"))))
     } else {
@@ -354,109 +400,186 @@ vcrpart_formula_eta <- function(x, family, env) {
   return(rval)
 }
 
-vcrpart_formula_cond <- function(x, family, env) {
+## --------------------------------------------------------- #
+##' Utility function for \code{\link{vcrpart_formula}}
+##' 
+##' Constructs a formula of conditioning variables, which are
+##' the moderators for \code{\link{vc}} terms and the grouping
+##' factors for \code{\link{re}} terms.
+##'
+##' @param x       a formula.
+##' @param family  the model family, e.g., cumulative()
+##' @param env     environment for evaluating the formula.
+##'
+##' @return A formula.
+##'
+##' @details Used in \code{vcrpart_formula}.
+## --------------------------------------------------------- #
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Sets up a list with predictor formulas and conditioning
-  ## variables for a term 'vc', 'fe' or 're' in a formula
-  ##
-  ## Arguments:
-  ## x:      a list of formula produced by 'fe', 're'  or 'vc'
-  ## family: the model family, e.g. cumulative etc.
-  ## env:    environment for evaluating the formula.
-  ##
-  ## Value:
-  ## A list with sublists for formulas. For internal use only.
-  ## ------------------------------------------------------- #
-  
-  ## extract the inner formula of the term
+vcrpart_formula_cond <- function (x, family, env) {
   rval <- x$cond
   environment(rval) <- env
-
   return(rval)
 }
 
-vcrpart_formula <- function(formula, family = cumulative(), env = parent.frame()) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Evaluates the input formula and returns a list with
-  ## the necessary parts for constructing model matrices.
-  ##
-  ## Arguments:
-  ## formula: the original formula.
-  ## family:  the model family, e.g. cumulative() etc.
-  ## env:     environment for evaluating the formula.
-  ##
-  ## Value:
-  ## A list with sublists of formulas. For internal use only.
-  ## ------------------------------------------------------- #
+## --------------------------------------------------------- #
+##' Construct a formula for \code{\link{tvcm}}, \code{\link{fvcm}}
+##' and \code{\link{olmm}} calls
+##' 
+##' Evaluates input formulas for \code{\link{tvcm}},
+##' \code{\link{fvcm}} and \code{\link{olmm}} and returns a
+##' list with component wise linear formulas for constructing
+##' model matrices.
+##'
+##' @param formula the original formula.
+##' @param family  the model family, e.g., cumulative()
+##' @param env     environment for evaluating the formula.
+##'
+##' @return A list with sublists of formulas.
+##'
+##' @details Used in \code{\link{fvcm}}, \code{\link{predict.fvcm}},
+##' \code{\link{olmm}}, \code{\link{predict.olmm}},
+##' \code{\link{tvcm}}, \code{tvcm_get_node},
+##' \code{\link{prune.tvcm}}.
+## --------------------------------------------------------- #
+
+vcrpart_formula <- function(formula, family = cumulative(),
+                            env = parent.frame()) {
 
   types <- c("fe", "vc", "re")
-  
   terms <- terms(formula, specials = types, keep.order = TRUE)
-  if (any(sapply(attr(terms, "specials"), length) > 1L))
-    stop("one of 'fe', 're' or 'vc' is duplicated in the formula")
-  yName <- all.vars(formula)[1L]
-  termLabs <- type <- attr(terms, "term.labels")
-  termFact <- rownames(attr(terms, "factors"))
-  subs <- termLabs %in% termFact[unlist(attr(terms, "specials"))]
-  type[subs] <- substr(termLabs[subs], 1L, 2L)
-  unknown <- !type %in% types
+  yName <- rownames(attr(terms(formula), "factors"))
+  termLabs <- attr(terms, "term.labels")
+  termFac <- attr(terms, "factors")
+  type <- rep("NA", length(termLabs))
+  if (length(type) > 0L)
+    for (tp in types)
+      type[colSums(termFac[attr(terms, "specials")[[tp]],,drop=FALSE]) > 0] <- tp 
   
-  ## check if all 'terms' use one of 'fe', 'vc' or 're'
-  if (any(unknown)) {
-    feTerm <- termLabs[unknown]
-    if ("fe" %in% type) {
-      feAdd <- eval(parse(text = attr(terms, "term.labels")[type == "fe"]))
-      feTerm <- c(attr(terms(feAdd$eta, keep.order = TRUE), "term.labels"), feTerm)
-      feTerm <- paste("fe(", paste(feTerm, collapse = "+"),
-                      ", intercept='", feAdd$intercept,  "')", sep = "")
-      termLabs[type == "fe"] <- feTerm
-      termLabs <- termLabs[!unknown]
-      type <- type[!unknown]
-    } else {
-      feTerm <- paste("fe(", paste(feTerm, collapse = "+"), ")", sep = "")
-      termLabs <- termLabs[!unknown]
-      type <- type[!unknown]
-      termLabs <- c(termLabs, feTerm)
-      type <- c(type, "fe")
-    }
+  getInt <- function(x) eval(parse(text = x))$intercept
+  getNPred <- function(x) length(all.vars(eval(parse(text = x))$eta))
+  getTerms1 <- function(x, which) {
+    x <- eval(parse(text = x))[[which]]
+    attr(terms(formula(paste("~", x)), keep.order = TRUE), "term.labels")
   }
   
-  rval <- vector("list", 3L)
-  names(rval) <- types
-  ## extract formulas for different types of coefficients
-  for (i in 1L:length(types)) {
-    if (types[i] %in% type) {
-      subs <- which(type == types[i])
-      rval[[i]] <- eval(parse(text = termLabs[subs]))
-      rval[[i]]$eta <- vcrpart_formula_eta(rval[[i]], family, env)
-      rval[[i]]$cond <- vcrpart_formula_cond(rval[[i]], family, env)
+  ## 'fe' terms
+  if (any(type == "fe")) {
+    feInt <- unique(unlist(lapply(termLabs[type == "fe"], getInt)))
+  } else {
+    feInt <- "ce"
+  }
+  if (length(feInt) > 1L) feInt <- "none"
+  feInt <- feInt == "ce"
+  feInt <- feInt & attr(terms(formula), "intercept") == 1L
+  termLabs[type == "NA"] <- paste("fe(", termLabs[type == "NA"], ")", sep = "")
+  type[type == "NA"] <- "fe"  
+  feTerms <- unlist(lapply(termLabs[type == "fe"], getTerms1, which = "eta"))
+  if (length(feTerms) == 0) feTerms <- "1"
+  feTerms <- paste("fe(", paste(feTerms, collapse = " + "),
+                   ", intercept = ", feInt, ")", sep = "")
+  feTerms <- eval(parse(text = feTerms))
+  feTerms$cond <- vcrpart_formula_cond(feTerms, family, env)
+  feTerms$eta <- vcrpart_formula_eta(feTerms, family, env)
+  
+  ## 'vc' terms
+  if (any(type == "vc")) {
+    vcTerms <- termLabs[type == "vc"]
+    vcInt <- unlist(lapply(vcTerms, getInt))
+    if (inherits(family, "family")) vcInt[vcInt == "ge"] <- "ce" 
+    nPred <- unlist(lapply(vcTerms, getNPred))
+    if (feTerms$intercept == "none") {
+      direct <- vcInt == "ce"
+      direct <- direct &
+        unlist(lapply(vcTerms, function(x) !"(Intercept)" %in%
+                      eval(parse(text = x))$nuisance))
+      subs <- which(direct)[1L]
+    } else {
+      subs <- c()
     }
+    direct <- rep(FALSE, length(vcTerms)); direct[subs] <- TRUE;
+    
+    if (any(direct)) {
+      ord <- order(as.integer(!direct))
+      direct <- direct[ord]
+      vcTerms <- vcTerms[ord]
+    }
+    vcTerms <- lapply(vcTerms, function(x) eval(parse(text = x)))
+    names(vcTerms) <- LETTERS[1:length(vcTerms)]
+    for (pid in seq_along(vcTerms)) {
+      vcTerms[[pid]]$name <- names(vcTerms)[pid]
+      vcTerms[[pid]]$cond <- vcrpart_formula_cond(vcTerms[[pid]], family, env)
+      vcTerms[[pid]]$eta <-
+        vcrpart_formula_eta(vcTerms[[pid]], family, env)
+      subsInt <- vcTerms[[pid]]$nuisance == "(Intercept)"
+      vcTerms[[pid]]$nuisance[subsInt] <- paste("Node", LETTERS[pid], sep = "")
+      vcTerms[[pid]]$nuisance[!subsInt] <-
+        paste("Node", LETTERS[pid], ":", vcTerms[[pid]]$nuisance[!subsInt], sep = "")
+      vcTerms[[pid]]$direct <- direct[pid]
+    }
+  } else {
+    vcTerms <- NULL
+  }
+  
+  ## 're' terms
+  if (sum(type == "re") > 1L) {
+    reCond <- unique(unlist(lapply(termLabs[type == "re"], getTerms1, which = "cond")))
+    if (length(reCond) > 1L) stop("non-unique subject factor in 're' terms.")
+    reInt <- unique(unlist(lapply(termLabs[type == "re"], getInt)))
+    if (length(reInt) == 0L) feInt <- "ge"
+    if (length(reInt) > 1L) stop("non-unique 'intercept' in 're' terms.")
+    reTerms <- unlist(lapply(termLabs[type == "re"], getTerms1, which = "eta"))
+    reTerms <- paste("re(", paste(reTerms, collapse = " + "), "|",
+                     reCond, ", intercept = '", reInt, "')", sep = "")
+  } else {
+    reTerms <- termLabs[type == "re"]
+    if (length(reTerms) == 0L) reTerms <- NULL
+  }
+  if (!is.null(reTerms)) {
+    reTerms <- eval(parse(text = reTerms))
+    reTerms$cond <- vcrpart_formula_cond(reTerms, family, env)
+    reTerms$eta <- vcrpart_formula_eta(reTerms, family, env)
   }
 
+  rval <- list(fe = feTerms,
+               vc = vcTerms,
+               re = reTerms)
+  
   ## add original formula
-  rval$original <- formula(formula, env = env)
+  rval$original <- as.formula(formula, env = env)
 
   ## formula with all predictors
-  getTerms <- function(x) {
-    if (inherits(x, "formula")) {
-      rval <- attr(terms(x, keep.order = TRUE), "term.labels")
-      if ("vc" %in% type) {
-        rval <- gsub("Node:", "", rval)
-        rval <- rval[rval != "Node"]
-      }
+  getTerms2 <- function(x) {
+    FUN <- function(x) {
+      rval <- c(rownames(attr(terms(x$eta$ce), "factors")),
+                rownames(attr(terms(x$eta$ge), "factors")),
+                rownames(attr(terms(x$cond), "factors")))
+      rval <- gsub("Node[A-Z]+:", "", rval)
+      rval <- rval[rval != paste("Node", x$name, sep = "")]
+    }
+    if ("type" %in% names(x)) {
+      rval <- rval <- FUN(x)
     } else {
-      rval <- NULL
+      rval <- unlist(lapply(x, FUN))
     }
     return(rval)
   }
-  allTerms <- unlist(lapply(unlist(rval[1L:3L]), getTerms))
+  allTerms <- unique(unlist(lapply(rval[1L:3L], getTerms2)))
   if (length(allTerms) == 0L) allTerms <- "1"
   fAll <- paste(yName, paste(allTerms, collapse = "+"), sep = "~")
-  fAll <- formula(fAll, env = env)
+  fAll <- as.formula(fAll, env = env)
   rval$all <- fAll
   return(rval)
+}
+
+vcrpart_contr.sum <- function(x, weights = rep(1.0, length(x))) {
+  if (nlevels(x) > 1L) {
+    con <- contr.sum(levels(x))
+    tab <- tapply(weights, x, sum)
+    con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
+    colnames(con) <- levels(x)[1:(nlevels(x) - 1)]
+    contrasts(x) <- con
+  }
+  return(x)
 }

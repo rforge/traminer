@@ -1,56 +1,56 @@
-## --------------------------------------------------------- #
-## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2014-05-10
-##
-## Description:
-## methods for olmm objects.
-##
-## anova:       Likelihood-ratio tests for the comparison of
-##              models
-## coef, coefficients: Extract model coefficients
-## deviance:    -2*Log-likelihood at the ML estimator
-## drop1:       Drop single fixed effects
-## estfun:      Negative scores
-## extractAIC:  Extract the AIC
-## fitted:      Extract fitted values from the model
-## fixef:       Extract fixed effect parameters
-## formula:     Extracts 'formula'
-## gefp:        Extract cumulated decorrelated score process
-## getCall:     Extracts 'call'
-## logLik:      Log-likelihood at the ML estimator
-## model.frame: Model frame (all needed variables)
-## model.matrix: Model matrix (for the fixed effects)
-## predict:     Predict from the fitted model
-## print:       Print summary output (method for olmm and
-##              olmm.summary objects)
-## ranef:       Extract predicted random effects
-## ranefCov:    Covariance-matrix of random effect terms
-## resid, residuals Extract different types of residuals from the
-##              fitted model
-## show:        Print summary output (method for olmm and
-##              olmm.summary objects)
-## simulate:    Simulate responses based on a fitted model
-## summary:     Extract summary information
-## terms, terms.olmm: Extracting the terms of the model frame
-##              for fixed effects
-## update:      Refits a model
-## VarCorr, print.VarCorr.olmm: Extract variance and standard
-##              deviation of random effects and their correlation
-## vcov:        Variance-covariance matrix for fixed effect parameters
-## weights:     Weights
-##
-## Modifications:
-## 2013-03-17: changed many methods to S3 methods (as in lme4)
-## 2013-09-06: modify formula() method. Now the formula slot
-##             is called
-## 2013-09-06: add S3 for terms() method
-## 2013-09-06: add drop1() method
-##
-## To do:
-## - improve update method
-## - plot methods
-## - estfun.olmm: handle equal zero random effects
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Author:          Reto Buergin, rbuergin@gmx.ch
+##' Date:            2014-05-10
+##'
+##' Description:
+##' methods for olmm objects.
+##'
+##' anova:       Likelihood-ratio tests for the comparison of
+##'              models
+##' coef, coefficients: Extract model coefficients
+##' deviance:    -2*Log-likelihood at the ML estimator
+##' drop1:       Drop single fixed effects
+##' estfun:      Negative scores
+##' extractAIC:  Extract the AIC
+##' fitted:      Extract fitted values from the model
+##' fixef:       Extract fixed effect parameters
+##' formula:     Extracts 'formula'
+##' gefp:        Extract cumulated decorrelated score process
+##' getCall:     Extracts 'call'
+##' logLik:      Log-likelihood at the ML estimator
+##' model.frame: Model frame (all needed variables)
+##' model.matrix: Model matrix (for the fixed effects)
+##' predict:     Predict from the fitted model
+##' print:       Print summary output (method for olmm and
+##'              olmm.summary objects)
+##' ranef:       Extract predicted random effects
+##' ranefCov:    Covariance-matrix of random effect terms
+##' resid, residuals Extract different types of residuals from the
+##'              fitted model
+##' show:        Print summary output (method for olmm and
+##'              olmm.summary objects)
+##' simulate:    Simulate responses based on a fitted model
+##' summary:     Extract summary information
+##' terms, terms.olmm: Extracting the terms of the model frame
+##'              for fixed effects
+##' update:      Refits a model
+##' VarCorr, print.VarCorr.olmm: Extract variance and standard
+##'              deviation of random effects and their correlation
+##' vcov:        Variance-covariance matrix for fixed effect parameters
+##' weights:     Weights
+##'
+##' Modifications:
+##' 2013-03-17: changed many methods to S3 methods (as in lme4)
+##' 2013-09-06: modify formula() method. Now the formula slot
+##'             is called
+##' 2013-09-06: add S3 for terms() method
+##' 2013-09-06: add drop1() method
+##'
+##' To do:
+##' - improve update method
+##' - plot methods
+##' - estfun.olmm: handle equal zero random effects
+##' -------------------------------------------------------- #
 
 anova.olmm <- function(object, ...) {
 
@@ -118,8 +118,8 @@ coef.olmm <- function(object, which = c("all", "fe"), ...) {
   which <- match.arg(which)
   if (which == "fe") return(fixef(object))
   
-  dims <- slot(object, "dims")
-  if (slot(object, "family")$family == "adjacent") {
+  dims <- object$dims
+  if (object$family$family == "adjacent") {
     T <- diag(dims["nPar"])
     subsRows <- seq(1, dims["pCe"] * (dims["nEta"] - 1L), 1L)
     subsCols <- seq(dims["pCe"] + 1L,
@@ -129,10 +129,10 @@ coef.olmm <- function(object, which = c("all", "fe"), ...) {
     } else {
       diag(T[subsRows, subsCols]) <- c(-1.0)
     }
-    rval <- c(T %*% slot(object, "coefficients"))
-    names(rval) <- names(slot(object, "coefficients"))
+    rval <- c(T %*% object$coefficients)
+    names(rval) <- names(object$coefficients)
   } else {
-    rval <- slot(object, "coefficients")
+    rval <- object$coefficients
   }
   if (dims["hasRanef"] == 0L)
     rval <- rval[!grepl("ranefCholFac", names(rval))]
@@ -141,6 +141,8 @@ coef.olmm <- function(object, which = c("all", "fe"), ...) {
 }
 
 coefficients.olmm <- coef.olmm
+
+deviance.olmm <- function(object, ...) return(-as.numeric(2.0 * logLik(object)))
 
 predecor_control <- function(impute = TRUE, seed = NULL,
                              symmetric = TRUE,  reltol = 1e-6,
@@ -163,17 +165,24 @@ predecor_control <- function(impute = TRUE, seed = NULL,
 
 estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
                         nuisance = NULL, ...) {
-  
+
+  ## append '...' arguments to control
+  cArgs <- list(...)
+  cArgs <- cArgs[intersect(names(cArgs), names(formals(olmm_control)))]
+  cArgsNames <- names(cArgs)
+  cArgs <- do.call("predecor_control", cArgs)
+  control[cArgsNames] <- cArgs[cArgsNames]
+    
   if (control$verbose) cat("* extract original scores ... ")
   
   ## check 'x'
   stopifnot(inherits(x, "olmm"))
-  Ni <- table(slot(x, "subject"))
+  Ni <- table(x$subject)
   Nmax <- as.integer(max(Ni))
   xOld <- x # store the original model for restoring at the end
 
   ## check 'predecor'
-  if (slot(x, "dims")["hasRanef"] == 0L) predecor <- FALSE
+  if (x$dims["hasRanef"] == 0L) predecor <- FALSE
   stopifnot(is.logical(predecor))
   predecor <- predecor[1L]
 
@@ -182,55 +191,51 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
   
   ## check 'nuisance'
   if (is.character(nuisance))
-    nuisance <- which(colnames(slot(x, "score_obs")) %in% nuisance)
-  stopifnot(all(nuisance %in% seq_along(colnames(slot(x, "score_obs")))))
-  parm <- seq_along(slot(x, "coefficients")) # internal variable
+    nuisance <- which(colnames(x$score_obs) %in% nuisance)
+  stopifnot(all(nuisance %in% seq_along(colnames(x$score_obs))))
+  parm <- seq_along(x$coefficients) # internal variable
   if (!is.null(nuisance) & is.character(nuisance))
     nuisance <- which(names(coef(x)) %in% nuisance)
   parm <- setdiff(parm, nuisance)
   attr <- list() # default attributes
   
-  scores <- slot(x, "score_obs")
+  scores <- x$score_obs
   subsImp <- rep(FALSE, nrow(scores))
+
+  if (control$verbose) cat("OK")
   
   ## impute data
   
   if (predecor && any(Ni != Nmax)) {
     
     Ninpute <- Nmax - Ni
-    subsImp <- c(rep(FALSE, slot(x, "dims")["n"]), rep(TRUE, sum(Ninpute)))
+    subsImp <- c(rep(FALSE, x$dims["n"]), rep(TRUE, sum(Ninpute)))
     sbjImp <- factor(rep(names(Ni), Ninpute), names(Ni))
     ranef <- ranef(x)
     ranefImp <- ranef[rownames(ranef) %in% unique(sbjImp),,drop = FALSE]
 
     ## get predictors from empirical distribution
     yName <- all.vars(formula(x))[1L]
-    yLevs <- levels(slot(x, "y"))
-    newFrame <- slot(x, "frame")[rep(1L, sum(Ninpute)),,drop=FALSE]
-    newFrame[, slot(x, "subjectName")] <- rep(names(Ninpute), Ninpute)
-    newX <- slot(x, "X")[rep(1L, sum(Ninpute)),,drop=FALSE]
-    newW <- slot(x, "W")[rep(1L, sum(Ninpute)),,drop=FALSE]
+    yLevs <- levels(x$y)
+    newFrame <- x$frame[rep(1L, sum(Ninpute)),,drop=FALSE]
+    newFrame[, x$subjectName] <- rep(names(Ninpute), Ninpute)
+    newX <- x$X[rep(1L, sum(Ninpute)),,drop=FALSE]
+    newW <- x$W[rep(1L, sum(Ninpute)),,drop=FALSE]
 
     ## add imputations to model
-    slot(x, "frame") <- rbind(slot(x, "frame"), newFrame)
-    slot(x, "y") <- ordered(c(as.character(slot(x, "y")),
+    x$frame <- rbind(x$frame, newFrame)
+    x$y <- ordered(c(as.character(x$y),
                               as.character(newFrame[, yName])), yLevs)
-    slot(x, "X") <- rbind(slot(x, "X"), newX)
-    slot(x, "W") <- rbind(slot(x, "W"), newW)
-    slot(x, "subject") <-
-      factor(c(as.character(slot(x, "subject")), newFrame[, slot(x, "subjectName")]),
+    x$X <- rbind(x$X, newX)
+    x$W <- rbind(x$W, newW)
+    x$subject <-
+      factor(c(as.character(x$subject), newFrame[, x$subjectName]),
              levels = names(Ni))
-    slot(x, "weights") <- slot(x, "weights_sbj")[as.integer(slot(x, "subject"))]
-    slot(x, "offset") <-
-      rbind(slot(x, "offset"),
-            matrix(0.0, sum(Ninpute), slot(x, "dims")["nEta"]))
-    slot(x, "dims")["n"] <- nrow(slot(x, "frame"))
-    slot(x, "eta") <-
-      rbind(slot(x, "eta"),
-            matrix(0.0, sum(Ninpute), slot(x, "dims")["nEta"]))
-    slot(x, "score_obs") <-
-      rbind(slot(x, "score_obs"),
-            matrix(0.0, sum(Ninpute), slot(x, "dims")["nPar"]))    
+    x$weights <- x$weights_sbj[as.integer(x$subject)]
+    x$offset <- rbind(x$offset, matrix(0.0, sum(Ninpute), x$dims["nEta"]))
+    x$dims["n"] <- nrow(x$frame)
+    x$eta <- rbind(x$eta, matrix(0.0, sum(Ninpute), x$dims["nEta"]))
+    x$score_obs <- rbind(x$score_obs, matrix(0.0, sum(Ninpute), x$dims["nPar"]))    
 
     ## simulate responses
     if (control$impute) {
@@ -240,35 +245,33 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
       ## set seed
 
       ## impute predictors
-      times <- Ninpute[slot(x, "subject")[!subsImp]]
-      rows <- unlist(tapply(1:sum(Ni), slot(x, "subject")[!subsImp], function(x) sample(x, times[x[1L]], replace = TRUE)))
-      slot(x, "frame")[subsImp,] <- slot(x, "frame")[rows,,drop=FALSE]
-      slot(x, "X")[subsImp, ] <- slot(x, "X")[rows,,drop=FALSE]
-      slot(x, "W")[subsImp, ] <- slot(x, "W")[rows,,drop=FALSE]
+      times <- Ninpute[x$subject[!subsImp]]
+      rows <- unlist(tapply(1:sum(Ni), x$subject[!subsImp], function(x) sample(x, times[x[1L]], replace = TRUE)))
+      x$frame[subsImp,] <- x$frame[rows,,drop=FALSE]
+      x$X[subsImp, ] <- x$X[rows,,drop=FALSE]
+      x$W[subsImp, ] <- x$W[rows,,drop=FALSE]
 
       ## draw responses
-      subsW <- c(rep(which(attr(slot(xOld, "W"), "merge") == 1L),
-                     slot(x, "dims")["nEta"]),
-                 which(attr(slot(xOld, "W"), "merge") == 2L))
-      tmatW <- rbind(kronecker(diag(slot(x, "dims")["nEta"]),
-                               rep(1,slot(x, "dims")["qCe"])),
-                     matrix(1, slot(x, "dims")["qGe"], slot(x, "dims")["nEta"]))
-      etaFixef <- slot(x, "X")[subsImp, ] %*% slot(x, "fixef")     
-      etaRanef <- (slot(x, "W")[subsImp, subsW,drop = FALSE] *
-                   ranef[as.integer(slot(x, "subject")[subsImp])]) %*% tmatW
+      subsW <- c(rep(which(attr(xOld$W, "merge") == 1L), x$dims["nEta"]),
+                 which(attr(xOld$W, "merge") == 2L))
+      tmatW <- rbind(kronecker(diag(x$dims["nEta"]), rep(1,x$dims["qCe"])),
+                     matrix(1, x$dims["qGe"], x$dims["nEta"]))
+      etaFixef <- x$X[subsImp, ] %*% x$fixef     
+      etaRanef <- (x$W[subsImp, subsW,drop = FALSE] *
+                   ranef[as.integer(x$subject[subsImp])]) %*% tmatW
       eta <- etaFixef + etaRanef
-      probs <- slot(x, "family")$linkinv(eta)
+      probs <- x$family$linkinv(eta)
       if (!is.null(control$seed)) set.seed(control$seed)
-      slot(x, "y")[subsImp] <- # simulate responses
+      x$y[subsImp] <- # simulate responses
         ordered(apply(probs, 1L, function(x) sample(yLevs, 1L, prob = x)), yLevs)
       
       ## recompute scores
-      .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
+      .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")
 
-      scores <- 0.0 * slot(x, "score_obs")
-      scores[!subsImp, ] <- slot(x, "score_obs")[!subsImp,,drop=FALSE]
+      scores <- 0.0 * x$score_obs
+      scores[!subsImp, ] <- x$score_obs[!subsImp,,drop=FALSE]
       
-      if (control$verbose) cat(" OK")
+      if (control$verbose) cat("OK")
     }
   }
 
@@ -280,7 +283,7 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
     ## compute transformation matrix
     if (control$verbose) cat("\n* compute transformation matrix ...")
     T <- olmm_decormat(scores = scores[!subsImp,,drop = FALSE],
-                       subject = slot(x, "subject")[!subsImp],
+                       subject = x$subject[!subsImp],
                        control = control)
     
     ## if transformation failed, return raw scores
@@ -291,7 +294,7 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
       ## transformation matrix for one subject
       Ti <- kronecker(matrix(1, Nmax, Nmax) - diag(Nmax), T)
       diag(Ti) <- 1
-      subsOrd <- order(slot(x, "subject"))      
+      subsOrd <- order(x$subject)      
       sTmp <- matrix(c(t(scores[subsOrd,,drop=FALSE])),
                      Nmax * ncol(scores),length(Ni))
       sTmp <- matrix(c(Ti %*% sTmp), nrow(scores), ncol(scores), byrow = TRUE)
@@ -306,7 +309,7 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
    
   ## ^hack: recompute old model
   x <- xOld
-  .Call("olmm_update_marg", x, slot(x, "coefficients"), PACKAGE = "vcrpart")
+  .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")
   
   if (control$verbose) cat("\n* return negative scores\n")
   
@@ -316,7 +319,7 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
     
 
 ## thanks lme4
-extractAIC.olmm <- function(fit, scale = 0, k = 2, ...) {
+extractAIC.olmm <- function(fit, scale, k = 2, ...) {
   L <- logLik(fit)
   edf <- attr(L,"df")
   c(edf,-2*L + k*edf)
@@ -329,7 +332,7 @@ fitted.olmm <- function(object, ...) {
 fixef.olmm <- function(object, which = c("all", "ce", "ge"), ...) {
 
   which <- match.arg(which)
-  dims <- slot(object, "dims")
+  dims <- object$dims
   coef <- coef(object)
   rval <- c()
 
@@ -350,7 +353,7 @@ fixef.olmm <- function(object, which = c("all", "ce", "ge"), ...) {
   return(rval)
 }
 
-formula.olmm <- function(x, ...) as.formula(slot(x, "formula"), env = parent.frame())
+formula.olmm <- function(x, ...) as.formula(x$formula, env = parent.frame())
 
 gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
                       predecor = TRUE, parm = NULL, center = TRUE, drop = TRUE,
@@ -402,17 +405,28 @@ gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
   process <- process / sqrt(n)
 
   ## multiply scores with the inverse of the square root of their crossproduct
-  J12Inv <- try(chol2inv(chol(root.matrix(crossprod(process)))), silent = TRUE)
-  if (class(J12Inv) == "try-error" && drop) {
-      J12 <- crossprod(process)
-      subs <- rep(TRUE, k)
-      subs[diag(J12) / max(diag(J12)) < 1e-2] <- FALSE
-      J12Inv <- matrix(0, k, k)
-      J12Inv[subs, subs] <- chol2inv(chol(root.matrix(J12[subs, subs, drop = FALSE])))
-      if (!silent) warning("covariance matrix is not positive semidefinite. ",
-                           "Omit terms: ",
-                           paste(colnames(process)[!subs], collapse = ", "))
-  } 
+  subs <- rep(TRUE, k)
+  J12 <- crossprod(process)
+  J12Inv <- matrix(0, k, k)
+  if (drop)
+    subs <- subs & apply(process, 2, function(x) max(abs(x)) > .Machine$double.eps)
+  mat <- try(chol2inv(chol(root.matrix(J12[subs, subs, drop = FALSE]))), TRUE)
+  if (inherits(mat, "try-error") && drop) {
+    subs <- subs & (diag(J12) / max(diag(J12)) > 1e-6)
+    mat <- try(chol2inv(chol(root.matrix(J12[subs, subs, drop = FALSE]))), TRUE)
+  }
+  if (inherits(mat, "try-error") && drop && length(parm) > 0L) {
+    subs <- subs & colnames(process) %in% parm
+    mat <- try(chol2inv(chol(root.matrix(J12[subs, subs, drop = FALSE]))), TRUE)
+  }
+  
+  if (inherits(mat, "try-error")) return(mat)
+  
+  if (!silent && !all(subs))
+    warning("covariance matrix is not positive semidefinite. Omit terms: ",
+            paste(cn[!subs], collapse = ", "))
+
+  J12Inv[subs, subs] <- mat  
   process <- t(J12Inv %*% t(process))
 
   ## order and cumulate the process
@@ -447,13 +461,13 @@ gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
   return(rval)
 }
 
-getCall.olmm <- function(x, ...) {
-  return(slot(x, "call"))
-}
+
+getCall.olmm <- function(x, ...) return(x$call)
+
 
 logLik.olmm <- function(object, ...) {
-  dims <- slot(object, "dims")
-  rval <- slot(object, "logLik")
+  dims <- object$dims
+  rval <- object$logLik
   attr(rval, "nall") <- attr(rval, "nobs") <- dims[["n"]]
   nPar <- dims[["nPar"]] - (1 - dims[["hasRanef"]])
   attr(rval, "df") <- nPar
@@ -461,14 +475,14 @@ logLik.olmm <- function(object, ...) {
   return(rval)
 }
 
-model.frame.olmm <- function(formula, ...) slot(formula, "frame")
+model.frame.olmm <- function(formula, ...) formula$frame
 
 model.matrix.olmm <- function(object, which = c("fe", "fe-ce", "fe-ge",
                                         "re", "re-ce", "re-ge"), ...) {
   which <- match.arg(which)
   rval <- switch(substr(which, 1L, 2L),
-                 fe = slot(object, "X"),
-                 re = slot(object, "W"))
+                 fe = object$X,
+                 re = object$W)
   if (!which %in% c("fe", "re")) {
     attr <- attributes(rval)
     subs <- attr(rval, "merge") == switch(substr(which, 4, 5), ce = 1, ge = 2)
@@ -481,9 +495,9 @@ model.matrix.olmm <- function(object, which = c("fe", "fe-ce", "fe-ge",
   return(rval)
 }
 
-neglogLik.olmm <- function(object, ...) return(-as.numeric(logLik(object)))
+neglogLik2.olmm <- function(object, ...) return(-as.numeric(logLik(object)))
 
-nobs.olmm <- function(object, ...) slot(object, "dims")[["n"]]
+nobs.olmm <- function(object, ...) object$dims[["n"]]
 
 predict.olmm <- function(object, newdata = NULL,
                          type = c("link", "response", "prob", "class", "ranef"),
@@ -501,7 +515,7 @@ predict.olmm <- function(object, newdata = NULL,
   formList <- vcrpart_formula(formula(object)) # extract formulas
   offset <- list(...)$offset
   subset <- list(...)$subset
-  dims <- slot(object, "dims")
+  dims <- object$dims
   
   ## checks
   if (!is.null(newdata) && !class(newdata) == "data.frame")
@@ -516,8 +530,8 @@ predict.olmm <- function(object, newdata = NULL,
     ## extract data from the model fit
     X <- model.matrix(object, "fe")
     W <- model.matrix(object, "re")
-    subject <- slot(object, "subject")
-    offset <- slot(object, "offset")
+    subject <- object$subject
+    offset <- object$offset
     
     ## check and extract random effects
     if (is.logical(ranef)) {
@@ -550,15 +564,11 @@ predict.olmm <- function(object, newdata = NULL,
       .checkMFClasses(cl, mf)   
  
     ## extract fixed effect model matrix from newdata
-    X <- olmm_merge_mm(model.matrix(terms(formList$fe$eta$ce, keep.order = TRUE),
-                                    newdata, attr(slot(object, "X"), "contrasts")),
-                       model.matrix(terms(formList$fe$eta$ge, keep.order = TRUE),
-                                    newdata, attr(slot(object, "X"), "contrasts")),
-                       TRUE)
+    X <- olmm_merge_mm(model.matrix(terms(formList$fe$eta$ce, keep.order = TRUE), newdata, attr(object$X, "contrasts")[intersect(all.vars(formList$fe$eta$ce), names(attr(object$X, "contrasts")))]), model.matrix(terms(formList$fe$eta$ge, keep.order = TRUE), newdata, attr(object$X, "contrasts")[intersect(all.vars(formList$fe$eta$ge), names(attr(object$X, "contrasts")))]), TRUE)
     rownames(X) <- rownames(newdata)
 
     ## delete columns of dropped terms
-    X <- X[, colnames(slot(object, "X")), drop = FALSE]
+    X <- X[, colnames(object$X), drop = FALSE]
 
     if (is.null(offset))
       offset <- matrix(0.0, nrow(X), dims["nEta"])
@@ -568,18 +578,18 @@ predict.olmm <- function(object, newdata = NULL,
       
     ## random effects
     if (is.matrix(ranef)) {
-      if (!slot(object, "subjectName") %in% colnames(newdata)) {
-        stop(paste("column '", slot(object, "subjectName"),
+      if (!object$subjectName %in% colnames(newdata)) {
+        stop(paste("column '", object$subjectName,
                    "' not found in the 'newdata'.", sep = ""))
       } else {
-        subject <- factor(newdata[, slot(object, "subjectName")])
+        subject <- factor(newdata[, object$subjectName])
       }
       
       ## extract model formulas
       W <- olmm_merge_mm(model.matrix(terms(formList$re$eta$ce, keep.order = TRUE),
-                                      newdata, attr(slot(object, "W"), "contrasts")),
+                                      newdata, attr(object$W, "contrasts")),
                          model.matrix(terms(formList$re$eta$ge, keep.order = TRUE),
-                                      newdata, attr(slot(object, "W"), "contrasts")),
+                                      newdata, attr(object$W, "contrasts")),
                                       FALSE)
       rownames(W) <- rownames(newdata)
       
@@ -613,17 +623,17 @@ predict.olmm <- function(object, newdata = NULL,
     if (!is.null(subject)) subject <- factor(subject)
   }
 
-  yLevs <- levels(slot(object, "y"))
+  yLevs <- levels(object$y)
   if (nrow(X) > 0) {
 
     ## compute linear predictor
-    eta <- offset + X %*% slot(object, "fixef")
+    eta <- offset + X %*% object$fixef
     
     ## predict marginal ...
     if (is.logical(ranef) && !ranef & type %in% c("response", "class")) {
 
       probs <- matrix(0, nrow(X), ncol(eta) + 1L)
-      colnames(probs) <- levels(slot(object, "y"))
+      colnames(probs) <- levels(object$y)
       rownames(probs) <- rownames(X)
       .Call("olmm_pred_marg", object, eta, W, nrow(X), probs, PACKAGE = "vcrpart")
       
@@ -640,11 +650,11 @@ predict.olmm <- function(object, newdata = NULL,
         eta <- eta +
           (W[, subsW,drop = FALSE] * ranef[as.integer(subject),,drop=FALSE]) %*% tmatW
       rownames(eta) <- rownames(X)
-      colnames(eta) <- colnames(slot(object, "eta"))
+      colnames(eta) <- colnames(object$eta)
         
       if (type == "link") return(eta)
 
-      probs <- slot(object, "family")$linkinv(eta)
+      probs <- object$family$linkinv(eta)
       colnames(probs) <- yLevs
       rownames(probs) <- rownames(X)
     }
@@ -710,21 +720,21 @@ print.olmm <- function(x, etalab = c("int", "char", "eta"), ...) {
 
 ranef.olmm <- function(object, norm = FALSE, ...) {
   if (!norm) {
-    rval <- slot(object, "u") %*% t(slot(object, "ranefCholFac"))
+    rval <- object$u %*% t(object$ranefCholFac)
   } else {
-    rval <- slot(object, "u")
+    rval <- object$u
   }
   return(rval)
 }
 
 ranefCov.olmm <- function(object, ...) {
 
-  dims <- slot(object, "dims")
+  dims <- object$dims
     
   ## transformation for the adjacent-categories model
-  if (slot(object, "family")$family == "adjacent" & dims["qCe"] > 0) {
+  if (object$family$family == "adjacent" & dims["qCe"] > 0) {
     
-    ranefCholFac <- rval <- slot(object, "ranefCholFac")
+    ranefCholFac <- rval <- object$ranefCholFac
     
     ## row-wise subtraction of category-specific effects
     
@@ -746,7 +756,7 @@ ranefCov.olmm <- function(object, ...) {
   } else {
     
     ## cumulative-link model or baseline-category model
-    return(slot(object, "ranefCholFac") %*% t(slot(object, "ranefCholFac")))
+    return(object$ranefCholFac %*% t(object$ranefCholFac))
   }
 }
 
@@ -757,7 +767,7 @@ resid.olmm <- function(object, norm = FALSE, ...) {
   args$type <- "response"
   fitted <- do.call("predict", args)
   y <- as.integer(model.response(model.frame(object)))
-  J <- slot(object, "dims")["J"]
+  J <- object$dims["J"]
   n <- length(y)
   rval <- sapply(1:n, function(i) {
     sum(fitted[i, 1L:J > y[i]]) - sum(fitted[i, 1L:J < y[i]])
@@ -771,9 +781,6 @@ resid.olmm <- function(object, norm = FALSE, ...) {
 
 residuals.olmm <- resid.olmm
 
-setMethod(f = "show", signature = "olmm",
-          definition = function(object) print.olmm(object))
-
 simulate.olmm <- function(object, nsim = 1, seed = NULL,
                           newdata = NULL, ranef = TRUE, ...) {
   dotArgs <- list(...)
@@ -782,10 +789,10 @@ simulate.olmm <- function(object, nsim = 1, seed = NULL,
   RNGstate <- .Random.seed
   dotArgs$type <- "response"
   pred <- predict(object, newdata = newdata, type = "prob", ranef = ranef, ...)
-  FUN <- function(x) sample(levels(slot(object, "y")), 1, prob = x)
+  FUN <- function(x) sample(levels(object$y), 1, prob = x)
   rval <- as.data.frame(replicate(nsim, apply(pred, 1L, FUN)))
   for (i in 1:nsim)
-    rval[,i] <- factor(rval[, i], levels = levels(slot(object, "y")), ordered = TRUE)
+    rval[,i] <- factor(rval[, i], levels = levels(object$y), ordered = TRUE)
   if (nsim == 1) {
     colnames(rval) <- colnames(model.frame(object))[1]
   } else {
@@ -799,7 +806,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
                          silent = FALSE, ...) {
 
   etalab <- match.arg(etalab)
-  dims <- slot(object, "dims")
+  dims <- object$dims
             
   ## goodness of fit measures
   lLik <- logLik(object)
@@ -824,7 +831,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
     feMatGe <- 
       cbind("Estimate" = fixef[subs],
             "Std. Error" = rep(NaN, length(subs)),
-            "t value" = rep(NaN, length(subs)))
+            "z value" = rep(NaN, length(subs)))
     if (validVcov) {
       feMatGe[, 2L] <- sqrt(diag(vcov)[subs])
       feMatGe[, 3L] <- feMatGe[, 1L] / feMatGe[, 2L]
@@ -832,7 +839,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
     
   } else { # empty matrix
     feMatGe <- matrix(, 0L, 3L, dimnames =
-                      list(c(), c("Estimate", "Std. Error", "t value")))
+                      list(c(), c("Estimate", "Std. Error", "z value")))
   }
   
   ## category-specific fixed effects
@@ -841,14 +848,14 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
     feMatCe <-
       cbind("Estimate" = fixef[subs],
             "Std. Error" = rep(NaN, length(subs)),
-            "t value" = rep(NaN, length(subs)))
+            "z value" = rep(NaN, length(subs)))
     if (validVcov) {
       feMatCe[, 2L] <- sqrt(diag(vcov)[subs])
       feMatCe[, 3L] <- feMatCe[, 1L] / feMatCe[, 2L]
     }
   } else { # empty matrix
     feMatCe <- matrix(, 0L, 3L, dimnames =
-                      list(c(), c("Estimate", "Std. Error", "t value")))
+                      list(c(), c("Estimate", "Std. Error", "z value")))
   }
   
   ## random effects
@@ -874,7 +881,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
   ## return a 'summary.olmm' object
   return(structure(
            list(methTitle = methTitle,
-                family = slot(object, "family"),
+                family = object$family,
                 formula = paste(deparse(formula(object)), collapse = "\n"),
                 data = deparseCall(call$data),
                 subset = deparseCall(call$subset),
@@ -884,7 +891,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
                 REmat = VarCorr,
                 na.action = na.action,
                 dims = dims,
-                yLevs = levels(slot(object, "y")),
+                yLevs = levels(object$y),
                 etalab = etalab,
                 dotargs = list(...)), class = "summary.olmm"))
 }
@@ -935,7 +942,7 @@ terms.olmm <- function(x, which = c("fe-ce", "fe-ge",
                   "fe-ce" = "feCe",
                   "re-ge" = "reGe",
                   "re-ce" = "reCe")
-  return(slot(x, "terms")[[which]])
+  return(x$terms[[which]])
 }
 
 
@@ -967,7 +974,7 @@ VarCorr.olmm <- function(x, sigma = 1., rdig = 3) {
   REmat <- cbind(Variance = diag(RECovMat),
                  StdDev = sqrt(diag(RECovMat)))
   rval <- cbind(REmat, cov2cor(RECovMat))
-  attr(rval, "title") <- paste("Subject:", slot(x, "subjectName"))
+  attr(rval, "title") <- paste("Subject:", x$subjectName)
   class(rval) <- "VarCorr.olmm"
   return(rval)
 }
@@ -1004,8 +1011,8 @@ print.VarCorr.olmm <- function(x, ...) { # S3 method
 
 vcov.olmm <- function(object, ...) {
 
-  dims <- slot(object, "dims")
-  info <- slot(object, "info")
+  dims <- object$dims
+  info <- object$info
   if (dims["hasRanef"] == 0L)
     info <- info[1L:dims["p"], 1:dims["p"]]
   
@@ -1014,7 +1021,7 @@ vcov.olmm <- function(object, ...) {
   dimnames(rval) <- dimnames(info)
   
   ## parameter transformation for adjacent-category models
-  if (slot(object, "family")$family == "adjacent") {
+  if (object$family$family == "adjacent") {
     
     ## matrix T with partial derivates of transformation 
     T <- diag(nrow(rval))
@@ -1045,6 +1052,6 @@ vcov.olmm <- function(object, ...) {
 
 weights.olmm <- function(object, level = c("observation", "subject"), ...) {
   return(switch(match.arg(level),
-                observation = slot(object, "weights"),
-                subject = slot(object, "weights_sbj")))
+                observation = object$weights,
+                subject = object$weights_sbj))
 }

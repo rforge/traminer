@@ -1,131 +1,203 @@
 \name{tvcm-assessment}			
 
 \alias{tvcm-assessment}
-\alias{AIC.tvcm}
-\alias{BIC.tvcm}
-\alias{cvfolds}
-\alias{cvrisk}
-\alias{cvrisk.tvcm}
-\alias{risk}
-\alias{risk.tvcm}
-\alias{oobrisk}
-\alias{oobrisk.tvcm}
-\alias{stabpath}
-\alias{stabpath.tvcm}
+\alias{folds_control}
+\alias{cvloss}
+\alias{cvloss.tvcm}
+\alias{loss}
+\alias{loss.tvcm}
+\alias{oobloss}
+\alias{oobloss.tvcm}
+\alias{print.cvloss.tvcm}
+\alias{plot.cvloss.tvcm}
+\alias{prune}
+\alias{prune.tvcm}
 
-\title{Model assessment and selection for \code{\link{tvcm}} objects.}
+\title{Model assessment and model selection for \code{\link{tvcm}} objects.}
 
 \description{
-  In-sample Akaike information criterion (AIC) and Bayesian information
-  criterion (BIC), out-of-bag risk, cross-validated risk and variable selection 
-  stability paths for \code{\link{tvcm}} objects.
+  Out-of-bag loss, cross-validation and pruning for 
+  \code{\link{tvcm}} objects. 
 }
 
 \usage{
 
-\method{AIC}{tvcm}(object, sub = FALSE, alpha = NULL, maxwidth = NULL, 
-    k = 2,  verbose = FALSE, ...)
+folds_control(type = c("kfold", "subsampling", "bootstrap"),
+      K = ifelse(type == "kfold", 5, 30),
+      prob = 0.5, weights = c("case", "freq"),
+      seed = NULL)
 
-\method{BIC}{tvcm}(object, ...)
+\method{cvloss}{tvcm}(object, folds = folds_control(),
+       fun = NULL, dfpar = 2, direction = c("backward", "forward"),
+       papply = mclapply, verbose = FALSE, ...)
 
-cvfolds(x, type = c("kfold", "subsampling", "bootstrap"),
-        K = ifelse(type == "kfold", 10L, 50L),
-        prob = 0.5)
+\method{print}{cvloss.tvcm}(x, ...)
 
-\method{cvrisk}{tvcm}(object, folds = cvfolds(object, "kfold", 10),
-       fun = NULL, alpha = NULL, maxwidth = NULL, verbose = FALSE, ...)
+\method{plot}{cvloss.tvcm}(x, legend = TRUE, details = TRUE, ...)
 
-\method{oobrisk}{tvcm}(object, newdata = NULL, weights = NULL, 
-     fun = NULL, ...)
+\method{oobloss}{tvcm}(object, newdata = NULL, weights = NULL,
+        fun = NULL, ...)
 
-\method{stabpath}{tvcm}(object, q, alpha = NULL, maxwidth = NULL, ...)
-
+\method{prune}{tvcm}(tree, dfsplit = NULL, dfpar = 2.0,
+      direction = c("backward", "forward"),
+      alpha = NULL, maxstep = NULL, terminal = NULL,
+      papply = mclapply, keeploss = FALSE, ...)
 }
 
 \arguments{
-  \item{object}{an object of class \code{\link{tvcm}}.}
-  \item{x}{either a \code{\link{tvcm}} object or a \code{factor}
-    representing the stage-1 structure (subjects) of the data.}
-  \item{sub}{logical scalar. Whether a list of AIC's of submodels should
-    be computed.}
-  \item{k}{numeric scalar. The penalty per parameter to be used; the
-    default \code{k=2} is the classical AIC.}  
-  \item{alpha}{numerical scalar. Maximal alpha parameter to be
-    evaluated. See \code{\link{tvcm_control}}.} 
-  \item{maxwidth}{integer scalar. Maximal width of the tree to be
-    evaluated. See \code{\link{tvcm_control}}.} 
-  \item{type}{character string. The type of sampling scheme to be
-    used to extract subsets.}   
-  \item{K}{integer. The number of folds to be evaluated.} 
-  \item{prob}{numeric. The probability for the \code{"subsampling"} 
-    cross-validation scheme.}
-  \item{folds}{a integer matrix. User specified folds for
-    cross-validation from which columns are used to extract subsets of
-    the data.}
-  \item{fun}{the risk function. By default, the mean of the deviance 
-    residuals are used. \code{\link{family}}.} 
+  \item{object, tree}{an object of class \code{\link{tvcm}}.}
+  \item{x}{an object of class \code{cvloss.tvcm} as produced by
+    \code{\link{cvloss}}.} 
+  \item{type}{character string. The type of sampling scheme to be used
+    to divide the data of the input model in a learning and a validation
+    set.}    
+  \item{K}{integer scalar. The number of folds.} 
+  \item{prob}{numeric between 0 and 1. The probability for the
+    \code{"subsampling"} cross-validation scheme.}
+  \item{weights}{for \code{\link{folds_control}}, a character that defines
+    whether the weights of \code{object} are case weights or frequencies
+    of cases; for \code{\link{oobloss}}, a numeric vector
+    of weights corresponding to the rows of \code{newdata}.}
+  \item{seed}{an numeric scalar that defines the seed.}
+  \item{folds}{a list with control arguments as produced by
+    \code{\link{folds_control}}.}
+  \item{fun}{the loss function for the validation sets. By default, the
+    (possibly weighted) mean of the deviance residuals as defined by the
+    \code{\link{family}} of the fitted \code{object} is applied.}
+  \item{dfpar}{a numeric scalar larger than zero. The per parameter penalty
+    to be applied. If the 2 log-likelihood prediction error is used,
+    this value is typically set to 2.} 
+  \item{direction}{either \code{"backward"} (the default) or
+    \code{"forward"}. Indicates the pruning algorithm to be
+    used. \code{"backward"} applies backward pruning where in each
+    iteration the inner node that produces the smallest per-node
+    increase is collapsed. \code{"forward"} applies premature stopping
+    when no new split would improve the model.}
+  \item{papply}{(parallel) apply function, defaults to
+    \code{\link[parallel]{mclapply}}. To run \code{cvloss} sequentially
+    (i.e. not in parallel), use \code{\link{lapply}}.}
   \item{newdata}{a data.frame of out-of-bag data (including the response
-    variable).}
-  \item{weights}{a numeric vector of weights corresponding to entries in \code{newdata}.} 
-  \item{q}{maximum number of variables to be selected in each
-    evaluation.} 
+    variable). See also \code{\link{predict.tvcm}}.}
   \item{verbose}{logical scalar. If \code{TRUE} verbose output is
     generated during the validation.}
+  \item{legend}{logical scalar. Whether a legend should be added.}
+  \item{details}{logical scalar. Whether the foldwise validation errors
+    and the in-sample prediction error should be shown.}
+  \item{dfsplit}{numeric scalar. The per-split cost \code{dfsplit} with
+    which the partitions are to be cross-validated. If no \code{dfsplit}
+    is specified (default), the parameter is ignored for pruning.}
+  \item{alpha}{numeric significance level. Represents the stopping
+    parameter for \code{\link{tvcm}} objects grown with \code{sctest =
+      TRUE}, see \code{\link{tvcm_control}}. A node is splitted when the 
+    \eqn{p} value for any coefficient stability test in that node falls
+    below \code{alpha}.}
+  \item{maxstep}{integer. The maximum number of steps of the algorithm.}
+  \item{terminal}{a list of integer vectors with the ids of the nodes
+    the subnodes of which should be merged. }
+  \item{keeploss}{logical scalar or numeric. If and how many times the
+    statistics should be reused in following iterations. Specifically,
+    the option activates approximating the AIC reduction per split based
+    on AIC reduction of the last iteration adjusted by AIC reduction of
+    the last collapse. Values different from \code{FALSE} or 0 will
+    accelerate the algorithm at the expense of accuracy. In cases of
+    multiple \code{\link{vc}} terms, only the statistics corresponding
+    to the \code{\link{vc}} term in which a node was collapsed in the previous
+    iteration are considered to be reused.}
   \item{...}{other arguments to be passed.} 
 }
 
-\details{The \code{\link{tvcm}} algorithm provides with 
-  \code{method = "mob"} an implementation that selects the size of 
-  the tree automatically. An alternative to such premature stopping 
-  is to evaluate the predictive performance at different levels of 
-  the tuning parameter, which is \code{alpha} for \code{method = "mob"} 
-  and \code{maxwidth} for \code{method = "partreg"}, selecting the 
-  tuning parameters that performs best and re-fit the model using 
-  the selected parameter. This is what you can do with \code{AIC}, 
-  \code{BIC} and \code{vcrisk}.
+\details{As described in the help of \code{\link{tvcm}}, the TVCM is a two stage  
+  procedure where first a model with overly fine partitions is grown 
+  with \code{\link{tvcm}} and second the best-sized partitions are 
+  selected with the \code{\link{prune}} method. An alternative is to specify
+  \code{sctest = TRUE} in \code{\link{tvcm_control}} and select the 
+  partition-sizes with the \code{alpha} and \code{bonferroni} parameters.
 
-  \code{AIC} resp. \code{BIC} with argument \code{sub = TRUE} show 
-  the Akaike information criterion resp. Bayesian information criterion, 
-  evaluated for different \code{alpha}s resp. \code{maxwidth}s. 
-  If the assigned \code{alpha} resp. \code{maxwidth} exceeds the 
-  corresponding parameter used for fitting, the model will be re-fitted. 
-  
-  \code{cvrisk} cross-validates the risk, which is by default the mean 
-  of deviance residuals, for different levels of the principal tuning 
-  parameter, i.e., for different levels of \code{alpha} for 
-  \code{method = "mob"} and for different levels of\code{maxwidth} 
-  for \code{method = "partreg"}. \code{cvrisk} requires an \eqn{n \times K} 
-  integer matrix \code{folds} where \eqn{n} is equal \code{nobs(object)} 
-  and \eqn{K} the number of desired evaluation steps. For the \eqn{k}-th 
-  evaluation step, the \eqn{k}-th column is used to extract a subset of 
-  the learning data to re-fit the model. Specifically, the integer 
-  numbers of entries in \code{folds} define the number of times
-  observations appear in the learning data for re-fitting the model. Zero 
-  entries are used to estimate the out-of-bag error. We recommend to 
-  produce the \code{folds} matrix by the utility function \code{cvfolds}.
+  The \code{\link{prune}} method collapses inner nodes of the overly large tree
+  fitted with \code{\link{tvcm}} to minimize the in-sample prediction error. 
+  The in-sample prediction error is, in what follows, defined as the mean of the
+  in-sample loss plus \code{dfpar} times the number of coefficients plus 
+  \code{dfsplit} times the number of splits. In the common likelihood setting, 
+  the loss is equal - 2 times the maximum likelihood and \code{dfpar = 2}. The
+  per-split penalty \code{dfsplit} generally unknown and estimated by using 
+  cross-validation.
 
-  The default for \code{cvfolds} is to produce a random 10-fold 
-  cross-validation scheme. Alternatives are \code{type = "subsampling"} 
-  (random draws without replacement) and \code{type = "bootstrap"} 
-  (random draws with replacement). For 2-stage models fitted by 
-  \code{\link{olmm}}, the subsets are based on subject-wise i.e. 
-  first stage sampling.
+  \code{\link{folds_control}} and \code{\link{cvloss}} allow for estimating 
+  \code{dfsplit} by cross-validation. The function \code{\link{folds_control}} 
+  is used to specify the cross-validation scheme, where a random 5-fold 
+  cross-validation scheme is set as the default. Alternatives are 
+  \code{type = "subsampling"} (random draws without replacement) and 
+  \code{type = "bootstrap"} (random draws with replacement). For 2-stage 
+  models (with random-effects) fitted by \code{\link{olmm}}, the subsets 
+  are based on subject-wise i.e. first stage sampling. For models where weights 
+  represent frequencies of observation units with exactly the same values in 
+  all variables (e.g., data from contingency tables), the option \code{weights =
+    "freq"} should be used. 
+
+  \code{\link{cvloss}} repeatedly fits \code{\link{tvcm}} objects based
+  on the internally created folds and evaluates mean out-of-bag loss of
+  the model at different levels of the tuning parameter \code{dfsplit}. 
+  Out-of-bag loss refers here to the prediction error based on a loss function, 
+  which is typically the -2 log-likelihood error (see the details for 
+  \code{oobloss} below). Commonly, \code{dfsplit} is used for backward pruning 
+  (\code{direction = "backward"}), but it is also possible to
+  cross-validate \code{dfsplit} for premature stopping (\code{direction
+  = "forward"}, see argument \code{dfsplit} in
+  \code{\link{tvcm_control}}). \code{\link{cvloss}} returns an object
+  for which a \code{print} and a \code{plot} generic is provided. The
+  proposed estimate for \code{dfsplit} is the one that minimizes the
+  validated loss and can be extracted from component \code{dfsplit.min}. 
   
-  \code{oobrisk} can be used for estimating the prediction error of the
-  selected model based on \code{newdata}. By default, the risk is defined
-  as the sum of deviance residuals. The risk function may be defined
-  manually by the argument \code{fun}, see the examples below.
-  
-  The function \code{stabpath} implements the "stability paths" of
-  Meinshausen and Buehlmann (2010). The function estimates the probability
-  with which variables are selected by \code{\link{tvcm}}, by fitting
-  the model on multiple subsamples. In each evaluation step, a tree
-  is grown until the maximum tuning parameter is reached or the number
-  of selected variables is equal \code{q}. For details, see 
-  Meinshausen and Buehlmann (2010).
+  \code{\link{oobloss}} can be used for estimating the out-of-bag
+  prediction error for out-of-bag data (the \code{newdata}
+  argument). By default, the loss is defined as the sum of deviance
+  residuals, see the return value \code{dev.resids} of
+  \code{\link{family}} resp. \code{\link{family.olmm}}. Otherwise, the
+  loss function can be defined manually by the argument \code{fun}, see 
+  the examples below. In general the sum of deviance residual is equal
+  the -2 log-likelihood. A special case is the gaussian family, where
+  the deviance residuals are computed as \eqn{\sum_{i=1}^N w_i
+  (y_i-\mu)^2} that is, the deviance residuals ignore the term
+  \eqn{\log{2\pi\sigma^2}}. Therefore, the sum of deviance residuals for
+  the gaussian model (and possibly others) is not exactly the -2
+  log-likelihood prediction error but shifted by a constant. Another
+  special case are models with random effects. For models based on
+  \code{\link{olmm}}, the deviance residuals are based on the marginal
+  predictions (where random effects are integrated out).
+
+  The \code{\link{prune}} function is used to select a nested model
+  of the current model, i.e. a model which collapses leaves to their
+  inner nodes based on the estimated prediction error. The estimated
+  prediction error is defined as the AIC of the model plus \code{dfsplit}
+  times the number of splits. Pruning with \code{direction = "backward"}
+  works as follows: In each iteration, all nested models of the current
+  model are evaluated, i.e. models which collapse one of the inner nodes
+  of the current model. The inner node that yields the smallest increase
+  in the estimated prediction error is collapsed and the resulting model
+  substitutes the current model. The algorithm is stopped as soon as all
+  nested models have a higher estimated prediction error than the
+  current model, which will be returned. 
 }
 
-\value{An object of class \code{cvrisk.tvcm} or \code{stabpath.tvcm}.}
+\value{\code{\link{folds_control}} returns a list of parameters for building a
+  cross-validation scheme. \code{\link{cvloss}} returns an
+  \code{cvloss.tvcm} object with the following essential components: 
+
+  \item{grid}{a list with two matrices \code{dfsplit} and
+    \code{nsplit}. Specifies the grid of values at which the
+    cross-validated loss was evaluated.}  
+  \item{loss}{a list with two matrices \code{dfsplit} and
+    \code{nsplit}. The cross-validated loss for each fold corresponding
+    to the values in \code{grid}.}
+  \item{dfsplit.min}{numeric scalar. The tuning parameter which minimizes
+    the cross-validated loss.}
+  \item{folds}{the used folds to extract the learning and the validation
+    sets.}
+
+  Further, \code{\link{oobloss}} returns the loss of the \code{newdata}
+  validation set and \code{\link{prune}} returns a (possibly modified)
+  \code{\link{tvcm}} object.  
+}
 
 \references{
   Breiman, L., Friedman, J.H., Olshen, R.A. and Stone, C.J. (1984) 
@@ -133,10 +205,6 @@ cvfolds(x, type = c("kfold", "subsampling", "bootstrap"),
 
   T. Hastie, R. Tibshirani, J. Friedman (2001), The elements of
   statistical learning, Springer.
-  
-  Meinshausen, N. and Buehlmann, P. (2010), Stability selection.
-  \emph{Journal of the Royal Statistical Society, Series B},
-  \bold{72}(4).
 }
 
 \seealso{
@@ -147,40 +215,30 @@ cvfolds(x, type = c("kfold", "subsampling", "bootstrap"),
 ## --------------------------------------------------------- #
 ## Dummy Example 1:
 ##
-## Model selection for the 'vcrpart_2' data with 
-## 'method = "partreg"'. The example is merely a syntax 
-## template.
+## Model selection for the 'vcrpart_2' data. The example is
+## merely a syntax template.
 ## --------------------------------------------------------- #
 
 ## load the data
 data(vcrpart_2)
 
 ## fit the model
-control <- tvcm_control(method = "partreg",  maxwidth = 2, minbucket = 1)
-
-model <- tvcglm(y ~ vc(z1, z2, by = x1) + x2, data = vcrpart_2,
+control <- tvcm_control(maxstep = 2L, minsize = 5L)
+model <- tvcglm(y ~ vc(z1, z2, by = x1) + vc(z1, by = x2), data = vcrpart_2,
                 family = gaussian(), control = control, subset = 1:75)
 
-## AIC and BIC
-AIC(model, sub = TRUE)
-BIC(model, sub = TRUE)
-
-## cross-validation
-folds <- cvfolds(model, type = "kfold", K = 2)
-cv <- cvrisk(model, folds, maxwidth = 3)
-plot(cv) # use maxwidth = 2, as already specified
+## cross-validate 'dfsplit'
+set.seed(1)
+cv <- cvloss(model, folds_control(type = "kfold", K = 2))
+cv
+plot(cv)
 
 ## out-of-bag error
-oobrisk(model, newdata = vcrpart_2[76:100,])
+oobloss(model, newdata = vcrpart_2[76:100,])
 
-## use an alternative risk function
+## use an alternative loss function
 rfun <- function(y, mu, wt) sum(abs(y - mu))
-oobrisk(model, newdata = vcrpart_2[76:100,], fun = rfun)
-
-## stability paths
-folds <- cvfolds(model, type = "subsampling", K = 2)
-sl <- stabpath(model, q = 1, folds = folds, maxwidth = 3)
-plot(sl)
+oobloss(model, newdata = vcrpart_2[76:100,], fun = rfun)
 }
 
 \author{Reto Buergin}

@@ -2,64 +2,81 @@
 
 \alias{tvcm_control}
 
-\title{Control parameters for \code{\link{tvcm}} and \code{\link{fvcm}}.} 
+\title{Control parameters for \code{\link{tvcm}}.} 
 
 \description{
   Various parameters that control aspects for \code{\link{tvcm}}.  
 }
 
 \usage{
-tvcm_control(method = c("mob", "partreg"),
-             alpha = 0.05, bonferroni = TRUE,
-             maxwidth = ifelse(method == "partreg", 10L, Inf),
-             minbucket = 50L, mtry = Inf,
-             minsplit = 2 * minbucket, trim = 0.1,
-             maxdepth = Inf, maxstep = maxwidth - 1L, 
-             nselect = Inf, estfun = list(), ninpute = 5L,
-             maxevalsplit = 20, riskfun = neglogLik,
-             fast = 0L, verbose = FALSE, ...)
+tvcm_control(lossfun = neglogLik2, 
+             maxstep = Inf, maxwidth = Inf,
+             minsize = 30, maxdepth = Inf,
+             dfpar = 2.0, dfsplit = 0.0, maxoverstep = 0,
+             sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
+             trim = 0.1, estfun = list(), ninpute = 5L,
+             maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
+             keeploss = FALSE, verbose = FALSE, ...)
 }
 
 \arguments{
-  \item{method}{single character. Defines the algorithm to be used.}
+  \item{lossfun}{function. A function that extracts a loss measure from a
+    fitted object, e.g., two times the negative log likelihood
+    (default).}
+  \item{maxstep}{integer. The maximum number of iterations i.e. the
+    total number of splits processed.} 
+  \item{maxwidth}{integer (vector). The maximum width of the tree(s).}  
+  \item{minsize}{numeric. The minimum sum of weights in a terminal
+    node. The default is the number of varying coefficients times 10.
+    The parameter specifies also the trimming in parameter coefficient
+    tests for numeric variables (if \code{sctest = TRUE}).}
+  \item{maxdepth}{integer (vector). The maximum depth of the tree(s).}
+  \item{dfpar}{a numeric scalar larger than zero. The per-parameter penalty to
+    be applied for stopping. See also argument \code{maxoverstep}.}
+  \item{dfsplit}{a numeric scalar larger than zero. The per-split penalty to
+    be applied for stopping. See also argument \code{maxoverstep}.}
+  \item{maxoverstep}{integer scalar. The maximum number of consecutive
+    times the AIC reduction statistic can be smaller than \code{dfsplit}
+    before stopping. Specifically, the AIC is computed as the loss (see
+    argument \code{lossfun}) of the model plus \code{dfpar} times the
+    number of coefficients  (as extracted from
+    \code{\link{extractAIC}}), and the AIC reduction statistic is the
+    difference between the AIC the current model and the AIC of the
+    selected update model.}  
+  \item{sctest}{logical scalar. Defines whether coefficient constancy
+    tests should be used for variable and node selection.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is
     splitted when the smallest (possibly Bonferroni-corrected) \eqn{p}
     value for any coefficient coefficient test in the current step falls
     below \code{alpha}.}  
-  \item{bonferroni}{logical. Should \eqn{p} values be Bonferroni
-    corrected?}
-  \item{maxwidth}{integer. The maximum width of the tree.}  
-  \item{minbucket}{numeric. The minimum sum of weights in a terminal
-    node. Specifies also the trimming in parameter coefficient tests for
-    numeric variables.}
-  \item{mtry}{integer. The number of input variables randomly sampled as
-    candidates at each node for random forest like algorithms.}
-  \item{minsplit}{numeric. The minimum sum of weights in a node in order
-    to be considered for splitting.}
+  \item{bonferroni}{logical. Indicates if and how \eqn{p}-values of
+    coefficient constancy tests must be Bonferroni
+    corrected. See details.}
   \item{trim}{numeric between 0 and 1. Specifies the trimming parameter in 
     coefficient constancy tests for continuous partitioning variables.}	
-  \item{maxdepth}{integer. The maximum depth of the tree.}
-  \item{maxstep}{integer. The maximum number of iterations. Equals to
-    \code{"maxwidth"} minus 1.} 
-  \item{nselect}{integer. The maximum number of distinct variables to be
-    selected.}
-  \item{estfun}{list of arguments to be passed to
-    \code{\link{gefp.olmm}}.}
-  \item{ninpute}{integer. The number of times the coefficient constancy
-    tests should be repeated in each step in cases of unbalanced data
-    where inputing missing values is required.}
-  \item{maxevalsplit}{integer. The maximum number of evaluation for
+  \item{estfun}{list of arguments to be passed to \code{\link{gefp.olmm}}.}
+  \item{ninpute}{the number of times the coefficient constancy tests are
+    repeated in each node in case of two-stage data that are
+    unbalanced.}
+  \item{maxfacsplit}{integer.}
+  \item{maxordsplit}{integer.}
+  \item{maxnumsplit}{integer. The maximum number of evaluation for
     splits on numeric partitioning variables.}
-  \item{riskfun}{function. A function that extracts a risk measure from a
-    fitted object, e.g., the negative log likelihood (default).}
-  \item{fast}{integer. Whether the algorithm should be
-    accelerated. Currently, for values larger than 1, optimizations use
-    coefficients from the most actual estimation as initial values.}
+  \item{keeploss}{logical scalar or a numeric equal or larger than
+    0. Indicates if and how many times the computed AIC reduction
+    statistics should be reused in the following
+    iterations. Specifically, the option activates approximating the AIC
+    reduction statistic of a split based on the AIC reduction statistic
+    of the same split in the previous iteration. Values different from
+    \code{FALSE} or 0 will accelerate the algorithm at the expense of
+    accuracy. In cases of multiple \code{\link{vc}} terms, only the
+    statistics corresponding to the \code{\link{vc}} term which was
+    splitted in the previous iteration are reused.}   
   \item{verbose}{logical. Should information about the fitting process
     (such as test statistics, \eqn{p} values, 
     selected splitting variables and split points) be printed to the
     screen?}
-  \item{...}{further arguments to be passed. For \code{tvcm_control}, these 
+  \item{\ldots}{further arguments to be passed. For \code{tvcm_control}, these 
     are undocumented, see details. For \code{fvcm_control}, the arguments 
     are passed to \code{tvcm_control}.} 
 }

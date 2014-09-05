@@ -1,5 +1,6 @@
 \name{olmm-control}
 
+\alias{olmm-control}
 \alias{olmm_control}
 
 \title{Control parameters for \code{\link{olmm}}.} 

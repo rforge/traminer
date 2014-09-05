@@ -1,5 +1,6 @@
 \name{olmm-predict}
 
+\alias{olmm-predict}
 \alias{fitted.olmm}
 \alias{predict.olmm}
 
@@ -59,7 +60,7 @@
 
 \author{Reto Buergin}
 
-\seealso{\code{\link{olmm}}, \code{\link{olmm-class}}}
+\seealso{\code{\link{olmm}}, \code{\link{olmm-methods}}}
 
 \examples{
 ## ------------------------------------------------------------------- #

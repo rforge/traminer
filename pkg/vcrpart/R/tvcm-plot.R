@@ -1,49 +1,94 @@
-## --------------------------------------------------------- #
-## Author:          Reto Buergin
-## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-04-27
-##
-## Description:
-## Plot functions for 'tvcm' objects.
-##
-## References:
-## party:           http://CRAN.R-project.org/package=party
-## partykit:        http://CRAN.R-project.org/package=partykit
-##
-## Overview:
-## plot.tvcm:   generic plot for tree.tvcm objects
-## panel_terms:  partial coefficient plots
-## panel_get_main:
-## panel_coef:
-## panel_empty:
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Author:          Reto Buergin
+##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' Date:            2014-08-30
+##'
+##' Description:
+##' Plot functions for 'tvcm' objects.
+##'
+##' References:
+##' party:           http://CRAN.R-project.org/package=party
+##' partykit:        http://CRAN.R-project.org/package=partykit
+##'
+##' Overview:
+##' plot.tvcm:       generic plot for tree.tvcm objects
+##' panel_partdep:   partial coefficient plots
+##' panel_get_main:  extracts the title for each terminal node
+##' panel_coef:      grapcon generator for coefficient plots
+##' panel_empty:     grapcon generator for empty terminal node plots
+##'
+##' Last modifications:
+##' 2014-08-30: - automatic titles
+##'             - write '(no split)' in panels where no split
+##'               is applied
+##' 2014-08-27: added the 'yadj' argument for 'panel_coef'
+##' 2014-07-02: make a loop over the partitions
+##' 2014-07-01: add checks for each function
+##' -------------------------------------------------------- #
 
 plot.tvcm <- function(x, type = c("default", "coef", 
-                           "simple", "terms"),
-                      main = NULL, drop_terminal = TRUE,
-                      tnex = 1, newpage = TRUE,
+                           "simple", "partdep"),
+                      main = NULL, part = NULL,
+                      drop_terminal = TRUE,
+                      tnex = 1, newpage = TRUE, ask = NULL, 
                       pop = TRUE, gp = gpar(), ...) {
-  
+
+  ## checks
   type <- match.arg(type)
+  stopifnot(is.null(main) | is.character(main))
+  stopifnot(is.logical(drop_terminal) && length(drop_terminal) == 1L)
+  stopifnot(is.numeric(tnex) && length(tnex) == 1L)
+  stopifnot(is.logical(newpage) && length(newpage) == 1L)
+  stopifnot(is.logical(pop) && length(pop) == 1L)
+  stopifnot(class(gp) %in% c("gpar", "list"))
   
-  if (type == "terms") {
+  if (type == "partdep") {
     
-    fun <- panel_terms
-    args <- list(object = x)
+    fun <- panel_partdep
+    args <- list(object = x, ask = ask, main = main)
     args <- append(args, list(...))
     do.call("fun", args)
+
   } else {
     
     ## tree plots
+
+    if (is.null(part)) part <- seq_along(x$info$node)
+    if (is.character(part)) {
+      levs <- LETTERS[seq_along(x$info$node)]
+      if (any(!part %in% levs)) stop("unknown 'part'.")
+      part <- which(part %in% levs)
+    } else if (is.numeric(part)) {
+      part <- as.integer(part)
+    } else {
+      stop("'part' must be a 'character' or a 'integer'.")
+    }
+
+    ## whether an input is expected before plotting the next tree
+    if (is.null(ask))
+      ask <- ifelse(length(part) == 1L, FALSE, TRUE)
     
+    ## repeat the title
+    if (is.null(main)) {
+      main <- tvcm_print_vclabs(x)
+      main <- main[part]
+    } else {
+        main <- rep(main, length.out = length(part))
+    }
     ## terminal panel
     tp_fun <-
       switch(type,
-             "default" = if (depth(x) > 3L) panel_empty else panel_coef,
+             "default" =
+             if (max(sapply(x$info$node[part], width))> 4L) {
+               panel_empty
+             } else {
+               panel_coef
+             },
              "coef" = panel_coef,
              "simple" = panel_empty)
     tp_args <-
       list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
+    tp_args$part <- part
     tp_args$gp <- gp
       
     ## inner panel
@@ -58,55 +103,70 @@ plot.tvcm <- function(x, type = c("default", "coef",
     ## other arguments
     dot_args <-
       list(...)[names(list(...)) %in% names(formals(plot.party))[-1]]
-    
+          
     ## prepare call
-    args <- list(x = x, main = main,
+    args <- list(x = x,
                  terminal_panel = tp_fun, tp_args = tp_args,
                  inner_panel = ip_fun, ip_args = ip_args,
                  drop_terminal = drop_terminal, tnex = tnex,
                  newpage = newpage,
                  pop = pop, gp = gp)
-    args <- append(args, dot_args)
+    args <- append(args, dot_args)    
+
+    if (ask) {
+      oask <- devAskNewPage(TRUE)
+      on.exit(devAskNewPage(oask))
+    }
     
     ## call
-    do.call("plot.party", args)
+    for (pid in seq_along(part)) {
+      args$tp_args$part <- part[pid]
+      args$main <- main[pid]
+      args$x$node <- args$x$info$node[[part[pid]]]
+      do.call("plot.party", args)
+    }
   }
 }
+            
+            
 
-panel_terms <- function(object, terms = NULL,
-                        variable = NULL, ask = NULL,
-                        prob = NULL, neval = 50L, add = FALSE,
-                        etalab = c("int", "char", "eta"),
-                        ...) {
+panel_partdep <- function(object, parm = NULL,
+                          var = NULL, ask = NULL,
+                          prob = NULL, neval = 50, add = FALSE,
+                          etalab = c("int", "char", "eta"), ...) {
 
-  
-  ## set and check 'terms'
-  allTerms <- colnames(extract(object, "coef")$vc)
-  if (is.null(terms)) terms <- allTerms
-  if (!all(terms %in% allTerms))
-    warnings("some 'terms' were not recognized.")
-  terms <- intersect(terms, allTerms)
-  if (length(terms) == 0L) stop("no valid 'terms'.")
+  ## set and check 'parm'
+  allParm <- unlist(lapply(extract(object, "coef")$vc, colnames))
+  if (is.null(parm)) parm <- allParm
+  if (!all(parm %in% allParm))
+    warnings("some 'parm' were not recognized.")
+  parm <- intersect(parm, allParm)
+  if (length(parm) == 0L) stop("no valid 'parm'.")
+  stopifnot(is.null(ask) | is.logical(ask) && length(ask) == 1L)
+  stopifnot(is.null(prob) | (is.numeric(prob) && length(prob) == 1L))
+  stopifnot(prob > 0 & prob <= 1)
+  stopifnot(is.numeric(neval) && length(eval) == 1L && neval > 0)
+  stopifnot(is.logical(add) && length(add) == 1L)
   etalab <- match.arg(etalab)
-
+  
   ## labels for coefficients
-  termLabs <- terms
+  termLabs <- parm
   if (object$info$fit == "olmm") 
-    termLabs <- olmm_rename(terms, levels(slot(object$info$model, "y")),
+    termLabs <- olmm_rename(parm, levels(object$info$model$y),
                             object$info$family, etalab)
   
-  ## set and check 'variable'
+  ## set and check 'var'
   data <- object$data
   allVars <- colnames(data)
-  if (is.null(variable)) variable <- allVars[1L]
-  if (!all(variable %in% allVars))
-    warnings("some 'variable's were not recognized.")
-  variable <- intersect(variable, allVars)
-  if (length(variable) == 0L) stop("no valid 'variable's.")
+  if (is.null(var)) var <- allVars[1L]
+  if (!all(var %in% allVars))
+    warnings("some variables in 'var' were not recognized.")
+  var <- intersect(var, allVars)
+  if (length(var) == 0L) stop("no valid variables in 'var'.")
   
   ## set defaults
-  if (is.null(ask)) ask <-
-    ifelse(length(terms) * length(variable) == 1L, FALSE, TRUE)
+  if (is.null(ask))
+    ask <- ifelse(length(parm) * length(var) == 1L, FALSE, TRUE)
   
   ## dotlist
   dotList <- list(...)
@@ -119,9 +179,9 @@ panel_terms <- function(object, terms = NULL,
     on.exit(devAskNewPage(oask))
   }
 
-  for (i in 1:length(variable)) {
+  for (i in 1:length(var)) {
 
-    z <- space[[variable[i]]]
+    z <- space[[var[i]]]
 
     ## draw a random subsample to save time
     if (is.null(prob)) {
@@ -133,23 +193,23 @@ panel_terms <- function(object, terms = NULL,
     } else {
       probi <- prob
     }
-    tmp <- if (probi < 1) { data[cvfolds(object, K = 1L, type = "subsampling", prob = probi) == 1L, , drop = FALSE] } else { data }
+    tmp <- if (probi < 1) { data[tvcm_folds(object, folds_control(K = 1L, type = "subsampling", prob = probi)) == 1L, , drop = FALSE] } else { data }
 
     newdata <- NULL
     for (j in 1:length(z)) newdata <- rbind(newdata, tmp)
-    newdata[, variable[i]] <- rep(z, each = nrow(tmp))
+    newdata[, var[i]] <- rep(z, each = nrow(tmp))
     beta <- predict(object, newdata = newdata, type = "coef")
     
     ## for each coefficients ...
-    for (j in 1:length(terms)) {
+    for (j in 1:length(parm)) {
 
       ## .. compute the expectation of beta_i at a value z_j
       ## over the distribution  of z_-j
-      betaj <- tapply(beta[, terms[j]], newdata[, variable[i]], mean)
+      betaj <- tapply(beta[, parm[j]], newdata[, var[i]], mean)
 
       ## define arguments for plot or points call
       ylab <-
-        paste("coef(", termLabs[j], "|", variable[i], ")", sep = "")
+        paste("coef(", termLabs[j], "|", var[i], ")", sep = "")
 
       if (is.numeric(z)) {
         args <- appendDefArgs(dotList, list(type = "s"))
@@ -167,7 +227,7 @@ panel_terms <- function(object, terms = NULL,
         fun <- plot.default
       }
       
-      args <- appendDefArgs(args, list(xlab = variable[i], ylab = ylab))
+      args <- appendDefArgs(args, list(xlab = var[i], ylab = ylab))
 
       ## call plot or points
       do.call(fun, args)
@@ -181,61 +241,109 @@ panel_terms <- function(object, terms = NULL,
   }
 }
 
+
+## --------------------------------------------------------- #
+##' Specifies a title for a terminal node
+##'
+##' @param object a \code{\link{tvcm}} object.
+##' @param node   a \code{\link{partynode}} object. The
+##'    terminal node for which the title is to be specified.
+##' @param id     a logical scalar. Whether the id of the node
+##'    is to be included in the title.
+##' @param nobs   a logical scalar. Whether the number of
+##'    observations in the node is to be included in the
+##'    title.
+##'
+##' @return a character string.
+## --------------------------------------------------------- #
+
 panel_get_main <- function(object, node, id, nobs) {
   rval <- ""
   if (id) rval <-
     paste(rval, paste(names(object)[id_node(node)], sep = ""))
   if (id && nobs) rval <- paste(rval, ": ", sep = "")
-  rval <- paste(rval, "nobs = ", node$info$dims["n"], sep = "")
+  if (nobs) rval <- paste(rval, "nobs = ", node$info$dims["n"], sep = "")
   return(rval)
 }
 
-panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
+panel_coef <- function(object, parm = NULL, 
+                       id = TRUE, nobs = TRUE,
                        exp = FALSE, plot_gp = list(),
-                       margins = c(3, 2, 0, 0),
-                       mean = TRUE, mean_gp = list(),
+                       margins = c(3, 2, 0, 0), yadj = 0.1,
+                       mean = FALSE, mean_gp = list(),
                        conf.int = TRUE, conf.int_gp = list(),
-                       etalab = c("int", "char", "eta"),
+                       abbreviate = TRUE, etalab = c("int", "char", "eta"),
                        ...) {
+
+  ## checks
+  stopifnot(is.logical(id) && length(id) == 1L)
+  stopifnot(is.logical(nobs) && length(nobs) == 1L)
+  stopifnot(is.list(plot_gp))
+  stopifnot(is.numeric(margins) && length(margins) == 4L)
+  stopifnot(is.list(mean_gp))
+  stopifnot(is.list(conf.int_gp))
+
+  ## get partition
+  part <- which(sapply(object$info$node, identical, object$node))
   
   ## get arguments for setting y tick labels
   etalab <- match.arg(etalab)
   if (object$info$fit == "olmm") {
-    yLevs <- levels(slot(object$info$model, "y"))
+    yLevs <- levels(object$info$model$y)
   } else {
-    yLevs <- all.vars(object$info$formula$root)[1]
+    yLevs <- all.vars(object$info$formula$original)[1L]
   }
   
   ## extract coefficients
-  coef <- extract(object, "coef")$vc
-  if (length(coef) < 1L) return(function(node) return(NULL))
-  if (is.null(terms)) terms <- colnames(coef)
-  if (!is.list(terms)) terms <- list(terms)
-  coef <- coef[, unlist(terms), drop = FALSE]
-  coefList <- lapply(terms, function(trms) coef[, trms, drop = FALSE])
+  coef <- extract(object, "coef")$vc[[part[1L]]]
+  if (length(na.omit(coef)) < 1L) {
+      rval <- function(node) {
+          pushViewport(viewport())
+          grid.text("(no split)")
+          upViewport()
+      }
+      return(rval)
+  }
+  if (is.null(parm)) parm <- colnames(coef)
+  if (!is.list(parm)) parm <- list(parm)
+  if (is.numeric(unlist(parm))) {
+    if (!all(unlist(parm) %in% seq_along(colnames(coef))))
+      stop("'parm' must be a subset of ", 1, " to ", ncol(coef), ".")
+    parm <- lapply(parm, function(x) colnames(coef)[x])
+  } else if (is.character(unlist(parm))) {
+    if (!all(unlist(parm) %in% colnames(coef)))
+      stop("'parm' must be a subset of ",
+           paste(paste("'", colnames(coef), "'", sep = ""), collapse = ", "),
+           ".")
+  } else {
+    stop("'parm' must be either an integer or a character vector.")
+  }
+  coef <- coef[, unlist(parm), drop = FALSE]
+  coefList <- lapply(parm, function(trms) coef[, trms, drop = FALSE])
   
   if (conf.int) {
-    sd <- extract(object, "sd")$vc
-    sd <- sd[, unlist(terms), drop = FALSE]
-    sdList <- lapply(terms, function(trms) sd[, trms, drop = FALSE])
+    sd <- extract(object, "sd")$vc[[part[1L]]]
+    sd <- sd[, unlist(parm), drop = FALSE]
+    sdList <- lapply(parm, function(trms) sd[, trms, drop = FALSE])
   }
 
   argsToList <- function(x) {
-    if (!(is.list(x) &&
-          length(x) == length(terms) &&
-          (is.null(names(x)) |
-           !is.null(names(x)) && all(names(x) == names(terms)))))
-      x <- lapply(seq_along(terms), function(i) x)
+    if (is.null(names(x))) {
+      if (length(x) < length(parm))
+      x <- append(x, vector("list", length(parm) - length(x)))
+    } else {
+      x <- lapply(seq_along(parm), function(i) x)
+    }
     return(x)
   }
 
   ## whether y labels should be the exponential of their actual values
-  exp <- argsToList(exp)
+  exp <- rep(exp, length.out = length(parm))
   
   ## plot parameters
   plot_gp <- argsToList(plot_gp)
   plot_gp <-
-    lapply(seq_along(coefList),
+      lapply(seq_along(coefList),
            function(i) {
              if (conf.int) {
                ylim <- range(c(c(coefList[[i]] - 2 * sdList[[i]]),
@@ -252,12 +360,12 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
              xlabel <- unlist(lapply(xlabel,
                                      function(x) {
                                        x <- unlist(strsplit(x, ":"))
-                                       x <- abbreviate(x)
+                                       if (abbreviate) x <- abbreviate(x)
                                        return(paste(x, collapse = ":"))
                                      }))
              rval <- list(xlim = c(0.75, ncol(coefList[[i]]) + 0.25),
                           pch = 1L, ylim = ylim,
-                          ylab = if (exp[[i]]) "exp(coef)" else "coef",
+                          ylab = if (exp[i]) "exp(coef)" else "coef",
                           type = "b",
                           xlabel = xlabel, 
                           height = 1, width = 0.6, 
@@ -265,7 +373,7 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
              if (length(plot_gp) > 0L)
                rval <- appendDefArgs(plot_gp[[i]], rval)
              rval$yat <- axisTicks(rval$ylim, log = FALSE, nint = 3)
-             rval$ylabel <- if (exp[[i]]) exp(rval$yat) else rval$yat
+             rval$ylabel <- if (exp[i]) exp(rval$yat) else rval$yat
              rval$ylabel <- format(rval$ylabel, digits = 2L)
              return(rval)
            })
@@ -277,7 +385,7 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
                             length = unit(1, "mm"),
                             ends = "both",
                             type = "open")
-    conf.int_gp <- lapply(seq_along(terms),
+    conf.int_gp <- lapply(seq_along(parm),
                           function(i) appendDefArgs(conf.int_gp[[i]],
                                                     conf.int_gp_def))
   }
@@ -288,16 +396,16 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
     mean_gp <- argsToList(mean_gp)
     mean_gp_def <- list(gp = gpar(col = "grey50", lty = 1,
                           lwd = 0.75, fontsize = 8), pch = 1L)
-    mean_gp <- lapply(seq_along(terms),
+    mean_gp <- lapply(seq_along(parm),
                       function(i) appendDefArgs(mean_gp[[i]], mean_gp_def))
 
-    w <- tapply(weights(object), predict(object, type = "node"), sum) /
+    w <- tapply(weights(object), predict(object, type = "node")[, part], sum) /
       sum(weights(object))
     meanCoef <- colSums(coef * matrix(w, nrow(coef), ncol(coef)))
-    meanCoef <- lapply(terms, function(trms) meanCoef[trms, drop = FALSE])
+    meanCoef <- lapply(parm, function(trms) meanCoef[trms, drop = FALSE])
     if (conf.int) {
       meanSd <- sqrt(colSums(sd^2 * matrix(w, nrow(coef), ncol(coef))^2))
-      meanSd <- lapply(terms, function(trms) sqrt(meanSd[trms, drop = FALSE]))
+      meanSd <- lapply(parm, function(trms) sqrt(meanSd[trms, drop = FALSE]))
     }
   }
 
@@ -305,15 +413,19 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
   
   rval <- function(node) {
     
-    strUnit <- unit(2, "strheight", "A")
-    pushViewport(viewport(layout = grid.layout(2, 1, heights = unit.c(strUnit, unit(1, "npc") - strUnit)))) # 1
-    grid.rect(gp = gpar(fill = "white", col = 0))
+    strUnit <- if (any(c(id, nobs))) unit(2, "strheight", "A") else unit(0, "npc")
+    pushViewport(viewport(layout = grid.layout(3, 1,
+                            heights = unit.c(unit(yadj, "npc"),
+                              strUnit,
+                              unit(1, "npc") - unit(yadj, "npc") - strUnit)))) # 1
     
-    pushViewport(viewport(layout.pos.row = 1L)) # 2
+    pushViewport(viewport(layout.pos.row = 2L)) # 2
+    grid.rect(gp = gpar(fill = "white", col = 0))
     grid.text(panel_get_main(object, node, id, nobs))
     upViewport()
     
-    pushViewport(viewport(layout.pos.row = 2L)) # 2
+    pushViewport(viewport(layout.pos.row = 3L)) # 2
+    grid.rect(gp = gpar(fill = "white", col = 0))
     pushViewport(viewport(layout = grid.layout(length(coefList), 1))) # 3
     
     for (i in 1:length(coefList)) {
@@ -421,8 +533,11 @@ panel_coef <- function(object, terms = NULL, id = TRUE, nobs = TRUE,
 class(panel_coef) <- "grapcon_generator"
 
 
-panel_empty <- function(object, id = TRUE, nobs = TRUE, ...) {
-    
+panel_empty <- function(object, part = 1L, id = TRUE, nobs = TRUE, ...) {
+  
+  stopifnot(is.logical(id) && length(id) == 1L)
+  stopifnot(is.logical(nobs) && length(nobs) == 1L)
+  
   rval <- function(node) {
     
     nid <- id_node(node)

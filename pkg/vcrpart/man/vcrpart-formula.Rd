@@ -2,39 +2,46 @@
 
 \alias{vcrpart-formula}
 \alias{fe}
-\alias{re}
 \alias{vc}
+\alias{re}
 \alias{ce}
 \alias{ge}
 
 \title{Special terms for formulas.}
 
-\description{Terms for the formula argument of \code{\link{tvcm}},
-  \code{\link{fvcm}} and \code{\link{olmm}}.  
+\description{Special terms for formulas assigned to \code{\link{tvcm}},
+  \code{\link{fvcm}} and \code{\link{olmm}}.   
 }
 
 \usage{
 fe(formula, intercept = TRUE)
 re(formula, intercept = TRUE)
-vc(..., by, intercept = TRUE)
+vc(..., by, intercept = missing(by), 
+   nuisance = character())
 ce(formula)
 ce(formula)
 }
 
 \arguments{
-  \item{formula}{a symbolic description for predictors in the model
-    term. See examples.} 
-  \item{...}{the names of moderators i.e. partitioning variables,
-    separated by commas.} 
+  \item{formula}{a symbolic description for the corresponding component
+    of the formula component. See examples.}
+  \item{intercept}{logical or character vector. \code{intercept = TRUE}
+    (default) indicates that an intercept is incorporated.
+    \code{intercept = FALSE} replaces the otherwise allowed \code{"-1"}
+    term, that is ignored by \code{\link{fvcm}}, \code{\link{olmm}} and
+    \code{\link{tvcm}}. Character strings may be used in connection with
+    \code{\link{olmm}}. Intercepts have specific interpretations, see
+    details.}
+  \item{\ldots}{the names of moderators i.e. partitioning variables,
+    separated by commas. It is also possibly to assign a character
+    vector that includes all the variable names.} 
   \item{by}{a symbolic description for predictors the effect of which is
-    moderated by the variables in \code{...}. See \code{\link{tvcm}} and
-    the examples below.} 
-  \item{intercept}{logical or character. \code{intercept = TRUE}
-    indicates that an intercept is incorporated. For models based on
-    \code{\link{olmm}}, \code{intercept = "ce"} incorporates category
-    specific intercepts and \code{intercept = "ge"} incorporates global
-    i.e. proportional odds intercepts. For \code{\link{vc}} terms, see
-    the detail section in \code{\link{tvcm}}.}
+    moderated by the variables in \code{\ldots}. See \code{\link{tvcm}}
+    and the examples below. Note that the by variable must be numeric
+    and factor variables must be recoded to dummy variables by hand.}
+  \item{nuisance}{character vector of variables in \code{by} which have
+    to be estimated separately for each partition but the algorithm
+    should not focus on this variable when searching for splits.}
 }
 
 \value{
@@ -43,24 +50,25 @@ ce(formula)
 }
 
 \details{
-  The \pkg{vcrpart} package provides special formula terms for fixed effects 
-  \code{\link{fe}}, random effects \code{\link{re}} and varying coefficients 
-  \code{\link{vc}}. We recommend the use of these formula terms to ensure that
-  the correct model is fitted. Some examples are given below.
+  Provided are special formula terms to define fixed effects
+  \code{\link{fe}}, varying coefficients \code{\link{vc}} and random
+  effects \code{\link{re}}. The use of these formula terms is strongly
+  recommended to ensure that the intended model is fitted. Some examples
+  are given below. 
 
   Variables which are not defined within one of these three special
   terms will be assigned to the fixed effect predictor equation. The
-  deletion of intercepts must be defined using \code{intercept = "none"}
-  in the corresponding special term. Terms like "\code{-1}" are
+  deletion of intercepts must be defined using \code{intercept = FALSE} 
+  in the corresponding special term. Terms like \code{"-1"} are
   ignored. The handling of intercept terms in connection with
-  \code{\link{vc}} terms is discussed in detail in the details section
-  of \code{\link{tvcm}}. The terms \code{\link{ce}} (category-specific
-  effects) and \code{\link{ge}} (global effect) are mainly designed for
-  categorical regression models, see \code{\link{olmm}}. Notice that the
-  model model will not keep the exact order of the terms except for all
-  \code{\link{ce}} terms appear in the formula before the
-  \code{\link{ge}} terms. At the time being, the term "\code{.}", which
-  is generally use to extract all variables in the data frame, is ignored.
+  \code{\link{vc}} terms is discussed in the details section of
+  \code{\link{tvcm}}. The terms \code{\link{ce}} (category-specific
+  effects) and \code{\link{ge}} (global effect or proportional odds
+  effect) are mainly designed for categorical regression models, see
+  \code{\link{olmm}}. Notice that the model model will likely not keep
+  the exact order of the components. At present, the term \code{"."},
+  which is generally use to extract all variables of the data, is
+  ignored. 
 }
 
 \seealso{\code{\link{tvcm}}, \code{\link{fvcm}}, \code{\link{olmm}}}

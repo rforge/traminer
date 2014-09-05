@@ -3,7 +3,7 @@
 \alias{tvcm-plot}
 \alias{plot.tvcm}
 \alias{panel_coef}
-\alias{panel_terms}
+\alias{panel_partdep}
 
 \title{\code{plot} method for \code{tvcm} objects.}
 
@@ -13,29 +13,31 @@
 
 \usage{
 \method{plot}{tvcm}(x, type = c("default", "coef", 
-        "simple", "terms"),
-     main = NULL, drop_terminal = TRUE,
-     tnex = 1, newpage = TRUE,
+        "simple", "partdep"),
+     main = NULL, part = NULL,
+     drop_terminal = TRUE,
+     tnex = 1, newpage = TRUE, ask = NULL,
      pop = TRUE, gp = gpar(), ...)
 
-panel_terms(object, terms = NULL,
-            variable = NULL, ask = NULL,
-            prob = NULL, neval = 50L, add = FALSE,
-            etalab = c("int", "char", "eta"), ...)
+panel_partdep(object, parm = NULL,
+              var = NULL, ask = NULL,
+              prob = NULL, neval = 50, add = FALSE,
+              etalab = c("int", "char", "eta"), ...)
 
-panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
+panel_coef(object, parm = NULL, 
+           id = TRUE, nobs = TRUE,
            exp = FALSE, plot_gp = list(),
-           margins = c(3, 2, 0, 0), 
-           mean = TRUE, mean_gp = list(),
+           margins = c(3, 2, 0, 0), yadj = 0.1,
+           mean = FALSE, mean_gp = list(),
            conf.int = TRUE, conf.int_gp = list(),
-           etalab = c("int", "char", "eta"), ...)
+           abbreviate = TRUE, etalab = c("int", "char", "eta"), ...)
 }
 
 \arguments{
   \item{x, object}{An object of class \code{\link{tvcm}}.}
   \item{type}{the type of the plot. Available types are
     \code{"default"}, \code{"simple"}, \code{"coef"} and
-    \code{"terms"}.}   
+    \code{"partdep"}.}   
   \item{main}{character. A main title for the plot.}
   \item{drop_terminal}{a logical indicating whether all terminal nodes
     should be plotted at the bottom. See also \code{\link{plot.party}}.}
@@ -46,13 +48,15 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
   \item{pop}{a logical whether the viewport tree should be popped before
     return.}
   \item{gp}{graphical parameters. See \code{\link{gpar}}.}
-  \item{terms}{character vector (\code{\link{panel_terms}} and
+  \item{part}{integer scalar. The partition i.e. varying coefficient
+    component to be plotted.} 
+  \item{parm}{character vector (\code{\link{panel_partdep}} and
     \code{\link{panel_coef}}) or list of character vectors
     (\code{\link{panel_coef}}) with names of model
-    coefficients. Indicates which coefficients should be visualized. If
-    \code{terms} is a list, a separate panel is allocated for each list
-    component.}  
-  \item{variable}{character vector. Indicates the partitioning variables
+    coefficients corresponding to the chosen component. Indicates which
+    coefficients should be visualized. If \code{parm} is a list, a
+    separate panel is allocated for each list component.}  
+  \item{var}{character vector. Indicates the partitioning variables
     to be visualized.}
   \item{ask}{logical. Whether an input should be asked before printing
     the next panel.}
@@ -71,11 +75,13 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
     components \code{xlim}, \code{ylim}, \code{pch}, \code{ylab},
     \code{type} (the type of symbols, e.g. \code{"b"}), \code{label}
     (characters for ticks at the x axis), \code{height}, \code{width},
-    \code{gp} (a list produced by \code{\link{gpar}}). If terms is a
+    \code{gp} (a list produced by \code{\link{gpar}}). If \code{parm} is a
     list, \code{plot_gp} may be a nested list specifying the graphical
-    parameters for each list component of \code{terms}. See examples.}
+    parameters for each list component of \code{parm}. See examples.}
   \item{margins}{a numeric vector \code{c(bottom, left, top, right)}
     specifying the space on the margins for each panel.}
+  \item{yadj}{numeric}{the margin above the panel. May be useful if the
+    edge labels are covered by the coefficient panels.}
   \item{mean}{logical. Whether the average coefficients over the
     population should be visualized.}
   \item{mean_gp}{list with graphical parameters for plotting the mean
@@ -87,11 +93,13 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
   \item{conf.int_gp}{a list of graphical parameters for the confindence
     intervals applied to \code{\link{arrow}}. Includes \code{angle},
     \code{length}, \code{ends} and \code{type}. See examples.}
+  \item{abbreviate}{logical scalar. Whether labels of coefficients should
+    be abbreviated.}		
   \item{etalab}{character. Whether category-specific effects should be
     labeled by integers of categories (default), the labels of the
     categories (\code{"char"}) or the index of the predictor
     (\code{"eta"}).} 
-  \item{\ldots}{additional arguments passed to \code{\link{panel_terms}}
+  \item{\ldots}{additional arguments passed to \code{\link{panel_partdep}}
     or \code{\link{panel_coef}} or other methods.}
 }
 
@@ -99,10 +107,10 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
   The plot functions allow the diagnosis of fitted \code{\link{tvcm}}
   objects. \code{type = "default"}, \code{type = "coef"} and 
   \code{type = "simple"} show the tree structure and coefficients in each
-  node. \code{type = "terms"} plots partial dependency plots, see Hastie
+  node. \code{type = "partdep"} plots partial dependency plots, see Hastie
   et al. (2001), section 10.13.2.
 
-  The functions \code{\link{panel_terms}} and \code{\link{panel_coef}}
+  The functions \code{\link{panel_partdep}} and \code{\link{panel_coef}}
   are exported to show the additional arguments that can be passed to
   \code{...} of a \code{\link{plot}} call.
 
@@ -119,15 +127,16 @@ panel_coef(object, terms = NULL, id = TRUE, nobs = TRUE,
 ## ------------------------------------------------------------------- #
 ## Dummy example 1:
 ##
-## Plotting the types "coef" and "terms" for a 'tvcm' object fitted on
+## Plotting the types "coef" and "partdep" for a 'tvcm' object fitted on
 ## artificial data.
 ## ------------------------------------------------------------------- #
 
 data(vcrpart_2)
 
 ## fit the model
-model <- tvcglm(y ~ vc(z1,z2,by=x1) + x2, vcrpart_2, gaussian(),
-                control = tvcm_control(alpha = 1, maxwidth = 3, minbucket = 5L))
+model <- tvcglm(y ~ vc(z1, z2, by = x1, intercept = TRUE) + x2,
+                data = vcrpart_2, family = gaussian(),
+                control = tvcm_control(maxwidth = 3, minbucket = 5L))
 
 ## plot type "coef"
 plot(model, "coef")
@@ -142,15 +151,15 @@ plot(model, "coef",
        gp = gpar(fontsize = 16, cex = 2, col = "red")))
 
 ## separate plots with separate plot parameters
-plot(model, "coef", terms = list("(Intercept)", "x1"), tnex = 2,
+plot(model, "coef", parm = list("(Intercept)", "x1"), tnex = 2,
      plot_gp = list(list(gp = gpar(col = "red")),
                     list(gp = gpar(col = "blue"))),
      mean_gp = list(list(gp = gpar(col = "green")),
                     list(gp = gpar(col = "yellow"))))
 
-## plot type "terms"
+## plot type "partdep"
 par(mfrow = c(1, 2))
-plot(model, "terms", variable = "z1", ask = FALSE)
+plot(model, "partdep", var = "z1", ask = FALSE)
 }
 
 \seealso{\code{\link{tvcm}}, \code{\link{tvcm-methods}}}

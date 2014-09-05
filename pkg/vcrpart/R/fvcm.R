@@ -1,25 +1,30 @@
-## --------------------------------------------------------- #
-## Author:          Reto Buergin
-## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-05-09
-##
-## Description:
-## Random forests implementation based on the 'tvcm' algorithm.
-##
-## Contents:
-## fvcm:         random forest algorithm
-## fvcm_control: control function for 'fvcm'
-## fitted.fvcm:  extracts fitted values
-## oobrisk.fvcm: extracts out-of-bag risk
-## predict.fvcm: prediction for 'forest.tvcm' objects
-## plot.fvcm:    plot method for 'forest.tvcm' objects
-## print.fvcm:   print method for 'forest.tvcm' objects
-##
-## To do:
-## - print.fvcm: 'data' output
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Author:          Reto Buergin
+##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' Date:            2014-08-05
+##'
+##' Description:
+##' Random forests implementation based on the 'tvcm' algorithm.
+##'
+##' Contents:
+##' fvcm:         random forest algorithm
+##' fvcm_control: control function for 'fvcm'
+##' fitted.fvcm:  extracts fitted values
+##' oobloss.fvcm: extracts out-of-bag loss
+##' predict.fvcm: prediction for 'fvcm' objects
+##' plot.fvcm:    plot method for 'fvcm' objects
+##' print.fvcm:   print method for 'fvcm' objects
+##'
+##' To do:
+##' - print.fvcm: 'data' output
+##' - set 'ptry', 'vtry' and 'ntry' automatically (see Hastie)
+##'
+##' Last modifications:
+##' 2014-08-05: - changed specification for folds
+##' -------------------------------------------------------- #
 
-fvcolmm <- function(..., family = cumulative(), folds,
+fvcolmm <- function(..., family = cumulative(),
+                    folds = folds_control("subsampling", 5),
                     control = fvcm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
@@ -28,7 +33,8 @@ fvcolmm <- function(..., family = cumulative(), folds,
   return(eval.parent(mc))
 }
 
-fvcglm <- function(..., folds, control = fvcm_control()) {
+fvcglm <- function(..., family, folds = folds_control("subsampling", 5),
+                   control = fvcm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
   mc$fit <- "glm"
@@ -36,7 +42,8 @@ fvcglm <- function(..., folds, control = fvcm_control()) {
   return(eval.parent(mc))
 }
 
-fvcm <- function(..., folds, control = fvcm_control()) {
+fvcm <- function(..., folds = folds_control("subsampling", 5),
+                 control = fvcm_control()) {
   
   mc <- match.call()
   args <- list(...)
@@ -59,8 +66,6 @@ fvcm <- function(..., folds, control = fvcm_control()) {
   
   ## reset the depth parameter and set the verbose parameter
   object$info$control$maxwidth <- maxwidth
-  folds <-
-    folds[rownames(args$data) %in% rownames(model.frame(object)),, drop = FALSE]
   
   ## compute trees for subsamples
   args$object <- object
@@ -69,17 +74,18 @@ fvcm <- function(..., folds, control = fvcm_control()) {
   args$fixed <- TRUE
   args$verbose <- verbose
   
-  cv <- do.call("cvrisk", args = args)
+  cv <- do.call("cvloss", args = args)
   fails <- cv$error$which  
   
   ## add new information to info slot
   if (length(fails) > 0)
     folds <- folds[, -fails, drop = FALSE]
+
   
-  object$info$node <- append(object$info$node, cv$node)
+  object$info$forest <- cv$node
   object$info$coefficients <-
     append(cv$coefficients, object$info$coefficient)
-  object$info$folds <- cbind(object$info$folds, folds)
+  object$info$folds <- cv$folds
   object$info$error <- cv$error
   object$info$control$verbose <- verbose
   object$info$call <- mc
@@ -89,18 +95,16 @@ fvcm <- function(..., folds, control = fvcm_control()) {
   return(object)
 }
 
-fvcm_control <- function(alpha = 1.0, maxwidth = 10L,
-                         minbucket = 50L, mtry = 5L, ...)
-  return(tvcm_control(alpha = alpha, maxwidth = maxwidth,
-                      minbucket = minbucket, mtry = mtry, ...))
+fvcm_control <- function(alpha = 1.0, maxstep = 10L,
+                         minsize = NULL, ptry = 1, ntry = 1, vtry = 5L, ...)
+  return(tvcm_control(alpha = alpha, maxstep = maxstep,
+                      minsize = minsize, ptry = ptry, ntry = ntry,
+                      vtry = vtry, ...))
 
 fitted.fvcm <- function(object, ...) predict(object, ...)
 
-oobrisk.fvcm <- function(object, fun = NULL, ranef = FALSE, ...) {
+oobloss.fvcm <- function(object, fun = NULL, ranef = FALSE, ...) {
 
-  ## estimate error for an observation with tree in which the observation
-  ## wasn't included
-  
   if (is.null(fun)) {
     fun <- function(y, mu, wt)
       sum(object$info$family$dev.resids(y, mu, wt), na.rm = TRUE)
@@ -132,61 +136,54 @@ oobrisk.fvcm <- function(object, fun = NULL, ranef = FALSE, ...) {
 
 
 plot.fvcm <- function(x, type = c("default", "coef", 
-                           "simple", "terms"),
-                      which = 1L, ask = TRUE, ...) {
-
+                           "simple", "partdep"),
+                      tree = NULL, ask = NULL, ...) {
+  
   type <- match.arg(type)
   dotargs <- list(...)
 
-  if (ask) {
-    oask <- devAskNewPage(TRUE)
-    on.exit(devAskNewPage(oask))
-  }
-
   ## set call
-  call <- call(name = "plot.tvcm", x = quote(x), type = type)  
+  call <- call(name = "plot.tvcm", x = quote(x), type = type, ask = ask)  
   for (arg in names(dotargs)) call[[arg]] <- dotargs[[arg]]
     
   ## modify model object if coefficients plots are called
 
-  if (type == "terms") {
+  if (type == "partdep") {
 
-    call$ask <- ask
     eval(call)
 
   } else {
 
-    if (type == "coef" | (type == "default" & depth(x) > 3L)) {
-      
-      ## modify default arguments
-      if (!is.null(dotargs$conf.int) && dotargs$conf.int)
-        warning("'conf.int' is not available for 'fvcm' objects")
-      call$conf.int <- FALSE
-      if (!is.null(dotargs$mean) && dotargs$mean)
-        warning("'mean' is not available for 'fvcm' objects")
-      call$mean <- FALSE
+    if (is.null(tree)) tree <- seq_along(x$info$forest)
+
+    if (is.null(ask))
+      ask <- ifelse(length(tree) == 1L, FALSE, TRUE)
+
+    if (ask) {
+      oask <- devAskNewPage(TRUE)
+      on.exit(devAskNewPage(oask))
     }
-    
-    which <- intersect(which, 1:length(x$info$node))
 
-    ## loop through all trees
-    for (i in which) {
+    ## modify default arguments
+    if (!is.null(dotargs$conf.int) && dotargs$conf.int)
+      warning("'conf.int' is not available for 'fvcm' objects")
+    call$conf.int <- FALSE
+    if (!is.null(dotargs$mean) && dotargs$mean)
+      warning("'mean' is not available for 'fvcm' objects")
+    call$mean <- FALSE
 
-      ## set nodes
-      x$node <- x$info$node[[i]]
+    for (tid in tree) {
 
-      ## set coefficients (this is a ugly hack)
-      if (type == "coef" | (type == "default" & depth(x) > 3L)) {
-        if (isS4(x$info$model)) {
-          slot(x$info$model, "coefficients") <- x$info$coefficients[[i]]
-        } else {
-          x$info$model$coefficients <- x$info$coefficients[[i]]
-        }
-      }
+      ## set nodes and coefficients
+      x$info$node <- x$info$forest[[tree[tid]]]
+      x$info$model$coefficients <- x$info$coefficients[[tree[tid]]]
+      
+      ## call plot
       eval(call)
     }
   }
 }
+
 
 predict.fvcm <- function(object, newdata = NULL,
                          type = c("link", "response", "prob", "class", "coef",
@@ -233,14 +230,17 @@ predict.fvcm <- function(object, newdata = NULL,
   folds <- if (oob) {
     object$info$folds
   } else {
-    matrix(1L, nrow(newdata), length(object$info$node))
+    matrix(1L, nrow(newdata), length(object$info$forest))
   }
   
   ## get formulas
-  formList <- vcrpart_formula(object$info$formula$root)
-
+  formList <- object$info$formula
+  rootForm <- tvcm_formula(formList, rep(TRUE, length(formList$vc)),
+                           object$info$family)$full
+  formList <- vcrpart_formula(rootForm, object$info$family)
+  
   ## extract the name and levels of the response
-  yName <- all.vars(object$info$formula$root)[1]
+  yName <- all.vars(formList$original)[1]
   yLevs <- if (object$info$fit == "olmm") levels(mf[, yName]) else yName
   nYLevs <- length(yLevs)
 
@@ -272,7 +272,7 @@ predict.fvcm <- function(object, newdata = NULL,
     Terms <- attr(mf, "terms")
     xlevels <- .getXlevels(attr(mf, "terms"), mf)
     if (is.matrix(ranef)) {
-      subjectName <- slot(dummymodel, "subjectName")
+      subjectName <- dummymodel$subjectName
       xlevels <- xlevels[names(xlevels) != subjectName]
     }
     
@@ -281,7 +281,7 @@ predict.fvcm <- function(object, newdata = NULL,
                                          xlev = xlevels))
   }
   
-  if (verbose) cat("* predicting the coefficient function ... ")
+  if (verbose) cat("* predicting the coefficient functions ... ")
 
   ## ------------------------------------------------------- #
   ## Step 1: predict the coefficients for each observation
@@ -293,20 +293,16 @@ predict.fvcm <- function(object, newdata = NULL,
   rownames(coef) <- rownames(newdata)
   subs <- matrix(TRUE, nrow(coef), ncol(coef))
   
-  for (i in seq_along(object$info$node)) {
+  for (i in seq_along(object$info$forest)) {
 
     if (verbose) cat(".")
 
     ## set node
-    object$node <- object$info$node[[i]]
+    object$info$node <- object$info$forest[[i]]
 
     ## set coefficients
-    if (object$info$fit == "olmm") {     
-        slot(object$info$model, "coefficients") <- object$info$coefficients[[i]]
-    } else {
-        object$info$model[["coefficients"]] <- object$info$coefficients[[i]]
-    }
-
+    object$info$model$coefficients <- object$info$coefficients[[i]]
+    
     coefi <- predict(object, newdata = newdata, type = "coef",
                      ranef = FALSE, na.action = na.pass, ...)
     if (!is.matrix(coefi)) coefi <- matrix(coefi, nrow = nrow(newdata))
@@ -363,20 +359,19 @@ predict.fvcm <- function(object, newdata = NULL,
   ## create a model matrix 'X'
   if (object$info$fit == "olmm") {
     X <- olmm_merge_mm(model.matrix(terms(formList$fe$eta$ce, keep.order = TRUE),
-                                    newdata, attr(slot(object$info$model, "X"),
-                                                  "contrasts")),
+                                    newdata, attr(object$info$model$X, "contrasts")),
                        model.matrix(terms(formList$fe$eta$ge, keep.order = TRUE),
-                                    newdata, attr(slot(object$info$model, "X"),
-                                                  "contrasts")), TRUE)
+                                    newdata, attr(object$info$model$X, "contrasts")),
+                       TRUE)
   } else {
-    X <- model.matrix(terms(object$info$formula$root), newdata,
+    X <- model.matrix(terms(rootForm), newdata,
                       object$info$model$contrasts)
   }
   
   ## compute the linear predictor 'eta' based on 'coef' and 'X'
   if (object$info$fit == "olmm") {
     coef <- coef[, substr(colnames(coef), 1,12) != "ranefCholFac", drop = FALSE]
-    dims <- slot(dummymodel, "dims")
+    dims <- dummymodel$dims
     fixefMat <- function(fixef) {
       return(rbind(matrix(fixef[1:(dims["pCe"] * dims["nEta"])], dims["pCe"], dims["nEta"], byrow = FALSE), if (dims["pGe"] > 0) matrix(rep(fixef[(dims["pCe"] * dims["nEta"] + 1):dims["p"]], each = dims["nEta"]), dims["pGe"], dims["nEta"], byrow = TRUE) else NULL))
     }
@@ -404,7 +399,7 @@ predict.fvcm <- function(object, newdata = NULL,
     terms <- "fe(intercept=FALSE)"
     
     ## add random effect terms
-    mTerms <- terms(object$info$formula$root, specials = "re")
+    mTerms <- terms(object$info$formula$original, specials = "re")
     if (length(subs <- attr(mTerms, "specials")$re) > 0L) {
       
       ## the random effect term
@@ -429,13 +424,13 @@ predict.fvcm <- function(object, newdata = NULL,
     newdata <- rbind(newdata, newdata[rep(1L, nYLevs),,drop = FALSE])
     newdata[subs, yName] <- yLevs
     if (object$info$fit == "olmm") {
-      sN <- slot(object$info$model, "subjectName")
+      sN <- object$info$model$subjectName
       levs <- c(levels(newdata[,sN]), "RetoBuergin") 
       newdata[sN] <- factor(newdata[,sN], levels = levs)
       newdata[subs, sN] <- "RetoBuergin"
     }
     eta <- rbind(eta, matrix(0, nYLevs, ncol(eta)))
-    folds <- rbind(folds, matrix(-1L, nYLevs, length(object$info$node)))
+    folds <- rbind(folds, matrix(-1L, nYLevs, length(object$info$forest)))
   }
 
   ## set the offset of the model as predicted linear predictors
@@ -489,22 +484,22 @@ predict.fvcm <- function(object, newdata = NULL,
 
 
 print.fvcm <- function(x, ...) {
-  cat(if (x$info$control$mtry < Inf) "Random forest" else "Bagging",
+  cat(if (x$info$control$vtry < Inf) "Random forest" else "Bagging",
       "based varying-coefficients model\n\n")
   if (length(x$info$family$family) > 0L)
-    cat("  Family:", x$info$family$family, x$info$family$link, "\n")
+    cat(" Family:", x$info$family$family, x$info$family$link, "\n")
   if (length(x$info$formula$original) > 0L)
-    cat(" Formula:", paste(deparse(x$info$formula$original), collapse = "\n"), "\n")
+    cat("Formula:", paste(deparse(x$info$formula$original), collapse = "\n"), "\n")
   if (length(str <- deparseCall(x$info$call$data)) > 0L)
-    cat("    Data: ", str, "\n", sep = "")
+    cat("   Data: ", str, "\n", sep = "")
   if (length(str <- deparseCall(x$info$call$subset)) > 0L)
-    cat("  Subset: ", str, "\n", sep = "")
+    cat(" Subset: ", str, "\n", sep = "")
   if (length(x$info$control) > 0L)
-    cat(paste("  Method: ", x$info$control$method,
-              " (maxwidth = ", x$info$control$maxwidth,
-              ", minbucket = ", x$info$control$minbucket,
-              ", ntrees = ", length(x$info$node),
-              ")\n", sep = ""))
+    cat(paste("Control: ", x$info$control$method,
+              "nsplit = ", x$info$control$maxstep,
+              ", minbucket = ", x$info$control$minsize,
+              ", ntrees = ", length(x$info$forest),
+              "\n", sep = ""))
   if (nzchar(mess <- naprint(attr(x$data, "na.action")))) 
     cat("\n(", mess, ")\n", sep = "")
   return(invisible(x))

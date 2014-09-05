@@ -1,42 +1,48 @@
 ## --------------------------------------------------------- #
-## Author:          Reto Buergin
-## E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-## Date:            2014-05-02
-##
-## Description:
-## Generics for methods for S3 and S4 classes
-##
-## Overview:
-## S3 Methods for olmm:
-## neglogLik:       log likelihood times minus one of a fitted model
-## ranefCov:        extracts covariance matrixof models with
-##                  random effects.
-## oobrisk:         estimates out-of-bag risk.
-## otsplot:         ordinal time series plot.
-## splitpath:       extracts the splitting path of a tree
-##                  structure.
-## stabpath:        computes stability paths for variable
-##                  selection.
+##' Author:          Reto Buergin
+##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' Date:            2014-07-17
+##'
+##' Description:
+##' New generics for exported methods
+##'
+##' Overview:
+##' cvloss:             cross-validates the loss of a model
+##'                     regarding a tuning parameter. See
+##'                     'tvcm-cv.R'.
+##' extract:            extracts features of a fitted model.
+##'                     See 'tvcm-methods.R'.
+##' neglogLik2:         log likelihood times minus two of a fitted
+##'                     model. See also 'olmm-methods.R' and
+##'                     'tvcm-methods.R'
+##' neglogLik2.default: neglogLik2 function which should
+##'                     work for most classes
+##' oobloss:            estimates out-of-bag loss.
+##' otsplot:            ordinal time series plot.
+##' splitpath:          extracts the splitting path of the
+##'                     growing process of a tree.
+##' ranefCov:           extracts covariance matrix of random
+##'                     effect variance parameters
+##'
+##' Last modifications:
+##' 2014-07-17: Update the descriptions
 ## --------------------------------------------------------- #
 
-## S3 generics
-
-ranefCov <- function(object, ...) UseMethod("ranefCov")
+cvloss <- function(object, ...) UseMethod("cvloss")
 
 extract <- function(object, ...) UseMethod("extract")
 
-cvrisk <- function(object, ...) UseMethod("cvrisk")
+neglogLik2 <- function(object, ...) UseMethod("neglogLik2")
 
-neglogLik <- function(object, ...) UseMethod("neglogLik")
+neglogLik2.default <- function(object, ...)
+  return(-as.numeric(2 * logLik(object)))
 
-neglogLik.default <- function(object, ...)
-  return(-as.numeric(logLik(object)))
-
-oobrisk <- function(object, ...) UseMethod("oobrisk")
+oobloss <- function(object, ...) UseMethod("oobloss")
 
 otsplot <- function(x, ...) UseMethod("otsplot")
 
+prunepath <- function(tree, ...) UseMethod("prunepath")
+
+ranefCov <- function(object, ...) UseMethod("ranefCov")
+
 splitpath <- function(tree, ...) UseMethod("splitpath")
-
-stabpath <- function(object, q, ...) UseMethod("stabpath")
-

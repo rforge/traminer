@@ -12,8 +12,8 @@
 \alias{logLik.olmm}
 \alias{model.frame.olmm}
 \alias{model.matrix.olmm}
-\alias{neglogLik}
-\alias{neglogLik.olmm}
+\alias{neglogLik2}
+\alias{neglogLik2.olmm}
 \alias{ranef}
 \alias{ranef.olmm}
 \alias{ranefCov}
@@ -43,7 +43,7 @@
 \method{model.matrix}{olmm}(object, which = c("fe", "fe-ce", "fe-ge",
              "re", "re-ce", "re-ge"), ...)
 
-\method{neglogLik}{olmm}(object, ...)
+\method{neglogLik2}{olmm}(object, ...)
 
 \method{ranef}{olmm}(object, norm = FALSE, ...)
 
@@ -90,8 +90,8 @@
   comparisons, based on the marginal likelihood. At the time being, 
   at least two models must be assigned.
 
-  \code{\link{neglogLik}} is simply the likelihood of the fitted model
-  times minus one.
+  \code{\link{neglogLik2}} is simply the likelihood of the fitted model
+  times minus 2.
 
   \code{ranefCov} extracts the variance-covariance matrix of the random
   effects. Similarly, \code{VarCorr} extracts the estimated variances,
@@ -112,12 +112,17 @@
 \author{Reto Buergin}
 
 \references{
+  Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data}, 10
+  edn, Wiley.
+
+  Tutz, G. (2012). \emph{Regression for Categorical Data}, Cambridge
+  Series in Statistical and Probabilistic Mathematics.
+  
   Li, C. and Sheperd, B. E. (2012). A new residual for ordinal
   outcomes, \emph{Biometrika} \bold{99} (2): 437-480
 }
 
-\seealso{\code{\link{olmm}}, \code{\link{olmm-class}},
-  \code{\link{predict.olmm}}, \code{\link{gefp.olmm}}}
+\seealso{\code{\link{olmm}}, \code{\link{predict.olmm}}, \code{\link{gefp.olmm}}}
 
 \examples{
 ## --------------------------------------------------------- #
@@ -141,7 +146,7 @@ head(weights(model.1))
 ranefCov(model.1)
 head(resid(model.1))
 head(simulate(model.1))
-terms(model.1)
+terms(model.1, "fe-ge")
 VarCorr(model.1)
 head(weights(model.1, "subject"))
 }

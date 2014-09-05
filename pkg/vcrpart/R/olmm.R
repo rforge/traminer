@@ -13,6 +13,7 @@
 ##
 ##
 ## Modifications:
+## 2014-06-17: convert routine to S3 class
 ## 2014-05-03: moved several control parameters to 'control' argument
 ## 2014-05-02: added 'linkinv' function to families 'cumulative' etc.
 ## 2014-05-01: change offset argument: not it must be a 'matrix'
@@ -256,7 +257,7 @@ olmm <- function(formula, data, family = cumulative(),
   names(dims) <- c("n", "N", "p", "pEta", "pInt", "pCe", "pGe", "q", "qEta", "qCe", "qGe", "J", "nEta", "nPar", "nGHQ", "nQP", "family", "link", "verb", "numGrad", "numHess", "doFit", "hasRanef")
 
   ## parameter names
-  parNames <- list(fixef = if (ncol(X) > 0L) c(paste("Eta", rep(seq(1L, dims["nEta"], 1L), each = dims["pCe"]), ":", rep(colnames(X)[attr(X, "merge") == 1L], dims["nEta"]), sep = ""), colnames(X)[attr(X, "merge") == 2L]), ranefCholFac = paste("ranefCholFac", 1L:(dims["q"] * (dims["q"] + 1L) / 2L ), sep = ""))
+  parNames <- list(fixef = c(if (dims["pCe"] > 0) paste("Eta", rep(seq(1L, dims["nEta"], 1), each = dims["pCe"]), ":", rep(colnames(X)[attr(X, "merge") == 1L], dims["nEta"]), sep = ""), if (dims["pGe"] > 0) colnames(X)[attr(X, "merge") == 2L]), ranefCholFac = paste("ranefCholFac", 1L:(dims["q"] * (dims["q"] + 1L) / 2L ), sep = ""))
   
   ## set the weights
   if (is.null(model.weights(fullmf))) {
@@ -264,11 +265,6 @@ olmm <- function(formula, data, family = cumulative(),
     weights_sbj <- as.double(rep(1.0, dims["N"]))
   } else { 
     weights <- model.weights(fullmf)
-    if (sum(weights) != dims["n"]) {
-      warning("sum of weights must be equal the number of observation. ",
-              "Apply auto correction.")
-      weights <- weights / sum(weights) * dims["n"]
-    }
     weights_sbj <- tapply(weights, subject, unique)
     if (is.list(weights_sbj)) {
       stop("'weights' must be constant for subjects")
@@ -384,40 +380,43 @@ olmm <- function(formula, data, family = cumulative(),
   
   if (control$verbose) cat("OK\n* building the model object ... ")
   
-  object <- new(Class = "olmm",
-                call = mc,
-                frame = fullmf,
-                formula = formula,
-                terms = terms,
-                family = family,
-                y = y,
-                X = X,
-                W = W,
-                subject = subject,
-                subjectName = subjectName,
-                weights = weights,
-                weights_sbj = weights_sbj,
-                offset = offset,
-                xlevels = xlevels,
-                contrasts = cons,
-                dims = dims,
-                fixef = start$fixef,
-                ranefCholFac = start$ranefCholFac,
-                coefficients = start$coefficients,
-                restricted = restr,
-                eta = eta,
-                u = u,
-                logLik_sbj = ll_sbj,
-                logLik = ll,
-                score_obs = score_obs,
-                score_sbj = score_sbj,
-                score = score,
-                info = info,
-                ghx = ghx,
-                ghw = ghw,
-                ranefElMat = ranefElMat,
-                control = control,
-                optim = optim)
+  object <- structure(
+              list(call = mc,
+                   frame = fullmf,
+                   formula = formula,
+                   terms = terms,
+                   family = family,
+                   y = y,
+                   X = X,
+                   W = W,
+                   subject = subject,
+                   subjectName = subjectName,
+                   weights = weights,
+                   weights_sbj = weights_sbj,
+                   offset = offset,
+                   xlevels = xlevels,
+                   contrasts = cons,
+                   dims = dims,
+                   fixef = start$fixef,
+                   ranefCholFac = start$ranefCholFac,
+                   coefficients = start$coefficients,
+                   restricted = restr,
+                   eta = eta,
+                   u = u,
+                   logLik_sbj = ll_sbj,
+                   logLik = ll,
+                   score_obs = score_obs,
+                   score_sbj = score_sbj,
+                   score = score,
+                   info = info,
+                   ghx = ghx,
+                   ghw = ghw,
+                   ranefElMat = ranefElMat,
+                   control = control,
+                   optim = optim,
+                   output = list(),
+                   conv = FALSE),
+              class = "olmm")
 
   ## delete big data blocks
   rm(list = ls()[!ls() %in% c("dims", "object")])
@@ -429,41 +428,45 @@ olmm <- function(formula, data, family = cumulative(),
     if (dims["verb"] > 0L) cat("OK\n* setting up the fitting environment ... ")
   
     ## set start parameters
-    slot(object, "optim")[[1L]] <- slot(object, "coefficients") 
-    slot(object, "optim")[[4L]] <- slot(object, "restricted")
+    object$optim[[1L]] <- object$coefficients
+    object$optim[[4L]] <- object$restricted
     ## fit the model
     
     if (dims["verb"] > 0L) cat("OK\n* fitting the model ... ")
 
-    if (!is.null(slot(object, "optim")$control$trace) &&
-        slot(object, "optim")$control$trace > 0L)
+    if (!is.null(object$optim$control$trace) &&
+        object$optim$control$trace > 0L)
       cat("\n")
 
     ## extract the function for fitting the model
-    FUN <- slot(object, "optim")$fit
-    subs <- which(names(slot(object, "optim")) == "fit")
-    slot(object, "optim") <- slot(object, "optim")[-subs] 
-    systemTime <- system.time(slot(object, "output") <-
-                              do.call(FUN, slot(object, "optim")))
-    slot(object, "optim")$fit <- FUN
+    FUN <- object$optim$fit
+    subs <- which(names(object$optim) == "fit")
+    object$optim <- object$optim[-subs] 
+    systemTime <- system.time(object$output <-
+                              suppressWarnings(do.call(FUN, object$optim)))
+    object$optim$fit <- FUN
     
     ## to get sure ...
-    .Call("olmm_update_marg", object, slot(object, "output")$par, PACKAGE = "vcrpart")
+    .Call("olmm_update_marg", object, object$output$par, PACKAGE = "vcrpart")
       
     ## print messages for opimization
     if (dims["verb"] > 0L) {
       cat(paste("OK\n\toptimization time:",
                 signif(systemTime[3L], 3L),
                 "seconds", sep = " "))
-      if (is.null(slot(object, "output")$message)) {
+      if (is.null(object$output$message)) {
         cat("\n\tno message returned by the optimizer")
       } else {
-        cat(paste("\n\tmessage: ", slot(object, "output")$message, sep = ""))
+        cat(paste("\n\tmessage: ", object$output$message, sep = ""))
       }
     }
 
     ## warnings from optimization
-    olmm_optim_warnings(slot(object, "output"), FUN)
+    olmm_optim_warnings(object$output, FUN)
+    object$conv <- switch(object$optim$fit,
+                          optim = object$output$convergence == 0,
+                          nlminb = object$output$convergence == 0,
+                          ucminf = object$output$convergence %in% c(1, 2, 4))
     
     ## numeric estimate of fisher information
     if (dims["numHess"] == 1L) {
@@ -471,16 +474,16 @@ olmm <- function(formula, data, family = cumulative(),
       if (dims["verb"] > 0L)
         cat("\n* computing the approximative hessian matrix ... ")
       
-      slot(object, "info")[] <- # replace the info slot
-        - hessian(func = slot(object, "optim")[[2L]],
-                  x = slot(object, "coefficients"),
+      object$info[] <- # replace the info slot
+        - hessian(func = object$optim[[2L]],
+                  x = object$coefficients,
                   method.args = list(r = 2, show.details = TRUE),
-                  restricted = slot(object, "restricted"))
+                  restricted = object$restricted)
       if (dims["verb"] > 0L) cat("OK")
     }
 
     if (dims["verb"] > 0L) {
-      eigenHess <- eigen(slot(object, "info"), only.values = TRUE)$values
+      eigenHess <- eigen(object$info, only.values = TRUE)$values
       condHess <- abs(max(eigenHess) / min(eigenHess))
       cat("\n\tcondition number of Hessian matrix:",
           format(condHess, digits = 2L, scientific = TRUE))
@@ -496,16 +499,16 @@ olmm <- function(formula, data, family = cumulative(),
     }
     
     ## reset environment of estimation equations
-    environment(slot(object, "optim")[[2L]]) <- baseenv()
+    environment(object$optim[[2L]]) <- baseenv()
     if (dims["numGrad"] < 1L)
-      environment(slot(object, "optim")[[3]]) <- baseenv()
+      environment(object$optim[[3]]) <- baseenv()
     
     if (dims["verb"] > 0L) cat("\n* computations finished, return model object\n")
     
   } else {
 
     ## update the object with the current estimates
-    .Call("olmm_update_marg", object, slot(object, "coefficients"),
+    .Call("olmm_update_marg", object, object$coefficients,
           PACKAGE = "vcrpart")
     if (dims["hasRanef"] > 0L)
       .Call("olmm_update_u", object, PACKAGE = "vcrpart")
