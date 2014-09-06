@@ -334,7 +334,8 @@ print.tvcm <- function(x, ...)
 prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
                        direction = c("backward", "forward"),
                        alpha = NULL, maxstep = NULL, terminal = NULL,
-                       papply = mclapply, keeploss = FALSE, ...) {
+                       papply = mclapply, keeploss = FALSE, original = FALSE,
+                       ...) {
 
   mc <- match.call()
   
@@ -398,35 +399,19 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
       terminal <- lapply(terminal, as.integer)
     }
   }
-  
-  if (tree$info$pruned &&
-      (any(tunepar %in% c("alpha", "maxstep")) |
-       (tunepar == "dfsplit" & direction == "forward")))
-    stop("pruning on 'alpha' or 'maxstep' is not available because ",
-         "'tree' has previously been prune backwards.")
 
-  if (tunepar %in% c("alpha", "maxstep", "terminal")) {
-    
-    ## prune the tree structure
-    node <- tvcm_prune_node(tree, alpha, maxstep, terminal)
-    
-    ## refit the model if something has changed
-    if (!identical(node, tree$info$node)) {
-      
-      ## attach nodes
-      tree$info$node <- node
-      tree$node <- node[[1L]]
-      
+  refit <- function(tree) {
+
       ## extract new formula
       env <- environment()
       formList <- tree$info$formula
-      vcRoot <- sapply(node, width) == 1L
+      vcRoot <- sapply(tree$info$node, width) == 1L
       ff <- tvcm_formula(formList, vcRoot, tree$info$family, env)
-      
+
       ## overwrite node predictors
       data <- model.frame(tree)
-      data[, paste("Node", LETTERS[seq_along(node)], sep = "")] <-
-        tvcm_get_node(tree, tree$data, TRUE, tree$fitted[,"(weights)"], formList)
+      data[, paste("Node", LETTERS[seq_along(tree$info$node)], sep = "")] <-
+          tvcm_get_node(tree, tree$data, TRUE, tree$fitted[,"(weights)"], formList)
       
       ## refit model
       call <- call(name = tree$info$fit,
@@ -437,23 +422,40 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
       for (arg in names(tree$info$dotargs)) call[[arg]] <- tree$info$dotargs[[arg]]
       tree$info$model <- suppressWarnings(try(eval(call), TRUE))
       
+      ## check if the refitting failed
       if (inherits(tree$info$model, "try-error"))
-        stop("tree model fitting failed.")
-      
-      if (tunepar == "terminal")
-        tree$info$pruned <- TRUE
-      
+          stop("tree model fitting failed.")
+
       ## update control
       tree$info$control <-
-        tvcm_grow_setcontrol(tree$info$control, tree$info$model, formList, vcRoot)
-    }
+          tvcm_grow_setcontrol(tree$info$control, tree$info$model, formList, vcRoot)
+          
+      return(tree)
+  }
+
+  ## get the original tree
+  if (original && !identical(tree$info$node, tree$info$grownode)) {
+      tree$node <- tree$info$grownode[[1L]]
+      tree$info$node <- tree$info$grownode
+      tree <- refit(tree)         
+  }
+  
+  if (tunepar %in% c("alpha", "maxstep", "terminal")) {
+       
+      ## prune the tree structure
+      node <- tvcm_prune_node(tree, alpha, maxstep, terminal)
     
-    ## update 'control'
-    if (!is.null(alpha)) 
-      tree$info$control$alpha <- alpha
-    if (!is.null(maxstep))
-      tree$info$control$maxstep <- maxstep
-    
+      ## refit the model if something has changed
+      if (!identical(node, tree$info$node)) {
+      
+          ## attach nodes
+          tree$node <- node[[1L]]
+          tree$info$node <- node
+
+          ## refit the model
+          tree <- refit(tree)     
+      }
+      
   } else if (tunepar == "dfsplit") {
     
     if (direction == "backward") {
@@ -552,7 +554,7 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
                                if (pid == ntab$part[i]) return(ntab$node[i])
                                return(NULL)
                              })
-              prTree <- try(prune(tree, terminal = term), TRUE)
+              prTree <- try(prune(tree, terminal = term, papply = lapply), TRUE)
               if (!inherits(prTree, "try-error"))
                 return(c(prTree$info$control$lossfun(prTree),
                          extractAIC(prTree$info$model)[1L],
@@ -702,7 +704,8 @@ print.splitpath.tvcm <- function(x, ...) {
       cat("\nSplitting variable:", x[[i]]$var)
       cat("\nNode:", x[[i]]$node)
       cat("\nCutpoint: ")
-      cat(paste("{",paste(x[[i]]$cutpoint, collapse = "}, {"), "}\n", sep = ""))
+      cat(paste("{",paste(x[[i]]$cutpoint, collapse = "}, {"), "}", sep = ""))
+      cat("\nPenalized loss reduction:", format(x[[i]]$ploss, ...), "\n")
   }
     
     if (!is.null(x[[i]]$sctest) | !is.null(x[[i]]$lossgrid))

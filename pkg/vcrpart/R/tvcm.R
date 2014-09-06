@@ -126,7 +126,7 @@ tvcm <- function(formula, data, fit, family,
   start <- list(...)$start
   weights <- model.weights(mf)
   if (is.null(weights)) weights <- rep(1.0, nrow(mf))  
-  call <- call(name = fit,
+  mcall <- call(name = fit,
                formula = quote(ff$full),
                family = quote(family),
                data = quote(mf),
@@ -135,12 +135,12 @@ tvcm <- function(formula, data, fit, family,
   mce <- match.call(expand.dots = TRUE)
   dotargs <- setdiff(names(mce), names(mc))
   dotargs <- intersect(dotargs, names(formals(fit)))
-  dotargs <- setdiff(dotargs, names(call))
-  for (arg in dotargs) call[[arg]] <- mce[[arg]]
-  environment(call) <- environment()
+  dotargs <- setdiff(dotargs, names(mcall))
+  for (arg in dotargs) mcall[[arg]] <- mce[[arg]]
+  environment(mcall) <- environment()
   
   ## call root model
-  model <- tvcm_grow_fit(call, doFit = FALSE)
+  model <- tvcm_grow_fit(mcall, doFit = FALSE)
   
   ## check if there are categorical variables among the predictors
   etaVars <- unlist(lapply(formList$vc, function(x) {
@@ -207,7 +207,7 @@ tvcm <- function(formula, data, fit, family,
   object <- structure(list(data = partData,
                            info = list(
                              call = mc,
-                             mcall = call,                             
+                             mcall = mcall,                             
                              formula = formList,
                              direct = direct,
                              fit = fit,
@@ -244,7 +244,7 @@ tvcm <- function(formula, data, fit, family,
   }
    
   ## pruning
-  if (control$prune) {
+  if (control$prune && inherits(tree, "tvcm")) {
     if (control$verbose) cat("\n* pruning ... ")
     tree <- prune(tree, dfsplit = tree$info$cv$dfsplit.hat, papply = control$papply)
     if (control$verbose) cat("OK")

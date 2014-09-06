@@ -2,14 +2,14 @@
 
 GENERAL
 
-    o    complete revision of the syntax, argument names and 
-         default parameters. R codes of version 0.1-14 will likely 
+    o    complete revision of syntaxes, argument names and 
+         default parameters. R commands for version 0.1-14 will likely 
          not work anymore.
     o    the default splitting criterion of 'tvcm' was changed from 
          coefficient constancy tests combined with greedy loss 
-         minimization to exclusive greedy loss minimization. Splitting 
+         minimization to exhaustive greedy loss minimization. Splitting 
          based on the former default require to set the argument 
-         'sctest' in 'tvcm_control'
+         'sctest = TRUE' in 'tvcm_control'
 
 NEW FEATURES
      

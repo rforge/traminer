@@ -153,8 +153,8 @@ data(poverty)
 poverty$EduHigh <- 1 * (poverty$Edu == "high")
 model.Pov <- tvcglm(Poor ~ -1 +  vc(CivStat) + vc(CivStat, by = EduHigh) + NChild, 
                     family = binomial(), data = poverty, subset = 1:200,
-                    control = tvcm_control(folds = 
-                        folds_control(K = 1, type = "subsampling", seed = 4)))
+                    control = tvcm_control(verbose = TRUE,
+                        folds = folds_control(K = 1, type = "subsampling", seed = 4)))
 
 ## diagnosis
 plot(model.Pov, "cv")

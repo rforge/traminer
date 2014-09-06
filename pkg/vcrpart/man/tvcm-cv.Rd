@@ -41,7 +41,7 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
 \method{prune}{tvcm}(tree, dfsplit = NULL, dfpar = NULL,
       direction = c("backward", "forward"),
       alpha = NULL, maxstep = NULL, terminal = NULL,
-      papply = mclapply, keeploss = FALSE, ...)
+      papply = mclapply, keeploss = FALSE, original,...)
 }
 
 \arguments{
@@ -105,6 +105,8 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
     multiple \code{\link{vc}} terms, only the statistics corresponding
     to the \code{\link{vc}} term in which a node was collapsed in the previous
     iteration are considered to be reused.}
+  \item{original}{logical scalar. Whether pruning should be based on the
+    trees from partitioning rather than on the current trees.}
   \item{...}{other arguments to be passed.} 
 }
 

@@ -100,8 +100,8 @@
 
 tvcm_grow <- function(object, subset = NULL, weights = NULL) {
 
-  call <- object$info$mcall
-  environment(call) <- environment()
+  mcall <- object$info$mcall
+  environment(mcall) <- environment()
   formList <- object$info$formula
   model <- object$info$model
   mf <- model.frame(model)
@@ -118,7 +118,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
   }
 
   if (!is.null(weights)) {
-    call$weights <- weights
+    mcall$weights <- weights
   } else {
     weights <- weights(model)
   }
@@ -169,7 +169,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
     vcRoot <- sapply(nodeid, length) == 1L
     ff <- tvcm_formula(formList, vcRoot, model$family,
                        environment(formList$original))
-    model <- try(tvcm_grow_fit(call))
+    model <- try(tvcm_grow_fit(mcall))
     
     if (inherits(model, "try-error")) stop(model)
 
@@ -280,7 +280,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
       ## compute the loss of all candidate splits and extract the best split
       loss <- try(tvcm_grow_loss(splits, partid, nodeid, varid, 
                                  model, nodes, where, partData,
-                                 control, call, formList, step), silent = TRUE)
+                                 control, mcall, formList, step), silent = TRUE)
       
       ## handling stops
       if (inherits(loss, "try-error")) {
@@ -299,13 +299,14 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         }
         
         if (run > 0L) {
-          noverstep <- if (loss$loss -
-                           control$dfpar * loss$df -
-                           control$dfsplit * 1 < 0)
-            noverstep + 1L else 0L
+          noverstep <- if (loss$ploss < 0) noverstep + 1L else 0L
           if (noverstep > control$maxoverstep) {
             run <- 0L
-            stopinfo <- "'maxoverstep' reached"
+            if (control$maxoverstep > 0L) {
+                stopinfo <- "'maxoverstep' reached"
+            } else {
+                stopinfo <- "minimal penalized loss-reduction reached"
+            }
             nstep <- nstep - 1L
           }
         }
@@ -339,6 +340,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         splitpath[[step]]$nodeid <- loss$nodeid
         splitpath[[step]]$varid <- loss$varid
         splitpath[[step]]$cutid <- loss$cutid
+        splitpath[[step]]$ploss <- loss$ploss
       }
       splitpath[[step]]$lossgrid <- loss$lossgrid 
     }
@@ -362,7 +364,9 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         cat("Model comparison:\n")
         print(data.frame("loss" = c(control$lossfun(model),
                            control$lossfun(model) - loss$loss),
-                         row.names = paste("step", step + c(-1, 0))))
+                         "penalized loss reduction" =  c("", format(loss$ploss)),
+                         row.names = paste("step", step + c(-1, 0)),
+                         check.names = FALSE))
         
       } else {
         cat("\n\nStopping the algorithm.\nMessage:", as.character(stopinfo), "\n")
@@ -393,7 +397,12 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
     tree <- model
     
   } else {
-    environment(call) <- NULL
+
+    ## delete environments of calls
+    environment(mcall) <- NULL
+    environment(object$info$call) <- NULL
+
+    ## build 'tvcm' object
     tree <- party(nodes[[1L]],
                   data = partData,
                   fitted = data.frame(
@@ -403,8 +412,8 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
                   terms = terms(formList$original, keep.order = TRUE),
                   info = list(
                     title = title,
-                    call = object$info$mc,
-                    mcall = call,
+                    call = object$info$call,
+                    mcall = mcall,
                     formula = formList,
                     direct = object$info$direct,
                     fit = object$info$fit,
@@ -413,9 +422,9 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
                     info = stopinfo,
                     model = model,
                     node = nodes,
+                    grownode = nodes,
                     nstep = nstep,
                     splitpath = splitpath,
-                    pruned = FALSE,
                     dotargs = object$info$dotargs))
     class(tree) <- c("tvcm", "party")
   }
@@ -462,22 +471,22 @@ glm.doNotFit <- function(x, y, weights, start, etastart,
               conv = TRUE, boundary = TRUE))
 }
 
-tvcm_grow_fit <- function(call, doFit = TRUE) {
+tvcm_grow_fit <- function(mcall, doFit = TRUE) {
     
-  ## extract information from 'call'
-  env <- environment(call)
+  ## extract information from 'mcall'
+  env <- environment(mcall)
 
-  ## set call if coefficients are not to optimized
+  ## set mcall if coefficients are not to optimized
   if (!doFit) {
-    if (inherits(eval(call$family, env), "family.olmm")) {
-      call$doFit <- FALSE
+    if (inherits(eval(mcall$family, env), "family.olmm")) {
+      mcall$doFit <- FALSE
     } else {        
-      call$method <- glm.doNotFit # skips glm.fit
+      mcall$method <- glm.doNotFit # skips glm.fit
     }
   }
   
   ## fit model
-  object <- suppressWarnings(eval(call, env))
+  object <- suppressWarnings(eval(mcall, env))
 
   ## return error if fitting failed
   if (inherits(object, "try-error")) stop("model fitting failed.")
@@ -493,7 +502,7 @@ tvcm_grow_fit <- function(call, doFit = TRUE) {
 ##' model. Used for the grid-search in 'tvcm_grow_loss'.
 ##'
 ##' @param object a prototype model
-##' @param call   the call for the prototype model
+##' @param mcall   the mcall for the prototype model
 ##'
 ##' @return A list of formulas ('root', 'tree' and 'original').
 ##'
@@ -1126,7 +1135,7 @@ tvcm_sctest_bonf <- function(test, type) {
 ##' @param nodes    an object of class 'partynode'.
 ##' @param partData a 'data.frame' with the partitioning variables.
 ##' @param control  an object of class 'tvcm_control'.
-##' @param call
+##' @param mcall
 ##' @param step     integer. The current step number.
 ##'
 ##' @return A nested list with loss matrices. Partitions of nodes
@@ -1137,12 +1146,12 @@ tvcm_sctest_bonf <- function(test, type) {
 
 tvcm_grow_loss <- function(splits, partid, nodeid, varid, 
                            model, nodes, where, partData, 
-                           control, call, formList, step) {
+                           control, mcall, formList, step) {
 
   verbose <- control$verbose; control$verbose <- FALSE;
 
   loss0 <- control$lossfun(model)
-  mfName <- switch(deparse(call[[1]]), glm = "model", olmm = "frame")
+  mfName <- switch(deparse(mcall[[1]]), glm = "model", olmm = "frame")
   
   if (verbose) cat("\n* computing splits ")
   
@@ -1195,21 +1204,21 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
     }
   }
 
-  call$data <- eval(call$data, environment(call))
+  mcall$data <- eval(mcall$data, environment(mcall))
   w <- weights(model)
-  call$offset <- predict(model, type = "link")
+  mcall$offset <- predict(model, type = "link")
   if (inherits(model, "glm")) {
-    call$x <- TRUE
-    call$y <- TRUE
-    call$model <- TRUE
+    mcall$x <- TRUE
+    mcall$y <- TRUE
+    mcall$model <- TRUE
   } else if (inherits(model, "olmm")) {
-    call$restricted <- grep("ranefCholFac", names(coef(model)), value = TRUE)
-    call$start <- coef(model)[call$restricted]
+    mcall$restricted <- grep("ranefCholFac", names(coef(model)), value = TRUE)
+    mcall$start <- coef(model)[mcall$restricted]
   }
 
   ff <- tvcm_formula(formList, rep(FALSE, length(partid)), 
-                     eval(call$family, environment(call)),
-                     environment(call), full = FALSE, update = TRUE)
+                     eval(mcall$family, environment(mcall)),
+                     environment(mcall), full = FALSE, update = TRUE)
   Left <- sample(c(0, 1), nobs(model), replace = TRUE)
   Right <- Left - 1
   
@@ -1217,10 +1226,10 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
 
     if (length(unlist(splits[[pid]])) > 0L) {
      
-      call$formula <- ff$update[[pid]][[1L]]
-      call$data$Left <- Left
-      call$data$Right <- Right 
-      sModel <- tvcm_grow_fit(call, doFit = FALSE)
+      mcall$formula <- ff$update[[pid]][[1L]]
+      mcall$data$Left <- Left
+      mcall$data$Right <- Right 
+      sModel <- tvcm_grow_fit(mcall, doFit = FALSE)
       sModel$coefficients[grepl("Left", names(sModel$coefficients))] <- 0.0
       sModel$coefficients[grepl("Right", names(sModel$coefficients))] <- 0.0
       sModel$control <- model$control
@@ -1228,9 +1237,9 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
       if (length(control$nuisance[[pid]]) == 0L) {
         sModelN <- NULL
       } else {
-        callN <- call
-        callN$formula <- ff$update[[pid]][[2L]]
-        sModelN <- tvcm_grow_fit(callN, doFit = FALSE)
+        mcallN <- mcall
+        mcallN$formula <- ff$update[[pid]][[2L]]
+        sModelN <- tvcm_grow_fit(mcallN, doFit = FALSE)
         sModelN$coefficients[] <- 0.0
         sModelN$control <- model$control
       } 
@@ -1365,6 +1374,7 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
                 cutid = cutid,
                 cut = stat[cutid, !colnames(stat) %in% c("loss", "df")],
                 loss = as.numeric(stat[cutid, "loss"]),
+                ploss = maxLossDiff,
                 df = as.numeric(stat[cutid, "df"]),
                 lossgrid = splits))
   } else {
