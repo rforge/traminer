@@ -1,6 +1,6 @@
 Package: vcrpart
 Type: Package
-Title: Tree-based varying coefficient regression for generalized linear regression and ordinal mixed models
+Title: Tree-based varying coefficient regression for generalized linear and ordinal mixed models
 Version: 0.1-15
 Date: 2014-09-05
 Authors@R: c(
