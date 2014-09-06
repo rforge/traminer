@@ -64,14 +64,15 @@ tvcglm(formula, data, family,
   The first and default procedure (cf. Buergin and Ritschard, 2014b) 
   selects the split that maximizes the loss reduction statistic 
   that compares the current with the one-step ahead model (see also
-  argument \code{lossfun} in \code{\link{tvcm_control}}). The algorithm is continued to build 
-  overly fine partitions and is stopped not until the criteria specified 
-  in \code{control} are reached. By default, only the \code{minsize}
-  (minimum node size) criteron is specified. For large data sets with 
-  many partitioning variables, this can be slow and, therefore, 
-  \code{\link{tvcm_control}} provides further criteria, such as \code{dfpar} 
-  and \code{maxoverstep}. The resulting model is likely too large and 
-  pruning is necessary, see \code{\link{cvloss}} and \code{\link{prune}}.
+  argument \code{lossfun} in \code{\link{tvcm_control}}). The algorithm is 
+  continued to build overly fine partitions and is stopped not until the 
+  criteria specified in \code{control} are reached. By default, only 
+  the \code{minsize} (minimum node size) criteron is specified. For 
+  large data sets with many partitioning variables, this can be slow 
+  and, therefore, \code{\link{tvcm_control}} provides further criteria, 
+  such as \code{dfpar} and \code{maxoverstep}. The resulting model is 
+  likely too large and pruning is necessary, see \code{\link{cvloss}} 
+  and \code{\link{prune}}.
 
   The second procedure (cf. Buergin and Ritschard, 2014a) is, for technical 
   reasons, restricted to the cases where a single \code{\link{vc}} term is used 
@@ -143,22 +144,24 @@ tvcglm(formula, data, family,
 ## that accounts for the moderation of 'CivStat' on the relation between 
 ## 'EduHigh' and 'Poor'. We use here the 2-stage procedure with
 ## a partitioning- and a pruning stage as described in 
-## Buergin and Ritschard (2014b)
+## Buergin and Ritschard (2014b).
 ## ------------------------------------------------------------------- #
 
 data(poverty)
 
-## partitioning
+## fit the model
 poverty$EduHigh <- 1 * (poverty$Edu == "high")
-model.Pov <- tvcglm(Poor ~ -1 +  vc(CivStat) + vc(CivStat, by = EduHigh), 
-                    family = binomial(), data = poverty, subset = 1:200)
-
-## pruning stage (using the test sample method to estimate the tuning parameter)
-cv.Pov <- cvloss(model.Pov, folds = folds_control(K = 1, type = "subsampling", seed = 3))
-model.Pov <- prune(model.Pov, dfsplit = cv.Pov$dfsplit.hat)
+model.Pov <- tvcglm(Poor ~ -1 +  vc(CivStat) + vc(CivStat, by = EduHigh) + NChild, 
+                    family = binomial(), data = poverty, subset = 1:200,
+                    control = tvcm_control(folds = 
+                        folds_control(K = 1, type = "subsampling", seed = 4)))
 
 ## diagnosis
-plot(model.Pov)
+plot(model.Pov, "cv")
+plot(model.Pov, "coef")
+summary(model.Pov)
+splitpath(model.Pov, steps = 1:3)
+prunepath(model.Pov, steps = 1)
 
 ## ------------------------------------------------------------------- # 
 ## Example 2: Moderated effect effect of unemployment
@@ -174,12 +177,14 @@ plot(model.Pov)
 data(unemp)
 
 ## fit the model
-model.2 <- tvcolmm(GHQL ~ -1 + 
-                   vc(AGE, FISIT, GENDER, UEREGION, by = UNEMP, intercept = TRUE) +
-                   re(1|PID), data = unemp,
-                   control = tvcm_control(sctest = TRUE, verbose = TRUE))
+model.UE <- tvcolmm(GHQL ~ -1 + 
+                    vc(AGE, FISIT, GENDER, UEREGION, by = UNEMP, intercept = TRUE) +
+                    re(1|PID), data = unemp, control = tvcm_control(sctest = TRUE))
 
-plot(model.2)
+## diagnosis (no cross-validation was performed since 'sctest = TRUE')
+plot(model.UE, "coef")
+summary(model.UE)
+splitpath(model.UE, steps = 1, details = TRUE)
 
 }
 

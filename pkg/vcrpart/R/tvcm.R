@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2014-09-02
+##' Date:        2014-09-06
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -11,7 +11,10 @@
 ##' tvcm         the main fitting function
 ##' tvcm_control control function for 'tvcm'
 ##'
+##' all functions are documented as *.Rd files
+##'
 ##' Last modifications:
+##' 2014-09-06: - incorporate automatic cross-validation and pruning
 ##' 2014-09-04: - assign only those arguments of '...' to 'fit'
 ##'               that appear in 'formals(fit)'
 ##' 2014-08-02: - the 'formula' slot is now a list of formulas as
@@ -57,7 +60,7 @@ tvcglm <- function(formula, data, family,
 tvcm <- function(formula, data, fit, family, 
                  weights, subset, na.action,
                  control = tvcm_control(), ...) {
-
+  
   ## get specified arguments
   mc <- match.call(expand.dots = FALSE)
 
@@ -132,11 +135,12 @@ tvcm <- function(formula, data, fit, family,
   mce <- match.call(expand.dots = TRUE)
   dotargs <- setdiff(names(mce), names(mc))
   dotargs <- intersect(dotargs, names(formals(fit)))
+  dotargs <- setdiff(dotargs, names(call))
   for (arg in dotargs) call[[arg]] <- mce[[arg]]
   environment(call) <- environment()
   
   ## call root model
-  model <- tvcm_fit_model(call, doFit = FALSE)
+  model <- tvcm_grow_fit(call, doFit = FALSE)
   
   ## check if there are categorical variables among the predictors
   etaVars <- unlist(lapply(formList$vc, function(x) {
@@ -193,303 +197,58 @@ tvcm <- function(formula, data, fit, family,
   }
   partData <- model.frame(partForm, mf)
   if (any(sapply(partData, function(x) !(is.factor(x) | is.numeric(x)))))
-    stop("partitioning variables must be either 'numeric' or (ordered) 'factor'.")
-  
+    stop("partitioning variables must be either 'numeric' or (ordered) 'factor'.")  
   attr(partData, "terms") <- attr(mf, "terms")
   attr(partData, "na.action") <- attr(mf, "na.action")
-  varid <- lapply(partVars, function(x) {
-    as.integer(sapply(x, function(x) which(colnames(partData) == x))) })
-  
-  if (control$verbose) cat("\n* starting partitioning ...\n")
-  
-  ## set the root node
-  nodes <- replicate(nPart, partynode(id = 1L, info = list(dims = nobs(model), depth = 0L)))
-  names(nodes) <- names(formList$vc)
-  where <- vector("list", length = nPart)
-  
-  partid <- seq(1, nPart, length.out = nPart)
-  spart <- 0 # pseudo value
-  splits <- vector("list", length = nPart)
-  
-  splitpath <- list()
-  
-  run <- 1L
-  step <- 0L
-  noverstep <- 0L
-  
-  while (run > 0L) {
 
-    step <- step + 1L; nstep <- step;
-    test <- NULL; loss <- NULL;
+  ## grow the tree
 
-    ## get current partitions and add them to the model data
-    for (pid in seq_along(nodes)) {
-      where[[pid]] <- factor(fitted_node(nodes[[pid]], partData))
-      where[[pid]] <- vcrpart_contr.sum(where[[pid]], weights(model))
-      mf[, paste("Node", LETTERS[pid], sep = "")] <- where[[pid]]
-    }
+  ## replicates the required structure of 'tvcm' objects
+  object <- structure(list(data = partData,
+                           info = list(
+                             call = mc,
+                             mcall = call,                             
+                             formula = formList,
+                             direct = direct,
+                             fit = fit,
+                             family = family,
+                             control = control,                             
+                             model = model,
+                             dotargs = dotargs)),
+                      class = "tvcm")
+
+  if (control$cv) {
+    if (control$verbose) cat("\n* starting partitioning and cross validation ...\n")
+    cvCall <- call(name = "cvloss",
+                   object = quote(object),
+                   folds = quote(control$folds),
+                   type = "loss",
+                   original = TRUE, 
+                   verbose = FALSE,
+                   papply = quote(control$papply))
+    papplyArgs <- intersect(names(formals(control$papply)), names(control))
+    papplyArgs <- setdiff(papplyArgs, names(args))
+    for (arg in papplyArgs) cvCall[[arg]] <- control[[arg]]
+
+    ## calls cvloss
+    tree <- eval(cvCall)
+    if (control$verbose)
+      cat("\nestimated dfsplit =", format(tree$info$cv$dfsplit.hat, digits = 3), "\n")
     
-    nodeid <- lapply(nodes, function(x) 1:width(x))
-    
-    if (control$verbose) cat("\n* starting step", step, "...")
-    
-    ## --------------------------------------------------- #
-    ## Step 1: fit the current model
-    ## --------------------------------------------------- #
-
-    vcRoot <- sapply(nodeid, length) == 1L
-    ff <- tvcm_formula(formList, vcRoot, family, env)
-    model <- try(tvcm_fit_model(call))
-    
-    if (inherits(model, "try-error")) stop(model)
-
-    control <- tvcm_grow_setcontrol(control, model, formList, vcRoot)
-
-    if (control$verbose) {
-      cat("\n\nVarying-coefficient(s) of current model:\n")
-      if (length(unlist(control$parm)) > 0L) {
-        print(data.frame(Estimate = coef(model)[unique(unlist(control$parm))]),
-              digits = 2)
-      } else {
-        cat("<no varying-coefficients>\n")
-      }
-    }
-    
-    ## compute / update splits
-    splits <- tvcm_grow_setsplits(splits, spart, partid, nodeid, varid, model,
-                                  nodes, where, partData, control)
-    
-    ## check if there is at least one admissible split
-    if (length(unlist(splits)) == 0L | step > control$maxstep |
-        length(control$parm) == 0L) {
-      run <- 0L
-      if (step > control$maxstep) {
-        stopinfo <- "maximal number of steps reached"
-      } else if (length(control$parm) == 0L) {
-        stopinfo <- "no varying coefficients"
-      } else {
-        stopinfo <- "no admissible splits (exceeded tree size parameters)"
-      }
-      nstep <- step - 1L
-    }
-
-    ## random selection (used by 'fvcm')
-    if (any(c(control$ptry, control$vtry, control$ntry) < Inf))
-        splits <- tvcm_setsplits_rselect(splits, partid, nodeid, varid, control)
-    
-    if (run > 0L && control$sctest) {
-      
-      ## --------------------------------------------------- #
-      ## Step 2: variable selection via coefficient constancy tests
-      ## --------------------------------------------------- #
-      
-      ## get raw p-values
-        test <- try(tvcm_grow_sctest(model, nodes, where, partid, nodeid, varid, 
-                                     splits, partData, control), TRUE)
-      
-      ## return error if test failed
-      if (inherits(test, "try-error")) {
-        run <- 0L
-        stopinfo <- test
-
-      } else {      
-        testAdj <- tvcm_sctest_bonf(test,ifelse(control$bonferroni,"nodewise", "none"))
-        run <- 1L * (min(c(1.0 + .Machine$double.eps, unlist(testAdj)),
-                         na.rm = TRUE) <= control$alpha)
-      }
-      
-      if (run > 0L) {
-        
-        ## extract the selected partition
-        testAdjPart <-
-          tvcm_sctest_bonf(test,ifelse(control$bonferroni,"partitionwise","none"))
-        minpval <- min(unlist(testAdjPart), na.rm = TRUE)
-        spart <- which(sapply(testAdjPart, function(x)any(sapply(x,identical,minpval))))
-        if (length(spart) > 1L) spart <- sample(spart, 1L)
-
-        ## select variable and node
-        minsubs <- which(sapply(test[[spart]], identical,
-                                min(test[[spart]], na.rm = TRUE)))
-        if (length(minsubs) > 1L) minsubs <- sample(minsubs, 1L)
-        svar <- ceiling(minsubs / nrow(test[[spart]]))
-        snode <- minsubs - (svar - 1L) * nrow(test[[spart]])
-        
-        ## print results
-        if (control$verbose) {
-
-          ## tests
-          cat("\nCoefficient constancy tests (p-value):\n")   
-          for (pid in seq_along(nodes)) {
-                cat(paste("\nPartition ", LETTERS[pid], ":\n", sep = ""))
-                print(data.frame(format(testAdj[[pid]], digits = 2L)))              
-              }
-          
-          ## selections
-          cat("\nSplitting partition:", names(nodes)[spart])
-          cat("\nSplitting variable:", names(partData)[varid[[spart]][svar]])
-          cat("\nNode:", levels(where[[spart]])[snode])
-          
-        }
-
-        ## set deviance statistic of not to selected nodes to 'Inf' to avoid
-        ## model evaluations
-        splits <- tvcm_setsplits_sctest(splits, partid, spart,
-                                        nodeid, snode, varid, svar)
-        
-      } else {
-        stopinfo <- "p-values of coefficient constancy tests exceed alpha"
-      }  
-    }
-      
-    if (run > 0L) {
-      
-      ## ------------------------------------------------- #
-      ## Step 3: search a cutpoint
-      ## ------------------------------------------------- #
-      
-      ## compute the loss of all candidate splits and extract the best split
-      loss <- try(tvcm_grow_loss(splits, partid, nodeid, varid, 
-                                 model, nodes, where, partData,
-                                 control, call, formList, step), silent = TRUE)
-      
-      ## handling stops
-      if (inherits(loss, "try-error")) {
-        run <- 0L
-        stopinfo <- loss
-        nstep <- step - 1L
-        
-      } else {
-        splits <- loss$lossgrid
-        spart <- loss$partid
-        
-        if (is.null(loss$cut)) {
-          run <- 0L
-          stopinfo <- "no split that decreases the loss found"
-          nstep <- step - 1L
-        }
-        
-        if (run > 0L) {
-          noverstep <- if (loss$loss -
-                           control$dfpar * loss$df -
-                           control$dfsplit * 1 < 0)
-            noverstep + 1L else 0L
-          if (noverstep > control$maxoverstep) {
-            run <- 0L
-            stopinfo <- "'maxoverstep' reached"
-            nstep <- nstep - 1L
-          }
-        }
-        
-      }
-    }
-    
-    ## incorporate the split into 'nodes'
-    if (run > 0L)
-      nodes <- tvcm_grow_splitnode(nodes, where, loss, partData,
-                                   step, weights(model))
-
-    if (run > 0L)
-      splits <- tvcm_setsplits_splitnode(splits, loss$partid, loss$nodeid,
-                                         nodeid, loss, model, control)
-      
-    ## update 'splitpath' to make the splitting process traceable
-    if (run >= 0L)
-      splitpath[[step]] <-
-        list(step = step,
-             loss = control$lossfun(model),
-             npar = extractAIC(model)[1L],
-             nspl = step - 1L)
-
-    if (!inherits(test, "try-error"))
-      splitpath[[step]]$sctest <- test
-    
-    if (!inherits(loss, "try-error")) {
-      if (run > 0L) {
-        splitpath[[step]]$partid <- loss$partid
-        splitpath[[step]]$nodeid <- loss$nodeid
-        splitpath[[step]]$varid <- loss$varid
-        splitpath[[step]]$cutid <- loss$cutid
-      }
-      splitpath[[step]]$lossgrid <- loss$lossgrid 
-    }
-    
-    ## print the split
-    if (control$verbose) {
-      if (run > 0L) {
-        if (!control$sctest) {
-            cat("\n\nSplitting partition:", names(nodes)[loss$partid])
-            cat("\nNode:", levels(where[[loss$partid]])[loss$nodeid])
-            cat("\nVariable:", names(partData)[loss$varid])
-        } else {
-            cat("\n")
-        }
-
-        cat("\nCutpoint:\n")
-        print(as.data.frame(matrix(loss$cut, 1L,
-                                   dimnames = list(loss$cutid,
-                                     names(loss$cut)))))
-        
-        cat("Model comparison:\n")
-        print(data.frame("loss" = c(control$lossfun(model),
-                           control$lossfun(model) - loss$loss),
-                         row.names = paste("step", step + c(-1, 0))))
-        
-      } else {
-        cat("\n\nStopping the algorithm.\nMessage:", as.character(stopinfo), "\n")
-        if (inherits("try-error", stopinfo)) warning(as.character(stopinfo))
-        
-      }
-    }
-  }
-  
-  if (control$verbose) cat("\n* building object ... ")
-  
-  ## inscribe original node names for later pruning
-  for (pid in seq_along(nodes)) {
-    nodes[[pid]] <- as.list(nodes[[pid]])
-    for (nid in 1:length(nodes[[pid]])) {
-        nodes[[pid]][[nid]]$info$id$original <- nodes[[pid]][[nid]]$id
-        nodes[[pid]][[nid]]$info$id$last <- nodes[[pid]][[nid]]$id
-    }
-    nodes[[pid]] <- as.partynode(nodes[[pid]])
-  }
-  
-  ## prepare the title
-  title <- c("Tree-based varying-coefficients model")
-  
-  ## modify splitpath    
-  splitpath <- tvcm_grow_splitpath(splitpath, varid, nodes, partData, control)
-  
-  ## the output object
-  if (nPart == 0L) {
-    tree <- model
-
   } else {
-    tree <- party(nodes[[1L]],
-                  data = partData,
-                  fitted = data.frame(
-                    "(response)" = model.response(model.frame(model)),
-                    "(weights)" = weights(model),
-                    check.names = FALSE),
-                  terms = terms(formula, keep.order = TRUE),
-                  info = list(
-                    title = title,
-                    call = mc,
-                    formula = formList,
-                    direct = direct,
-                    fit = fit,
-                    family = family,
-                    control = control,
-                    info = stopinfo,
-                    model = model,
-                    node = nodes,
-                    nstep = nstep,
-                    splitpath = splitpath,
-                    pruned = FALSE,
-                    dotargs = list(...)))
-    class(tree) <- c("tvcm", "party")
+    
+    ## calls directly 'tvcm_grow'
+    if (control$verbose) cat("\n* starting partitioning ...\n")
+    tree <- tvcm_grow(object)
+    if (control$verbose) cat("OK")
   }
-  if (control$verbose) cat("OK")
+   
+  ## pruning
+  if (control$prune) {
+    if (control$verbose) cat("\n* pruning ... ")
+    tree <- prune(tree, dfsplit = tree$info$cv$dfsplit.hat, papply = control$papply)
+    if (control$verbose) cat("OK")
+  }
   
   if (control$verbose) {
     cat("\n\nFitted model:\n")
@@ -502,20 +261,22 @@ tvcm <- function(formula, data, fit, family,
   return(tree)
 }
 
+
 tvcm_control <- function(lossfun = neglogLik2, 
                          maxstep = Inf, maxwidth = Inf,
                          minsize = 30, maxdepth = Inf,
-                         dfpar = 2.0, dfsplit = 0.0, maxoverstep = 0,
+                         dfpar = 2.0, dfsplit = 0.0,
+                         maxoverstep = ifelse(sctest, Inf, 0),
                          sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
                          trim = 0.1, estfun = list(), ninpute = 5L,
                          maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
-                         keeploss = FALSE, verbose = FALSE, ...) {
+                         cv = !sctest, folds = folds_control("kfold", 5),
+                         prune = cv, keeploss = FALSE, papply = mclapply,
+                         verbose = FALSE, ...) {
+  mc <- match.call()
   
   ## check available arguments
   stopifnot(is.function(lossfun))
-  stopifnot((is.logical(keeploss) | is.numeric(keeploss)) &&
-            length(keeploss) == 1L)
-  keeploss <- as.numeric(keeploss)
   stopifnot(is.numeric(maxstep) && length(maxstep) == 1L && maxstep >= 0L)
   stopifnot(is.numeric(maxwidth) && all(maxwidth > 0L))
   stopifnot(is.null(minsize) | (is.numeric(minsize) && all(minsize > 0)))
@@ -533,6 +294,13 @@ tvcm_control <- function(lossfun = neglogLik2,
   stopifnot(is.numeric(maxfacsplit) && length(maxfacsplit) == 1L && maxfacsplit > 1L)
   stopifnot(is.numeric(maxordsplit) && length(maxordsplit) == 1L && maxordsplit > 1L)
   stopifnot(is.numeric(maxnumsplit) && length(maxnumsplit) == 1L && maxnumsplit > 1L)
+  stopifnot(is.logical(cv) && length(cv) == 1L)
+  stopifnot(inherits(folds, "folds"))
+  stopifnot(is.logical(prune) && length(prune) == 1L)
+  if (!cv & prune) stop("'prune = TRUE' requires 'cv = TRUE'")
+  stopifnot((is.logical(keeploss) | is.numeric(keeploss)) &&
+            length(keeploss) == 1L)
+  keeploss <- as.numeric(keeploss)
   if (is.numeric(verbose)) verbose <- as.logical(verbose)
   stopifnot(is.logical(verbose) && length(verbose) == 1L)
   
@@ -543,6 +311,16 @@ tvcm_control <- function(lossfun = neglogLik2,
   stopifnot(is.numeric(ntry) && all(ntry > 0))
   vtry <- if (is.null(list(...)$vtry)) Inf else list(...)$vtry
   stopifnot(is.numeric(vtry) && all(vtry > 0))
+
+  ## check and set 'papply'
+  stopifnot(is.character(papply) | is.function(papply))
+  if (is.function(papply)) {
+    if ("papply" %in% names(mc)) {
+      papply <- deparse(mc$papply)
+    } else {
+      papply <- deparse(formals(tvcm_control)$papply)
+    }
+  }
   
   ## set the default parameters for 'gefp.estfun' calls
   estfun <- appendDefArgs(estfun, list(predecor = TRUE,
@@ -561,7 +339,6 @@ tvcm_control <- function(lossfun = neglogLik2,
            appendDefArgs(
              list(...),
              list(lossfun = lossfun,
-                  keeploss = keeploss,
                   maxstep = maxstep,
                   maxwidth = maxwidth,
                   minsize = minsize,
@@ -581,6 +358,11 @@ tvcm_control <- function(lossfun = neglogLik2,
                   maxfacsplit = maxfacsplit,
                   maxordsplit = maxordsplit,
                   maxnumsplit = maxnumsplit,
+                  cv = cv,
+                  folds = folds,
+                  prune = prune,
+                  keeploss = keeploss,
+                  papply = papply,
                   verbose = verbose,
                   parm = NULL, intercept = NULL, 
                   functional.factor = "LMuo",

@@ -51,6 +51,7 @@ extract.tvcm <- function(object, what = c("control", "model",
                          steps = NULL, ...) {
   
   what <- match.arg(what)
+
   splitpath <- object$info$splitpath
   if (length(splitpath) > 0 && is.null(steps))
     steps <- seq(1L, object$info$nstep)
@@ -75,14 +76,18 @@ extract.tvcm <- function(object, what = c("control", "model",
     
     return(object$info$model)
     
-  } else if (what == "selected" && depth(object) > 0) {
+  } else if (what == "selected") {
 
     rval <-
       lapply(object$info$node,
              function(node) {
-               ids <- setdiff(nodeids(node), nodeids(node, terminal = TRUE))
-               rval <- unlist(nodeapply(node, ids, function(node) node$split$varid))
-               if (length(rval) > 0L) rval <- unique(colnames(object$data)[rval])
+                 if (depth(node) > 0L) {
+                     ids <- setdiff(nodeids(node), nodeids(node, terminal = TRUE))
+                     rval <- unlist(nodeapply(node, ids, function(node) node$split$varid))
+                     if (length(rval) > 0L) rval <- unique(colnames(object$data)[rval])
+                 } else {
+                     rval <- NULL
+                 }
                return(rval)
              })
     return(rval)
@@ -326,7 +331,7 @@ tvcm_print <- function(x, type = c("print", "summary"),
 print.tvcm <- function(x, ...)
   tvcm_print(x, type = "print", ...)
 
-prune.tvcm <- function(tree, dfsplit = NULL, dfpar = 2.0,
+prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
                        direction = c("backward", "forward"),
                        alpha = NULL, maxstep = NULL, terminal = NULL,
                        papply = mclapply, keeploss = FALSE, ...) {
@@ -335,13 +340,14 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = 2.0,
   
   ## checking arguments
   direction <- match.arg(direction)
+  if (is.null(dfpar)) dfpar <- tree$info$control$dfpar
   stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
   stopifnot(is.character(papply) | is.function(papply))
   if (is.function(papply)) {
     if ("papply" %in% names(mc)) {
       papply <- deparse(mc$papply)
     } else {
-      papply <- deparse(formals(fvcm_control)$papply)
+      papply <- deparse(formals(prune.tvcm)$papply)
     }
   }
   papplyArgs <- list(...)[names(list(...)) %in% names(formals(papply))]
@@ -472,6 +478,10 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = 2.0,
                           unlist(nodeapply(tree$info$node[[pid]], ids[[pid]],
                                            function(node) node$info$id$original))
                         })
+
+        ## call to evaluate the collapses
+        prStatCall <- call(name = papply, X = quote(subs), FUN = quote(prStat))
+        for (arg in names(papplyArgs)) prStatCall[[arg]] <- papplyArgs[[arg]]
         
         ntab <- data.frame(
                   part = rep(seq_along(tree$info$node), sapply(ids, length)),
@@ -549,7 +559,7 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = 2.0,
                          sum(sapply(prTree$info$node, width) - 1L)))
               return(c(Inf, NA, NA))
             }
-            stat <- do.call(papply, append(list(X = subs, FUN = prStat), papplyArgs))
+            stat <- eval(prStatCall)
             ntab[subs, cols] <- t(sapply(stat, function(x) x))
           }
           
@@ -632,11 +642,13 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = 2.0,
   return(tree)
 }
 
+
 prunepath.tvcm <- function(tree, steps = 1L, ...) {
   rval <- tree$info$prunepath[steps]
   class(rval) <- "prunepath.tvcm"
   return(rval)
 }
+
 
 print.prunepath.tvcm <- function(x, ...) {
   for (i in seq_along(x)) {
@@ -648,29 +660,34 @@ print.prunepath.tvcm <- function(x, ...) {
   }
 }
 
+
 summary.tvcm <- function(object, ...)
   tvcm_print(object, type = "summary", ...)
 
+
 ranef.tvcm <- function(object, ...)
   return(ranef(object$info$model, ...))
+
 
 resid.tvcm <- function(object, ...)
   return(resid(object = object$info$model, ...))
 
 residuals.tvcm <- resid.tvcm
 
+
 splitpath.tvcm <- function(tree, steps = 1L,
                            details = FALSE, ...) {
-  
-  rval <- tree$info$splitpath[steps]
-  if (!details) {
-    for (i in seq_along(steps)) {
-      rval[[i]]$sctest <- NULL
-      rval[[i]]$lossgrid <- NULL
+
+    steps <- intersect(steps, seq_along(tree$info$splitpath))
+    rval <- tree$info$splitpath[steps]
+    if (!details) {
+        for (i in seq_along(steps)) {
+            rval[[i]]$sctest <- NULL
+            rval[[i]]$lossgrid <- NULL
+        }
     }
-  }
-  class(rval) <- "splitpath.tvcm"
-  return(rval)
+    class(rval) <- "splitpath.tvcm"
+    return(rval)
 }
 
 

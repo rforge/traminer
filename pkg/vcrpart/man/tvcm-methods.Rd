@@ -104,22 +104,22 @@
 ## ------------------------------------------------------------------- #
 ## Dummy example 1:
 ##
-## Apply various methods on a fitted 'tvcm' object.
+## Apply various methods on 'tvcm' object fitted on the 'vcrpart_2'
+## data. Cross-validation is omitted to accelerate the computations.
 ## ------------------------------------------------------------------- #
 
-data(vcrpart_1)
+data(vcrpart_2)
 
-control <- tvcm_control(sctest = TRUE, minsize = 10, verbose = TRUE)
-
-model <- tvcolmm(y ~ -1 + wave + vc(z3, z4, by = treat, intercept = TRUE) + re(1|id), 
-                 data = vcrpart_1, subset = 1:150, control = control)
+model <- tvcm(y ~ -1 + vc(z1, z2) + vc(z1, z2, by = x1) + x2,
+              data = vcrpart_2, family = gaussian(), subset = 1:90,
+              control = tvcm_control(cv = FALSE))
 
 coef(model)
 extract(model, "selected")
 extract(model, "model")
-predict(model, newdata = vcrpart_1[191:200,], type = "node")
-predict(model, newdata = vcrpart_1[191:200,], type = "response")
-splitpath(model, 1)
+predict(model, newdata = vcrpart_2[91:100,], type = "node")
+predict(model, newdata = vcrpart_2[91:100,], type = "response")
+splitpath(model, steps = 1)
 summary(model, digits = 2)
 }
 \keyword{methods}

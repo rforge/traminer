@@ -13,7 +13,7 @@
 
 \usage{
 \method{plot}{tvcm}(x, type = c("default", "coef", 
-        "simple", "partdep"),
+        "simple", "partdep", "cv"),
      main = NULL, part = NULL,
      drop_terminal = TRUE,
      tnex = 1, newpage = TRUE, ask = NULL,
@@ -36,8 +36,8 @@ panel_coef(object, parm = NULL,
 \arguments{
   \item{x, object}{An object of class \code{\link{tvcm}}.}
   \item{type}{the type of the plot. Available types are
-    \code{"default"}, \code{"simple"}, \code{"coef"} and
-    \code{"partdep"}.}   
+    \code{"default"}, \code{"simple"}, \code{"coef"},
+    \code{"partdep"} and \code{"cv"}.}   
   \item{main}{character. A main title for the plot.}
   \item{drop_terminal}{a logical indicating whether all terminal nodes
     should be plotted at the bottom. See also \code{\link{plot.party}}.}
@@ -108,7 +108,8 @@ panel_coef(object, parm = NULL,
   objects. \code{type = "default"}, \code{type = "coef"} and 
   \code{type = "simple"} show the tree structure and coefficients in each
   node. \code{type = "partdep"} plots partial dependency plots, see Hastie
-  et al. (2001), section 10.13.2.
+  et al. (2001), section 10.13.2. Finally, \code{type = "cv"} will show,
+  if available, the results from cross-validation. 
 
   The functions \code{\link{panel_partdep}} and \code{\link{panel_coef}}
   are exported to show the additional arguments that can be passed to

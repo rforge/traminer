@@ -12,11 +12,15 @@
 tvcm_control(lossfun = neglogLik2, 
              maxstep = Inf, maxwidth = Inf,
              minsize = 30, maxdepth = Inf,
-             dfpar = 2.0, dfsplit = 0.0, maxoverstep = 0,
+             dfpar = 2.0, dfsplit = 0.0,
+             maxoverstep = ifelse(sctest, Inf, 0),
              sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
              trim = 0.1, estfun = list(), ninpute = 5L,
              maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
-             keeploss = FALSE, verbose = FALSE, ...)
+             cv = !sctest, folds = folds_control("kfold", 5),
+             prune = cv, keeploss = FALSE, papply = mclapply,
+             verbose = FALSE, ...)
+
 }
 
 \arguments{
@@ -36,13 +40,13 @@ tvcm_control(lossfun = neglogLik2,
   \item{dfsplit}{a numeric scalar larger than zero. The per-split penalty to
     be applied for stopping. See also argument \code{maxoverstep}.}
   \item{maxoverstep}{integer scalar. The maximum number of consecutive
-    times the AIC reduction statistic can be smaller than \code{dfsplit}
-    before stopping. Specifically, the AIC is computed as the loss (see
-    argument \code{lossfun}) of the model plus \code{dfpar} times the
-    number of coefficients  (as extracted from
+    times the AIC reduction statistic is allowed to be smaller than 
+    \code{dfsplit} before stopping. Specifically, the AIC is computed 
+    as the loss (see argument \code{lossfun}) of the model plus 
+    \code{dfpar} times the number of coefficients  (as extracted from
     \code{\link{extractAIC}}), and the AIC reduction statistic is the
     difference between the AIC the current model and the AIC of the
-    selected update model.}  
+    selected update model. The argument is disabled if \code{sctest = TRUE}.}  
   \item{sctest}{logical scalar. Defines whether coefficient constancy
     tests should be used for variable and node selection.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is
@@ -62,6 +66,13 @@ tvcm_control(lossfun = neglogLik2,
   \item{maxordsplit}{integer.}
   \item{maxnumsplit}{integer. The maximum number of evaluation for
     splits on numeric partitioning variables.}
+  \item{cv}{logical scalar. Whether or not the \code{dfsplit} parameter should
+    be cross-validated.}
+  \item{folds}{a list of parameters to create folds as produced by 
+   \code{\link{folds_control}}.}
+  \item{prune}{logical scalar. Whether or not the overly large partitions should
+    be pruned by the estimated \code{dfsplit} parameter from cross-validation. 
+    Note that \code{prune = TRUE} conflicts with \code{cv = FALSE}}
   \item{keeploss}{logical scalar or a numeric equal or larger than
     0. Indicates if and how many times the computed AIC reduction
     statistics should be reused in the following
@@ -71,7 +82,11 @@ tvcm_control(lossfun = neglogLik2,
     \code{FALSE} or 0 will accelerate the algorithm at the expense of
     accuracy. In cases of multiple \code{\link{vc}} terms, only the
     statistics corresponding to the \code{\link{vc}} term which was
-    splitted in the previous iteration are reused.}   
+    splitted in the previous iteration are reused.} 
+   \item{papply}{(parallel) apply function, defaults to
+    \code{\link[parallel]{mclapply}}. The function will parallelize the 
+    partition stage and the evaluation of the cross-validation folds as
+    well as the final pruning stage.}  
   \item{verbose}{logical. Should information about the fitting process
     (such as test statistics, \eqn{p} values, 
     selected splitting variables and split points) be printed to the

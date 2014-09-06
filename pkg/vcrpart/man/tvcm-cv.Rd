@@ -28,7 +28,7 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
       seed = NULL)
 
 \method{cvloss}{tvcm}(object, folds = folds_control(),
-       fun = NULL, dfpar = 2, direction = c("backward", "forward"),
+       fun = NULL, dfpar = NULL, direction = c("backward", "forward"),
        papply = mclapply, verbose = FALSE, ...)
 
 \method{print}{cvloss.tvcm}(x, ...)
@@ -38,7 +38,7 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
 \method{oobloss}{tvcm}(object, newdata = NULL, weights = NULL,
         fun = NULL, ...)
 
-\method{prune}{tvcm}(tree, dfsplit = NULL, dfpar = 2.0,
+\method{prune}{tvcm}(tree, dfsplit = NULL, dfpar = NULL,
       direction = c("backward", "forward"),
       alpha = NULL, maxstep = NULL, terminal = NULL,
       papply = mclapply, keeploss = FALSE, ...)
@@ -66,7 +66,8 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
     \code{\link{family}} of the fitted \code{object} is applied.}
   \item{dfpar}{a numeric scalar larger than zero. The per parameter penalty
     to be applied. If the 2 log-likelihood prediction error is used,
-    this value is typically set to 2.} 
+    this value is typically set to 2. If \code{NULL}, the value of
+    \code{dfpar} of the partitioning stage is used, see \code{tvcm_control()}} 
   \item{direction}{either \code{"backward"} (the default) or
     \code{"forward"}. Indicates the pruning algorithm to be
     used. \code{"backward"} applies backward pruning where in each
@@ -107,21 +108,22 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   \item{...}{other arguments to be passed.} 
 }
 
-\details{As described in the help of \code{\link{tvcm}}, the TVCM is a two stage  
-  procedure where first a model with overly fine partitions is grown 
-  with \code{\link{tvcm}} and second the best-sized partitions are 
-  selected with the \code{\link{prune}} method. An alternative is to specify
-  \code{sctest = TRUE} in \code{\link{tvcm_control}} and select the 
-  partition-sizes with the \code{alpha} and \code{bonferroni} parameters.
+\details{As described in the help of \code{\link{tvcm}}, TVCM (combined 
+  with \code{sctest = FALSE}) is a two stage procedure that first grows overly 
+  fine partitions and second selects the best-sized partitions by pruning. 
+  Both steps can be carried out with a single \code{\link{tvcm}} and several 
+  parameters can be specified with \code{\link{tvcm_control}}. The here 
+  presented functions may be interesting for advanced users who want to 
+  process the two stages with separate calls.
 
   The \code{\link{prune}} method collapses inner nodes of the overly large tree
-  fitted with \code{\link{tvcm}} to minimize the in-sample prediction error. 
-  The in-sample prediction error is, in what follows, defined as the mean of the
-  in-sample loss plus \code{dfpar} times the number of coefficients plus 
-  \code{dfsplit} times the number of splits. In the common likelihood setting, 
-  the loss is equal - 2 times the maximum likelihood and \code{dfpar = 2}. The
-  per-split penalty \code{dfsplit} generally unknown and estimated by using 
-  cross-validation.
+  fitted with \code{\link{tvcm}} according to the tuning parameter \code{dfsplit} 
+  to minimize the estimated in-sample prediction error. The in-sample prediction 
+  error is, in what follows, defined as the mean of the in-sample loss plus
+  \code{dfpar} times the number of coefficients plus \code{dfsplit} times the 
+  number of splits. In the common likelihood setting, the loss is equal - 2 
+  times the maximum likelihood and \code{dfpar = 2}. The per-split penalty 
+  \code{dfsplit} generally unknown and estimated by using cross-validation.
 
   \code{\link{folds_control}} and \code{\link{cvloss}} allow for estimating 
   \code{dfsplit} by cross-validation. The function \code{\link{folds_control}} 
@@ -224,13 +226,12 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
 data(vcrpart_2)
 
 ## fit the model
-control <- tvcm_control(maxstep = 2L, minsize = 5L)
+control <- tvcm_control(maxstep = 2L, minsize = 5L, cv = FALSE)
 model <- tvcglm(y ~ vc(z1, z2, by = x1) + vc(z1, by = x2), data = vcrpart_2,
                 family = gaussian(), control = control, subset = 1:75)
 
 ## cross-validate 'dfsplit'
-set.seed(1)
-cv <- cvloss(model, folds_control(type = "kfold", K = 2))
+cv <- cvloss(model, folds = folds_control(type = "kfold", K = 2, seed = 1))
 cv
 plot(cv)
 

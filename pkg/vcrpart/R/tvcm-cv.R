@@ -66,10 +66,10 @@ oobloss.tvcm <- function(object, newdata = NULL, weights = NULL,
 }
 
 
-folds_control<- function(type = c("kfold", "subsampling", "bootstrap"),
-                         K = ifelse(type == "kfold", 5, 30),
-                         prob = 0.5, weights = c("case", "freq"),
-                         seed = NULL) {
+folds_control <- function(type = c("kfold", "subsampling", "bootstrap"),
+                          K = ifelse(type == "kfold", 5, 30),
+                          prob = 0.5, weights = c("case", "freq"),
+                          seed = NULL) {
   if ("bootstrapping" %in% type) type <- "bootstrap"
   type <- match.arg(type)
   stopifnot(is.numeric(K) && length(K) == 1L)
@@ -80,8 +80,8 @@ folds_control<- function(type = c("kfold", "subsampling", "bootstrap"),
     warning(paste("'K' has been set to ", K, ".", sep = ""))
   K <- as.integer(round(K))
   stopifnot(is.numeric(prob))
-  if (prob <= 0 | prob >= 1)
-    stop("'prob' must be within the interval (0, 1).")
+  if (prob < 0 | prob > 1)
+    stop("'prob' must be within the interval [0, 1].")
   K <- round(K)
   stopifnot(is.numeric(prob) && length(prob) == 1L)
   weights <- match.arg(weights)
@@ -115,10 +115,17 @@ tvcm_folds <- function(object, control) {
   weights <- control$weights
   seed <- control$seed
 
-  subject <- extract(object, "model")$subject
-  if (!is.null(subject) && weights == "freq")
-    stop("option 'weights = 'freq'' is not available for 2-stage data")
-
+  subject <- object$info$model$subject
+  if (inherits(object, "olmm")) {
+    if (max(table(subject)) > 0L) {
+      if (weights == "freq")
+        stop("option 'weights = 'freq'' is not available for 'olmm' objects")
+      if (type == "bootstrapt")
+        stop("option 'type = 'bootstrap'' is not available for 'olmm' object",
+             "with 2-stage structures.")
+    }
+  }
+  
   freq <- switch(weights,
                  case = rep(1, nobs(extract(object, "model"))),
                  freq = weights(extract(object, "model")))
@@ -181,62 +188,41 @@ tvcm_folds <- function(object, control) {
 
 
 cvloss.tvcm <- function(object, folds = folds_control(),
-                        fun = NULL, dfpar = 2, direction = c("backward", "forward"),
+                        fun = NULL, dfpar = NULL,
+                        direction = c("backward", "forward"),
                         papply = mclapply, verbose = FALSE, ...) {
-
+  
   mc <- match.call()
   stopifnot(inherits(folds, "folds"))
+  
+  if (is.null(dfpar)) dfpar <- object$info$control$dfpar
+  dfsplit <- object$info$control$dfsplit
+  
   stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
   type <- list(...)$type
-  direction <- match.arg(direction)
   if (is.null(type)) type <- "loss"
-  folds <- tvcm_folds(object, folds)
+  original <- list(...)$original
+  if (is.null(original)) original <- FALSE
+  direction <- match.arg(direction)
+  foldsMat <- tvcm_folds(object, folds)
   stopifnot(is.character(papply) | is.function(papply))
   if (is.function(papply)) {
     if ("papply" %in% names(mc)) {
       papply <- deparse(mc$papply)
     } else {
-      papply <- deparse(formals(fvcm_control)$papply)
+      papply <- deparse(formals(tvcm_control)$papply)
     }
   }
   papplyArgs <- list(...)[names(list(...)) %in% names(formals(papply))]
   keeploss <- list(...)$keeploss
-  if (is.null(keeploss)) keeploss <- formals(prune.tvcm)$keeploss
-  
+  if (is.null(keeploss)) keeploss <- object$info$control$keeploss
+
   control <- object$info$control
   control$verbose <- FALSE
-  control$center <- FALSE
-      
-  ## get data of 'object'
-  data <- model.frame(object)
+  weights <- weights(object$info$model)
+  mf <- model.frame(object)
   
-  weights <- weights(object)
-  partvar <- colnames(object$data)
-  modelvar <- colnames(model.frame(extract(object, "model")))
-  subjectName <- extract(object, "model")$subjectName
-  
-  ## check folds
-  if (!is.matrix(folds) | (is.matrix(folds) && nrow(folds) != nrow(data)))
-    stop(sQuote("folds"), " must be a ", sQuote("matrix"), " with the number of rows equal the number of observations in ", sQuote("object"), ".")
-  K <- ncol(folds)
-  if (nrow(folds) != nrow(data)) {
-    dataCall <- eval.parent(object$info$call$data)
-    if (nrow(folds) != nrow(dataCall))
-      stop(sQuote("folds"), " has wrong number of rows.")
-    folds <- folds[rownames(dataCall) %in% rownames(data), ]
-    rm(dataCall)
-  }
-  
-  ## prepare formulas and calls
-  ibCall <- call(name = "tvcm",
-                 formula = quote(object$info$formula$original),
-                 data = quote(ibData),
-                 fit = quote(object$info$fit),
-                 family = quote(object$info$family),
-                 control = quote(control))
-  for (arg in names(object$info$dotargs)) ibCall[[arg]] <- object$info$dotargs[[arg]]
-    
-  ## process cross-validation
+  ## cross-validation function
 
   cvFun <- function(i) {
 
@@ -247,27 +233,34 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       if (papply != "lapply") cat("[", i, "]") else cat("* fold", i, "...")
     }
     
-    ## extract subset
-    if (attr(folds, "value") == "weights") {
-      ibSubs <- folds[, i] > 0.0
-      ibData <- data[ibSubs,, drop = FALSE]
-      ibCall$weights <- folds[ibSubs, i]
-      oobSubs <- rep(TRUE, nrow(folds))
-      oobWeights <- weights - folds[, i]
+    if (i > 0L) {
+      ## extract subset
+      if (attr(foldsMat, "value") == "weights") {
+        ibSubs <- foldsMat[, i] > 0.0
+        ibWeights <- foldsMat[ibSubs, i]
+        oobSubs <- rep(TRUE, nrow(foldsMat))
+        oobWeights <- weights - foldsMat[, i]
+      } else {
+        ibSubs <- foldsMat[, i]
+        ibSubs <- rep(1:length(ibSubs), ibSubs) # rep. bootstrap replications  
+        oobSubs <- foldsMat[, i] <= 0
+        ibWeights <- weights[ibSubs]
+        oobWeights <- weights[oobSubs]
+      }
+      object$info$control <- control
     } else {
-      ibSubs <- folds[, i]
-      ibSubs <- rep(1:length(ibSubs), ibSubs) # rep. bootstrap replications
-      ibData <- data[ibSubs, , drop = FALSE] # learning data
-      if (!is.null(subjectName))
-        ibData[, subjectName] <- factor(paste(ibData[, subjectName], unlist(lapply(folds[, i], function(x) if (x > 0) 1:x)), sep = ".")) # treat replicated subjects as distinct
-      ibCall$weights <- weights[ibSubs]
-      oobSubs <- folds[, i] <= 0
-      oobWeights <- weights[oobSubs]
+      ibSubs <- NULL
+      ibWeights <- NULL
     }
-
+    
     ## re-fit the tree with training sample (in-bag)
-    ibTree <- try(eval(ibCall), silent = TRUE)
-    dfsplit <- switch(direction, backward = 0.0, forward = 0.0)
+    ibTree <- try(tvcm_grow(object, ibSubs, ibWeights), silent = TRUE)
+    
+    if (i == 0) {
+      if (inherits(ibTree, "try-error"))
+        stop("partitioning failed.")
+      return(ibTree)
+    }
     
     if (!inherits(ibTree, "try-error")) {
       
@@ -279,7 +272,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
                               papply = "lapply", keeploss = keeploss), TRUE)
           if (!inherits(ibTree, "try-error")) {
             ## save the out-of-bag loss and the current tuning parameter
-            oobLoss <- oobloss(ibTree, newdata = data[oobSubs,,drop = FALSE],
+            oobLoss <- oobloss(ibTree, newdata = mf[oobSubs,,drop = FALSE],
                                weights = oobWeights, fun = fun)
             cv[[1L]] <-
               cbind(cv[[1L]], c(dfsplit))
@@ -321,9 +314,20 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     return(cv)
   }
 
-  cv <- do.call(papply, append(list(X = 1:ncol(folds), FUN = cvFun), papplyArgs))
+  call <- call(name = papply, X = seq(ifelse(original, 0, 1), ncol(foldsMat)),
+               FUN = quote(cvFun))
+  for (arg in names(papplyArgs)) call[[arg]] <- papplyArgs[[arg]]
+  cv <- eval(call)
   
   if (type %in% c("loss")) {
+
+    ## extract tree on all data
+    if (original) {
+      tree <- cv[[1L]]
+      cv <- cv[2:length(cv)]
+    } else {
+      tree <- NULL
+    }
     
     ## delete fails
     fails <- sapply(cv, function(x) sum(sapply(x, length)) == 0)
@@ -368,11 +372,11 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       ibLoss <- t(sapply(cv, getVals, grid = grid, rowsG = 1L, rowsL = 1L))
       if (length(grid) == 1L) ibLoss <- t(ibLoss)
      
-      if (attr(folds, "value") == "weights") {
-        ibWeights <- folds
+      if (attr(foldsMat, "value") == "weights") {
+        ibWeights <- foldsMat
       } else {
-        ibWeights <- matrix(rep(weights, ncol(folds)), ncol = ncol(folds))
-        ibWeights[folds <= 0] <- 0
+        ibWeights <- matrix(rep(weights, ncol(foldsMat)), ncol = ncol(foldsMat))
+        ibWeights[foldsMat <= 0] <- 0
       }
       ibLoss <- ibLoss / colSums(ibWeights)[!fails]
       rownames(ibLoss) <- paste("fold", 1L:length(cv))
@@ -382,11 +386,11 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       oobLoss <- t(sapply(cv, getVals, grid = grid, rowsG = 1L, rowsL = 2L))
       if (length(grid) == 1L) oobLoss <- t(oobLoss)
        
-      oobWeights <- matrix(rep(weights, ncol(folds)), ncol = ncol(folds))
-      if (attr(folds, "value") == "weights") {
-        oobWeights <- oobWeights - folds
+      oobWeights <- matrix(rep(weights, ncol(foldsMat)), ncol = ncol(foldsMat))
+      if (attr(foldsMat, "value") == "weights") {
+        oobWeights <- oobWeights - foldsMat
       } else {
-        oobWeights[folds > 0] <- 0
+        oobWeights[foldsMat > 0] <- 0
       }
       oobLoss <- oobLoss / colSums(oobWeights)[!fails]
       rownames(oobLoss) <- paste("fold", 1L:length(cv))
@@ -400,12 +404,17 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       if (length(minSubs) > 1L) minSubs <- max(minSubs)
       rval$dfsplit.hat <- max(0, mean(c(rval$grid, Inf)[minSubs:(minSubs + 1)]))
 
-      rval$folds <- folds
+      rval$foldsMat <- foldsMat
       class(rval) <- "cvloss.tvcm"     
     }
 
     rval$direction <- direction
     rval$call <- deparseCall(getCall(object))
+
+    if (original) {
+      tree$info$cv <- rval
+      rval <- tree
+    }
     
   } else if (type == "forest") {
     
@@ -417,7 +426,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     cv[rval$error$which] <- NULL
     rval$node <- lapply(cv, function(x) x[[1]])
     rval$coefficients <- lapply(cv, function(x) x[[2]])
-    rval$folds <- folds
+    rval$folds <- foldsMat
   }
   
   if (verbose) cat("\n")

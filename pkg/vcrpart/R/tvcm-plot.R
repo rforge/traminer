@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-08-30
+##' Date:            2014-09-06
 ##'
 ##' Description:
 ##' Plot functions for 'tvcm' objects.
@@ -18,6 +18,9 @@
 ##' panel_empty:     grapcon generator for empty terminal node plots
 ##'
 ##' Last modifications:
+##' 2014-09-06: - add 'type = "cv"' option for the cases where
+##'               cross validation was incorporated in the
+##'               partitioning stage
 ##' 2014-08-30: - automatic titles
 ##'             - write '(no split)' in panels where no split
 ##'               is applied
@@ -27,7 +30,7 @@
 ##' -------------------------------------------------------- #
 
 plot.tvcm <- function(x, type = c("default", "coef", 
-                           "simple", "partdep"),
+                           "simple", "partdep", "cv"),
                       main = NULL, part = NULL,
                       drop_terminal = TRUE,
                       tnex = 1, newpage = TRUE, ask = NULL, 
@@ -49,6 +52,15 @@ plot.tvcm <- function(x, type = c("default", "coef",
     args <- append(args, list(...))
     do.call("fun", args)
 
+
+  } else if (type == "cv") {
+
+    if (is.null(x$info$cv)) {
+      warning("no information on cross validation.")
+    } else {
+      plot(x$info$cv, main = main, ...)
+    }
+    
   } else {
     
     ## tree plots

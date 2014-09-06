@@ -14,19 +14,16 @@
 
 \usage{
 
-fvcm(..., folds = folds_control("subsampling", 5),
-     control = fvcm_control())
+fvcm(..., control = fvcm_control())
 
-fvcolmm(..., family = cumulative(),
-        folds = folds_control("subsampling", 5),
-        control = fvcm_control())
+fvcolmm(..., family = cumulative(), control = fvcm_control())
 
-fvcglm(..., family,
-       folds = folds_control("subsampling", 5),
-       control = fvcm_control())
+fvcglm(..., family, control = fvcm_control())
 
-fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
-             ntry = 1, vtry = 5L, papply = mclapply, ...)
+fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
+             ptry = 1, ntry = 1, vtry = 5, 
+             alpha = 1.0, maxoverstep = Inf, ...)
+
 }
 
 \arguments{
@@ -35,19 +32,15 @@ fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
     \code{\link{tvcm}}, see \code{\link{tvcm}}. This includes at least
     the arguments \code{formula}, \code{data} and \code{family} (see
     examples). For \code{\link{fvcm_control}}, \code{\ldots} are further
-    arguments to be passed to \code{\link{tvcm_control}}.}   
-  \item{folds}{a list of parameters for folds as created by
-    \code{\link{folds_control}}.}   
+    arguments to be passed to \code{\link{tvcm_control}}.}      
   \item{control}{control parameters as produced by
     \code{\link{fvcm_control}}.} 
   \item{family}{the model family, e.g., \code{\link{cumulative}} for
     fitting a cumulative link model.} 
-  \item{alpha}{numeric significance threshold between 0 and 1. A node is 
-    splitted when the smallest \eqn{p} value for any coefficient
-    coefficient test in the current step falls below \code{alpha}.}
   \item{maxstep}{integer. The maximum number of steps for when growing
     individual trees.}
-  \item{minsize}{integer. The minimum sum of weights in each node.}
+  \item{folds}{a list of parameters for folds as created by
+    \code{\link{folds_control}}.}
   \item{ptry}{positive scalar numeric. The number of components randomly
     sampled as candidates at each step. If \code{0 < ptry < 1},
     \code{ptry} is interpreted as the relative number of components to 
@@ -64,11 +57,8 @@ fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
     step. If \code{0 < vtry < 1}, \code{ntry} is interpreted as the
     relative number of variables to select relative to the total number
     of variables for the corresponding component.}
-  \item{papply}{(parallel) apply function, defaults to
-    \code{\link[parallel]{mclapply}}. To run \code{cvloss} sequentially
-    (i.e. not in parallel), use \code{\link{lapply}}. Special arguments 
-    for that apply function can be assigned as well to
-    \code{\link{fvcm_control}}.} 
+  \item{maxoverstep, alpha}{These two parameters are specified to disable
+    the default stopping rules. See \code{\link{tvcm_control}} for details.}
 }
 
 \details{
@@ -83,21 +73,22 @@ fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
   functions for whether a \code{\link{olmm}} or a \code{\link{glm}}
   model is fitted. 
 
-  \code{\link{fvcm_control}} is a wrapper for \code{\link{tvcm_control}}
-  with other defaults for the main tuning parameters. The principal
-  tuning parameters for \code{\link{fvcm}} are \code{maxstep},
-  \code{ptry}, \code{ntry} and \code{vtry}. \code{alpha} is set to 1 so
-  that the algorithm is not stopped because of high p-values in the
-  coefficient constancy tests (the parameter is ignored if \code{sctest
-    = FALSE}). The parameter \code{maxstep} is discussed in the details
-  section of \code{\link{tvcm}}. The arguments \code{ptry}, \code{ntry}
-  and \code{vtry} determine random selections in each
-  step. Specifically, \code{ptry} specifies the number of
-  \code{\link{vc}} components to be randomly selected, \code{ntry} the
-  number of nodes and \code{vtry} the number of variables. The latter
-  two parameters can be specified componentwise. The \code{vtry} is
-  commonly specified as the number of partitioning  variables divided
-  by 3, see Hastie et al. (2001), sec. 15.
+  \code{\link{fvcm_control}} is a wrapper of \code{\link{tvcm_control}} and 
+  the arguments indiciated specify modified defaults and parameters for 
+  randomizing the split selection in random forests. Notice that, relative 
+  to \code{\link{tvcm_control}}, also the \code{cv} \code{prune} arguments are 
+  internally disabled. The default arguments for \code{alpha} and \code{maxoverstep} 
+  essentially disable the stopping rules of \code{\link{tvcm}}, where the argument 
+  \code{maxstep} fully controls the stopping. The three parameters \code{ptry}, 
+  \code{ntry} and \code{vtry} control the randomization for selecting the  
+  \code{\link{vc}} term, the node and the variable. The default of \code{vtry = 5} 
+  should be adjusted in applications. For this, the number of partitioning variables 
+  divided by 3 is a common rule-of-thumb, see Hastie et al. (2001).
+
+  The performance of the implementation has not been investigated yet. For 
+  computational reasons we also suggest to use a single \code{\link{vc}} term
+  combined with \code{sctest = TRUE} in \code{\link{fvcm_control}}, see the 
+  example below.
 }
 
 \value{An object of class \code{fvcm}.}
@@ -128,7 +119,9 @@ fvcm_control(alpha = 1.0, maxstep = 10L, minsize = NULL, ptry = 1,
 data(vcrpart_2)
 
 ## set parameters
-control <- fvcm_control(sctest = TRUE, vtry = 1, minsize = 25, verbose=TRUE)
+control <- fvcm_control(sctest = TRUE, maxstep = 2, 
+                        vtry = 1, verbose = TRUE, minsize = 10,
+                        folds = folds_control("subsampling", 3, 0.75))
 
 ## fit the forest
 model <- fvcm(y ~ -1 + vc(z1, z2, by = x1, intercept = TRUE) + x2,

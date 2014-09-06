@@ -326,7 +326,9 @@ extractAIC.olmm <- function(fit, scale, k = 2, ...) {
 }
 
 fitted.olmm <- function(object, ...) {
-  return(predict(object, ...))
+    args <- append(list(object = object), list(...))
+    args$newdata <- NULL # delete the newdata argument
+    return(do.call(predict, args = args)) # ... and call predict
 }
 
 fixef.olmm <- function(object, which = c("all", "ce", "ge"), ...) {

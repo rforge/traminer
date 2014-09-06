@@ -81,7 +81,8 @@
 ## Dummy example 1:
 ##
 ## Fitting a random forest tvcm on artificially generated ordinal
-## longitudinal data.
+## longitudinal data. The tuning parameter 'maxstep = 1' is chosen
+## to restrict the computations.
 ## ------------------------------------------------------------------- #
 
 ## load the data
@@ -90,12 +91,12 @@ data(vcrpart_1)
 
 ## fit and analyse the model
 
-control <- fvcm_control(sctest = TRUE, mtry = 2, maxstep = 2, minsize = 20)
-folds <- folds_control(type = "subsampling", K = 2, prob = 0.75)
+control <- fvcm_control(sctest = TRUE, mtry = 2, maxstep = 1, 
+                        folds = folds_control(type = "subsampling", K = 2, prob = 0.75))
 
 model.1 <- fvcolmm(y ~ -1 + wave + vc(z3, z4, by = treat, intercept = TRUE) + re(1|id),
                    family = cumulative(), subset = 1:100,
-                   data = vcrpart_1, control = control, folds = folds)
+                   data = vcrpart_1, control = control)
 
 suppressWarnings(oobloss(model.1))
 
@@ -126,20 +127,21 @@ head(predict(model.1, type = "response", ranef = TRUE))
 ## Dummy example 2:
 ##
 ## Fitting a random forest tvcm on artificially generated normally
-## distributed data.
+## distributed data. The tuning parameter 'maxstep = 3' is chosen
+## to restrict the computations and 'minsize = 1' to obtain at least
+## a few splits given the small sample size.
 ## ------------------------------------------------------------------- #
 
 data(vcrpart_2)
 
 ## fit and analyse the model
 
-control <- fvcm_control(mtry = 1L, minsize = 1L, maxstep = 3L)
-folds <- folds_control("subsampling", 3L, 0.75)
+control <- fvcm_control(mtry = 1L, minsize = 5L, maxstep = 3L,
+                        folds_control("subsampling", 3L, 0.75))
 
 model.2 <- fvcglm(y ~ -1 + vc(z1, z2, by = x1, intercept = TRUE) + x2,
                   data = vcrpart_2,
-                  family = gaussian(), subset = 1:50,
-                  folds = folds, control = control)
+                  family = gaussian(), subset = 1:50,control = control)
 
 suppressWarnings(oobloss(model.2))
 

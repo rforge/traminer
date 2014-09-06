@@ -23,9 +23,7 @@
 ##' 2014-08-05: - changed specification for folds
 ##' -------------------------------------------------------- #
 
-fvcolmm <- function(..., family = cumulative(),
-                    folds = folds_control("subsampling", 5),
-                    control = fvcm_control()) {
+fvcolmm <- function(..., family = cumulative(), control = fvcm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
   mc$fit <- "olmm"
@@ -33,8 +31,7 @@ fvcolmm <- function(..., family = cumulative(),
   return(eval.parent(mc))
 }
 
-fvcglm <- function(..., family, folds = folds_control("subsampling", 5),
-                   control = fvcm_control()) {
+fvcglm <- function(..., family, control = fvcm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
   mc$fit <- "glm"
@@ -42,8 +39,7 @@ fvcglm <- function(..., family, folds = folds_control("subsampling", 5),
   return(eval.parent(mc))
 }
 
-fvcm <- function(..., folds = folds_control("subsampling", 5),
-                 control = fvcm_control()) {
+fvcm <- function(..., control = fvcm_control()) {
   
   mc <- match.call()
   args <- list(...)
@@ -53,8 +49,8 @@ fvcm <- function(..., folds = folds_control("subsampling", 5),
     args$fit <- deparse(mc$fit)
   
   ## modify control parameters temporarily for a first tree
-  maxwidth <- control$maxwidth
-  control$maxwidth <- 1L
+  maxstep <- control$maxstep
+  control$maxstep <- 0L
   verbose <- control$verbose
   control$verbose <- FALSE
   
@@ -65,24 +61,25 @@ fvcm <- function(..., folds = folds_control("subsampling", 5),
   if (verbose) cat("OK\n")
   
   ## reset the depth parameter and set the verbose parameter
-  object$info$control$maxwidth <- maxwidth
+  object$info$control$maxstep <- maxstep
   
   ## compute trees for subsamples
-  args$object <- object
-  args$folds <- folds
-  args$type <- "forest"
-  args$verbose <- verbose
-  args$papply <- control$papply
+  cvCall <- call(name = "cvloss",
+                 object = quote(object),
+                 folds = quote(control$folds),
+                 type = "forest",
+                 verbose = quote(verbose),
+                 papply = quote(control$papply))
   papplyArgs <- intersect(names(formals(args$papply)), names(control))
   papplyArgs <- setdiff(papplyArgs, names(args))
-  args[papplyArgs] <- control[papplyArgs]
-    
-  cv <- do.call("cvloss", args = args)
+  for (arg in papplyArgs) cvCall[[arg]] <- control[[arg]]
+  cv <- eval(cvCall)
+  
   fails <- cv$error$which  
   
   ## add new information to info slot
   if (length(fails) > 0)
-    folds <- folds[, -fails, drop = FALSE]
+    foldsMat <- foldsMat[, -fails, drop = FALSE]
 
   
   object$info$forest <- cv$node
@@ -98,24 +95,35 @@ fvcm <- function(..., folds = folds_control("subsampling", 5),
   return(object)
 }
 
-fvcm_control <- function(alpha = 1.0, maxstep = 10L,
-                         minsize = NULL, ptry = 1, ntry = 1, vtry = 5L,
-                         papply = mclapply, ...) {
-  mc <- match.call()
-  stopifnot(is.character(papply) | is.function(papply))
-  if (is.function(papply)) {
+fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
+                         ptry = 1, ntry = 1, vtry = 5,
+                         alpha = 1.0, maxoverstep = Inf, ...) {
+
+    ## modify the 'papply' argument
+    mc <- match.call()
     if ("papply" %in% names(mc)) {
-      papply <- deparse(mc$papply)
+        papply <- deparse(mc$papply)
     } else {
-      papply <- deparse(formals(fvcm_control)$papply)
+        papply <- deparse(formals(tvcm_control)$papply)
     }
-  }
-  return(tvcm_control(alpha = alpha, maxstep = maxstep,
-                      minsize = minsize, ptry = ptry, ntry = ntry,
-                      vtry = vtry, papply = papply, ...))
+
+    ## combine the parameter to a list and disble cross validation and pruning 
+    args <- list(maxstep = maxstep, folds = folds,
+                 ptry = ptry, ntry = ntry, vtry = vtry,
+                 alpha = alpha, maxoverstep = Inf,
+                 papply = papply, cv = FALSE, prune = FALSE)
+    args <- appendDefArgs(args, list(...))
+
+    ## call 'tvcm_control'
+    return(do.call("tvcm_control", args))
 }
 
-fitted.fvcm <- function(object, ...) predict(object, ...)
+
+fitted.fvcm <- function(object, ...) {
+    args <- append(list(object = object), list(...))
+    args$newdata <- NULL # delete the newdata argument
+    return(do.call(predict, args = args)) # ... and call predict
+}
 
 oobloss.fvcm <- function(object, fun = NULL, ranef = FALSE, ...) {
 
