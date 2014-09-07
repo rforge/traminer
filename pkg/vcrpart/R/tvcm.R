@@ -129,9 +129,9 @@ tvcm <- function(formula, data, fit, family,
   weights <- model.weights(mf)
   #if (is.null(weights)) weights <- rep(1.0, nrow(mf))  
   if (missing(offset)) offset <- NULL
-  if (!is.null(offset) & !is.null(model.offset(fullmf)))
+  if (!is.null(offset) & !is.null(model.offset(mf)))
       stop("duplicated specification of 'offset'.")
-  if (!is.null(model.offset(fullmf))) offset <- model.offset(fullmf)
+  if (!is.null(model.offset(mf))) offset <- model.offset(mf)
   
   mcall <- list(name = as.name(fit),
                formula = quote(ff$full),
