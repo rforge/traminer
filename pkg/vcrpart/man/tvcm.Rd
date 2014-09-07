@@ -62,33 +62,39 @@ tvcglm(formula, data, family,
   iteration, there are two procedures available.
 
   The first and default procedure (cf. Buergin and Ritschard, 2014b) 
-  selects the split that maximizes the loss reduction statistic 
-  that compares the current with the one-step ahead model (see also
-  argument \code{lossfun} in \code{\link{tvcm_control}}). The algorithm is 
-  continued to build overly fine partitions and is stopped not until the 
-  criteria specified in \code{control} are reached. By default, only 
-  the \code{minsize} (minimum node size) criteron is specified. For 
-  large data sets with many partitioning variables, this can be slow 
-  and, therefore, \code{\link{tvcm_control}} provides further criteria, 
-  such as \code{dfpar} and \code{maxoverstep}. The resulting model is 
-  likely too large and pruning is necessary, see \code{\link{cvloss}} 
-  and \code{\link{prune}}.
+  is a two-stage procedure which builds overly fine partitions in the
+  first stage and selects the best-sized partitions by pruning in the
+  second stage. For the second stage, which is automatically processed, we 
+  refer to \code{\link{tvcm-assessment}}. The partitioning stage selects, 
+  in each iteration, the split that maximizes the penalized loss reduction 
+  statistic that compares the current with the one-step ahead model 
+  (see also argument \code{lossfun} in \code{\link{tvcm_control}}). By  
+  default, the penalized loss reduction statistic is the Akaike Information 
+  Criterion (Akaike, 1974), but alternatives could be specified by the 
+  \code{control} argument. The algorithm is continued to build until the 
+  criteria specified in \code{control} are reached. By default, only the 
+  \code{minsize} (minimum node size) criteron are specified (and 
+  that the penalized loss reduction is larger than 0). For large data sets 
+  with many partitioning variables, this can be slow and, therefore, 
+  \code{\link{tvcm_control}} provides further criteria. In particular, you may 
+  increase the minimum permitted penalized loss reduction by \code{dfsplit}.
 
   The second procedure (cf. Buergin and Ritschard, 2014a) is, for technical 
   reasons, restricted to the cases where a single \code{\link{vc}} term is used 
-  and non of the moderators intersects with predictors. On the other hand, 
-  the second procedure avoids the variable selection bias and is computationally 
-  much less burdensome. The procedure selects the split by first choosing the 
-  node and the variable with M-fluctuation tests (cf. Zeileis and Hornik, 2007) 
-  and second choosing the cutpoint by the deviance reduction statistic, 
-  as above. To use this option it is necessary to set \code{sctest=TRUE} in 
-  \code{\link{tvcm_control}}. The algorithm is stopped as soon as all 
-  nodewise Bonferroni corrected p-values of M-fluctuation tests reach a 
-  prespecified threshold (e.g., 0.05), see argument \code{alpha} in 
-  \code{\link{tvcm_control}} and no pruning is necessary (or optional). 
-  Note that coefficient constancy tests are adjusted for intra-subject  
-   correlation for 2-stage models,  see \code{\link{estfun.olmm}}. The procedure
-  is illustrated below in example 2.
+  and non of the moderators (partitioning variables) intersects with predictors. 
+  On the other hand, the second procedure avoids the variable selection bias 
+  that exhibits the exhaustive search above and is computationally much less 
+  burdensome. The procedure selects the split by first choosing the node and 
+  the variable with M-fluctuation tests (cf. Zeileis and Hornik, 2007) and second 
+  choosing the cutpoint by the deviance reduction statistic, as above. To use this 
+  option it is necessary to set \code{sctest=TRUE} in \code{\link{tvcm_control}}. 
+  The algorithm is stopped as soon as all nodewise Bonferroni corrected p-values 
+  of M-fluctuation tests reach a prespecified threshold (e.g., 0.05), see 
+  argument \code{alpha} in \code{\link{tvcm_control}} and no pruning is 
+  necessary (or optional). Note that, as explained in Buergin and Ritschard (2014a),
+  coefficient constancy tests are adjusted for intra-subject correlation for 
+  2-stage models,  see \code{\link{estfun.olmm}}. The procedure is illustrated below 
+  in example 2.
 }
 
 \value{An object of class \code{\link{tvcm}}. The \code{\link{tvcm}} 
@@ -122,10 +128,13 @@ tvcglm(formula, data, family,
    and Graphical Statistics}.
 
    Buergin R. and Ritschard G. (2014a), Tree-based varying coefficient 
-   regression for longitudinal ordinal responses. Submitted.
+   regression for longitudinal ordinal responses. Submitted article.
 
    Buergin R. and Ritschard G. (2014b), Coefficient-wise tree-based varying
-   coefficient regression with vcrpart. In progress.
+   coefficient regression with vcrpart. Article in progress.
+
+   Akaike H. (1974), A new look at the statistical model identification, 
+   \emph{IEEE Transactions on Automatic Control}, \bold{19}, 716--723.
 }
 
 \seealso{\code{\link{tvcm_control}}, \code{\link{tvcm-methods}},
@@ -167,7 +176,7 @@ prunepath(model.Pov, steps = 1)
 ## Example 2: Moderated effect effect of unemployment
 ##
 ## Here we fit a varying coefficient ordinal linear mixed on the 
-## synthetic ordinal longitudinal data 'unemp'. The interst is whether
+## synthetic ordinal longitudinal data 'unemp'. The interest is whether
 ## the effect of unemployment 'UNEMP' on happiness 'GHQL' is moderated
 ## by 'AGE', 'FISIT', 'GENDER' and 'UEREGION'. 'FISIT' is the only true 
 ## moderator. For the the partitioning we coefficient constancy tests,

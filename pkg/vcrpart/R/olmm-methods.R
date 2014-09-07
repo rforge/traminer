@@ -113,6 +113,7 @@ anova.olmm <- function(object, ...) {
   }
 }
 
+
 coef.olmm <- function(object, which = c("all", "fe"), ...) {
 
   which <- match.arg(which)
@@ -140,9 +141,12 @@ coef.olmm <- function(object, which = c("all", "fe"), ...) {
   return(rval)
 }
 
+
 coefficients.olmm <- coef.olmm
 
+
 deviance.olmm <- function(object, ...) return(-as.numeric(2.0 * logLik(object)))
+
 
 predecor_control <- function(impute = TRUE, seed = NULL,
                              symmetric = TRUE,  reltol = 1e-6,
@@ -162,6 +166,7 @@ predecor_control <- function(impute = TRUE, seed = NULL,
                         verbose = verbose[1L], silent = silent[1L]),
                    class = "predecor_control"))
 }
+
 
 estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
                         nuisance = NULL, ...) {
@@ -325,11 +330,9 @@ extractAIC.olmm <- function(fit, scale, k = 2, ...) {
   c(edf,-2*L + k*edf)
 }
 
-fitted.olmm <- function(object, ...) {
-    args <- append(list(object = object), list(...))
-    args$newdata <- NULL # delete the newdata argument
-    return(do.call(predict, args = args)) # ... and call predict
-}
+
+fitted.olmm <- function(object, ...) vcrpart_fitted(object, ...)
+
 
 fixef.olmm <- function(object, which = c("all", "ce", "ge"), ...) {
 
@@ -355,7 +358,9 @@ fixef.olmm <- function(object, which = c("all", "ce", "ge"), ...) {
   return(rval)
 }
 
+
 formula.olmm <- function(x, ...) as.formula(x$formula, env = parent.frame())
+
 
 gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
                       predecor = TRUE, parm = NULL, center = TRUE, drop = TRUE,
@@ -477,7 +482,9 @@ logLik.olmm <- function(object, ...) {
   return(rval)
 }
 
+
 model.frame.olmm <- function(formula, ...) formula$frame
+
 
 model.matrix.olmm <- function(object, which = c("fe", "fe-ce", "fe-ge",
                                         "re", "re-ce", "re-ge"), ...) {
@@ -499,7 +506,9 @@ model.matrix.olmm <- function(object, which = c("fe", "fe-ce", "fe-ge",
 
 neglogLik2.olmm <- function(object, ...) return(-as.numeric(logLik(object)))
 
+
 nobs.olmm <- function(object, ...) object$dims[["n"]]
+
 
 predict.olmm <- function(object, newdata = NULL,
                          type = c("link", "response", "prob", "class", "ranef"),
@@ -683,6 +692,7 @@ predict.olmm <- function(object, newdata = NULL,
   return(rval)
 }
 
+
 print.olmm <- function(x, etalab = c("int", "char", "eta"), ...) {
 
   etalab <- match.arg(etalab)
@@ -720,6 +730,7 @@ print.olmm <- function(x, etalab = c("int", "char", "eta"), ...) {
   }
 }
 
+
 ranef.olmm <- function(object, norm = FALSE, ...) {
   if (!norm) {
     rval <- object$u %*% t(object$ranefCholFac)
@@ -728,6 +739,7 @@ ranef.olmm <- function(object, norm = FALSE, ...) {
   }
   return(rval)
 }
+
 
 ranefCov.olmm <- function(object, ...) {
 
@@ -781,7 +793,9 @@ resid.olmm <- function(object, norm = FALSE, ...) {
   return(rval)
 }
 
+
 residuals.olmm <- resid.olmm
+
 
 simulate.olmm <- function(object, nsim = 1, seed = NULL,
                           newdata = NULL, ranef = TRUE, ...) {
@@ -803,6 +817,7 @@ simulate.olmm <- function(object, nsim = 1, seed = NULL,
   attr(rval, "seed") <- RNGstate
   return(rval)
 }
+
 
 summary.olmm <- function(object, etalab = c("int", "char", "eta"),
                          silent = FALSE, ...) {
@@ -898,6 +913,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
                 dotargs = list(...)), class = "summary.olmm"))
 }
 
+
 print.summary.olmm <- function(x, ...) {
 
   args <- appendDefArgs(list(...), x$dotargs)  
@@ -936,6 +952,7 @@ print.summary.olmm <- function(x, ...) {
   }
 }
 
+
 terms.olmm <- function(x, which = c("fe-ce", "fe-ge",
                             "re-ce", "re-ge"), ...) {
   which <- match.arg(which)
@@ -968,6 +985,7 @@ update.olmm <- function(object, formula., evaluate = TRUE, ...) {
     eval(call, parent.frame())
   else call
 }
+
 
 VarCorr.olmm <- function(x, sigma = 1., rdig = 3) {
             
@@ -1011,6 +1029,7 @@ print.VarCorr.olmm <- function(x, ...) { # S3 method
   invisible(x)
 }
 
+
 vcov.olmm <- function(object, ...) {
 
   dims <- object$dims
@@ -1051,6 +1070,7 @@ vcov.olmm <- function(object, ...) {
   
   return(rval)
 }
+
 
 weights.olmm <- function(object, level = c("observation", "subject"), ...) {
   return(switch(match.arg(level),

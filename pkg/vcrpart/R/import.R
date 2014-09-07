@@ -18,16 +18,19 @@
 ## --------------------------------------------------------- #
 
 ## copied from stats:::safe_pchisq
+
 safe_pchisq <- function (q, df, ...) {
     df[df <= 0] <- NA
     pchisq(q = q, df = df, ...)
 }
+
 
 ## from package colorspace
 
 "rainbowPalette" <- structure(c("#C3687C", "#AE783C", "#838A0A", "#31964F", "#00998B", "#0090B6", "#847AC4", "#B966AE"))
 
 "divergePalette" <- structure(list(c("#023FA5", "#E2E2E2", "#8E063B"), c("#023FA5", "#BEC1D4", "#D6BCC0", "#8E063B"), c("#023FA5", "#A1A6C8", "#E2E2E2", "#CA9CA4", "#8E063B"), c("#023FA5", "#8C94BF", "#D2D3DC", "#DDD0D2", "#C18692", "#8E063B"), c("#023FA5", "#7D87B9", "#BEC1D4", "#E2E2E2", "#D6BCC0", "#BB7784", "#8E063B"), c("#023FA5", "#727EB5", "#AEB2CD", "#D8D9DE", "#DFD7D9", "#D0AAB1", "#B56B7A", "#8E063B"), c("#023FA5", "#6A76B2", "#A1A6C8", "#CBCDD9", "#E2E2E2", "#DBC9CC", "#CA9CA4", "#B16273", "#8E063B"), c("#023FA5", "#6371AF", "#959CC3", "#BEC1D4", "#DBDCE0", "#E0DBDC", "#D6BCC0", "#C6909A", "#AE5A6D", "#8E063B"), c("#023FA5", "#5D6CAE", "#8C94BF", "#B3B7CF", "#D2D3DC", "#E2E2E2", "#DDD0D2", "#D2B0B6", "#C18692", "#AB5468", "#8E063B")))
+
 
 ## imported from the statmod package, version 1.4.15
 
@@ -138,6 +141,7 @@ u.vectors <- function( n )
     return( list( k=k, I=I ) )
 }
 
+
 E.matrices <- function( n )
 {
 ###
@@ -169,6 +173,7 @@ E.matrices <- function( n )
     }
     return( E )
 }
+
 
 L.matrix <- function( n )
 {

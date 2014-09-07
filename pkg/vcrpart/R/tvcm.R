@@ -48,6 +48,7 @@ tvcolmm <- function(formula, data, family = cumulative(),
     return(eval.parent(mc))
 }
 
+
 tvcglm <- function(formula, data, family,
                    weights, subset, na.action,
                    control = tvcm_control(), ...) { 
@@ -56,6 +57,7 @@ tvcglm <- function(formula, data, family,
     mc$fit <- "glm"
     return(eval.parent(mc))
 }
+
 
 tvcm <- function(formula, data, fit, family, 
                  weights, subset, na.action,

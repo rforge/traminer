@@ -28,45 +28,45 @@ fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
 
 \arguments{
   \item{\ldots}{for \code{\link{fvcm}}, \code{\link{fvcolmm}} and
-    \code{\link{fvcglm}}, \code{\ldots} are arguments to be passed to
-    \code{\link{tvcm}}, see \code{\link{tvcm}}. This includes at least
-    the arguments \code{formula}, \code{data} and \code{family} (see
-    examples). For \code{\link{fvcm_control}}, \code{\ldots} are further
-    arguments to be passed to \code{\link{tvcm_control}}.}      
-  \item{control}{control parameters as produced by
+    \code{\link{fvcglm}} arguments to be passed to \code{\link{tvcm}}. 
+    This includes at least the arguments \code{formula}, \code{data} and 
+    \code{family}, see examples below. For \code{\link{fvcm_control}} 
+    further control arguments to be passed to \code{\link{tvcm_control}}.}      
+  \item{control}{a list of control parameters as produced by
     \code{\link{fvcm_control}}.} 
-  \item{family}{the model family, e.g., \code{\link{cumulative}} for
-    fitting a cumulative link model.} 
+  \item{family}{the model family, e.g., \code{\link{binomial}} or 
+    \code{\link{cumulative}}.} 
   \item{maxstep}{integer. The maximum number of steps for when growing
     individual trees.}
-  \item{folds}{a list of parameters for folds as created by
-    \code{\link{folds_control}}.}
-  \item{ptry}{positive scalar numeric. The number of components randomly
-    sampled as candidates at each step. If \code{0 < ptry < 1},
-    \code{ptry} is interpreted as the relative number of components to 
-    select relative to the total number of components.}
+  \item{folds}{a list of parameters to control the extraction of subsets, 
+    as created by \code{\link{folds_control}}.}
+  \item{ptry}{positive numeric scalar. The number of \code{\link{vc}} terms
+    to be randomly sampled as candidates in each iteration. If 
+    \code{0 < ptry < 1}, \code{ptry} is interpreted as the relative number 
+    of terms to select regarding the total number of terms.}
   \item{ntry}{positive numeric, either a scalar or a vector of length
-    equal the number of \code{vc} components. The number(s) of input
-    nodes of each component randomly sampled as candidates at each
-    step. If \code{0 < ntry < 1}, \code{ntry} is interpreted as the
-    relative number of nodes to select relative to the total number of
-    nodes in the corresponding component.} 
+    equal the number of \code{\link{vc}} terms. The number(s) of
+    nodes of each term to be randomly sampled as candidates in each
+    iteration. If \code{0 < ntry < 1}, \code{ntry} is interpreted as the
+    relative number of nodes to select regarding the current total number 
+    of nodes in the term.} 
   \item{vtry}{positive numeric, either a scalar or a vector of length
-    equal the number of \code{vc} components. The number(s) of input
-    variables of each component randomly sampled as candidates at each
-    step. If \code{0 < vtry < 1}, \code{ntry} is interpreted as the
-    relative number of variables to select relative to the total number
-    of variables for the corresponding component.}
-  \item{maxoverstep, alpha}{These two parameters are specified to disable
-    the default stopping rules. See \code{\link{tvcm_control}} for details.}
+    equal the number of \code{\link{vc}} terms. The number(s) of input
+    variables of each term to be randomly sampled as candidates in each 
+    iteration. If \code{0 < vtry < 1}, \code{ntry} is interpreted as the
+    relative number of variables to select regarding the total number
+    of variables of the corresponding term.}
+  \item{maxoverstep, alpha}{These two parameters are merely specified to 
+    disable the default stopping rules for \code{\link{tvcm}}. See also 
+    \code{\link{tvcm_control}} for details.}
 }
 
 \details{
   Implements the \emph{bagging} (Breiman, 1996) and \emph{random
-    forests} (Breiman, 2001) ensemble algorithms for the
-  \code{\link{tvcm}} algorithm. The method consist in growing multiple 
-  trees by using \code{\link{tvcm}} and aggregating the fitted
-  coefficient functions. For bagging, simply set \code{vtry = Inf} in
+   forests} (Breiman, 2001) ensemble algorithms for \code{\link{tvcm}}. The 
+  method consist in growing multiple trees by using \code{\link{tvcm}} and
+  aggregating the fitted coefficient functions. To enable bagging, use 
+  \code{ptry = Inf}, \code{ntry = Inf} and \code{vtry = Inf} in 
   \code{\link{fvcm_control}}.  
 
   \code{\link{fvcolmm}} and \code{\link{fvcglm}} are convenience
@@ -74,21 +74,17 @@ fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
   model is fitted. 
 
   \code{\link{fvcm_control}} is a wrapper of \code{\link{tvcm_control}} and 
-  the arguments indiciated specify modified defaults and parameters for 
-  randomizing the split selection in random forests. Notice that, relative 
-  to \code{\link{tvcm_control}}, also the \code{cv} \code{prune} arguments are 
-  internally disabled. The default arguments for \code{alpha} and \code{maxoverstep} 
-  essentially disable the stopping rules of \code{\link{tvcm}}, where the argument 
-  \code{maxstep} fully controls the stopping. The three parameters \code{ptry}, 
-  \code{ntry} and \code{vtry} control the randomization for selecting the  
-  \code{\link{vc}} term, the node and the variable. The default of \code{vtry = 5} 
-  should be adjusted in applications. For this, the number of partitioning variables 
-  divided by 3 is a common rule-of-thumb, see Hastie et al. (2001).
-
-  The performance of the implementation has not been investigated yet. For 
-  computational reasons we also suggest to use a single \code{\link{vc}} term
-  combined with \code{sctest = TRUE} in \code{\link{fvcm_control}}, see the 
-  example below.
+  the arguments indicated specify modified defaults and parameters for 
+  randomizing split selections. Notice that, relative to \code{\link{tvcm_control}}, 
+  also the \code{cv} \code{prune} arguments are internally disabled. The 
+  default arguments for \code{alpha} and \code{maxoverstep} essentially disable 
+  the stopping rules of \code{\link{tvcm}}, where the argument \code{maxstep} 
+  (the number of iterations i.e. the maximum number of splits) fully controls the 
+  stopping. The three parameters \code{ptry}, \code{ntry} and \code{vtry} control 
+  the randomization for selecting the \code{\link{vc}} term, the node and the 
+  variable for splitting. The default of \code{vtry = 5} is arbitrary. It should 
+  be adjusted in applications, e.g., to the number of partitioning variables 
+  (for each term) divided by 3, see Hastie et al. (2001).
 }
 
 \value{An object of class \code{fvcm}.}
@@ -112,24 +108,28 @@ fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
 ## ------------------------------------------------------------------- #
 ## Dummy example 1:
 ##
-## Fitting a random forest 'tvcm' on artificially generated data.
+## Bagging 'tvcm' on the artificially generated data 'vcrpart_3'. The 
+## true coefficient function is a sinus curve between -pi/2 and pi/2. 
+## The parameters 'maxstep = 3' and 'K = 5' are chosen to restrict the 
+## computations.
 ## ------------------------------------------------------------------- #
 
-## simulate data
-data(vcrpart_2)
+## simulated data
+data(vcrpart_3)
 
-## set parameters
-control <- fvcm_control(sctest = TRUE, maxstep = 2, 
-                        vtry = 1, verbose = TRUE, minsize = 10,
-                        folds = folds_control("subsampling", 3, 0.75))
+## setting parameters
+control <- fvcm_control(maxstep = 3, minsize = 10,
+                        folds = folds_control("subsampling", K = 5, 0.5, seed = 3))
 
-## fit the forest
-model <- fvcm(y ~ -1 + vc(z1, z2, by = x1, intercept = TRUE) + x2,
-              data = vcrpart_2, family = gaussian(), 
-              folds = folds_control("subsampling", 3, 0.75), control = control)
-model
+## fitting the forest
+model <- fvcm(y ~ vc(z1, by = x1), data = vcrpart_3, 
+              family = gaussian(), control = control)
 
+## plot the first two trees
+plot(model, "coef", 1:2)
 
+## plotting the partial dependency of the coefficient for 'x1'
+plot(model, "partdep")
 }
 
 \keyword{models}

@@ -1,15 +1,16 @@
-		 CHANGES IN tvcm VERSION 0.1-15
+		 CHANGES IN tvcm VERSION 0.2-1
 
 GENERAL
 
     o    complete revision of syntaxes, argument names and 
-         default parameters. R commands for version 0.1-14 will likely 
-         not work anymore.
+         default parameters. R commands for the former version 0.1-14 
+         are hardly compatibel. Please contact reto.buergin@unige.ch 
+         in case of questions.
     o    the default splitting criterion of 'tvcm' was changed from 
-         coefficient constancy tests combined with greedy loss 
-         minimization to exhaustive greedy loss minimization. Splitting 
-         based on the former default require to set the argument 
-         'sctest = TRUE' in 'tvcm_control'
+         (old) coefficient constancy tests combined with greedy loss 
+         minimization to (new) exhaustive greedy loss minimization. Splitting 
+         based on the (old) requires to set the argument 'sctest = TRUE' in 
+         'tvcm_control'
 
 NEW FEATURES
      
@@ -21,3 +22,8 @@ IMPROVEMENTS
      o	 the greedy loss reduction minimization stage of 'tvcm' does now 
          fixate coefficients which are not splitted at the estimates of 
          the current model. The technique intends acceleration.
+
+     o   cross-validation is now integrated in the 'tvcm' function.
+
+     o   several functions such as 'cvloss' are parallelized by using the
+         'parallel' package.

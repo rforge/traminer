@@ -3,6 +3,7 @@
 \alias{vcrpart-demo}
 \alias{vcrpart_1}
 \alias{vcrpart_2}
+\alias{vcrpart_3}
 \alias{unemp}
 
 \docType{data}
@@ -14,6 +15,7 @@
 \usage{
 data(vcrpart_1)
 data(vcrpart_2)
+data(vcrpart_3)
 data(unemp)
 }
 
@@ -24,10 +26,10 @@ data(unemp)
     \item{\code{wave}}{numeric. The wave identification vector.}
     \item{\code{treat}}{a dummy variable. The treatment effect.}
     \item{\code{x1, x2}}{numeric predictor variables.}
-    \item{\code{z1, z2, z3, z2}}{partitioning/ varying-coefficients variables.}
+    \item{\code{z1, z2, z3, z2}}{moderator (partitioning) variables.}
     \item{\code{GHQL}}{self rated general happiness.}
     \item{\code{YEAR}}{survey year.}
-    \item{\code{UNEMP}}{unempoyed or not.}
+    \item{\code{UNEMP}}{unemployed or not.}
     \item{\code{AGE}}{age.}
     \item{\code{FISIT}}{self-reported financial situation.}
     \item{\code{GENDER}}{gender.}
@@ -67,12 +69,21 @@ vcrpart_1$y <- cut(-eta, c(-Inf, -1, 1, Inf), 1:3,
 
 set.seed(1)
 vcrpart_2 <- data.frame(x1 = rnorm(100),
-                  x2 = rnorm(100),
-                  z1 = factor(sample(1:3, 100, TRUE)),
-                  z2 = factor(sample(1:3, 100, TRUE)))
+                        x2 = rnorm(100),
+                        z1 = factor(sample(1:3, 100, TRUE)),
+                        z2 = factor(sample(1:3, 100, TRUE)))
 vcrpart_2$y <- vcrpart_2$x1 * (vcrpart_2$z1 == "2") +
   2 * vcrpart_2$x1 * (vcrpart_2$z1 == "3")
 vcrpart_2$y <- vcrpart_2$y + rnorm(100)
+
+## --------------------------------------------------------- #
+## generating 'vcrpart_3'
+## --------------------------------------------------------- #
+
+set.seed(1)
+vcrpart_3 <- data.frame(x1 = rnorm(100),
+                        z1 = runif(100, -pi/2, pi/2))
+vcrpart_3$y <- vcrpart_3$x1 * sin(vcrpart_3$z1) + rnorm(100)
 
 ## --------------------------------------------------------- #
 ## generating 'unemp'

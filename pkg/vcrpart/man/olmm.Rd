@@ -10,7 +10,7 @@
 
 \description{
   Fits different types of two-stage linear mixed models for longitudinal
-  (or clustered) ordinal (or multinomial) responses. one-stage models
+  (or clustered) ordinal (or multinomial) responses. O	ne-stage models
   are also allowed. Random effects are assumed to be multivariate normal 
   distributed with expectation 0. At the time being, cumulative link 
   models with the logit, probit or cauchy link, the baseline-category 
@@ -42,7 +42,7 @@ olmm(formula, data, family = cumulative(),
     
     \code{y ~ ce(x1) + ge(x2) +re(1 + ge(w2) | id)} 
 
-    where \code{ce(x1)} specificies that the predictor \code{x1} has a 
+    where \code{ce(x1)} specifies that the predictor \code{x1} has a 
     category-specific i.e. non-proportional odds effect and \code{ge(x2)} 
     has global i.e. proportional odds fixed effect, see
     \code{\link{ge}}, resp. \code{\link{ce}}. Random effects are

@@ -8,7 +8,7 @@
 \title{\code{plot} method for \code{tvcm} objects.}
 
 \description{
-  \code{plot} method and panel functions for \code{tvcm} and objects. 
+  \code{plot} method and panel functions for \code{tvcm} objects. 
 }
 
 \usage{
@@ -80,8 +80,8 @@ panel_coef(object, parm = NULL,
     parameters for each list component of \code{parm}. See examples.}
   \item{margins}{a numeric vector \code{c(bottom, left, top, right)}
     specifying the space on the margins for each panel.}
-  \item{yadj}{numeric}{the margin above the panel. May be useful if the
-    edge labels are covered by the coefficient panels.}
+  \item{yadj}{a numeric scalar larger than zero that increases the margin above the 
+    panel. May be useful if the edge labels are covered by the coefficient panels.}
   \item{mean}{logical. Whether the average coefficients over the
     population should be visualized.}
   \item{mean_gp}{list with graphical parameters for plotting the mean
@@ -90,7 +90,7 @@ panel_coef(object, parm = NULL,
   \item{conf.int}{logical. Whether confidence intervals should be
     visualized. Note that these intervals do not account for the error
     of the algorithm,}
-  \item{conf.int_gp}{a list of graphical parameters for the confindence
+  \item{conf.int_gp}{a list of graphical parameters for the confidence
     intervals applied to \code{\link{arrow}}. Includes \code{angle},
     \code{length}, \code{ends} and \code{type}. See examples.}
   \item{abbreviate}{logical scalar. Whether labels of coefficients should
@@ -108,7 +108,7 @@ panel_coef(object, parm = NULL,
   objects. \code{type = "default"}, \code{type = "coef"} and 
   \code{type = "simple"} show the tree structure and coefficients in each
   node. \code{type = "partdep"} plots partial dependency plots, see Hastie
-  et al. (2001), section 10.13.2. Finally, \code{type = "cv"} will show,
+  et al. (2001), section 10.13.2. Finally, \code{type = "cv"} shows,
   if available, the results from cross-validation. 
 
   The functions \code{\link{panel_partdep}} and \code{\link{panel_coef}}
@@ -128,8 +128,8 @@ panel_coef(object, parm = NULL,
 ## ------------------------------------------------------------------- #
 ## Dummy example 1:
 ##
-## Plotting the types "coef" and "partdep" for a 'tvcm' object fitted on
-## artificial data.
+## Plotting the types "coef" and "partdep" for a 'tvcm' object fitted 
+## on the artificial data 'vcrpart_2'.
 ## ------------------------------------------------------------------- #
 
 data(vcrpart_2)

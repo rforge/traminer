@@ -1,69 +1,69 @@
-## --------------------------------------------------------- #
-## Author:          Reto Buergin, rbuergin@gmx.ch
-## Date:            2014-06-17
-##
-## Description:
-## Utility functions for the olmm function (see olmm.R). Some
-## functions are experimental and not listed in the namespace.
-##
-## References and dependencies:
-## statmod:         http://cran.r-project.org/web/packages/statmod/index.html
-## ucminf:          http://cran.r-project.org/web/packages/ucminf/index.html
-##
-## Contents:
-##
-## Functions for olmm:
-## olmm_expandQP:        expand grid for numerical integration
-## olmm_fn
-## olmm_gn
-## olmm_optim_setup:     set up algorithm function
-## olmm_optim_warnings:
-## olmm_coefShortLabs:   short labels for coefficient names
-## olmm_check_mm:        check and modify model matrix
-## olmm_start:           set initial values
-## olmm_mergeMm:         merge the predictor-variable and predictor-invariant
-##                       model matrices
-##                     
-## gcauchy:              derivate of dcauchy
-## glogis:               derivate of dlogis
-## gnorm:                derivate of dnorm
-##
-## Functions for estfun.olmm:
-## olmm_scoreVar:        computes the variance of the observation scores.
-## olmm_scoreCovWin:     computes the intra-subject covariance of
-##                       the observation scores.
-## olmm_scoreCovBet:     computes the between-subject covariance
-##                       of the observation scores.
-## olmm_f_decormat:      the equation to be optimized to zero:
-##                       the difference between the adjusted
-##                       intra-subject covariance and the adjusted
-##                       between-subject covariance of likelihood scores.
-## olmm_g_decormat:      the derivation of olmm_fDecorrelate.
-## olmm_rename:
-## olmm_decormat:        computes the transformation matrix for
-##                       removing the intra-subject
-##                       correlation of ML scores.
-##
-## To do:
-## - replace ranefChol fac initial value with covariance matrix
-## - add multiple family arguments
-## - make olmm_refit_MC working (compare version 0.1-5)
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Author:          Reto Buergin, rbuergin@gmx.ch
+##' Date:            2014-09-07
+##'
+##' Description:
+##' Utility functions for the olmm function (see olmm.R). Some
+##' functions are experimental and not listed in the namespace.
+##'
+##' References and dependencies:
+##' statmod:         http://cran.r-project.org/web/packages/statmod/index.html
+##' ucminf:          http://cran.r-project.org/web/packages/ucminf/index.html
+##'
+##' Contents:
+##'
+##' Functions for olmm:
+##' olmm_expandQP:        expand grid for numerical integration
+##' olmm_fn
+##' olmm_gn
+##' olmm_optim_setup:     set up algorithm function
+##' olmm_optim_warnings:
+##' olmm_coefShortLabs:   short labels for coefficient names
+##' olmm_check_mm:        check and modify model matrix
+##' olmm_start:           set initial values
+##' olmm_mergeMm:         merge the predictor-variable and predictor-invariant
+##'                       model matrices
+##'                     
+##' gcauchy:              derivate of dcauchy
+##' glogis:               derivate of dlogis
+##' gnorm:                derivate of dnorm
+##'
+##' Functions for estfun.olmm:
+##' olmm_scoreVar:        computes the variance of the observation scores.
+##' olmm_scoreCovWin:     computes the intra-subject covariance of
+##'                       the observation scores.
+##' olmm_scoreCovBet:     computes the between-subject covariance
+##'                       of the observation scores.
+##' olmm_f_decormat:      the equation to be optimized to zero:
+##'                       the difference between the adjusted
+##'                       intra-subject covariance and the adjusted
+##'                       between-subject covariance of likelihood scores.
+##' olmm_g_decormat:      the derivation of olmm_fDecorrelate.
+##' olmm_rename:
+##' olmm_decormat:        computes the transformation matrix for
+##'                       removing the intra-subject
+##'                       correlation of ML scores.
+##'
+##' Modifications:
+##' 2014-09-07: updated descriptions for undocumented functions
+##' 
+##' To do:
+##' - replace ranefChol fac initial value with covariance matrix
+##' - add multiple family arguments
+##' - make olmm_refit_MC working (compare version 0.1-5)
+##' -------------------------------------------------------- #
+
+##' -------------------------------------------------------- #
+##' Expand quadrature points to the dimension of random
+##' effects.
+##'
+##' @param x nodes (or weights) for one dimension.
+##' @param q number of random coefficients.
+##'
+##' @return A grid matrix of nodes (or weights) of dimension q.
+##' -------------------------------------------------------- #
 
 olmm_expandQP <- function(x, q) {
-
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Expand quadrature points to the dimension of random
-  ## effects.
-  ##
-  ## Arguments:
-  ## x: nodes (or weights) for one dimension.
-  ## q: number of random coefficients.
-  ##
-  ## Value:
-  ## A grid matrix of nodes (or weights) of dimension q.
-  ## ------------------------------------------------------- #
 
   if (length(q)^q * q > 2^31 - 1)
     stop("number of quadrature weights is too large. Decrease 'nAGQ'")
@@ -81,6 +81,7 @@ olmm_fn <- function(par, restricted) {
   return(-object$logLik)
 }
 
+
 olmm_gr <- function(par, restricted) {
   if (!exists("object")) object <- structure(list(), class = "olmm")
   scoreNew <- object$score
@@ -88,21 +89,19 @@ olmm_gr <- function(par, restricted) {
   return(-scoreNew)
 }
 
-olmm_optim_setup <- function(x, env = parent.frame()) {  
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Processes the algorithm argument.
-  ##
-  ## Arguments:
-  ## x:        argument 'optim' of 'olmm' call
-  ## numGrad:  argument 'numGrad' of 'olmm' call
-  ## env:      environment of the optimization 
-  ##
-  ## Value:
-  ## A prepared list to be assigned to the eval command
-  ## envoking the optimization (using the eval function).
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Processes the algorithm argument.
+##'
+##' @param x       argument 'optim' of 'olmm' call
+##' @param numGrad argument 'numGrad' of 'olmm' call
+##' @param env     environment of the optimization 
+##'
+##' @return A prepared list to be assigned to the eval command
+##'    invoking the optimization (using the eval function).
+##' -------------------------------------------------------- #
+
+olmm_optim_setup <- function(x, env = parent.frame()) {  
 
   numGrad <- x$numGrad
   if (x$fit == "optim" && is.null(x$method)) x$method <- "Nelder-Mead"
@@ -123,6 +122,7 @@ olmm_optim_setup <- function(x, env = parent.frame()) {
   
   return(rval)
 }
+
 
 olmm_optim_warnings <- function(output, FUN) {
 
@@ -163,18 +163,17 @@ olmm_optim_warnings <- function(output, FUN) {
     }
 }
 
-olmm_coefShortLabs <- function(object) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Proposes abbreviations for names of coefficients.
-  ##
-  ## Arguments:
-  ## object: an olmm object
-  ##
-  ## Value:  vector of character strings with abbreviations
-  ##         for names of coefficients.
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Proposes abbreviations for names of coefficients.
+##'
+##' @param object an olmm object
+##'
+##' @return Vector of character strings with abbreviations
+##'    for names of coefficients.
+##' -------------------------------------------------------- #
+
+olmm_coefShortLabs <- function(object) {
 
   ## abbreviations for predictor-variable fixed effects
   abbCe <- names(fixef(object, "predictor-variable"))
@@ -193,20 +192,18 @@ olmm_coefShortLabs <- function(object) {
   return(c(abbCe, abbGe, abbReCF))
 }
 
-olmm_merge_mm <- function(x, y, deleteIntY = TRUE) {
 
-  ## ------------------------------------------------------- #
-  ## Description: Merge a model matrix of predictor variable
-  ##              effects with a model matrix of predictor
-  ##              invariant effects
-  ##
-  ## Arguments:
-  ## x: a model matrix for predictor-variable effects.
-  ## y: a model matrix for predictor-invariant effects. 
-  ##
-  ## Value:
-  ## A model matrix.
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Merge a model matrix of predictor variable effects with a
+##' model matrix of predictor invariant effects
+##'
+##' @param x a model matrix for predictor-variable effects.
+##' @param y a model matrix for predictor-invariant effects. 
+##'
+##' @return A model matrix.
+##' -------------------------------------------------------- #
+
+olmm_merge_mm <- function(x, y, deleteIntY = TRUE) {
 
   if (ncol(y) == 0L) deleteIntY <- FALSE
   if (deleteIntY & "(Intercept)" %in% colnames(y)) {
@@ -226,18 +223,16 @@ olmm_merge_mm <- function(x, y, deleteIntY = TRUE) {
   return(rval)
 }
 
-olmm_check_mm <- function(x) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Check and modify model matrix.
-  ##
-  ## Arguments:
-  ## x: a model matrix.
-  ##
-  ## Value:
-  ## a model matrix.
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Check and modify model matrix.
+##'
+##' @param x a model matrix.
+##'
+##' @return A model matrix.
+##' -------------------------------------------------------- #
+
+olmm_check_mm <- function(x) {
   
   qr.x <- qr(x, LAPACK = FALSE)
   rank <- qr.x$rank
@@ -274,27 +269,26 @@ olmm_check_mm <- function(x) {
   return(x)
 }
 
-olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
 
-    ## ------------------------------------------------------- #
-    ## Description:
-    ## Evaluate user-defined initial values for the parameters.
-    ##
-    ## Arguments:
-    ## start:      named vector with user-defined initial values
-    ## dims:       dimension slot of the olmm object
-    ## parNames:   list with elements 'fixef' and 'ranefCholFac'
-    ##             including the parameter names
-    ## X:          model matrix for fixed effects
-    ## W:          model matrix for random effects
-    ## eta:        matrix for storing the linear predictor
-    ## ranefElMat: matrix for transforming the ranefCholFac
-    ##             vectors to matrices
-    ##
-    ## Value:
-    ## a list with elements 'fixef', 'ranefCholFac' and
-    ## 'coefficients' that are used as initial values.
-    ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Evaluate user-defined initial values for the parameters.
+##'
+##' @param start      named vector with user-defined initial
+##'    values
+##' @param dims       dimension slot of the olmm object
+##' @param parNames   list with elements 'fixef' and
+##'    'ranefCholFac' including the parameter names
+##' @param X          model matrix for fixed effects
+##' @param W          model matrix for random effects
+##' @param eta        matrix for storing the linear predictor
+##' @param ranefElMat matrix for transforming the ranefCholFac
+##'    vectors to matrices
+##'
+##' @return A list with elements 'fixef', 'ranefCholFac' and
+##'    'coefficients' that are used as initial values.
+##' -------------------------------------------------------- #
+
+olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
 
     ## checks
     if (!is.null(start)) {
@@ -375,61 +369,58 @@ olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
                 coefficients = coefficients))
 }
 
-olmm_scoreVar <- function(scores, subject) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Computes variance of scores.
-  ##
-  ## Arguments:
-  ## scores:  the scores of the model
-  ## subject: the subject vector
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Computes variance of scores.
+##'
+##' @param scores  the scores of the model
+##' @param subject the subject vector
+##' -------------------------------------------------------- #
+
+olmm_scoreVar <- function(scores, subject) {
   
   return(crossprod(scores) / nrow(scores))
 }
 
-olmm_scoreCovWin <- function(scores, subject) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Computes within-subject covariance of scores.
-  ##
-  ## Arguments:
-  ## scores:  a numeric matrix of scores.
-  ## subject: a factor vector that assigns entries in 'scores'
-  ##          to the grouping factor.
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Computes within-subject covariance of scores.
+##'
+##' @param scores  a numeric matrix of scores.
+##' @param subject a factor vector that assigns entries in
+##'    'scores' to the grouping factor.
+##' -------------------------------------------------------- #
+
+olmm_scoreCovWin <- function(scores, subject) {
   
   Ni <- table(subject)
   return((crossprod(apply(scores, 2, tapply, subject, sum)) -
           crossprod(scores)) / sum(Ni * (Ni - 1)))
 }
 
+
+##' -------------------------------------------------------- #
+##' Computes between-subject covariance of scores.
+##'
+##' @param scores  a numeric matrix of scores.
+##' @param subject a factor vector that assigns entries in
+##'    'scores' to the grouping factor.
+##' -------------------------------------------------------- #
+
 olmm_scoreCovBet <- function(scores, subject) {
-  
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Computes between-subject covariance of scores.
-  ##
-  ## Arguments:
-  ## scores:  a numeric matrix of scores.
-  ## subject: a factor vector that assigns entries in 'scores'
-  ##          to the grouping factor.
-  ## ------------------------------------------------------- #
   
   Ni <- table(subject)
   return(-crossprod(apply(scores, 2, tapply, subject, sum)) /
          (nrow(scores)^2 - nrow(scores) - sum(Ni * (Ni - 1))))
 }
 
-olmm_f_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Difference between adjusted within- and adjusted between-
-  ## subject covariance.
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Difference between adjusted within- and adjusted between-
+##' subject covariance.
+##' -------------------------------------------------------- #
+
+olmm_f_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
 
   adjScoreCovWin <-
     sVar %*% t(T) + T %*% sVar + (Nmax - 2) * T %*% sVar %*% t(T) +
@@ -446,12 +437,11 @@ olmm_f_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
   return(c(rval[subs]))
 }
 
-olmm_g_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
+##' -------------------------------------------------------- #
+##' Gradient for the olmm_f_decormat() function above
+##' -------------------------------------------------------- #
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Gradient for the olmm_f_decormat() function above
-  ## ------------------------------------------------------- #
+olmm_g_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
 
   k <- ncol(T)
   nPar <- max(Tindex)
@@ -477,25 +467,23 @@ olmm_g_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
   return(rval)
 }
 
+
+##' -------------------------------------------------------- #
+##' Modifies the 'Eta[1-9]+' labels of coefficients of
+##' 'olmm' objects.
+##'
+##' @param x       a character vector, a named numeric vector
+##'    or a named matrix.
+##' @param levels  the response levels.
+##' @param family  an object of class 'family.olmm'
+##' @param etalab  character string. Allowed are "int", "char" or
+##'    "eta". 
+##'
+##' @return An object of the same class as 'x' but with new
+##'    labels for category-specific coefficients.
+##' -------------------------------------------------------- #
+
 olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
-  
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Modifies the 'Eta[1-9]+' labels of coefficients of
-  ## 'olmm' objects.
-  ##
-  ## Arguments:
-  ## x:          a character vector, a named numeric vector or
-  ##             a named matrix.
-  ## levels:     the response levels.
-  ## family:     an object of class 'family.olmm'
-  ## etalab:     character string. Allowed are "int", "char" or
-  ##             "eta" 
-  ##
-  ## Value:
-  ## An object of the same class as 'x' but with new labels
-  ## for category-specific coefficients
-  ## ------------------------------------------------------- #
 
   etalab <- match.arg(etalab)
 
@@ -537,25 +525,23 @@ olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
   return(x)  
 }
 
-olmm_decormat <- function(scores, subject, control = predecor_control()) {
 
-  ## ------------------------------------------------------- #
-  ## Description:
-  ## Computes the T matrix for the pre-decorrelation transformation
-  ## of scores.
-  ##
-  ## Arguments:
-  ## scores:    a matrix of scores
-  ## subject:   a factor, the grouping factor for entries in
-  ##            'scores'
-  ## parm:      a subset of coefficients for which the matrix
-  ##            is to be computed
-  ## control:   a list with parameters produced by predecor_control
-  ##
-  ## Value:
-  ## A list with the frame and model matrices of the simulated
-  ## predictors
-  ## ------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Computes the T matrix for the pre-decorrelation transformation
+##' of scores.
+##'
+##' @param scores  a matrix of scores.
+##' @param subject a factor, the grouping factor for entries in
+##'    'scores'.
+##' @param parm    a subset of coefficients for which the matrix
+##'    is to be computed.
+##' @param control a list with parameters produced by predecor_control.
+##'
+##' @return A list with the frame and model matrices of the simulated
+##'    predictors
+##' -------------------------------------------------------- #
+
+olmm_decormat <- function(scores, subject, control = predecor_control()) {
 
   stopifnot(inherits(control, "predecor_control"))
   Nmax <- max(table(subject))

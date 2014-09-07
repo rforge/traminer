@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-02
+##' Date:            2014-09-07
 ##'
 ##' Description:
 ##' Function for model selection and assessment for 'tvcm' objects.
@@ -15,6 +15,7 @@
 ##' plot.cvloss.tvcm:    plot fot 'cv.tvcm' objects
 ##'
 ##' Last modifications:
+##' 2014-09-07: modifications for direct call from 'tvcm'
 ##' 2014-09-02: - modifications on 'tvcm_get_node'. The former
 ##'               implementation was a time-killer an therefore
 ##'               there is a new argument 'formList' and a
@@ -226,7 +227,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
 
   cvFun <- function(i) {
 
-    cv <- vector(mode = "list", length = 2)
+    cv <- vector(mode = "list", length = switch(type, loss = 2L, forest = 3L))
     
     if (verbose) {
       if (papply == "lapply" && i > 1L) cat("\n")
@@ -296,6 +297,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
         ibTreePr <- ibTree
         cv[[1]] <- ibTree$info$node
         cv[[2]] <- coef(extract(ibTree, "model"))
+        cv[[3]] <- extract(ibTree, "model")$contrasts
         
       }
 
@@ -418,14 +420,16 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     
   } else if (type == "forest") {
     
-    rval <- vector(mode = "list", length = 3)
-    names(rval) <- c("node", "coefficients", "error")
+    rval <- vector(mode = "list", length = 5L)
+    names(rval) <- c("node", "coefficients", "contrasts", "error", "folds")
     rval$error$which <-
       which(sapply(cv, function(x) inherits(x, "try-error")))
     rval$error$message <- unlist(cv[rval$error$which])
     cv[rval$error$which] <- NULL
-    rval$node <- lapply(cv, function(x) x[[1]])
-    rval$coefficients <- lapply(cv, function(x) x[[2]])
+    rval$node <- lapply(cv, function(x) x[[1L]])
+    rval$coefficients <- lapply(cv, function(x) x[[2L]])
+    rval$contrasts <- lapply(cv, function(x) x[[3L]])
+    
     rval$folds <- foldsMat
   }
   

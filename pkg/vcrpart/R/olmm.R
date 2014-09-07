@@ -1,46 +1,46 @@
-## --------------------------------------------------------- #
-## Author:        Reto Buergin, rbuergin@gmx.ch
-## Date:          2014-05-03
-##
-## References:
-## ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
-## lme4:        http://cran.r-project.org/web/packages/lme4/index.html
-## matrixcalc:  http://cran.r-project.org/web/packages/matrixcalc/index.html
-## statmod:     http://cran.r-project.org/web/packages/statmod/index.html
-##
-## Dependencies:
-## ucminf:      http://cran.r-project.org/web/packages/ucminf/index.html
-##
-##
-## Modifications:
-## 2014-06-17: convert routine to S3 class
-## 2014-05-03: moved several control parameters to 'control' argument
-## 2014-05-02: added 'linkinv' function to families 'cumulative' etc.
-## 2014-05-01: change offset argument: not it must be a 'matrix'
-## 2014-04-22: implement change in 'form' object
-## 2013-09-15: Free() commands were added in olmm.c
-## 2013-09-07: C implementation for updating the marginal Likelihood
-## 	       and predicting random-effects was stabilized by 
-##	       replacing many alloca's by the R built-in function
-##	       Calloc, which may slow the estimation
-## 2013-07-27: change 'start' handling and add 'restricted'
-##             argument
-## 2013-07-19: correct use of numGrad argument (from now the slots
-##             score_sbj and score_obs remain empty)
-## 2013-07-12: improve use of contrasts. There were irritating
-##             warnings under correct use and now the slot
-##             'contrasts' also contains contrasts from the
-##             model matrix for random effects
-##
-## To do:
-## - add to family 'link' and 'linkinv' and incorporate
-##   that in 'predict'
-## - implement further family options
-## - find better initial parameter values (see polr.R)
-## - extract covariance matrix directly from optimizer
-## - standardized coefficients
-## - unconstrained covariance-matrix for random-effects
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
+##' Author:       Reto Buergin, rbuergin@gmx.ch
+##' Date:         2014-06-17
+##'
+##' References:
+##' ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
+##' lme4:        http://cran.r-project.org/web/packages/lme4/index.html
+##' matrixcalc:  http://cran.r-project.org/web/packages/matrixcalc/index.html
+##' statmod:     http://cran.r-project.org/web/packages/statmod/index.html
+##'
+##' Dependencies:
+##' ucminf:      http://cran.r-project.org/web/packages/ucminf/index.html
+##'
+##'
+##' Modifications:
+##' 2014-06-17: convert routine to S3 class
+##' 2014-05-03: moved several control parameters to 'control' argument
+##' 2014-05-02: added 'linkinv' function to families 'cumulative' etc.
+##' 2014-05-01: change offset argument: not it must be a 'matrix'
+##' 2014-04-22: implement change in 'form' object
+##' 2013-09-15: Free() commands were added in olmm.c
+##' 2013-09-07: C implementation for updating the marginal Likelihood
+##' 	       and predicting random-effects was stabilized by 
+##'	       replacing many alloca's by the R built-in function
+##'	       Calloc, which may slow the estimation
+##' 2013-07-27: change 'start' handling and add 'restricted'
+##'             argument
+##' 2013-07-19: correct use of numGrad argument (from now the slots
+##'             score_sbj and score_obs remain empty)
+##' 2013-07-12: improve use of contrasts. There were irritating
+##'             warnings under correct use and now the slot
+##'             'contrasts' also contains contrasts from the
+##'             model matrix for random effects
+##'
+##' To do:
+##' - add to family 'link' and 'linkinv' and incorporate
+##'   that in 'predict'
+##' - implement further family options
+##' - find better initial parameter values (see polr.R)
+##' - extract covariance matrix directly from optimizer
+##' - standardized coefficients
+##' - unconstrained covariance-matrix for random-effects
+##' -------------------------------------------------------- #
 
 dev.resids <- function(y, mu, wt) {
   sapply(1:nrow(y), function(i) - 2 * log(mu[i, which(y[i, ] > 0)]))

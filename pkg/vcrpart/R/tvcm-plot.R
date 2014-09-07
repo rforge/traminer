@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-06
+##' Date:            2014-09-07
 ##'
 ##' Description:
 ##' Plot functions for 'tvcm' objects.
@@ -18,6 +18,7 @@
 ##' panel_empty:     grapcon generator for empty terminal node plots
 ##'
 ##' Last modifications:
+##' 2014-09-06: solve bugs in 'panel_partdep'
 ##' 2014-09-06: - add 'type = "cv"' option for the cases where
 ##'               cross validation was incorporated in the
 ##'               partitioning stage
@@ -139,8 +140,7 @@ plot.tvcm <- function(x, type = c("default", "coef",
     }
   }
 }
-            
-            
+                    
 
 panel_partdep <- function(object, parm = NULL,
                           var = NULL, ask = NULL,
@@ -148,7 +148,7 @@ panel_partdep <- function(object, parm = NULL,
                           etalab = c("int", "char", "eta"), ...) {
 
   ## set and check 'parm'
-  allParm <- unlist(lapply(extract(object, "coef")$vc, colnames))
+  allParm <- tvcm_get_vcparm(object)
   if (is.null(parm)) parm <- allParm
   if (!all(parm %in% allParm))
     warnings("some 'parm' were not recognized.")
@@ -211,6 +211,7 @@ panel_partdep <- function(object, parm = NULL,
     for (j in 1:length(z)) newdata <- rbind(newdata, tmp)
     newdata[, var[i]] <- rep(z, each = nrow(tmp))
     beta <- predict(object, newdata = newdata, type = "coef")
+    parm <- intersect(parm, colnames(beta))
     
     ## for each coefficients ...
     for (j in 1:length(parm)) {
@@ -254,7 +255,7 @@ panel_partdep <- function(object, parm = NULL,
 }
 
 
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
 ##' Specifies a title for a terminal node
 ##'
 ##' @param object a \code{\link{tvcm}} object.
@@ -267,7 +268,7 @@ panel_partdep <- function(object, parm = NULL,
 ##'    title.
 ##'
 ##' @return a character string.
-## --------------------------------------------------------- #
+##' -------------------------------------------------------- #
 
 panel_get_main <- function(object, node, id, nobs) {
   rval <- ""
@@ -277,6 +278,7 @@ panel_get_main <- function(object, node, id, nobs) {
   if (nobs) rval <- paste(rval, "nobs = ", node$info$dims["n"], sep = "")
   return(rval)
 }
+
 
 panel_coef <- function(object, parm = NULL, 
                        id = TRUE, nobs = TRUE,

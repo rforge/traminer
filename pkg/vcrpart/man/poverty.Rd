@@ -6,10 +6,10 @@
 
 \title{Poverty in Switzerland}
 
-\description{Poverty measurments of elderly people (older than the Swiss
-  legal retirement age) in Switzerland. The data are the complete
+\description{Poverty measurements of elderly people (older than the Swiss
+  legal retirement age) in Switzerland. The data are the (complete)
   subsample of participants of the canton Valais of the
-  Vivre-Leben-Vivere (VLV) data set.} 
+  Vivre-Leben-Vivere (VLV) survey data.} 
 
 \usage{data(poverty)}
 
@@ -24,7 +24,7 @@
     \item{\code{AgeGroup}}{to which age group the person belongs to.}
     \item{\code{Edu}}{ordered 3-category measurement on the persons education.}
     \item{\code{CivStat}}{civil status.}
-    \item{\code{NChild}}{number of childs.}
+    \item{\code{NChild}}{number of children.}
     \item{\code{Working}}{whether the person is still working (even
       though all persons are in the legal retirement age).}
     \item{\code{FirstJob}}{5-category classification of the person's
@@ -42,7 +42,7 @@
       \code{"missing / early retirement"}, \code{"start and stop"} and
       \code{"stop and restart"}. The classification was retrieved from a
       longitudinal cluster analysis on the professional carriers in
-      Gabrie et. al. (2014).} 
+      Gabriel et. al. (2014).} 
     \item{\code{Pension}}{5-category classification of the pension
       plan. Number refer to the Swiss pension three-pillar system.}
     \item{\code{TimFirstChild}}{timing of first child relative to the
@@ -71,8 +71,8 @@
 \source{VLV survey, see also \url{http://cigev.unige.ch/recherches/vlv.html}}
 
 \references{Ludwig, C., Cavalli, S. and Oris,
-  M. \sQuote{Vivre/Leben/Vivere}: An interdisciplary survey adressing
-  progress and inequalities of aging over the past 30 years in
+  M. \sQuote{Vivre/Leben/Vivere}: An interdisciplinary survey addressing
+  progress and inequalities of ageing over the past 30 years in
   Switzerland. \emph{Archives of Gerontology and Geriatrics}. 
   
   Gabriel, R., Oris, M. Studer, M. and Baeriswyl, M. The persistance of

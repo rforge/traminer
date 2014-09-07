@@ -31,6 +31,7 @@
 ##' tvcm_get_node:            extract node vectors and assign the contrasts
 ##' tvcm_get_terms:           creates a list which assigns coefficients
 ##'                           to the corresponding type, partition etc.
+##' tvcm_get_vcparm:          extracts the names of the predictors on 'vc' terms
 ##' tvcm_get_estimates:       extracts the estimates from a fitted
 ##'                           'tvcm' object and creates a list with
 ##'                           an entry for each different type of
@@ -45,6 +46,7 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
+##' 2014-09-07: added 'tvcm_get_vcparm' function
 ##' 2014-09-06: modified function names for 'tvcm_fit_model' and
 ##'             'tvcm_refit_model' for consistency reasons. The
 ##'             new names are 'tvcm_grow_fit' and 'tvcm_grow_update'
@@ -82,7 +84,6 @@
 ##' 2013-11-01: modify 'restricted' and 'terms' correctly in
 ##'             'tvcm_modify_modargs'
 ##' -------------------------------------------------------- #
-
 
 ##' -------------------------------------------------------- #
 ##' \code{\link{tvcm_grow_fit}} fits the current node model.
@@ -850,6 +851,7 @@ tvcm_setsplits_validcats <-  function(cp, z, weights, subs, minsize) {
   return(rval)
 }
 
+
 ##'------------------------------------------------------ #
 ##' Updates the list of splits after coefficient
 ##' constancy tests.
@@ -886,6 +888,7 @@ tvcm_setsplits_sctest <- function(splits, partid, spart,
   ## return updated 'splits'
   return(splits)
 }
+
 
 ##'------------------------------------------------------ #
 ##' Updates the list of splits after grid search
@@ -978,8 +981,8 @@ tvcm_setsplits_rselect <- function(splits, partid, nodeid, varid, control) {
 
   ## delete not selected nodes from 'splits'
   for (pid in seq_along(partid)) 
-    for (nid in seq_along(nodeid[[partid]])) 
-      for (vid in seq_along(varid[[partid]])) 
+    for (nid in seq_along(nodeid[[pid]])) 
+      for (vid in seq_along(varid[[pid]])) 
         if (nrow(splits[[pid]][[nid]][[vid]]) > 0 &&
             !(pid %in% spart & vid %in% svar[[pid]] & nid %in% snode[[pid]]))
           splits[[pid]][[nid]][[vid]][, "loss"] <- -Inf
@@ -987,6 +990,7 @@ tvcm_setsplits_rselect <- function(splits, partid, nodeid, varid, control) {
   ## return updated 'splits'
   return(splits)
 }
+
 
 ##'------------------------------------------------------ #
 ##' Processing of nodewise coefficient constancy tests.
@@ -1106,6 +1110,7 @@ tvcm_grow_sctest <- function(model, nodes, where, partid, nodeid, varid,
   return(rval)
 }
 
+
 tvcm_sctest_bonf <- function(test, type) {
   for (pid in seq_along(test)) {
     for (nid in 1:nrow(test[[pid]])) {
@@ -1123,6 +1128,7 @@ tvcm_sctest_bonf <- function(test, type) {
   }
   return(test)
 }
+
 
 ##'-------------------------------------------------------- #
 ##' Computes the loss for each possible split.
@@ -1773,6 +1779,7 @@ tvcm_grow_setcontrol <- function(control, model, formList, root, parm.only = TRU
   return(control)
 }
 
+
 ##'-------------------------------------------------------- #
 ##' Extract the node vector from 'newdata' and assign
 ##' the contrasts.
@@ -1839,7 +1846,6 @@ tvcm_get_node <- function(object, newdata, setContrasts = FALSE, weights,
 ##'-------------------------------------------------------- #
 
 tvcm_get_terms <- function(names, ids, parm) {
-
   
   parm <- lapply(parm, function(x) {
     lapply(x, function(x) x[grepl("Node[A-Z]", x)])
@@ -1898,6 +1904,44 @@ tvcm_get_terms <- function(names, ids, parm) {
   return(list(names = names, 
               terms = terms, type = type,
               node = node, partition = partition))
+}
+
+
+##'-------------------------------------------------------- #
+##' Extracts the names of the predictors on 'vc' terms
+##' 
+##' @param object a 'tvcm' object.
+##'
+##' @return A character vector.
+##'-------------------------------------------------------- #
+
+tvcm_get_vcparm <- function(object) {
+    vcTerms <- terms(object$info$formula$original, specials = "vc")
+    vcTerms <- rownames(attr(vcTerms, "factors"))[attr(vcTerms, "specials")$vc]
+    parm <- unique(unlist(lapply(vcTerms, function(x) {
+        eta <- eval(parse(text = x))$eta
+        if (inherits(object$info$model, "olmm")) {
+            etaList <- vcrpart_formula(eta)
+            parmCe <- all.vars(etaList$fe$eta$ce)
+            parmCe <- paste("Eta", 1:object$info$model$dims["nEta"], ":", parmCe, sep = "")
+            parmGe <- all.vars(etaList$fe$eta$ge)
+            parm <- c(parmCe, parmGe)
+        } else {
+            parm <- all.vars(eta)
+        }
+        return(parm)
+    })))
+    intTerms <- unique(unlist(lapply(object$info$formula$vc, function(x) x$intercept)))
+    if (inherits(object$info$model, "olmm")) {
+        if ("ge" %in% intTerms) parm <- c("(Intercept)", parm)
+        if ("ce" %in% intTerms)
+            parm <-
+                c(paste("Eta", 1:object$info$model$dims["nEta"], ":(Intercept)", sep = ""),
+                  parm)
+    } else {
+        if (any(intTerms != "none")) parm <- c("(Intercept)", parm)
+    }
+    return(parm)
 }
 
 

@@ -90,14 +90,14 @@
   comparisons, based on the marginal likelihood. At the time being, 
   at least two models must be assigned.
 
-  \code{\link{neglogLik2}} is simply the likelihood of the fitted model
-  times minus 2.
+  \code{\link{neglogLik2}} is the marginal maximum likelihood of the fitted 
+  model times minus 2.
 
-  \code{ranefCov} extracts the variance-covariance matrix of the random
-  effects. Similarly, \code{VarCorr} extracts the estimated variances,
+  \code{\link{ranefCov}} extracts the variance-covariance matrix of the random
+  effects. Similarly, \code{\link{VarCorr}} extracts the estimated variances,
   standard deviations and correlations of the random effects. 
 
-  \code{resid} extracts the residuals of Li and Sheperd (2012). By
+  \code{\link{resid}} extracts the residuals of Li and Sheperd (2012). By
   default, the marginal outcome distribution is used to compute these residuals. 
   The conditional residuals can be computed by assigning \code{ranef = TRUE} as 
    a supplementary argument.  

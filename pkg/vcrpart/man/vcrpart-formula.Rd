@@ -16,8 +16,7 @@
 \usage{
 fe(formula, intercept = TRUE)
 re(formula, intercept = TRUE)
-vc(..., by, intercept = missing(by), 
-   nuisance = character())
+vc(..., by, intercept = missing(by), nuisance = character())
 ce(formula)
 ce(formula)
 }
@@ -50,25 +49,25 @@ ce(formula)
 }
 
 \details{
-  Provided are special formula terms to define fixed effects
-  \code{\link{fe}}, varying coefficients \code{\link{vc}} and random
-  effects \code{\link{re}}. The use of these formula terms is strongly
-  recommended to ensure that the intended model is fitted. Some examples
-  are given below. 
+  Special formula terms to define fixed effects \code{\link{fe}}, 
+  varying coefficients \code{\link{vc}} and random effects \code{\link{re}}. 
+  The use of these formula terms ensures that \code{\link{fvcm}}, 
+  \code{\link{tvcm}} and \code{\link{olmm}} fit the intended model. 
+  Some examples are given below and in the corresponding documentation 
+  pages. 
 
   Variables which are not defined within one of these three special
   terms will be assigned to the fixed effect predictor equation. The
-  deletion of intercepts must be defined using \code{intercept = FALSE} 
-  in the corresponding special term. Terms like \code{"-1"} are
-  ignored. The handling of intercept terms in connection with
-  \code{\link{vc}} terms is discussed in the details section of
-  \code{\link{tvcm}}. The terms \code{\link{ce}} (category-specific
+  deletion of the intercept can be indicated by a \code{-1} or 
+  \code{vc(intercept = FALSE)}. The terms \code{\link{ce}} (category-specific
   effects) and \code{\link{ge}} (global effect or proportional odds
-  effect) are mainly designed for categorical regression models, see
-  \code{\link{olmm}}. Notice that the model model will likely not keep
-  the exact order of the components. At present, the term \code{"."},
+  effect) are mainly designed for \code{\link{olmm}}. Notice that 
+  \code{\link{tvcm}} may changes, for internal reasons, the order of the
+  terms in the specified formula. At present, the term \code{"."},
   which is generally use to extract all variables of the data, is
-  ignored. 
+  ignored. On the other hand, \code{\link{vc}} interprets character
+  vectors, assigned as unnamed arguments, as lists of variables of 
+  moderators to be extracted from \code{data}.
 }
 
 \seealso{\code{\link{tvcm}}, \code{\link{fvcm}}, \code{\link{olmm}}}
@@ -80,7 +79,15 @@ ce(formula)
 formula <- y ~ fe(x1 + x2) + re(1|id)
 
 ## Formula for a model with 1 fixed effect and a varying coefficient term
-## with 2 moderators and 2 varying coefficient predictors.
+## with 2 moderators and 2 varying coefficient predictors. 'tvcm' will
+## fit one common partition for the two moderated predictors 'x2' and
+## 'x3'.
+
+formula <- y ~ x1 + vc(z1, z1, by = x2 + x3, intercept = TRUE)
+
+## Similar formula as above, but the predictors 'x2' and 'x3' have
+## separate 'vc' terms. 'tvcm' will fit a separate partition for each 
+## 'vc' term
 
 formula <- y ~ x1 + vc(z1, z1, by = x2 + x3, intercept = TRUE)
 }

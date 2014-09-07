@@ -25,7 +25,7 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
     should be retrieved numerically.}
   \item{numHess}{logical scalar. Indicates whether the Hess matrix for
     the variance-covariance matrix should be estimated numerically,
-    which is an approximation of the observed fisher information). Must
+    which is an approximation of the observed Fisher information. Must
     be \code{TRUE} if \code{numGrad} is \code{TRUE}. See details.} 
   \item{nGHQ}{a positive integer specifying the number of quadrature
     points for the approximation of the marginal Likelihood by numerical
@@ -52,7 +52,7 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
   Notice that an additional argument \code{control}, e.g.,
   \code{control = list(trace = 1)}, can be passed access control
   parameters of the optimizers. For arguments, see \code{\link{ucminf}},
-  \code{\link{nlminb}} or \code{\link{nlminb}}. 
+  \code{\link{nlminb}} or \code{\link{optim}}. 
 }
 
 \value{

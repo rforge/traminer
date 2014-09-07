@@ -29,8 +29,8 @@
   }
 }
 
-\details{The documentation file was inspired by that of \code{schizo}
-  of package \pkg{mixcat}.}
+\details{The documentation file was copied from the \pkg{mixcat} package and 
+  slightly modified.}
 
 \source{\url{http://tigger.uic.edu/~hedeker/ml.html}}
 

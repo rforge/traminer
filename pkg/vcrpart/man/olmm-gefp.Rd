@@ -8,9 +8,9 @@
 \title{Methods for empirical processes of \code{\link{olmm}} objects}
 
 \description{Methods to extract and pre-decorrelate the estimating
-  equations (the negative maximum likelihood scores) and compute the
+  equations (the negative marginal maximum likelihood scores) and compute the
   empirical fluctuation process (the decorrelated, cumulative score
-  process) from a fitted \code{\link{olmm}} object.
+  process) of a fitted \code{\link{olmm}} object.
 } 
 
 \usage{
@@ -59,11 +59,8 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   \item{order.by}{a numeric or factor vector. The explanatory variable to 
     be used to order the entries in the estimating equations. If set to 
     \code{NULL} (the default) the observations are assumed to be ordered.}
-  \item{subset}{logical vector. For \code{\link{gefp.olmm}}, this argument
-    extracts the subset of the estimating equations to be used. For 
-    \code{estfun.olmm}, the argument specifies which observations of an 
-    individual with more than \code{Nbal} observations should be kept / dropped. 
-    See examples.}
+  \item{subset}{logical vector. For extracts the subset of the estimating 
+    equations to be used.}
   \item{parm}{integer, logical or a character vector. Extracts the
     columns of the estimating equations.}
   \item{center}{logical scalar. \code{TRUE} subtracts, if necessary, the
@@ -88,7 +85,7 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   and the \code{gefp} method of the package \code{strucchange} for
   \code{\link{olmm}} objects. \code{\link{estfun.olmm}} allows to
   pre-decorrelate the intra-individual correlation of observation
-  scores, see argument \code{predecor}. The value returned by
+  scores, see the argument \code{predecor}. The value returned by
   \code{gefp.olmm} may be used for testing coefficient constancy
   regarding an explanatory variable \code{order.by} by the \code{sctest}
   function of package \code{strucchange}, see the examples below. 
@@ -102,22 +99,21 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   u*_{it'}) =  \mathrm{Cov}(u*_{it}, u*_{i't''})} for all \eqn{i \neq
   i'} and \eqn{t \neq t'}.
   
-  The pre-decorrelation approach above is prinicipally limited to
+  The pre-decorrelation approach above is principally limited to
   balanced data. If the data of \code{object} are not balanced, a
-  multiple immputation algorithm is applied to estimate values the
+  multiple imputation algorithm is applied to estimate the values that
   scores would take if the data were balanced. Specifically, in each
   iteration of the imputation, (i) a set of predictors is drawn from the 
-  empirical distribution of the model matrices in \code{object}, (ii) 
-  responses are drawn based on predictors of (i) and \code{object}
-  (cf. \code{\link{simulate.olmm}}) and (iii) the predictors of (i) and
-  the responses of (ii) are added \code{object} and the scores are
-  recomputed. The obtained sets of scores are averaged and then used to
-  for transforming the scores instead of the original scores. The
-  imputation algorithm can be controlled with \code{maxit.impute} (the
-  number of imputation iterations), \code{abstol.impute} the maximum
-  permitted quantile of differences between scores of the previous and
-  the current step and \code{ratio.impute} specifies the quantile to be
-  taken.
+  empirical distribution of the model matrix, (ii) responses are drawn 
+  based on these predictors of (i) and \code{object} (cf. \code{\link{simulate.olmm}}) 
+  and (iii) the predictors of (i) and the responses of (ii) are added 
+  \code{object} and the scores are recomputed. The obtained sets of 
+  scores are averaged and then used to for transforming the scores instead 
+  of the original scores. The imputation algorithm can be controlled 
+  with \code{maxit.impute} (the number of imputation iterations), 
+  \code{abstol.impute} the maximum permitted quantile of differences 
+  between scores of the previous and the current step and \code{ratio.impute} 
+  specifies the quantile to be taken.
   
   Given a score matrix produced by \code{\link{estfun.olmm}}, the
   empirical fluctuation process can be computed by
@@ -125,14 +121,17 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   (2007). \code{\link{gefp.olmm}} provides with \code{subset} and
   \code{parm} arguments specifically designed for nodewise tests in the
   \code{\link{tvcm}} algorithm. Using \code{subset} extracts the partial
-  fluctuation process of the selected subset. \code{center = TRUE} makes 
-  sure that the partial fluctuation process ends with zero. 
+  fluctuation process of the selected subset. Further, \code{center = TRUE} 
+  makes sure that the partial fluctuation process (starts and) ends with zero. 
 }
 
 \references{
 Zeileis A., Hornik K. (2007), Generalized M-Fluctuation Tests for Parameter
 Instability, \emph{Statistica Neerlandica}, \bold{61}, 488--508.
 doi:10.1111/j.1467-9574.2007.00371.x.
+
+Buergin R. and Ritschard G. (2014a), Tree-based varying coefficient 
+regression for longitudinal ordinal responses. Submitted article.
 }
 
 \author{Reto Buergin}

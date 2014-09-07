@@ -1,25 +1,35 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-08-05
+##' Date:            2014-09-07
 ##'
 ##' Description:
-##' Random forests implementation based on the 'tvcm' algorithm.
+##' Random forests and bagging for the 'tvcm' algorithm.
 ##'
 ##' Contents:
-##' fvcm:         random forest algorithm
+##' fvcolmm:      convenience function for 'fvcm'
+##' fvcglm:       convenience function for 'fvcm'
+##' fvcm:         main fitting function
 ##' fvcm_control: control function for 'fvcm'
 ##' fitted.fvcm:  extracts fitted values
 ##' oobloss.fvcm: extracts out-of-bag loss
-##' predict.fvcm: prediction for 'fvcm' objects
 ##' plot.fvcm:    plot method for 'fvcm' objects
+##' predict.fvcm: prediction for 'fvcm' objects
 ##' print.fvcm:   print method for 'fvcm' objects
+##' ranef.fvcm:   extracts random effects
 ##'
 ##' To do:
-##' - print.fvcm: 'data' output
 ##' - set 'ptry', 'vtry' and 'ntry' automatically (see Hastie)
 ##'
 ##' Last modifications:
+##' 2014-09-07: - improvment of predict.tvcm function
+##'               - treated bugs for 'type = "coef"'
+##'               - deal with ordinal responses in cases not
+##'                 all responses are available in a subset
+##'             - 'fvcm': replaced 'do.call' with 'eval' when
+##'               calling 'cvloss'
+##'             - added 'contrast slot'
+##'             - changed defaults in 'fvcm'
 ##' 2014-08-05: - changed specification for folds
 ##' -------------------------------------------------------- #
 
@@ -31,6 +41,7 @@ fvcolmm <- function(..., family = cumulative(), control = fvcm_control()) {
   return(eval.parent(mc))
 }
 
+
 fvcglm <- function(..., family, control = fvcm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
@@ -38,6 +49,7 @@ fvcglm <- function(..., family, control = fvcm_control()) {
   if ("weights" %in% names(mc)) mc$weights <- list(...)$weights
   return(eval.parent(mc))
 }
+
 
 fvcm <- function(..., control = fvcm_control()) {
   
@@ -80,11 +92,10 @@ fvcm <- function(..., control = fvcm_control()) {
   ## add new information to info slot
   if (length(fails) > 0)
     foldsMat <- foldsMat[, -fails, drop = FALSE]
-
-  
+ 
   object$info$forest <- cv$node
-  object$info$coefficients <-
-    append(cv$coefficients, object$info$coefficient)
+  object$info$coefficients <- cv$coefficients
+  object$info$contrasts <- cv$contrasts
   object$info$folds <- cv$folds
   object$info$error <- cv$error
   object$info$control$verbose <- verbose
@@ -94,6 +105,7 @@ fvcm <- function(..., control = fvcm_control()) {
   class(object) <- append("fvcm", class(object))
   return(object)
 }
+
 
 fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
                          ptry = 1, ntry = 1, vtry = 5,
@@ -119,11 +131,8 @@ fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
 }
 
 
-fitted.fvcm <- function(object, ...) {
-    args <- append(list(object = object), list(...))
-    args$newdata <- NULL # delete the newdata argument
-    return(do.call(predict, args = args)) # ... and call predict
-}
+fitted.fvcm <- function(object, ...) vcrpart_fitted(object, ...)
+
 
 oobloss.fvcm <- function(object, fun = NULL, ranef = FALSE, ...) {
 
@@ -172,7 +181,7 @@ plot.fvcm <- function(x, type = c("default", "coef",
 
   if (type == "partdep") {
 
-    eval(call)
+      eval(call)
 
   } else {
 
@@ -313,7 +322,8 @@ predict.fvcm <- function(object, newdata = NULL,
   etaLabs <- paste("Eta", 1L:nEta, sep = "")
   coef <- count <- 0 * predict(object, newdata, type = "coef")
   rownames(coef) <- rownames(newdata)
-  subs <- matrix(TRUE, nrow(coef), ncol(coef))
+  subs <- matrix(TRUE, nrow(coef), ncol(coef),
+                 dimnames = list(rownames(coef), colnames(coef)))
   
   for (i in seq_along(object$info$forest)) {
 
@@ -324,16 +334,14 @@ predict.fvcm <- function(object, newdata = NULL,
 
     ## set coefficients
     object$info$model$coefficients <- object$info$coefficients[[i]]
-    
+
+    ## set contrasts
+    object$info$model$contrasts <- object$info$contrasts[[i]]
+
+    ## predict the coefficients
     coefi <- predict(object, newdata = newdata, type = "coef",
                      ranef = FALSE, na.action = na.pass, ...)
     if (!is.matrix(coefi)) coefi <- matrix(coefi, nrow = nrow(newdata))
-
-    ## index matrix for valid entries
-    subsi <- subs
-    
-    ## remove observations that appear in the learning sample
-    if (oob) subsi[folds[,i] > 0L, ] <- FALSE
 
     ## acount for skipped categories
     if (object$info$fit == "olmm" && ncol(coefi) < ncol(coef)) {        
@@ -352,17 +360,15 @@ predict.fvcm <- function(object, newdata = NULL,
         }
         colnamesi <- sapply(colnamesi, function(x) paste(x, collapse = ":"))
         colnames(coefi) <- colnamesi          
-    } else {
-        subsiCols <- rep(TRUE, ncol(coefi))
     }
 
-    subsi <- subs
-    subsi[, !colnames(coef) %in% colnames(coefi)] <- FALSE
-    if (oob) subsi[folds[,i] > 0L,] <- FALSE
+    ## index matrix for valid entries
+    subsi <- subs    
+    if (oob) subsi[folds[,i] > 0L, ] <- FALSE
+    subsi[is.na(coefi)] <- FALSE
 
-    subsiC <- intersect(colnames(coef), colnames(coefi))
-    subsiR <- if (oob) folds[,i] == 0L else subs[,1]
-    coef[subsi] <- coef[subsi] + c(coefi[subsiR, subsiC])
+    ## add coefficients and count
+    coef[subsi] <- coef[subsi] + coefi[subsi]
     count <- count + 1 * subsi
   }
   
@@ -370,7 +376,6 @@ predict.fvcm <- function(object, newdata = NULL,
   
   coef <- coef / count
   coef[apply(count, 1, function(x) any(x == 0)), ] <- NA
-  coef <- coef[, names(coef(dummymodel))]
   
   ## ------------------------------------------------------- #
   ## Step 2: predict the linear predictor for each observation
@@ -386,8 +391,7 @@ predict.fvcm <- function(object, newdata = NULL,
                                     newdata, attr(object$info$model$X, "contrasts")),
                        TRUE)
   } else {
-    X <- model.matrix(terms(rootForm), newdata,
-                      object$info$model$contrasts)
+    X <- model.matrix(terms(rootForm), newdata, dummymodel$contrasts)
   }
   
   ## compute the linear predictor 'eta' based on 'coef' and 'X'
@@ -506,7 +510,7 @@ predict.fvcm <- function(object, newdata = NULL,
 
 
 print.fvcm <- function(x, ...) {
-  cat(if (x$info$control$vtry < Inf) "Random forest" else "Bagging",
+  cat(if (any(x$info$control$vtry < Inf)) "Random forest" else "Bagging",
       "based varying-coefficients model\n\n")
   if (length(x$info$family$family) > 0L)
     cat(" Family:", x$info$family$family, x$info$family$link, "\n")
@@ -517,15 +521,16 @@ print.fvcm <- function(x, ...) {
   if (length(str <- deparseCall(x$info$call$subset)) > 0L)
     cat(" Subset: ", str, "\n", sep = "")
   if (length(x$info$control) > 0L)
-    cat(paste("Control: ", x$info$control$method,
-              "nsplit = ", x$info$control$maxstep,
-              ", minbucket = ", x$info$control$minsize,
+    cat(paste("Control: ", 
+              "maxstep = ", x$info$control$maxstep,
+              ", minsize = ", paste(x$info$control$minsize, collapse = ", "),
               ", ntrees = ", length(x$info$forest),
               "\n", sep = ""))
   if (nzchar(mess <- naprint(attr(x$data, "na.action")))) 
     cat("\n(", mess, ")\n", sep = "")
   return(invisible(x))
 }
+
 
 ranef.fvcm <- function(object, ...) {
   return(predict(object, type = "ranef", ...))

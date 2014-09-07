@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-08-29
+##' Date:            2014-09-07
 ##'
 ##' Description:
 ##' General utility functions for the 'vcrpart' package.
@@ -15,13 +15,17 @@
 ##' vcrpart_copy:         duplicate R objects
 ##' vcrpart_value_space:  extract the values space of data data.frame
 ##' fe, vc, re, ce, ge    special terms for formulas. Are exported.
+##' vcrpart_contr.sum:    compute weighted sum contrasts
+##' vcrpart_fitted:       extract model fitted values
 ##' vcrpart_formula_eta:  constructs a formula for linear predictors
 ##' vcrpart_formula_cond: constructs a formula for contitioning variables
 ##' vcrpart_formula:      extracts a list of predictor formulas
 ##'
 ##' Last modifications:
-##' 2014-09-04: removed 'adj' option
-##' 2014-08-29: add the 'adj' argument to vc() to adjust the selection
+##' 2014-09-07: added 'vcrpart_fitted' function to avoid replicated
+##'             definitions of the same function.
+##' 2014-09-04: removed 'adj' option in 'vc'
+##' 2014-08-29: add the 'adj' argument to 'vc' to adjust the selection
 ##'             if the number of predictors per vc() term varies.
 ##' 2014-08-27: allow character vectors in 'vc' terms
 ##' 2014-07-31: - added to possibility to remove the intercept
@@ -36,6 +40,9 @@
 ##'             class to a S3 class
 ##' 2014-06-03: modify 'tvcm_formula' to allow component-wise
 ##'             trees
+##'
+##' To do:
+##' - max export 'vcrpart_contr.sum' in future versions.
 ##' -------------------------------------------------------- #
 
 
@@ -263,6 +270,59 @@ ge <- function(formula) {
 
 
 ## --------------------------------------------------------- #
+##' Compute weighted sum contrasts
+##' 
+##' Computes weighted sum contrasts for the nodes
+##'
+##' @param x       a factor vector.
+##' @param weights a numeric weights vector of the same
+##'                length as 'x'
+##'
+##' @return a matrix of the number of rows equal to the number
+##'    of factor levels of 'x' and the number of rows equal to the
+##'    number of levels of 'x' minus 1
+##'
+##' @details Used in several functions, including 'tvcm',
+##'    'tvcm_grow'.
+## --------------------------------------------------------- #
+
+vcrpart_contr.sum <- function(x, weights = rep(1.0, length(x))) {
+  if (nlevels(x) > 1L) {
+    con <- contr.sum(levels(x))
+    tab <- tapply(weights, x, sum)
+    con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
+    colnames(con) <- levels(x)[1:(nlevels(x) - 1)]
+    contrasts(x) <- con
+  }
+  return(x)
+}
+
+
+## --------------------------------------------------------- #
+##' Extract model fitted values
+##' 
+##' Extracts model fitted values. The function essentially
+##' calls 'predict' and deletes 'newdata' if supplied
+##'
+##' @param object  a fitted object.
+##' @param ...     further arguments passed to predict
+##'
+##' @return A matrix of fitted values.
+##'
+##' @details Substitutes 'fitted.fvcm', 'fitted.tvcm' and
+##'    'fitted.olmm'
+## --------------------------------------------------------- #
+
+vcrpart_fitted <- function(object, ...) {
+    call <- call(name = "predict", object = object)
+    dotargs <- list(...)
+    dotargs$newdata <- NULL
+    for (arg in names(dotargs)) call[[arg]] <- list(...)[[arg]]
+    return(eval(call))
+}
+
+
+## --------------------------------------------------------- #
 ##' Utility function for \code{vcrpart_formula}
 ##' 
 ##' Constructs a formula for the linear predictor.
@@ -399,6 +459,7 @@ vcrpart_formula_eta <- function(x, family, env) {
   names(rval) <- c("ce", "ge")
   return(rval)
 }
+
 
 ## --------------------------------------------------------- #
 ##' Utility function for \code{\link{vcrpart_formula}}
@@ -571,15 +632,4 @@ vcrpart_formula <- function(formula, family = cumulative(),
   fAll <- as.formula(fAll, env = env)
   rval$all <- fAll
   return(rval)
-}
-
-vcrpart_contr.sum <- function(x, weights = rep(1.0, length(x))) {
-  if (nlevels(x) > 1L) {
-    con <- contr.sum(levels(x))
-    tab <- tapply(weights, x, sum)
-    con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
-    colnames(con) <- levels(x)[1:(nlevels(x) - 1)]
-    contrasts(x) <- con
-  }
-  return(x)
 }

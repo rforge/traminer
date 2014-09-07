@@ -79,11 +79,13 @@
   The \code{\link{predict}} function has two additional options for the
   \code{type} argument. The option \code{"node"} calls the node id and
   \code{"coef"} predicts the coefficients corresponding to an
-  observation. 
+  observation. In cases of multiple \code{\link{vc}} terms for the same
+  predictor, the coefficients are summed up.
 
-  \code{\link{splitpath}} is a new method to trace the fitting
-  procedure. It shows several information, such as coefficient constancy
-  tests or the loss of different splits, computed at each step.
+  \code{\link{splitpath}} and \code{\link{prunepath}} are new methods to 
+  trace the splitting resp. pruning procedures. They shows several information, 
+  such as the loss reduction of new splits during partitioning or the loss
+  reduction of collapsing an inner node when pruning.
   
   Further undocumented, available methods are: \code{\link{fitted}}, 
   \code{\link{formula}}, \code{\link{getCall}}, \code{\link{logLik}},
@@ -104,7 +106,7 @@
 ## ------------------------------------------------------------------- #
 ## Dummy example 1:
 ##
-## Apply various methods on 'tvcm' object fitted on the 'vcrpart_2'
+## Apply various methods on a 'tvcm' object fitted on the 'vcrpart_2'
 ## data. Cross-validation is omitted to accelerate the computations.
 ## ------------------------------------------------------------------- #
 

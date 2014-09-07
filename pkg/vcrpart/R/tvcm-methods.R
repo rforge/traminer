@@ -42,7 +42,9 @@
 
 coef.tvcm <- function(object, ...) tvcm_get_estimates(object, ...)
 
+
 coefficients.tvcm <- coef.tvcm 
+
 
 extract.tvcm <- function(object, what = c("control", "model", 
                                    "nodes", "sctest", "p.value",
@@ -115,23 +117,24 @@ extract.tvcm <- function(object, what = c("control", "model",
   return(rval)
 }
 
+
 extractAIC.tvcm <- function(fit, scale, k = 2, ...) {
   extractAIC(extract(fit, "model"), scale, k, ...)
 }
 
-fitted.tvcm <- function(object, ...) {
-  args <- append(list(object = object), list(...))
-  args$newdata <- NULL # delete the newdata argument 
-  return(do.call(predict, args = args)) # ... and call predict
-}
+
+fitted.tvcm <- function(object, ...) vcrpart_fitted(object, ...)
+
 
 formula.tvcm <- function(x, ...) return(x$info$formula$original)
 
 
 getCall.tvcm <- function(x, ...) return(x$info$call)
 
+
 logLik.tvcm <- function(object, ...)
   return(logLik(extract(object, "model")))
+
 
 model.frame.tvcm <- function(formula, ...) {
     rval <- cbind(model.frame(formula$info$model), formula$data)
@@ -140,10 +143,13 @@ model.frame.tvcm <- function(formula, ...) {
     return(rval)
 }
 
+
 neglogLik2.tvcm <- function(object, ...)
   return(-2 * as.numeric(logLik(extract(object, "model"))))
 
+
 nobs.tvcm <- function(object, ...) nobs(extract(object, "model"), ...)
+
 
 predict.tvcm <- function(object, newdata = NULL,
                          type = c("link", "response", "prob", "class",
@@ -213,7 +219,17 @@ predict.tvcm <- function(object, newdata = NULL,
     terms <- unique(colnames(rval))
     rval <-
       sapply(terms, function(x) rowSums(rval[, colnames(rval) == x, drop = FALSE]))
+
+    vcparm <- tvcm_get_vcparm(object)
+    parm <- union(colnames(rval), vcparm)
+    if (length(misC <- setdiff(parm, colnames(rval))) > 0L) {
+        cn <- c(colnames(rval), misC)
+        rval <- cbind(rval, matrix(0, nrow(rval), length(misC)))
+        colnames(rval) <- cn
+    }
+    
     rval <- cbind(rval, re)
+    
     rownames(rval) <- rownames(fitted)
     
     return(rval)
@@ -225,6 +241,7 @@ predict.tvcm <- function(object, newdata = NULL,
   }
   return(fitted)
 }
+
 
 tvcm_print <- function(x, type = c("print", "summary"),
                        etalab = c("int", "char", "eta"), ...) {
@@ -328,8 +345,10 @@ tvcm_print <- function(x, type = c("print", "summary"),
     cat(paste("\n(", mess, ")\n", sep = ""))
 }
 
+
 print.tvcm <- function(x, ...)
   tvcm_print(x, type = "print", ...)
+
 
 prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
                        direction = c("backward", "forward"),
@@ -674,6 +693,7 @@ ranef.tvcm <- function(object, ...)
 resid.tvcm <- function(object, ...)
   return(resid(object = object$info$model, ...))
 
+
 residuals.tvcm <- resid.tvcm
 
 
@@ -734,6 +754,7 @@ print.splitpath.tvcm <- function(x, ...) {
     }
   }
 }
+
 
 weights.tvcm <- function(object, ...) {
   weights(extract(object, "model"))

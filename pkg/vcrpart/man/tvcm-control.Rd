@@ -24,7 +24,7 @@ tvcm_control(lossfun = neglogLik2,
 }
 
 \arguments{
-  \item{lossfun}{function. A function that extracts a loss measure from a
+  \item{lossfun}{a function that extracts a loss measure from a
     fitted object, e.g., two times the negative log likelihood
     (default).}
   \item{maxstep}{integer. The maximum number of iterations i.e. the
@@ -40,18 +40,19 @@ tvcm_control(lossfun = neglogLik2,
   \item{dfsplit}{a numeric scalar larger than zero. The per-split penalty to
     be applied for stopping. See also argument \code{maxoverstep}.}
   \item{maxoverstep}{integer scalar. The maximum number of consecutive
-    times the AIC reduction statistic is allowed to be smaller than 
-    \code{dfsplit} before stopping. Specifically, the AIC is computed 
-    as the loss (see argument \code{lossfun}) of the model plus 
+    times the penalized reduction statistic is allowed to be smaller than 
+    \code{dfsplit} before stopping. Specifically, the penalized loss 
+    is computed as the loss (see argument \code{lossfun}) of the model plus 
     \code{dfpar} times the number of coefficients  (as extracted from
-    \code{\link{extractAIC}}), and the AIC reduction statistic is the
-    difference between the AIC the current model and the AIC of the
-    selected update model. The argument is disabled if \code{sctest = TRUE}.}  
+    \code{\link{extractAIC}}), and the penalized loss reduction statistic is the
+    difference between the penalized loss of the current model and the 
+    penalized loss of the selected (best) update model. The argument is 
+    disabled if \code{sctest = TRUE}.}  
   \item{sctest}{logical scalar. Defines whether coefficient constancy
     tests should be used for variable and node selection.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is
     splitted when the smallest (possibly Bonferroni-corrected) \eqn{p}
-    value for any coefficient coefficient test in the current step falls
+    value for any coefficient constancy test in the current step falls
     below \code{alpha}.}  
   \item{bonferroni}{logical. Indicates if and how \eqn{p}-values of
     coefficient constancy tests must be Bonferroni
@@ -74,10 +75,10 @@ tvcm_control(lossfun = neglogLik2,
     be pruned by the estimated \code{dfsplit} parameter from cross-validation. 
     Note that \code{prune = TRUE} conflicts with \code{cv = FALSE}}
   \item{keeploss}{logical scalar or a numeric equal or larger than
-    0. Indicates if and how many times the computed AIC reduction
+    0. Indicates if and how many times the computed penalized loss reduction
     statistics should be reused in the following
-    iterations. Specifically, the option activates approximating the AIC
-    reduction statistic of a split based on the AIC reduction statistic
+    iterations. Specifically, the option activates approximating the penalized loss
+    reduction statistic of a split based on the penalized loss reduction statistic
     of the same split in the previous iteration. Values different from
     \code{FALSE} or 0 will accelerate the algorithm at the expense of
     accuracy. In cases of multiple \code{\link{vc}} terms, only the
@@ -91,9 +92,8 @@ tvcm_control(lossfun = neglogLik2,
     (such as test statistics, \eqn{p} values, 
     selected splitting variables and split points) be printed to the
     screen?}
-  \item{\ldots}{further arguments to be passed. For \code{tvcm_control}, these 
-    are undocumented, see details. For \code{fvcm_control}, the arguments 
-    are passed to \code{tvcm_control}.} 
+  \item{\ldots}{further, undocumented arguments to be passed. These can
+    include arguments for the \code{papply} function.} 
 }
 
 \value{
@@ -106,5 +106,5 @@ tvcm_control(lossfun = neglogLik2,
 \seealso{\code{\link{tvcm}}, \code{\link{fvcm}}}
 
 \examples{
-tvcm_control(method = "partreg")
+tvcm_control()
 }

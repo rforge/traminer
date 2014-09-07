@@ -1,3 +1,30 @@
+##' -------------------------------------------------------- #
+##' Author:          Reto Buergin, rbuergin@gmx.ch
+##' Date:            2014-09-07
+##'
+##' Description:
+##' Ordinal time series plot and utility functions.
+##'
+##' Contents:
+##'
+##' otsplot_control:      control plot parameters
+##' otsplot_filter:       creates filtering function for
+##'                       fading out patterns
+##' otsplot.default:      default function
+##' print.otsplot:        print method for 'otsplot'
+##' otsplot_panel:        panel function for otsplot
+##' otsplot_data2str:     create trajectory strings
+##' otsplot_layoutObjFun: layout optimization function
+##' otsplot_layout:       layout optimizer
+##' otsplot_color:        function to colour lines
+##' linear:               linear colour filter function
+##' minfreq:              minimal frequency for lines to filter
+##' cumfreq:              filter a given proportion of most frequent sequences
+##'
+##' Modifications:
+##' 2014-09-07: added header
+##' -------------------------------------------------------- #
+
 otsplot_control <- function(cex = 1, lwd = 1/4, col = NULL,
                             hide.col = grey(0.8),
                             lorder = c("background", "foreground") ,
@@ -46,6 +73,7 @@ otsplot_control <- function(cex = 1, lwd = 1/4, col = NULL,
            class = "otsplot_control"))
 }
 
+
 otsplot_filter <- function(method = c("minfreq", "cumfreq", "linear"), level = NULL) {
     method <- match.arg(method)
     if (is.null(level) && method %in% c("minfreq", "cumfreq"))
@@ -56,6 +84,7 @@ otsplot_filter <- function(method = c("minfreq", "cumfreq", "linear"), level = N
                      cumfreq = cumfreq)
     return(structure(list(method = method, level = level), class = "otsplot_filter"))
 }
+
 
 otsplot.default <- function(x, y, subject, weights, groups,
                             control = otsplot_control(), filter = NULL, 
@@ -447,6 +476,7 @@ otsplot.default <- function(x, y, subject, weights, groups,
                 pop = control$pop), class = "otsplot"))
 }
 
+
 print.otsplot <- function(x, ...) {
 
   if (x$newpage) grid.newpage()
@@ -585,7 +615,6 @@ otsplot_panel <- function(x, groups) {
 }
   
 
-## create trajectory strings
 otsplot_data2str <- function(y, x = 1L:length(y),
                          pa.left = "(", pa.right = ")",
                          pot= "^" ,con = "-") {
@@ -597,7 +626,6 @@ otsplot_data2str <- function(y, x = 1L:length(y),
 }
 
 
-## layout optimization function 
 otsplot_layoutObjFun <- function(nXLevs, nYLevs, n, c = 0.5) {
   control <- nXLevs * nYLevs - n # number of empty windows
   ## optimization value: function of number of empty windows
@@ -606,7 +634,7 @@ otsplot_layoutObjFun <- function(nXLevs, nYLevs, n, c = 0.5) {
   return(c(control,opt))
 }
 
-## layout optimizer
+
 otsplot_layout <- function(nXLevs, nYLevs, npanels, c = 1L) {
   minvalue1 <- otsplot_layoutObjFun(nXLevs - 1L, nYLevs, npanels, c)
   minvalue2 <- otsplot_layoutObjFun(nXLevs, nYLevs - 1L, npanels, c)
@@ -629,23 +657,22 @@ otsplot_layout <- function(nXLevs, nYLevs, npanels, c = 1L) {
 }
 
 
-## function to colour lines
 otsplot_color <- function(value, col1, col2) {
   mp <- colorRamp(c(col1, col2))
   col <- rgb(mp(value), maxColorValue = 255)
 }
 
-## linear colour filter function
+
 linear <- function(x, ...) {
   return((x - min(x)) / diff(range(x)))
 }
 
-## minimal frequency for lines to filter
+
 minfreq <- function(x, level = 0.05) {
   return(1*(x >= level))
 }
 
-## filter a given proportion of most frequent sequences
+
 cumfreq <- function(x, level = 0.75) {
   tmp <- which(cumsum(sort(x, decreasing = TRUE)) >= level)[1L]
   ret <- vector("logical", length(x))

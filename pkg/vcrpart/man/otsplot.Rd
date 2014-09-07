@@ -93,7 +93,7 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
   function of the \pkg{TraMineR} package, implemented in the \pkg{grid}
   graphics environment.
 
-  The \code{filter} argument serves to specify filters to gray less
+  The \code{filter} argument serves to specify filters to fade out less
   interesting patterns. The filtered-out patterns are displayed in the
   \code{hide.col} color. The \code{filter} argument expects an object 
   produced by \code{\link{otsplot_filter}}.
@@ -109,7 +109,7 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
 \references{
   Reto Buergin and Gilbert Ritschard, G. (2014). A decorated parallel
   coordinate plot for categorical longitudinal data, \emph{The American
-    Statistician}, accepted.
+    Statistician} \bold{68}: 98-103
 }
 
 \examples{
