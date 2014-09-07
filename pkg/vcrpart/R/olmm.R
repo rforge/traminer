@@ -279,7 +279,14 @@ olmm <- function(formula, data, family = cumulative(),
   }
 
   ## set the offset
-  if (!missing(offset)) {
+  if (missing(offset)) offset <- NULL
+  if (!is.null(offset) & !is.null(model.offset(fullmf)))
+      stop("duplicated specification of 'offset'.")
+  if (is.null(offset)) {
+      offset <- matrix(0.0, dims["n"], dims["nEta"],
+                     dimnames = list(rownames(fullmf),
+                       paste("Eta", 1L:dims["nEta"], sep = "")))
+  } else {
     if (!is.matrix(offset)) stop("'offset' must be a 'matrix'")
     if (ncol(offset) != dims["nEta"])
       stop("'offset should be a 'matrix' with ", dims["nEta"], " columns")
@@ -287,10 +294,6 @@ olmm <- function(formula, data, family = cumulative(),
       offset <- offset[-attr(fullmf, "na.action"), , drop = FALSE]
     if (any(is.na(offset))) stop("'offset' contains NA's.")
     if (nrow(offset) != dims["n"]) stop("'offset' has wrong dimensions.")    
-  } else {
-    offset <- matrix(0.0, dims["n"], dims["nEta"],
-                     dimnames = list(rownames(fullmf),
-                       paste("Eta", 1L:dims["nEta"], sep = "")))
   }
   if (!is.null(model.offset(fullmf)))
     offset <- offset + matrix(model.offset(fullmf), dims["n"], dims["nEta"])

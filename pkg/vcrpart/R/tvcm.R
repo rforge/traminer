@@ -36,7 +36,7 @@
 ##' -------------------------------------------------------- #
 
 tvcolmm <- function(formula, data, family = cumulative(),
-                    weights, subset, na.action,
+                    weights, subset, offset, na.action,
                     control = tvcm_control(), ...) {
     mc <- match.call()
     mc[[1L]] <- as.name("tvcm")
@@ -50,7 +50,7 @@ tvcolmm <- function(formula, data, family = cumulative(),
 
 
 tvcglm <- function(formula, data, family,
-                   weights, subset, na.action,
+                   weights, subset, offset, na.action,
                    control = tvcm_control(), ...) { 
     mc <- match.call()
     mc[[1L]] <- as.name("tvcm")       
@@ -60,7 +60,7 @@ tvcglm <- function(formula, data, family,
 
 
 tvcm <- function(formula, data, fit, family, 
-                 weights, subset, na.action,
+                 weights, subset, offset, na.action,
                  control = tvcm_control(), ...) {
   
   ## get specified arguments
@@ -127,17 +127,25 @@ tvcm <- function(formula, data, fit, family,
   if (control$verbose) cat("OK\n* setting arguments ... ")
   start <- list(...)$start
   weights <- model.weights(mf)
-  if (is.null(weights)) weights <- rep(1.0, nrow(mf))  
-  mcall <- call(name = fit,
+  #if (is.null(weights)) weights <- rep(1.0, nrow(mf))  
+  if (missing(offset)) offset <- NULL
+  if (!is.null(offset) & !is.null(model.offset(fullmf)))
+      stop("duplicated specification of 'offset'.")
+  if (!is.null(model.offset(fullmf))) offset <- model.offset(fullmf)
+  
+  mcall <- list(name = as.name(fit),
                formula = quote(ff$full),
                family = quote(family),
-               data = quote(mf),
-               weights = weights,
-               start = quote(start))
+               data = quote(mf))
   mce <- match.call(expand.dots = TRUE)
   dotargs <- setdiff(names(mce), names(mc))
   dotargs <- intersect(dotargs, names(formals(fit)))
   dotargs <- setdiff(dotargs, names(mcall))
+  mcall[dotargs] <- list(...)[dotargs]
+  mode(mcall) <- "call"
+  mcall$weights <- weights
+  mcall$offset <- offset  
+  
   for (arg in dotargs) mcall[[arg]] <- mce[[arg]]
   environment(mcall) <- environment()
   
