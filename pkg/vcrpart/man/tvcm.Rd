@@ -17,15 +17,15 @@
 
 \usage{
 tvcm(formula, data, fit, family,
-     weights, subset, na.action,
+     weights, subset, offset, na.action,
      control = tvcm_control(), ...)
 
 tvcolmm(formula, data, family = cumulative(), 
-        weights, subset, na.action, 
+        weights, subset, offset, na.action, 
         control = tvcm_control(), ...)
 
 tvcglm(formula, data, family, 
-       weights, subset, na.action, 
+       weights, subset, offset, na.action, 
        control = tvcm_control(), ...)
 }
 
@@ -45,6 +45,8 @@ tvcglm(formula, data, family,
     fitting process.}
   \item{subset}{an optional logical or integer vector specifying a subset
     of \code{'data'} to be used in the fitting process.}
+  \item{offset}{this can be used to specify an a priori known component 
+    to be included in the linear predictor during fitting.} 	
   \item{na.action}{a function that indicates what should happen if data 
     contain \code{NA}s. See \code{\link{na.action}}.}
   \item{control}{a list with control parameters as returned by

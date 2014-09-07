@@ -38,6 +38,7 @@ fvcolmm <- function(..., family = cumulative(), control = fvcm_control()) {
   mc[[1L]] <- as.name("fvcm")
   mc$fit <- "olmm"
   if ("weights" %in% names(mc)) mc$weights <- list(...)$weights
+  if ("offset" %in% names(mc)) mc$offset <- list(...)$offset
   return(eval.parent(mc))
 }
 
@@ -47,6 +48,7 @@ fvcglm <- function(..., family, control = fvcm_control()) {
   mc[[1L]] <- as.name("fvcm")
   mc$fit <- "glm"
   if ("weights" %in% names(mc)) mc$weights <- list(...)$weights
+  if ("offset" %in% names(mc)) mc$offset <- list(...)$offset
   return(eval.parent(mc))
 }
 

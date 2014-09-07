@@ -448,10 +448,13 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
 ##' if \code{doFit = FALSE}
 ##' -------------------------------------------------------- #
 
-glm.doNotFit <- function(x, y, weights, start, etastart,
-                         mustart, offset, family, control, intercept) {
-  coefficients <- rep(0, ncol(x))
+glm.doNotFit <- function(x, y, weights = NULL, start = NULL, etastart = NULL,
+                         mustart = NULL, offset = NULL, family = gaussian(),
+                         control = list(), intercept = TRUE) {
+  coefficients <- rep.int(0, NCOL(x))
   names(coefficients) <- colnames(x)
+  if (is.null(weights)) weights <- rep.int(1.0, NROW(x))
+  if (is.null(offset)) offset <- rep.int(0.0, NROW(x))
   if (!is.null(start)) {
     if (!is.null(names(start))) {
       start <- start[intersect(names(coefficients), names(start))]
@@ -469,7 +472,7 @@ glm.doNotFit <- function(x, y, weights, start, etastart,
               deviance = NULL, aic = NULL, null.deviance = NULL,
               iter = 0, weights = NULL, prior.weights = weights,
               df.residual = NULL, df.null = NULL, y = y,
-              conv = TRUE, boundary = TRUE))
+              converged = TRUE, boundary = TRUE))
 }
 
 tvcm_grow_fit <- function(mcall, doFit = TRUE) {

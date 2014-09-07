@@ -14,6 +14,7 @@
 ##' all functions are documented as *.Rd files
 ##'
 ##' Last modifications:
+##' 2014-09-07: resolved a problem with 'offset'
 ##' 2014-09-06: - incorporate automatic cross-validation and pruning
 ##' 2014-09-04: - assign only those arguments of '...' to 'fit'
 ##'               that appear in 'formals(fit)'
@@ -127,7 +128,6 @@ tvcm <- function(formula, data, fit, family,
   if (control$verbose) cat("OK\n* setting arguments ... ")
   start <- list(...)$start
   weights <- model.weights(mf)
-  #if (is.null(weights)) weights <- rep(1.0, nrow(mf))  
   if (missing(offset)) offset <- NULL
   if (!is.null(offset) & !is.null(model.offset(mf)))
       stop("duplicated specification of 'offset'.")
@@ -144,9 +144,7 @@ tvcm <- function(formula, data, fit, family,
   mcall[dotargs] <- list(...)[dotargs]
   mode(mcall) <- "call"
   mcall$weights <- weights
-  mcall$offset <- offset  
-  
-  for (arg in dotargs) mcall[[arg]] <- mce[[arg]]
+  mcall$offset <- offset    
   environment(mcall) <- environment()
   
   ## call root model
