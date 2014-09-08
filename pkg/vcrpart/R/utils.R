@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-07
+##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' General utility functions for the 'vcrpart' package.
@@ -22,6 +22,7 @@
 ##' vcrpart_formula:      extracts a list of predictor formulas
 ##'
 ##' Last modifications:
+##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-09-07: added 'vcrpart_fitted' function to avoid replicated
 ##'             definitions of the same function.
 ##' 2014-09-04: removed 'adj' option in 'vc'
@@ -61,10 +62,10 @@ addEmptyChar <- function(x, nchar, justify = "left") {
   
   for (i in 1:length(x))
     if (justify == "left") {
-      x[i] <- paste(x[i], paste(rep(" ", nchar - nchar(x[i])),
+      x[i] <- paste(x[i], paste(rep.int(" ", nchar - nchar(x[i])),
                                 collapse = ""), sep = "")
     } else if (justify == "right") {
-      x[i] <- paste(paste(rep(" ", nchar - nchar(x[i])),
+      x[i] <- paste(paste(rep.int(" ", nchar - nchar(x[i])),
                           collapse = ""), x[i], sep = "")
     }
   return(x)
@@ -120,7 +121,7 @@ formatMatrix <- function(x, ...) {
   
   rowNames <- rownames(x)
   colNames <- colnames(x)
-  if (is.null(rowNames)) rowNames <- rep("", nrow(x))
+  if (is.null(rowNames)) rowNames <- rep.int("", nrow(x))
   if (!is.null(colNames)) rowNames <- append("", rowNames)
   rowNames <- addEmptyChar(rowNames, max(nchar(rowNames)))
   rval <- format(x, ...)
@@ -286,7 +287,7 @@ ge <- function(formula) {
 ##'    'tvcm_grow'.
 ## --------------------------------------------------------- #
 
-vcrpart_contr.sum <- function(x, weights = rep(1.0, length(x))) {
+vcrpart_contr.sum <- function(x, weights = rep.int(1.0, length(x))) {
   if (nlevels(x) > 1L) {
     con <- contr.sum(levels(x))
     tab <- tapply(weights, x, sum)
@@ -513,7 +514,7 @@ vcrpart_formula <- function(formula, family = cumulative(),
   yName <- rownames(attr(terms(formula), "factors"))
   termLabs <- attr(terms, "term.labels")
   termFac <- attr(terms, "factors")
-  type <- rep("NA", length(termLabs))
+  type <- rep.int("NA", length(termLabs))
   if (length(type) > 0L)
     for (tp in types)
       type[colSums(termFac[attr(terms, "specials")[[tp]],,drop=FALSE]) > 0] <- tp 
@@ -559,7 +560,7 @@ vcrpart_formula <- function(formula, family = cumulative(),
     } else {
       subs <- c()
     }
-    direct <- rep(FALSE, length(vcTerms)); direct[subs] <- TRUE;
+    direct <- rep.int(FALSE, length(vcTerms)); direct[subs] <- TRUE;
     
     if (any(direct)) {
       ord <- order(as.integer(!direct))

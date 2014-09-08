@@ -86,12 +86,27 @@ olmm(formula, data, family = cumulative(),
   category. Notice that the estimated coefficients of cumulative models
   may have the opposite sign those obtained with alternative software.  
   
-  For alternative fitting functions, see fore example \code{clmm} of
-  package \code{ordinal}, \code{cumlogitRE} of package \code{glmmAK},
-  \code{nplmt} of package \code{mixcat}, \code{DPolmm} of package
-  \code{DPpackage}, \code{lcmm} of package \code{lcmm}, \code{MCMCglmm}
-  of package \code{MCMCglmm}, \code{sabre} of package \code{sabreR} or
-  \code{OrdinalBoost} of package \code{GMMBoost}. 
+  For alternative fitting functions, see for example the 
+  functions \code{clmm} of \pkg{ordinal} (url: 
+  \url{http://cran.r-project.org/web/packages/ordinal/}),
+  \code{cumlogitRE} of package \pkg{glmmAK} (url: 
+  \url{http://cran.r-project.org/web/packages/glmmAK/}),
+  \code{nplmt} of package \pkg{mixcat} (url: 
+  \url{http://cran.r-project.org/web/packages/mixcat/}),
+  \code{DPolmm} of package \pkg{DPpackage} (url: 
+  \url{http://cran.r-project.org/web/packages/DPpackage/}), 
+  \code{lcmm} of package \pkg{lcmm} (url: 
+  \url{http://cran.r-project.org/web/packages/lcmm/}),
+  \code{MCMCglmm} of package \pkg{MCMCglmm} 
+  (url: \url{http://cran.r-project.org/web/packages/MCMCglmm/}),
+  \code{sabre} of package \pkg{sabreR} (url: 
+  \url{http://cran.r-project.org/web/packages/sabreR/}) or
+  \code{OrdinalBoost} of package \pkg{GMMBoost} (url: 
+  \url{http://cran.r-project.org/web/packages/GMMBoost/}). 
+
+  The implementation adopts functions of the packages \pkg{statmod}
+  (Novomestky, 2012) and \pkg{matrixcalc} (Smyth et al., 2014), which
+  is not visible for the user. The authors are grateful for these codes.
 }
 
 \value{\code{\link{olmm}} returns an object of class
@@ -185,6 +200,14 @@ olmm(formula, data, family = cumulative(),
 
   Tutz, G. (2012). \emph{Regression for Categorical Data}, Cambridge
   Series in Statistical and Probabilistic Mathematics.
+
+  Frederick Novomestky (2012). matrixcalc: Collection of functions for 
+  matrix calculations. R package version 1.0-3. URL 
+  \url{http://CRAN.R-project.org/package=matrixcalc}
+
+  Gordon Smyth, Yifang Hu, Peter Dunn, Belinda Phipson and Yunshun Chen 
+  (2014). statmod: Statistical Modeling. R package version 1.4.20. 
+  URL \url{http://CRAN.R-project.org/package=statmod}
 }
 
 \seealso{\code{\link{olmm-methods}}, \code{\link{olmm_control}},

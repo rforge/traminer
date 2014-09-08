@@ -56,11 +56,6 @@ fvcglm <- function(..., family, control = fvcm_control()) {
 fvcm <- function(..., control = fvcm_control()) {
   
   mc <- match.call()
-  args <- list(...)
-
-  ## get fitting function (avoids error in tvcm)
-  if (!is.null(args$fit) && is.function(args$fit))
-    args$fit <- deparse(mc$fit)
   
   ## modify control parameters temporarily for a first tree
   maxstep <- control$maxstep
@@ -70,23 +65,27 @@ fvcm <- function(..., control = fvcm_control()) {
   
   ## fit a prototyp tree
   if (verbose) cat("* fitting an initial tree ... ")
-  initargs <- append(args, list(control = control))
-  object <- do.call("tvcm", args = initargs)
+  initCall <- mc
+  initCall[[1L]] <- as.name("tvcm")
+  initCall$control <- control
+  
+  object <- eval(initCall)
+  
   if (verbose) cat("OK\n")
   
   ## reset the depth parameter and set the verbose parameter
   object$info$control$maxstep <- maxstep
   
   ## compute trees for subsamples
-  cvCall <- call(name = "cvloss",
+  cvCall <- list(name = as.name("cvloss"),
                  object = quote(object),
                  folds = quote(control$folds),
                  type = "forest",
                  verbose = quote(verbose),
                  papply = quote(control$papply))
-  papplyArgs <- intersect(names(formals(args$papply)), names(control))
-  papplyArgs <- setdiff(papplyArgs, names(args))
-  for (arg in papplyArgs) cvCall[[arg]] <- control[[arg]]
+  papplyArgs <- intersect(names(formals(control$papply)), names(control))
+  cvCall[papplyArgs] <- control[papplyArgs]
+  mode(cvCall) <- "call"
   cv <- eval(cvCall)
   
   fails <- cv$error$which  
@@ -122,14 +121,16 @@ fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
     }
 
     ## combine the parameter to a list and disble cross validation and pruning 
-    args <- list(maxstep = maxstep, folds = folds,
+    call <- list(maxstep = maxstep, folds = folds,
                  ptry = ptry, ntry = ntry, vtry = vtry,
                  alpha = alpha, maxoverstep = Inf,
                  papply = papply, cv = FALSE, prune = FALSE)
-    args <- appendDefArgs(args, list(...))
+    call <- appendDefArgs(call, list(...))
 
     ## call 'tvcm_control'
-    return(do.call("tvcm_control", args))
+    call <- append(list(name = as.name("tvcm_control")), call)
+    mode(call) <- "call"
+    return(eval(call))
 }
 
 
@@ -176,8 +177,9 @@ plot.fvcm <- function(x, type = c("default", "coef",
   dotargs <- list(...)
 
   ## set call
-  call <- call(name = "plot.tvcm", x = quote(x), type = type, ask = ask)  
-  for (arg in names(dotargs)) call[[arg]] <- dotargs[[arg]]
+  call <- list(name = as.name("plot.tvcm"), x = quote(x), type = type, ask = ask)  
+  call[names(dotargs)] <- dotargs
+  mode(call) <- "call"
     
   ## modify model object if coefficients plots are called
 

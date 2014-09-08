@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-09-07
+##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' Ordinal time series plot and utility functions.
@@ -19,9 +19,11 @@
 ##' otsplot_color:        function to colour lines
 ##' linear:               linear colour filter function
 ##' minfreq:              minimal frequency for lines to filter
-##' cumfreq:              filter a given proportion of most frequent sequences
+##' cumfreq:              filter a given proportion of most frequent
+##'                       sequences
 ##'
 ##' Modifications:
+##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-09-07: added header
 ##' -------------------------------------------------------- #
 
@@ -111,8 +113,8 @@ otsplot.default <- function(x, y, subject, weights, groups,
   
   ## check and prepare raw data
 
-  if (missing(weights)) weights <- rep(1.0, length(x))
-  if (missing(groups)) groups <- factor(rep(1L, length(x)))
+  if (missing(weights)) weights <- rep.int(1.0, length(x))
+  if (missing(groups)) groups <- factor(rep.int(1L, length(x)))
   if (!all(c(length(y), length(subject), length(groups), length(weights))
            == length(x)))
     stop("input vectors have different lengths.")
@@ -296,8 +298,8 @@ otsplot.default <- function(x, y, subject, weights, groups,
         while (length(potpos) == 0) { # no potential position available
           if (count2 > 0) { # enlarge grid
             ngrid <- ngrid + 1L
-            grid <- rbind(grid, rep(0, ngrid - 1L))
-            grid <- cbind(grid, rep(0, ngrid))
+            grid <- rbind(grid, rep.int(0, ngrid - 1L))
+            grid <- cbind(grid, rep.int(0, ngrid))
             gridsubs <- seq(1L, ngrid^2, 1L)
             ## correct blacklist
             blacklist <-  blacklist + floor(blacklist/ngrid)
@@ -355,9 +357,9 @@ otsplot.default <- function(x, y, subject, weights, groups,
   
   ## curve colors
   if (is.null(control$plot_gp$col)) { # colors are not specified by the user
-    control$plot_gp$col <- rainbowPalette[rep(seq(1L, 8), ceiling(ntraj / 8))][1L:ntraj]
+    control$plot_gp$col <- rainbowPalette[rep.int(seq(1L, 8), ceiling(ntraj / 8))][1L:ntraj]
   } else {
-    control$plot_gp$col <- rep(control$plot_gp$col,length.out = ntraj) 
+    control$plot_gp$col <- rep_len(control$plot_gp$col, ntraj) 
   }
   control$plot_gp$col <- control$plot_gp$col[order(trajord)]
   if (is.character(control$plot_gp$col)) {
@@ -368,8 +370,8 @@ otsplot.default <- function(x, y, subject, weights, groups,
                                control$plot_gp$alpha * 255, maxColorValue = 255)
   }
   
-  pts[, colCols] <- matrix(rep(control$plot_gp$col[pts$traj], nGroups), ncol = nGroups)
-  control$plot_gp$noobs <- rep(control$plot_gp$noobs, nGroups)
+  pts[, colCols] <- matrix(rep.int(control$plot_gp$col[pts$traj], nGroups), ncol = nGroups)
+  control$plot_gp$noobs <- rep.int(control$plot_gp$noobs, nGroups)
   
   ## color gradients
   if (!is.null(filter)) {
@@ -416,7 +418,7 @@ otsplot.default <- function(x, y, subject, weights, groups,
     subs <- which(pts$traj == i)
     nsubs <- length(subs)
     if (length(subs) > 1L) {
-      tmp <- data.frame(traj = rep(i, nsubs-1L),
+      tmp <- data.frame(traj = rep.int(i, nsubs-1L),
                         x0 = pts$x[subs[-nsubs]],
                         y0 = pts$y[subs[-nsubs]],
                         x1 = pts$x[subs[-1L]],

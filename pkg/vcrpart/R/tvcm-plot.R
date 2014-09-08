@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-07
+##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' Plot functions for 'tvcm' objects.
@@ -18,6 +18,7 @@
 ##' panel_empty:     grapcon generator for empty terminal node plots
 ##'
 ##' Last modifications:
+##' 2014-09-08: replace 'do.call' by 'eval'
 ##' 2014-09-06: solve bugs in 'panel_partdep'
 ##' 2014-09-06: - add 'type = "cv"' option for the cases where
 ##'               cross validation was incorporated in the
@@ -47,12 +48,11 @@ plot.tvcm <- function(x, type = c("default", "coef",
   stopifnot(class(gp) %in% c("gpar", "list"))
   
   if (type == "partdep") {
-    
-    fun <- panel_partdep
-    args <- list(object = x, ask = ask, main = main)
-    args <- append(args, list(...))
-    do.call("fun", args)
 
+      call <- list(as.name("panel_partdep"), object = quote(x), ask = ask, main = main)
+      call <- append(call, list(...))
+      mode(call) <- "call"
+      eval(call)
 
   } else if (type == "cv") {
 
@@ -114,18 +114,19 @@ plot.tvcm <- function(x, type = c("default", "coef",
       list(...)[names(list(...)) %in% names(formals(ip_fun))[-1]]
     
     ## other arguments
-    dot_args <-
-      list(...)[names(list(...)) %in% names(formals(plot.party))[-1]]
+    dotargs <- list(...)[names(list(...)) %in% names(formals(plot.party))[-1]]
           
     ## prepare call
-    args <- list(x = x,
-                 terminal_panel = tp_fun, tp_args = tp_args,
-                 inner_panel = ip_fun, ip_args = ip_args,
-                 drop_terminal = drop_terminal, tnex = tnex,
-                 newpage = newpage,
+    call <- list(name = as.name("plot.party"),
+                 x = quote(x),
+                 terminal_panel = quote(tp_fun), tp_args = quote(tp_args),
+                 inner_panel = quote(ip_fun), ip_args = quote(ip_args),
+                 drop_terminal = quote(drop_terminal), tnex = quote(tnex),
+                 newpage = quote(newpage), main = quote(main[pid]),
                  pop = pop, gp = gp)
-    args <- append(args, dot_args)    
-
+    call <- append(call, dotargs)    
+    mode(call) <- "call"
+    
     if (ask) {
       oask <- devAskNewPage(TRUE)
       on.exit(devAskNewPage(oask))
@@ -133,10 +134,9 @@ plot.tvcm <- function(x, type = c("default", "coef",
     
     ## call
     for (pid in seq_along(part)) {
-      args$tp_args$part <- part[pid]
-      args$main <- main[pid]
-      args$x$node <- args$x$info$node[[part[pid]]]
-      do.call("plot.party", args)
+      tp_args$part <- part[pid]
+      x$node <- x$info$node[[part[pid]]]
+      eval(call)
     }
   }
 }
@@ -225,27 +225,23 @@ panel_partdep <- function(object, parm = NULL,
         paste("coef(", termLabs[j], "|", var[i], ")", sep = "")
 
       if (is.numeric(z)) {
-        args <- appendDefArgs(dotList, list(type = "s"))
-        args <- appendDefArgs(list(x = z, y = betaj), args)
+        call <- appendDefArgs(dotList, list(type = "s"))
+        call <- appendDefArgs(list(x = z, y = betaj), call)
       } else {
-        args <- dotList
-        args <- appendDefArgs(list(x = as.integer(z), y = betaj,
-                                            type = "b"), args)
-        if (!add) args <- appendDefArgs(args, list(axes = FALSE))
-      }
-
-      if (add) {
-        fun <- points
-      } else {
-        fun <- plot.default
+        call <- dotList
+        call <- appendDefArgs(list(x = as.integer(z), y = betaj,
+                                            type = "b"), call)
+        if (!add) call <- appendDefArgs(call, list(axes = FALSE))
       }
       
-      args <- appendDefArgs(args, list(xlab = var[i], ylab = ylab))
-
+      call <- appendDefArgs(call, list(xlab = var[i], ylab = ylab))
+      call <- append(list(name = as.name(ifelse(add, "points", "plot.default"))), call)
+      mode(call) <- "call"
+      
       ## call plot or points
-      do.call(fun, args)
+      eval(call)
       if (!add && is.factor(z) && !"axes" %in% names(list(...)) &&
-          !args$axes) {
+          !call$axes) {
         box()
         axis(1, 1:nlevels(z), levels(z))
         axis(2)

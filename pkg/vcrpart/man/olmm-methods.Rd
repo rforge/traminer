@@ -107,6 +107,9 @@
   \code{\link{getCall}}, \code{\link{logLik}},
   \code{\link{model.frame}}, \code{\link{nobs}}, \code{\link{update}},
   \code{\link{vcov}}. 
+
+  The \code{\link{anova}} implementation is based on codes of the 
+  \pkg{lme4} package. The authors are grateful for these codes. 
 }
 
 \author{Reto Buergin}
@@ -120,6 +123,10 @@
   
   Li, C. and Sheperd, B. E. (2012). A new residual for ordinal
   outcomes, \emph{Biometrika} \bold{99} (2): 437-480
+
+  Bates D, Maechler M, Bolker BM and Walker S (2014). lme4: 
+  Linear mixed-effects models using Eigen and S4. Submitted to 
+  \emph{Journal of Statistical Software}
 }
 
 \seealso{\code{\link{olmm}}, \code{\link{predict.olmm}}, \code{\link{gefp.olmm}}}

@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-09-07
+##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' Utility functions for the olmm function (see olmm.R). Some
@@ -45,6 +45,7 @@
 ##'                       correlation of ML scores.
 ##'
 ##' Modifications:
+##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-09-07: updated descriptions for undocumented functions
 ##' 
 ##' To do:
@@ -303,9 +304,9 @@ olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
     ## default values
     intDef <- switch(dims["family"],
                      qlogis(ppoints(dims["nEta"])),
-                     rep(0.0, dims["nEta"]),
-                     rep(0.0, dims["nEta"]))
-    fixef <- c(matrix(c(rep(intDef, dims["pInt"]), rep(0.0, dims["nEta"] * (dims["pCe"] - dims["pInt"]))), dims["pCe"], dims["nEta"], byrow = TRUE), rep(0.0, dims["pGe"]))
+                     rep.int(0.0, dims["nEta"]),
+                     rep.int(0.0, dims["nEta"]))
+    fixef <- c(matrix(c(rep.int(intDef, dims["pInt"]), rep.int(0.0, dims["nEta"] * (dims["pCe"] - dims["pInt"]))), dims["pCe"], dims["nEta"], byrow = TRUE), rep.int(0.0, dims["pGe"]))
     names(fixef) <- parNames$fixef
 
     ## overwrite with 'start'
@@ -339,7 +340,7 @@ olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
     ranefCholFac <-
         matrix(t(ranefElMat) %*% ranefCholFac, dims["q"], dims["q"])
     ## set row- and column names
-    tmp <- c((if (dims["qCe"] > 0) paste("Eta", rep(seq(1, dims["nEta"], 1), each = dims["qCe"]), ":", rep(colnames(W)[attr(W, "merge") == 1], dims["nEta"]), sep = "") else NULL), (if (dims["qGe"] > 0) colnames(W)[attr(W, "merge") == 2] else NULL))
+    tmp <- c((if (dims["qCe"] > 0) paste("Eta", rep(seq(1, dims["nEta"], 1), each = dims["qCe"]), ":", rep.int(colnames(W)[attr(W, "merge") == 1], dims["nEta"]), sep = "") else NULL), (if (dims["qGe"] > 0) colnames(W)[attr(W, "merge") == 2] else NULL))
     rownames(ranefCholFac) <- tmp
     colnames(ranefCholFac) <- tmp
 
@@ -514,7 +515,7 @@ olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
       if (!is.null(rownames(x))) {
         rownames(x) <- rename(rownames(x))
       } else {
-        if (nrow(x) > 0L) rownames(x) <- rep("", nrow(x))
+        if (nrow(x) > 0L) rownames(x) <- rep.int("", nrow(x))
       }
       if (!is.null(colnames(x))) colnames(x) <- rename(colnames(x))
     } else if (is.numeric(x)) {
@@ -563,8 +564,8 @@ olmm_decormat <- function(scores, subject, control = predecor_control()) {
   Tindex[subs] <- 1:nPar
   if (control$symmetric)
     Tindex[upper.tri(Tindex, FALSE)] <- t(Tindex)[upper.tri(Tindex, FALSE)]
-  par <- rep(0, nPar)
-  fEval <- rep(Inf, nPar)
+  par <- rep.int(0, nPar)
+  fEval <- rep.int(Inf, nPar)
   nit <- 0; error <- FALSE; eps <- 2 * control$reltol;
   
   ## optimize by Newton's algorithm

@@ -102,6 +102,10 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
   support of at least 5\% (within a group). \code{otsplot_filter("cumfreq", level = 0.75)}
   highlight the 75\% most frequent patterns (within group). \code{otsplot_filter("linear")} 
   linearly greys out patterns with low support.
+
+  The implementation adopts a color palette which was originally generated
+  by the \pkg{colorspace} package (Ihaka et al., 2013). The authors are 
+  grateful for these codes. 
 }
 
 \author{Reto Buergin and Gilbert Ritschard}
@@ -110,6 +114,10 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
   Reto Buergin and Gilbert Ritschard, G. (2014). A decorated parallel
   coordinate plot for categorical longitudinal data, \emph{The American
     Statistician} \bold{68}: 98-103
+
+  Ross Ihaka, Paul Murrell, Kurt Hornik, Jason C. Fisher, Achim Zeileis (2013). 
+  colorspace: Color Space Manipulation. R package version 1.2-4. URL
+  \url{http://CRAN.R-project.org/package=colorspace}
 }
 
 \examples{

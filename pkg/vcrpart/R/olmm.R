@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:       Reto Buergin, rbuergin@gmx.ch
-##' Date:         2014-06-17
+##' Date:         2014-09-08
 ##'
 ##' References:
 ##' ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
@@ -13,6 +13,7 @@
 ##'
 ##'
 ##' Modifications:
+##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-06-17: convert routine to S3 class
 ##' 2014-05-03: moved several control parameters to 'control' argument
 ##' 2014-05-02: added 'linkinv' function to families 'cumulative' etc.
@@ -33,6 +34,7 @@
 ##'             model matrix for random effects
 ##'
 ##' To do:
+##' - check 'nlopr' package
 ##' - add to family 'link' and 'linkinv' and incorporate
 ##'   that in 'predict'
 ##' - implement further family options
@@ -50,7 +52,7 @@ cumulative <- function(link = c("logit", "probit", "cauchy")) {
   link <- match.arg(link)
   linkinv <- function(eta) {
     cumProbs <- plogis(eta)
-    cumProbs <- cbind(cumProbs, rep(1.0, nrow(eta)))
+    cumProbs <- cbind(cumProbs, rep.int(1.0, nrow(eta)))
     tmp <- apply(cumProbs, 1, diff)
     if (ncol(cumProbs) > 2) tmp <- t(tmp)
     probs <- cbind(cumProbs[, 1], tmp)
@@ -257,12 +259,12 @@ olmm <- function(formula, data, family = cumulative(),
   names(dims) <- c("n", "N", "p", "pEta", "pInt", "pCe", "pGe", "q", "qEta", "qCe", "qGe", "J", "nEta", "nPar", "nGHQ", "nQP", "family", "link", "verb", "numGrad", "numHess", "doFit", "hasRanef")
 
   ## parameter names
-  parNames <- list(fixef = c(if (dims["pCe"] > 0) paste("Eta", rep(seq(1L, dims["nEta"], 1), each = dims["pCe"]), ":", rep(colnames(X)[attr(X, "merge") == 1L], dims["nEta"]), sep = ""), if (dims["pGe"] > 0) colnames(X)[attr(X, "merge") == 2L]), ranefCholFac = paste("ranefCholFac", 1L:(dims["q"] * (dims["q"] + 1L) / 2L ), sep = ""))
+  parNames <- list(fixef = c(if (dims["pCe"] > 0) paste("Eta", rep(seq(1L, dims["nEta"], 1), each = dims["pCe"]), ":", rep.int(colnames(X)[attr(X, "merge") == 1L], dims["nEta"]), sep = ""), if (dims["pGe"] > 0) colnames(X)[attr(X, "merge") == 2L]), ranefCholFac = paste("ranefCholFac", 1L:(dims["q"] * (dims["q"] + 1L) / 2L ), sep = ""))
   
   ## set the weights
   if (is.null(model.weights(fullmf))) {
-    weights <- as.double(rep(1.0, dims["n"]))
-    weights_sbj <- as.double(rep(1.0, dims["N"]))
+    weights <- as.double(rep.int(1.0, dims["n"]))
+    weights_sbj <- as.double(rep.int(1.0, dims["N"]))
   } else { 
     weights <- model.weights(fullmf)
     weights_sbj <- tapply(weights, subject, unique)
@@ -287,16 +289,16 @@ olmm <- function(formula, data, family = cumulative(),
                      dimnames = list(rownames(fullmf),
                        paste("Eta", 1L:dims["nEta"], sep = "")))
   } else {
-    if (!is.matrix(offset)) stop("'offset' must be a 'matrix'")
-    if (ncol(offset) != dims["nEta"])
-      stop("'offset should be a 'matrix' with ", dims["nEta"], " columns")
-    if (nrow(offset) != nrow(fullmf))
-      offset <- offset[-attr(fullmf, "na.action"), , drop = FALSE]
-    if (any(is.na(offset))) stop("'offset' contains NA's.")
-    if (nrow(offset) != dims["n"]) stop("'offset' has wrong dimensions.")    
+      if (!is.null(model.offset(fullmf))) offset <- model.offset(fullmf)
+      if (NCOL(offset) == 1L) offset <- matrix(offset, dims["n"], dims["nEta"])
+      if (!is.matrix(offset)) stop("'offset' must be a 'matrix'")
+      if (ncol(offset) != dims["nEta"])
+          stop("'offset should be a 'matrix' with ", dims["nEta"], " columns")
+      if (nrow(offset) != nrow(fullmf))
+          offset <- offset[-attr(fullmf, "na.action"), , drop = FALSE]
+      if (any(is.na(offset))) stop("'offset' contains NA's.")
+      if (nrow(offset) != dims["n"]) stop("'offset' has wrong dimensions.")    
   }
-  if (!is.null(model.offset(fullmf)))
-    offset <- offset + matrix(model.offset(fullmf), dims["n"], dims["nEta"])
 
   ## set the transformed random effect matrix
   u <- matrix(0, dims["N"], dims["q"],
@@ -318,7 +320,7 @@ olmm <- function(formula, data, family = cumulative(),
   ranefElMat <- L.matrix(n = dims["q"])
     
   ## Likelihood function
-  ll_sbj <- rep(0.0, dims["N"])
+  ll_sbj <- rep.int(0.0, dims["N"])
   names(ll_sbj) <- levels(subject)
   ll <- c(0.0)
   
@@ -333,7 +335,7 @@ olmm <- function(formula, data, family = cumulative(),
     score_obs <- matrix(, 0L, 0L)
     score_sbj <- matrix(, 0L, 0L)
   }
-  score <- rep(0, dims["nPar"])
+  score <- rep.int(0, dims["nPar"])
   names(score) <- unlist(parNames)
 
   ## info matrix
@@ -352,7 +354,7 @@ olmm <- function(formula, data, family = cumulative(),
   start <- olmm_start(control$start, dims, parNames, X, W, eta, ranefElMat)
 
   ## restricted
-  restr <- rep(FALSE, dims["nPar"])
+  restr <- rep.int(FALSE, dims["nPar"])
   names(restr) <- unlist(parNames)
   if (dims["family"] == 3L) control$restricted <- NULL
 

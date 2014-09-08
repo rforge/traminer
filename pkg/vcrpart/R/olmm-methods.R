@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-05-10
+##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' methods for olmm objects.
@@ -40,6 +40,8 @@
 ##' weights:     Weights
 ##'
 ##' Modifications:
+##' 2014-09-08: - partial substitution of 'rep' by 'rep.int'
+##'             - replace 'do.call' by 'call' in 'resid.olmm'
 ##' 2013-03-17: changed many methods to S3 methods (as in lme4)
 ##' 2013-09-06: modify formula() method. Now the formula slot
 ##'             is called
@@ -205,7 +207,7 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
   attr <- list() # default attributes
   
   scores <- x$score_obs
-  subsImp <- rep(FALSE, nrow(scores))
+  subsImp <- rep.int(FALSE, nrow(scores))
 
   if (control$verbose) cat("OK")
   
@@ -214,18 +216,18 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
   if (predecor && any(Ni != Nmax)) {
     
     Ninpute <- Nmax - Ni
-    subsImp <- c(rep(FALSE, x$dims["n"]), rep(TRUE, sum(Ninpute)))
-    sbjImp <- factor(rep(names(Ni), Ninpute), names(Ni))
+    subsImp <- c(rep.int(FALSE, x$dims["n"]), rep.int(TRUE, sum(Ninpute)))
+    sbjImp <- factor(rep.int(names(Ni), Ninpute), names(Ni))
     ranef <- ranef(x)
     ranefImp <- ranef[rownames(ranef) %in% unique(sbjImp),,drop = FALSE]
 
     ## get predictors from empirical distribution
     yName <- all.vars(formula(x))[1L]
     yLevs <- levels(x$y)
-    newFrame <- x$frame[rep(1L, sum(Ninpute)),,drop=FALSE]
-    newFrame[, x$subjectName] <- rep(names(Ninpute), Ninpute)
-    newX <- x$X[rep(1L, sum(Ninpute)),,drop=FALSE]
-    newW <- x$W[rep(1L, sum(Ninpute)),,drop=FALSE]
+    newFrame <- x$frame[rep.int(1L, sum(Ninpute)),,drop=FALSE]
+    newFrame[, x$subjectName] <- rep.int(names(Ninpute), Ninpute)
+    newX <- x$X[rep.int(1L, sum(Ninpute)),,drop=FALSE]
+    newW <- x$W[rep.int(1L, sum(Ninpute)),,drop=FALSE]
 
     ## add imputations to model
     x$frame <- rbind(x$frame, newFrame)
@@ -391,7 +393,7 @@ gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
     if (is.character(subset)) subset <- rownames(scores) %in% subset
     if (is.numeric(subset)) subset <- (1:nobs(object)) %in% subset
   } else {
-    subset <- rep(TRUE, nobs(object))
+    subset <- rep.int(TRUE, nobs(object))
   }
   subsScores <- rownames(model.frame(object)) %in% rownames(scores)
 
@@ -412,7 +414,7 @@ gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
   process <- process / sqrt(n)
 
   ## multiply scores with the inverse of the square root of their crossproduct
-  subs <- rep(TRUE, k)
+  subs <- rep.int(TRUE, k)
   J12 <- crossprod(process)
   J12Inv <- matrix(0, k, k)
   if (drop)
@@ -620,7 +622,7 @@ predict.olmm <- function(object, newdata = NULL,
 
       ## set random effects to zero
       W <- matrix(0.0, nrow(X), dims["q"])
-      subject <- factor(rep(1, nrow(W)))
+      subject <- factor(rep.int(1L, nrow(W)))
     }
   }
   
@@ -653,7 +655,7 @@ predict.olmm <- function(object, newdata = NULL,
 
       subsW <- c(rep(which(attr(W, "merge") == 1L), dims["nEta"]),
                  which(attr(W, "merge") == 2L))
-      tmatW <- rbind(kronecker(diag(dims["nEta"]), rep(1,dims["qCe"])),
+      tmatW <- rbind(kronecker(diag(dims["nEta"]), rep.int(1,dims["qCe"])),
                      matrix(1, dims["qGe"], dims["nEta"]))
       
       ## extend linear predictor
@@ -776,21 +778,21 @@ ranefCov.olmm <- function(object, ...) {
 
 
 resid.olmm <- function(object, norm = FALSE, ...) {
-  args <- list(...)
-  args$object <- object
-  args$type <- "response"
-  fitted <- do.call("predict", args)
-  y <- as.integer(model.response(model.frame(object)))
-  J <- object$dims["J"]
-  n <- length(y)
-  rval <- sapply(1:n, function(i) {
-    sum(fitted[i, 1L:J > y[i]]) - sum(fitted[i, 1L:J < y[i]])
-  })
-  if (norm) {
-    var <- (1.0 - apply(fitted^3, 1, sum)) / 3.0
-    rval <- rval / sqrt(var)
-  }
-  return(rval)
+    call <- list(name = as.name("predict"), object = quote(object), type = "response")
+    call <- appendDefArgs(call, list(...))
+    mode(call) <- "call"
+    fitted <- eval(call)
+    y <- as.integer(model.response(model.frame(object)))
+    J <- object$dims["J"]
+    n <- length(y)
+    rval <- sapply(1:n, function(i) {
+        sum(fitted[i, 1L:J > y[i]]) - sum(fitted[i, 1L:J < y[i]])
+    })
+    if (norm) {
+        var <- (1.0 - apply(fitted^3, 1, sum)) / 3.0
+        rval <- rval / sqrt(var)
+    }
+    return(rval)
 }
 
 
@@ -847,8 +849,8 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
                 dims["pCe"] * dims["nEta"] + dims["pGe"], 1L)
     feMatGe <- 
       cbind("Estimate" = fixef[subs],
-            "Std. Error" = rep(NaN, length(subs)),
-            "z value" = rep(NaN, length(subs)))
+            "Std. Error" = rep.int(NaN, length(subs)),
+            "z value" = rep.int(NaN, length(subs)))
     if (validVcov) {
       feMatGe[, 2L] <- sqrt(diag(vcov)[subs])
       feMatGe[, 3L] <- feMatGe[, 1L] / feMatGe[, 2L]
@@ -864,8 +866,8 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
     subs <- seq(1L, dims["pCe"] * dims["nEta"], 1L)
     feMatCe <-
       cbind("Estimate" = fixef[subs],
-            "Std. Error" = rep(NaN, length(subs)),
-            "z value" = rep(NaN, length(subs)))
+            "Std. Error" = rep.int(NaN, length(subs)),
+            "z value" = rep.int(NaN, length(subs)))
     if (validVcov) {
       feMatCe[, 2L] <- sqrt(diag(vcov)[subs])
       feMatCe[, 3L] <- feMatCe[, 1L] / feMatCe[, 2L]
@@ -1012,7 +1014,7 @@ print.VarCorr.olmm <- function(x, ...) { # S3 method
     diag(Corr) <- colnames(Corr)
     Corr <- Corr[, -nrow(Corr), drop = FALSE]
     dimnames(Corr) <- NULL
-    colnames(Corr) <- c("Corr", rep("", nrow(Corr) - 2L))
+    colnames(Corr) <- c("Corr", rep.int("", nrow(Corr) - 2L))
     rval <- cbind(rval[, 1L:2L, drop = FALSE], Corr)
   } else {
 

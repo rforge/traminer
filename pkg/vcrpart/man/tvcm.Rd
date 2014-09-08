@@ -97,6 +97,14 @@ tvcglm(formula, data, family,
   coefficient constancy tests are adjusted for intra-subject correlation for 
   2-stage models,  see \code{\link{estfun.olmm}}. The procedure is illustrated below 
   in example 2.
+
+  An alternative algorithm to \code{\link{tvcm}} is the MOB algorithm of Zeileis 
+  et al. (2008), which is implemented by the \code{mob} function in the 
+  packages \pkg{party} (url: \url{http://cran.r-project.org/web/packages/party/}) and 
+  \pkg{partykit} (url: \url{http://cran.r-project.org/web/packages/party/}).
+
+  The \code{\link{tvcm}} function builds on the software infrastructure of the
+  \pkg{partykit} package. The authors are grateful for these codes
 }
 
 \value{An object of class \code{\link{tvcm}}. The \code{\link{tvcm}} 
@@ -122,8 +130,10 @@ tvcglm(formula, data, family,
    Parameter Instability, \emph{Statistica Neerlandica}, \bold{61}, 488--508.
    doi:10.1111/j.1467-9574.2007.00371.x.
 
-   Hothorn, T. and Zeileis A. (2013). partykit: A Toolkit for
-   Recursive Partytioning. \url{http://CRAN.R-project.org/package=partykit}.
+   Torsten Hothorn, Achim Zeileis (2014). partykit: A Modular Toolkit for Recursive
+   Partytioning in R. Working Paper 2014-10. Working Papers in Economics and Statistics,
+   Research Platform Empirical and Experimental Economics, Universitaet Innsbruck. URL 
+   \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2014-10}
 
    Wang, J. C., Hastie, T. (2013), Boosted Varying-Coefficient Regression
    Models for Product Demand Prediction, \emph{Journal of Computational

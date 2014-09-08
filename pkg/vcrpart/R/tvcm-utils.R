@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-06
+##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' Workhorse functions for the 'tvcm' function
@@ -46,7 +46,9 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
-##' 2014-09-07: added 'tvcm_get_vcparm' function
+##' 2014-09-08: substitute 'rep' function by 'rep.int' or 'rep_len'
+##' 2014-09-07: - added 'tvcm_get_vcparm' function
+##'             - set default values in 'glm.doNotFit'
 ##' 2014-09-06: modified function names for 'tvcm_fit_model' and
 ##'             'tvcm_refit_model' for consistency reasons. The
 ##'             new names are 'tvcm_grow_fit' and 'tvcm_grow_update'
@@ -713,7 +715,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
           }
           rval <- rval[-length(rval)]
         }
-        rval <- cbind(rval, rep(NA, length(rval)), rep(NA, length(rval)))
+        rval <- cbind(rval, rep.int(NA, length(rval)), rep.int(NA, length(rval)))
         
       } else {
         rval <- matrix(, 0L, 3L)
@@ -766,7 +768,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
       if (is.ordered(z) && nrow(rval) > control$maxordsplit) {         
         nCat <- apply(rval, 1, function(x) sum(subs & z %in% levels(z)[x > 0L]))
         nCat <- round(c(nCat[1L], diff(nCat)))
-        zd <- rep(1:nrow(rval), nCat)
+        zd <- rep.int(1:nrow(rval), nCat)
         nq <- control$maxordsplit - 1L; rows <- 1;
         while(length(rows) < control$maxordsplit) {
           nq <- nq + 1L
@@ -775,7 +777,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
         rval <- rval[rows,,drop=FALSE]
       }
       
-      rval <- cbind(rval, rep(NA, nrow(rval)), rep(NA, nrow(rval)))
+      rval <- cbind(rval, rep.int(NA, nrow(rval)), rep.int(NA, nrow(rval)))
       colnames(rval) <- c(levels(z), "loss", "df")
       
     } else {
@@ -842,7 +844,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
 tvcm_setsplits_validcats <-  function(cp, z, weights, subs, minsize) {
 
   ## delete cuts that do not satisfy 'minsize'
-  rval <- rep(TRUE, nrow(cp))
+  rval <- rep.int(TRUE, nrow(cp))
   for (i in seq_along(rval)) {
     Node <- factor(1 * (z[subs] %in% levels(z)[cp[i,]==1L]))
     if (nlevels(Node) == 1L | (nlevels(Node) > 1L &&
@@ -1036,9 +1038,10 @@ tvcm_grow_sctest <- function(model, nodes, where, partid, nodeid, varid,
   }
 
   ## call 'estfun'
-  eCall <- call(ifelse(inherits(model, "olmm"),"estfun.olmm", "estfun"))
+  eCall <- list(name = as.name(ifelse(inherits(model, "olmm"),"estfun.olmm", "estfun")))
   eCall$x <- quote(model)
-  for (arg in names(control$estfun)) eCall[[arg]] <- control$estfun[[arg]]
+  eCall[names(control$estfun)] <- control$estfun
+  mode(eCall) <- "call"
   scores <- replicate(control$ninpute, eval(eCall))
 
   ## set the 'gefp' call (which is called in each iteration below)
@@ -1206,7 +1209,7 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
       nuis <- gsub("Node[A-Z]", "Left", nuisance)
       parm <- setdiff(parm, nuis)  
       if (inherits(model, "try-error")) {
-        return(rep(NA, length(parm)))
+        return(rep.int(NA, length(parm)))
       } else {
         return(coef(model)[parm])
       }
@@ -1225,7 +1228,7 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
     mcall$start <- coef(model)[mcall$restricted]
   }
 
-  ff <- tvcm_formula(formList, rep(FALSE, length(partid)), 
+  ff <- tvcm_formula(formList, rep.int(FALSE, length(partid)), 
                      eval(mcall$family, environment(mcall)),
                      environment(mcall), full = FALSE, update = TRUE)
   Left <- sample(c(0, 1), nobs(model), replace = TRUE)
@@ -1285,7 +1288,7 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
                   cp <- cp[-invalids,,drop = FALSE]
                   st <- st[-invalids,,drop = FALSE]
                 }
-                score <- rep(0, nlevels(z))
+                score <- rep.int(0, nlevels(z))
                 score[colSums(cp) > 0] <- prcomp(st)$x[,1]
                 
                 ## define 'z' as ordinal and retrieve the splits             
@@ -1306,7 +1309,7 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
                   nCat <-
                     apply(cp, 1, function(x) sum(subs & z %in% levels(z)[x > 0L]))
                   nCat <- round(c(nCat[1L], diff(nCat)))
-                  zd <- rep(1:nrow(cp), nCat)
+                  zd <- rep.int(1:nrow(cp), nCat)
                   nq <- control$maxordsplit - 1L; rows <- 1;
                   while(length(rows) < control$maxordsplit) {
                     nq <- nq + 1L
@@ -1700,26 +1703,26 @@ tvcm_grow_setcontrol <- function(control, model, formList, root, parm.only = TRU
     
     if (!length(control$maxwidth) %in% c(1L, npart))
       stop("'maxwidth' must be either of length ", 1L, " or ", npart, ".")
-    control$maxwidth <- rep(control$maxwidth, length.out = npart)
+    control$maxwidth <- rep_len(control$maxwidth, npart)
     
     if (!is.null(control$minsize) && !length(control$minsize) %in% c(1L, npart))
       stop("'minsize' must be either of length ", 1L, " or ", npart, ".")
     if (!is.null(control$minsize))
-      control$minsize <- rep(control$minsize, length.out = npart)
+      control$minsize <- rep_len(control$minsize, npart)
     
     if (!length(control$maxdepth) %in% c(1L, npart))
       stop("'maxdepth' must be either of length ", 1L, " or ", npart, ".")
-    control$maxdepth <- rep(control$maxdepth, length.out = npart)
+    control$maxdepth <- rep_len(control$maxdepth, npart)
     
     ## update 'fvcm' parameters
     
     if (!length(control$ntry) %in% c(1L, npart))
       stop("'ntry' must be either of length ", 1L, " or ", npart, ".")
-      control$ntry <- rep(control$ntry, length.out = npart)
+      control$ntry <- rep_len(control$ntry, npart)
     
     if (!length(control$vtry) %in% c(1L, npart))
       stop("'vtry' must be either of length ", 1L, " or ", npart, ".")
-    control$vtry <- rep(control$vtry, length.out = npart)
+    control$vtry <- rep_len(control$vtry, npart)
   }
   
   ## update the 'parm' and the 'nuisance' slots
@@ -2098,7 +2101,7 @@ tvcm_print_vclabs <- function(object) {
   by <- sapply(vcLabs, function(x) eval(parse(text = x)))
 
   ## collapse the short labels
-  rval <- rep("vc(", length(formula$vc))
+  rval <- rep.int("vc(", length(formula$vc))
   for (pid in seq_along(rval)) {
     if (length(cond) > 0L) 
       rval[pid] <- paste(rval[pid], paste(cond[[pid]], collapse = ", "), sep = "")

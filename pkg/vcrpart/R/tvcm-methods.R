@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-05
+##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' S3 methods for tvcm objects
@@ -433,12 +433,13 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
           tvcm_get_node(tree, tree$data, TRUE, tree$fitted[,"(weights)"], formList)
       
       ## refit model
-      call <- call(name = tree$info$fit,
+      call <- list(name = as.name(tree$info$fit),
                    formula = quote(ff$full),
                    data = quote(data),
                    family = quote(tree$info$family),
                    weights = tree$fitted[,"(weights)"])
-      for (arg in names(tree$info$dotargs)) call[[arg]] <- tree$info$dotargs[[arg]]
+      call[names(tree$info$dotargs)] <- tree$info$dotargs
+      mode(call) <- "call"
       tree$info$model <- suppressWarnings(try(eval(call), TRUE))
       
       ## check if the refitting failed
@@ -500,17 +501,18 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
                                            function(node) node$info$id$original))
                         })
 
-        ## call to evaluate the collapses
-        prStatCall <- call(name = papply, X = quote(subs), FUN = quote(prStat))
-        for (arg in names(papplyArgs)) prStatCall[[arg]] <- papplyArgs[[arg]]
+        ## 'call' to evaluate the collapses        
+        prStatCall <- list(name = as.name(papply), X = quote(subs), FUN = quote(prStat))
+        prStatCall[names(papplyArgs)] <- papplyArgs
+        mode(prStatCall) <- "call"
         
         ntab <- data.frame(
                   part = rep(seq_along(tree$info$node), sapply(ids, length)),
                   node = unlist(ids),
-                  loss = rep(Inf, length(unlist(ids))),
-                  npar = rep(NA, length(unlist(ids))),
-                  nspl = rep(NA, length(unlist(ids))),
-                  dfsplit = rep(NA, length(unlist(ids))))
+                  loss = rep.int(Inf, length(unlist(ids))),
+                  npar = rep.int(NA, length(unlist(ids))),
+                  nspl = rep.int(NA, length(unlist(ids))),
+                  dfsplit = rep.int(NA, length(unlist(ids))))
               
         if (nrow(ntab) > 0L) {
           

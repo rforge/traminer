@@ -14,7 +14,7 @@
 ##' all functions are documented as *.Rd files
 ##'
 ##' Last modifications:
-##' 2014-09-07: resolved a problem with 'offset'
+##' 2014-09-08: resolved a problem with 'offset'
 ##' 2014-09-06: - incorporate automatic cross-validation and pruning
 ##' 2014-09-04: - assign only those arguments of '...' to 'fit'
 ##'               that appear in 'formals(fit)'
@@ -141,7 +141,8 @@ tvcm <- function(formula, data, fit, family,
   dotargs <- setdiff(names(mce), names(mc))
   dotargs <- intersect(dotargs, names(formals(fit)))
   dotargs <- setdiff(dotargs, names(mcall))
-  mcall[dotargs] <- list(...)[dotargs]
+  dotargs <- list(...)[dotargs]
+  mcall[names(dotargs)] <- dotargs
   mode(mcall) <- "call"
   mcall$weights <- weights
   mcall$offset <- offset    
@@ -227,7 +228,7 @@ tvcm <- function(formula, data, fit, family,
 
   if (control$cv) {
     if (control$verbose) cat("\n* starting partitioning and cross validation ...\n")
-    cvCall <- call(name = "cvloss",
+    cvCall <- list(name = as.name("cvloss"),
                    object = quote(object),
                    folds = quote(control$folds),
                    type = "loss",
@@ -236,8 +237,9 @@ tvcm <- function(formula, data, fit, family,
                    papply = quote(control$papply))
     papplyArgs <- intersect(names(formals(control$papply)), names(control))
     papplyArgs <- setdiff(papplyArgs, names(args))
-    for (arg in papplyArgs) cvCall[[arg]] <- control[[arg]]
-
+    cvCall[papplyArgs] <- control[papplyArgs]
+    mode(cvCall) <- "call"
+    
     ## calls cvloss
     tree <- eval(cvCall)
     if (control$verbose)
@@ -248,7 +250,6 @@ tvcm <- function(formula, data, fit, family,
     ## calls directly 'tvcm_grow'
     if (control$verbose) cat("\n* starting partitioning ...\n")
     tree <- tvcm_grow(object)
-    if (control$verbose) cat("OK")
   }
    
   ## pruning

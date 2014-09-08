@@ -316,9 +316,11 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     return(cv)
   }
 
-  call <- call(name = papply, X = seq(ifelse(original, 0, 1), ncol(foldsMat)),
+  call <- list(name = as.name(papply),
+               X = quote(seq(ifelse(original, 0, 1), ncol(foldsMat))),
                FUN = quote(cvFun))
-  for (arg in names(papplyArgs)) call[[arg]] <- papplyArgs[[arg]]
+  call[names(papplyArgs)] <- papplyArgs
+  mode(call) <- "call"
   cv <- eval(call)
   
   if (type %in% c("loss")) {
@@ -478,13 +480,15 @@ plot.cvloss.tvcm <- function(x, legend = TRUE, details = TRUE, ...) {
   defArgs$ylim <- range(if (details) c(yy2, yy3) else yy1, na.rm = TRUE)
   
   ## set plot arguments
-  plotArgs <- appendDefArgs(list(x = xx[, 1], y = yy1), list(...))
-  plotArgs <- appendDefArgs(plotArgs, defArgs)
-  llty[1L] <- plotArgs$lty
-  lcol[1L] <- plotArgs$col
+  call <- list(name = as.name("plot"), x = quote(xx[, 1]), y = quote(yy1))
+  call <- appendDefArgs(call, list(...))
+  call <- appendDefArgs(call, defArgs)
+  llty[1L] <- call$lty
+  lcol[1L] <- call$col
+  mode(call) <- "call"
   
   ## plot mean validated prediction error
-  do.call("plot", plotArgs)
+  eval(call)
   
   ## plot details
   if (details) {
