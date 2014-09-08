@@ -220,7 +220,7 @@ predict.tvcm <- function(object, newdata = NULL,
     rval <-
       sapply(terms, function(x) rowSums(rval[, colnames(rval) == x, drop = FALSE]))
 
-    vcparm <- tvcm_get_vcparm(object)
+    vcparm <- unique(unlist(tvcm_get_vcparm(object)))
     parm <- union(colnames(rval), vcparm)
     if (length(misC <- setdiff(parm, colnames(rval))) > 0L) {
         cn <- c(colnames(rval), misC)
@@ -303,22 +303,27 @@ tvcm_print <- function(x, type = c("print", "summary"),
 
   terminal_panel <- function(node, partid) {
     rval <- function(node) {
-      nid <- as.character(id_node(node))
-      if (type == "print") {
-        coefMat <- matrix(coef$vc[[partid]][nid, ], 1)
-        colnames(coefMat) <- colnames(coef$vc[[partid]])
-      } else {
-        coefMat <- cbind("Estimate" = coef$vc[[partid]][nid, ],
-                         "Std. Error" = sd$vc[[partid]][nid, ],
-                         "z value" = coef$vc[[partid]][nid, ] / sd$vc[[partid]][nid, ])
-        rownames(coefMat) <- colnames(coef$vc[[partid]])
-      }
-      if (x$info$fit == "olmm")
-        coefMat <- olmm_rename(coefMat, yLevs, x$info$family, etalab)
-      return(c("", unlist(strsplit(formatMatrix(coefMat, ...), "\n"))))
+        nid <- as.character(id_node(node))
+        if (nrow(coef$vc[[partid]]) > 0L) {
+            if (type == "print") {
+                coefMat <- matrix(coef$vc[[partid]][nid, ], 1)
+                colnames(coefMat) <- colnames(coef$vc[[partid]])
+            } else {
+                coefMat <- cbind("Estimate" = coef$vc[[partid]][nid, ],
+                                 "Std. Error" = sd$vc[[partid]][nid, ],
+                                 "z value" = coef$vc[[partid]][nid, ] / sd$vc[[partid]][nid, ])
+                rownames(coefMat) <- colnames(coef$vc[[partid]])
+            }
+            if (x$info$fit == "olmm")
+                coefMat <- olmm_rename(coefMat, yLevs, x$info$family, etalab)
+            return(c("", unlist(strsplit(formatMatrix(coefMat, ...), "\n"))))
+        } else {
+            return(NULL) 
+        }
     }
     return(rval)
-  }
+}
+    
   class(terminal_panel) <- "grapcon_generator"
 
   vcLabs <- tvcm_print_vclabs(x)

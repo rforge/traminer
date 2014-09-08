@@ -148,7 +148,7 @@ panel_partdep <- function(object, parm = NULL,
                           etalab = c("int", "char", "eta"), ...) {
 
   ## set and check 'parm'
-  allParm <- tvcm_get_vcparm(object)
+  allParm <- unique(unlist(tvcm_get_vcparm(object)))
   if (is.null(parm)) parm <- allParm
   if (!all(parm %in% allParm))
     warnings("some 'parm' were not recognized.")

@@ -1924,7 +1924,7 @@ tvcm_get_terms <- function(names, ids, parm) {
 tvcm_get_vcparm <- function(object) {
     vcTerms <- terms(object$info$formula$original, specials = "vc")
     vcTerms <- rownames(attr(vcTerms, "factors"))[attr(vcTerms, "specials")$vc]
-    parm <- unique(unlist(lapply(vcTerms, function(x) {
+    parm <- lapply(vcTerms, function(x) {
         eta <- eval(parse(text = x))$eta
         if (inherits(object$info$model, "olmm")) {
             etaList <- vcrpart_formula(eta)
@@ -1936,16 +1936,19 @@ tvcm_get_vcparm <- function(object) {
             parm <- all.vars(eta)
         }
         return(parm)
-    })))
-    intTerms <- unique(unlist(lapply(object$info$formula$vc, function(x) x$intercept)))
-    if (inherits(object$info$model, "olmm")) {
-        if ("ge" %in% intTerms) parm <- c("(Intercept)", parm)
-        if ("ce" %in% intTerms)
-            parm <-
-                c(paste("Eta", 1:object$info$model$dims["nEta"], ":(Intercept)", sep = ""),
-                  parm)
-    } else {
-        if (any(intTerms != "none")) parm <- c("(Intercept)", parm)
+    })
+    for (pid in seq_along(object$info$formula$vc)) {
+        int <- object$info$formula$vc[[pid]]$intercept
+        if (inherits(object$info$model, "olmm")) {
+            if (int == "ce") {
+                parm[[pid]] <- c(paste("Eta", 1:object$info$model$dims["nEta"],
+                                       ":(Intercept)", sep = ""), parm[[pid]])
+            } else if (int == "ge") {
+                parm[[pid]] <- c("(Intercept)", parm)
+            }
+        } else {
+            if (int != "none") parm[[pid]] <- c("(Intercept)", parm[[pid]])
+        }
     }
     return(parm)
 }
@@ -1993,7 +1996,8 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
   ## restricted coefficients
   if (any(termsE$type == "fe"))
     rval$fe <- estimates[termsE$type == "fe"]
-    
+
+  ## random effects
   if (any(termsE$type == "re"))
     rval$re <- estimates[termsE$type == "re"]
 
@@ -2060,7 +2064,7 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
       rval <- lapply(rval, getSqrt)
       
     }
-  }
+}
   return(rval)
 }
 

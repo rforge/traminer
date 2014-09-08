@@ -1,14 +1,14 @@
 useDynLib(vcrpart, .registration = TRUE)
 
-import("methods", "parallel", "partykit")
+import("methods", "partykit")
 
 ## Exported methods for which generics exist
 importFrom("graphics", plot)
+importFrom("parallel", mclapply)
 importFrom("grid", gpar, unit, unit.c, convertHeight, convertWidth, convertUnit,
            viewport, pushViewport, upViewport, popViewport, plotViewport,
            grid.layout, grid.rect, grid.points, grid.lines, grid.segments, grid.text,
-           grid.xaxis, grid.yaxis, grid.newpage,
-           arrow)
+           depth, grid.xaxis, grid.yaxis, grid.newpage, arrow) # add 'depth'
 importFrom("stats",
            AIC, BIC, anova, coef, coefficients, deviance,
            extractAIC, fitted, formula, getCall, logLik,
