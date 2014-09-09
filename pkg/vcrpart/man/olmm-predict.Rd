@@ -4,10 +4,11 @@
 \alias{fitted.olmm}
 \alias{predict.olmm}
 
-\title{Predict outcome probabilities and responses for \code{olmm}
-  objects} 
+\title{Predict outcome probabilities and responses for
+  \command{\link{olmm}} objects} 
 
-\description{\code{fitted} and \code{predict} method for \code{olmm} objects.}
+\description{\code{fitted} and \code{predict} method for
+  \command{\link{olmm}} objects.} 
 
 \usage{
 \method{fitted}{olmm}(object, ...)
@@ -18,14 +19,14 @@
 }
 
 \arguments{
-  \item{object}{a fitted \code{olmm} object.}
+  \item{object}{a fitted \command{\link{olmm}} object.}
   \item{newdata}{data frame for which to evaluate predictions.}
   \item{type}{character string. \code{type = "response"} and 
     \code{type = "prob"} yield response probabilities, 
     \code{type = "class"} the response category with highest 
     probability and \code{type = "link"} the linear predictor
     matrix. \code{type = "ranef"} yields the predicted random effects,
-    see \code{\link{ranef.olmm}}.}
+    see \command{\link{ranef.olmm}}.}
   \item{ranef}{logical or numeric matrix. For all of
     \code{type = "response"}, \code{type = "prob"} or
     \code{type = "class"}, the option \code{ranef = FALSE} yields the
@@ -44,7 +45,7 @@
     the same result as \code{ranef(object)}.} 
   \item{na.action}{function determining what should be done with missing
     values for fixed effects in \code{newdata}. The default is to
-    predict \code{NA}: see \code{\link{na.pass}}.} 
+    predict \code{NA}: see \command{\link{na.pass}}.} 
   \item{...}{optional additional parameters. Includes \code{offset} and
     \code{subset}.} 
 }
@@ -60,7 +61,7 @@
 
 \author{Reto Buergin}
 
-\seealso{\code{\link{olmm}}, \code{\link{olmm-methods}}}
+\seealso{\command{\link{olmm}}, \command{\link{olmm-methods}}}
 
 \examples{
 ## ------------------------------------------------------------------- #

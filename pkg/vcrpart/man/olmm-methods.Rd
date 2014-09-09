@@ -29,9 +29,10 @@
 \alias{vcov.olmm}
 \alias{weights.olmm}
 
-\title{Methods for \code{olmm} objects}
+\title{Methods for \command{\link{olmm}} objects}
 
-\description{Standard methods for computing on \code{olmm} objects.}
+\description{Standard methods for computing on \command{\link{olmm}}
+  objects.} 
 
 \usage{
 \method{anova}{olmm}(object, ...)
@@ -60,15 +61,15 @@
 }
 
 \arguments{
-  \item{object, x}{an \code{\link{olmm}} object.}
-  \item{which}{optional character string. For  \code{\link{coef}} and
-    \code{\link{fixef}}, it indicates whether \code{"all"} coefficients,
-    the fixed effects \code{"fe"}, the category-specific fixed effects
-    \code{"ce"} (i.e. non-proportional odds) or the global fixed effects
-    \code{"ge"} (i.e. proportional odds) should be extracted. For
-    \code{model.matrix} it indicates whether the model matrix of the
-    fixed- (\code{"fe"}) or the random effects (\code{"re"}) should be
-    extracted.}
+  \item{object, x}{an \command{\link{olmm}} object.}
+  \item{which}{optional character string. For  \command{\link{coef}} and
+    \command{\link{fixef}}, it indicates whether \code{"all"}
+    coefficients, the fixed effects \code{"fe"}, the category-specific
+    fixed effects \code{"ce"} (i.e. non-proportional odds) or the global
+    fixed effects \code{"ge"} (i.e. proportional odds) should be
+    extracted. For \code{model.matrix} it indicates whether the model
+    matrix of the fixed- (\code{"fe"}) or the random effects (\code{"re"})
+    should be extracted.} 
   \item{level}{character string. Whether the results should be on the
     observation level (\code{level = "observation"}) or on the subject
     level (\code{level = "subject"}).} 
@@ -76,7 +77,7 @@
     standard deviation.}
   \item{nsim}{number of response vectors to simulate.  Defaults to 1.}
   \item{seed}{an object specifying if and how the random number
-    generator should be initialized. See \code{\link{simulate}}}
+    generator should be initialized. See \command{\link{simulate}}}
   \item{newdata}{a data frame with predictor variables.}
   \item{ranef}{whether the simulated responses should be based on
     conditional probabilities.}
@@ -86,29 +87,30 @@
 }
 
 \details{
-  \code{\link{anova}} implements log-likelihood ratio tests for model 
+  \command{\link{anova}} implements log-likelihood ratio tests for model  
   comparisons, based on the marginal likelihood. At the time being, 
   at least two models must be assigned.
 
-  \code{\link{neglogLik2}} is the marginal maximum likelihood of the fitted 
-  model times minus 2.
+  \command{\link{neglogLik2}} is the marginal maximum likelihood of the
+  fitted model times minus 2. 
 
-  \code{\link{ranefCov}} extracts the variance-covariance matrix of the random
-  effects. Similarly, \code{\link{VarCorr}} extracts the estimated variances,
-  standard deviations and correlations of the random effects. 
+  \command{\link{ranefCov}} extracts the variance-covariance matrix of
+  the random effects. Similarly, \command{\link{VarCorr}} extracts the
+  estimated variances, standard deviations and correlations of the
+  random effects.  
 
-  \code{\link{resid}} extracts the residuals of Li and Sheperd (2012). By
-  default, the marginal outcome distribution is used to compute these residuals. 
-  The conditional residuals can be computed by assigning \code{ranef = TRUE} as 
-   a supplementary argument.  
+  \command{\link{resid}} extracts the residuals of Li and Sheperd
+  (2012). By default, the marginal outcome distribution is used to
+  compute these residuals. The conditional residuals can be computed by
+  assigning \code{ranef = TRUE} as a supplementary argument.   
   
-  Further, undocumented methods are \code{\link{deviance}},
-  \code{\link{extractAIC}}, \code{\link{fitted}}, \code{\link{formula}},
-  \code{\link{getCall}}, \code{\link{logLik}},
-  \code{\link{model.frame}}, \code{\link{nobs}}, \code{\link{update}},
-  \code{\link{vcov}}. 
+  Further, undocumented methods are \command{\link{deviance}},
+  \command{\link{extractAIC}}, \command{\link{fitted}},
+  \command{\link{formula}}, \command{\link{getCall}},
+  \command{\link{logLik}}, \command{\link{model.frame}},
+  \command{\link{nobs}}, \command{\link{update}}, \command{\link{vcov}}.  
 
-  The \code{\link{anova}} implementation is based on codes of the 
+  The \command{\link{anova}} implementation is based on codes of the 
   \pkg{lme4} package. The authors are grateful for these codes. 
 }
 
@@ -129,7 +131,8 @@
   \emph{Journal of Statistical Software}
 }
 
-\seealso{\code{\link{olmm}}, \code{\link{predict.olmm}}, \code{\link{gefp.olmm}}}
+\seealso{\command{\link{olmm}}, \command{\link{predict.olmm}},
+  \command{\link{gefp.olmm}}} 
 
 \examples{
 ## --------------------------------------------------------- #

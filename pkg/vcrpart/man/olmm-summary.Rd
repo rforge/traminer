@@ -5,10 +5,10 @@
 \alias{print.summary.olmm}
 \alias{print.olmm}
 
-\title{Printing and summarizing \code{\link{olmm}} objects}
+\title{Printing and summarizing \command{\link{olmm}} objects}
 
 \description{
-  Generates summary results of a fitted \code{\link{olmm}} object.
+  Generates summary results of a fitted \command{\link{olmm}} object.
 }
 
 \usage{
@@ -19,11 +19,11 @@
 }
 
 \arguments{
-  \item{object, x}{a fitted \code{\link{olmm}} object.}
-  \item{etalab}{character. Whether category-specific effects should be
-    labeled by integers of categories (default), the labels of the
+  \item{object, x}{a fitted \command{\link{olmm}} object.}
+  \item{etalab}{character. Whether category-specific effects should be 
+    labeled by integers of categories (default), the labels of the 
     categories or the index of the predictor.}
-  \item{silent}{logical: should a warning be reported if the computation
+  \item{silent}{logical: should a warning be reported if the computation 
     of the covariance matrix for the estimated coefficients failed.}
   \item{...}{additional arguments passed to print.}
 }
@@ -33,7 +33,7 @@
   \code{"summary.olmm"}.
 }
 
-\seealso{\code{\link{olmm}}, \code{\link{olmm-methods}}}
+\seealso{\command{\link{olmm}}, \command{\link{olmm-methods}}}
 
 \author{Reto Buergin}
  

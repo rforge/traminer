@@ -37,7 +37,8 @@ data(unemp)
   }
 }
 
-\seealso{\code{\link{olmm}}, \code{\link{otsplot}}, \code{\link{tvcm}}}
+\seealso{\command{\link{olmm}}, \command{\link{otsplot}},
+  \command{\link{tvcm}}} 
 
 \examples{
 ## --------------------------------------------------------- #

@@ -137,10 +137,10 @@ logLik.tvcm <- function(object, ...)
 
 
 model.frame.tvcm <- function(formula, ...) {
-    rval <- cbind(model.frame(formula$info$model), formula$data)
-    attr(rval, "terms") <- attr(formula$data, "terms")
-    attr(rval, "na.action") <- attr(formula$data, "na.action")
-    return(rval)
+  rval <- cbind(model.frame(formula$info$model), formula$data)
+  attr(rval, "terms") <- attr(formula$data, "terms")
+  attr(rval, "na.action") <- attr(formula$data, "na.action")
+  return(rval)
 }
 
 
@@ -514,7 +514,8 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
                         })
 
         ## 'call' to evaluate the collapses        
-        prStatCall <- list(name = as.name(papply), X = quote(subs), FUN = quote(prStat))
+        prStatCall <- list(name = as.name(papply), X = quote(subs),
+                           FUN = quote(prStat))
         prStatCall[names(papplyArgs)] <- papplyArgs
         mode(prStatCall) <- "call"
         

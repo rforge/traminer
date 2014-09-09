@@ -154,18 +154,18 @@ predecor_control <- function(impute = TRUE, seed = NULL,
                              symmetric = TRUE,  reltol = 1e-6,
                              maxit = 250L, minsize = 1L, 
                              verbose = FALSE, silent = FALSE) {
-  stopifnot(is.logical(impute))
-  stopifnot(is.null(seed) | is.numeric(seed))
-  stopifnot(is.logical(symmetric))
-  stopifnot(is.numeric(reltol) && reltol > 0)
-  stopifnot(is.numeric(maxit) && maxit > 0)
-  stopifnot(is.numeric(minsize) && minsize > 0)
-  stopifnot(is.logical(verbose))
-  stopifnot(is.logical(silent))
-  return(structure(list(impute = impute[1L], seed = seed[1L], 
-                        symmetric = symmetric[1L], reltol = reltol[1L],
-                        maxit = maxit[1L], minsize = minsize[1L], 
-                        verbose = verbose[1L], silent = silent[1L]),
+  stopifnot(is.logical(impute) && length(impute) == 1L)
+  stopifnot(is.null(seed) | is.numeric(seed) && length(seed) == 1L)
+  stopifnot(is.logical(symmetric) && length(symmetric) == 1L)
+  stopifnot(is.numeric(reltol) && reltol > 0 && length(reltol) == 1L)
+  stopifnot(is.numeric(maxit) && maxit > 0 && length(maxit) == 1L)
+  stopifnot(is.numeric(minsize) && minsize > 0 && length(minsize) == 1L)
+  stopifnot(is.logical(verbose) && length(verbose) == 1L)
+  stopifnot(is.logical(silent) && length(silent) == 1L)
+  return(structure(list(impute = impute, seed = seed, 
+                        symmetric = symmetric, reltol = reltol,
+                        maxit = maxit, minsize = minsize, 
+                        verbose = verbose, silent = silent),
                    class = "predecor_control"))
 }
 

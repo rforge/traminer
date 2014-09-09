@@ -5,10 +5,10 @@
 \alias{panel_coef}
 \alias{panel_partdep}
 
-\title{\code{plot} method for \code{tvcm} objects.}
+\title{\code{plot} method for \command{\link{tvcm}} objects.}
 
 \description{
-  \code{plot} method and panel functions for \code{tvcm} objects. 
+  \code{plot} method and panel functions for \command{\link{tvcm}} objects. 
 }
 
 \usage{
@@ -34,26 +34,27 @@ panel_coef(object, parm = NULL,
 }
 
 \arguments{
-  \item{x, object}{An object of class \code{\link{tvcm}}.}
+  \item{x, object}{An object of class \command{\link{tvcm}}.}
   \item{type}{the type of the plot. Available types are
     \code{"default"}, \code{"simple"}, \code{"coef"},
     \code{"partdep"} and \code{"cv"}.}   
   \item{main}{character. A main title for the plot.}
   \item{drop_terminal}{a logical indicating whether all terminal nodes
-    should be plotted at the bottom. See also \code{\link{plot.party}}.}
+    should be plotted at the bottom. See also
+    \command{\link{plot.party}}.} 
   \item{tnex}{a numeric value giving the terminal node extension in
     relation to the inner nodes.}
   \item{newpage}{a logical indicating whether \code{grid.newpage()}
     should be called.}
   \item{pop}{a logical whether the viewport tree should be popped before
     return.}
-  \item{gp}{graphical parameters. See \code{\link{gpar}}.}
+  \item{gp}{graphical parameters. See \command{\link{gpar}}.}
   \item{part}{integer scalar. The partition i.e. varying coefficient
     component to be plotted.} 
-  \item{parm}{character vector (\code{\link{panel_partdep}} and
-    \code{\link{panel_coef}}) or list of character vectors
-    (\code{\link{panel_coef}}) with names of model
-    coefficients corresponding to the chosen component. Indicates which
+  \item{parm}{character vector (\command{\link{panel_partdep}} and
+    \command{\link{panel_coef}}) or list of character vectors
+    (\command{\link{panel_coef}}) with names of model
+    coefficients corresponding to the chosen component. Indicates which 
     coefficients should be visualized. If \code{parm} is a list, a
     separate panel is allocated for each list component.}  
   \item{var}{character vector. Indicates the partitioning variables
@@ -65,7 +66,8 @@ panel_coef(object, parm = NULL,
     smaller than 1 if the sample is large.}
   \item{neval}{the maximal number of distinct values of the variable to
     be evaluated.}
-  \item{add}{logical. Whether the panel is to be added into an active plot.}
+  \item{add}{logical. Whether the panel is to be added into an active
+    plot.} 
   \item{id}{logical. Whether the node id should be displayed.}
   \item{nobs}{logical. Whether the number of observations in each node
     should be displayed.}
@@ -75,13 +77,15 @@ panel_coef(object, parm = NULL,
     components \code{xlim}, \code{ylim}, \code{pch}, \code{ylab},
     \code{type} (the type of symbols, e.g. \code{"b"}), \code{label}
     (characters for ticks at the x axis), \code{height}, \code{width},
-    \code{gp} (a list produced by \code{\link{gpar}}). If \code{parm} is a
-    list, \code{plot_gp} may be a nested list specifying the graphical
-    parameters for each list component of \code{parm}. See examples.}
+    \code{gp} (a list produced by \command{\link{gpar}}). If \code{parm} 
+    is a list, \code{plot_gp} may be a nested list specifying the
+    graphical parameters for each list component of \code{parm}. See
+    examples.} 
   \item{margins}{a numeric vector \code{c(bottom, left, top, right)}
     specifying the space on the margins for each panel.}
-  \item{yadj}{a numeric scalar larger than zero that increases the margin above the 
-    panel. May be useful if the edge labels are covered by the coefficient panels.}
+  \item{yadj}{a numeric scalar larger than zero that increases the
+    margin above the panel. May be useful if the edge labels are covered
+    by the coefficient panels.} 
   \item{mean}{logical. Whether the average coefficients over the
     population should be visualized.}
   \item{mean_gp}{list with graphical parameters for plotting the mean
@@ -91,7 +95,7 @@ panel_coef(object, parm = NULL,
     visualized. Note that these intervals do not account for the error
     of the algorithm,}
   \item{conf.int_gp}{a list of graphical parameters for the confidence
-    intervals applied to \code{\link{arrow}}. Includes \code{angle},
+    intervals applied to \command{\link{arrow}}. Includes \code{angle},
     \code{length}, \code{ends} and \code{type}. See examples.}
   \item{abbreviate}{logical scalar. Whether labels of coefficients should
     be abbreviated.}		
@@ -99,24 +103,26 @@ panel_coef(object, parm = NULL,
     labeled by integers of categories (default), the labels of the
     categories (\code{"char"}) or the index of the predictor
     (\code{"eta"}).} 
-  \item{\ldots}{additional arguments passed to \code{\link{panel_partdep}}
-    or \code{\link{panel_coef}} or other methods.}
+  \item{\ldots}{additional arguments passed to
+    \command{\link{panel_partdep}} or \command{\link{panel_coef}} or
+  other methods.}
 }
 
 \details{
-  The plot functions allow the diagnosis of fitted \code{\link{tvcm}}
-  objects. \code{type = "default"}, \code{type = "coef"} and 
-  \code{type = "simple"} show the tree structure and coefficients in each
-  node. \code{type = "partdep"} plots partial dependency plots, see Hastie
-  et al. (2001), section 10.13.2. Finally, \code{type = "cv"} shows,
-  if available, the results from cross-validation. 
+  The plot functions allow the diagnosis of fitted \command{\link{tvcm}}
+  objects. \code{type = "default"}, \code{type = "coef"} and
+  \code{type = "simple"} show the tree structure and coefficients in
+  each node. \code{type = "partdep"} plots partial dependency plots, see
+  Hastie et al. (2001), section 10.13.2. Finally, \code{type = "cv"}
+  shows, if available, the results from cross-validation. 
 
-  The functions \code{\link{panel_partdep}} and \code{\link{panel_coef}}
-  are exported to show the additional arguments that can be passed to
-  \code{...} of a \code{\link{plot}} call.
+  The functions \command{\link{panel_partdep}} and
+  \command{\link{panel_coef}} are exported to show the additional
+  arguments that can be passed to \code{\ldots} of a
+  \command{\link{plot}} call.  
 
   Notice that user-defined plots can be generated by the use of the
-  \code{\link{plot.party}} function, see \pkg{partykit}.
+  \command{\link{plot.party}} function, see \pkg{partykit}.
 }
 
 \references{
@@ -130,7 +136,7 @@ panel_coef(object, parm = NULL,
 ##
 ## Plotting the types "coef" and "partdep" for a 'tvcm' object fitted 
 ## on the artificial data 'vcrpart_2'.
-## ------------------------------------------------------------------- #
+## ------------------------------------------------------------------- # 
 
 data(vcrpart_2)
 
@@ -163,7 +169,7 @@ par(mfrow = c(1, 2))
 plot(model, "partdep", var = "z1", ask = FALSE)
 }
 
-\seealso{\code{\link{tvcm}}, \code{\link{tvcm-methods}}}
+\seealso{\command{\link{tvcm}}, \command{\link{tvcm-methods}}}
 
 \author{Reto Buergin}
 

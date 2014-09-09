@@ -24,9 +24,10 @@
 \alias{summary.tvcm}
 \alias{weights.tvcm}
 
-\title{Methods for \code{tvcm} objects}
+\title{Methods for \command{\link{tvcm}} objects}
 
-\description{Standard methods for computing on \code{tvcm} objects.}
+\description{Standard methods for computing on \command{\link{tvcm}}
+  objects.} 
 
 \usage{
 \method{coef}{tvcm}(object, ...)
@@ -55,49 +56,51 @@
 }
 
 \arguments{
-  \item{object, tree}{an object of class \code{\link{tvcm}}.}
-  \item{steps}{integer vector. The iteration steps from which information
-    should be extracted.} 
-  \item{newdata}{an optional data frame in which to look for variables
-    with which to predict, if omitted, the fitted values are used.}
-  \item{type}{character string. Denotes for \code{\link{predict}} the
-    type of predicted value. See \code{\link{predict.glm}} or
-    \code{\link{predict.olmm}}.}
+  \item{object, tree}{an object of class \command{\link{tvcm}}.}
+  \item{steps}{integer vector. The iteration steps from which
+    information should be extracted.} 
+  \item{newdata}{an optional data frame in which to look for variables 
+    with which to predict, if omitted, the fitted values are used.} 
+  \item{type}{character string. Denotes for \command{\link{predict}} the
+    type of predicted value. See \command{\link{predict.glm}} or
+    \command{\link{predict.olmm}}.}
   \item{na.action}{function determining what should be done with missing
     values for fixed effects in \code{newdata}. The default is to
-    predict \code{NA}: see \code{\link{na.pass}}.}
+    predict \code{NA}: see \command{\link{na.pass}}.}
   \item{ranef}{logical scalar or matrix indicating whether prediction
-    should be based on random effects. See \code{\link{predict.olmm}}.}
+    should be based on random effects. See
+    \command{\link{predict.olmm}}. }
   \item{what}{a character specifying the quantities to \code{extract}.}
   \item{details}{logical scalar. Whether detail results like
-    coefficient constancy tests or loss minimizing grid search should be
+    coefficient constancy tests or loss minimizing grid search should be 
     shown.}
   \item{...}{Additional arguments passed to the calls.}
 }
 
 \details{
-  The \code{\link{predict}} function has two additional options for the
+  The \command{\link{predict}} function has two additional options for the
   \code{type} argument. The option \code{"node"} calls the node id and
   \code{"coef"} predicts the coefficients corresponding to an
-  observation. In cases of multiple \code{\link{vc}} terms for the same
+  observation. In cases of multiple \command{\link{vc}} terms for the same
   predictor, the coefficients are summed up.
 
-  \code{\link{splitpath}} and \code{\link{prunepath}} are new methods to 
-  trace the splitting resp. pruning procedures. They shows several information, 
-  such as the loss reduction of new splits during partitioning or the loss
-  reduction of collapsing an inner node when pruning.
+  \command{\link{splitpath}} and \command{\link{prunepath}} are new
+  methods to trace the splitting resp. pruning procedures. They shows
+  several information, such as the loss reduction of new splits during
+  partitioning or the loss reduction of collapsing an inner node when
+  pruning. 
   
-  Further undocumented, available methods are: \code{\link{fitted}}, 
-  \code{\link{formula}}, \code{\link{getCall}}, \code{\link{logLik}},
-  \code{\link{model.frame}}, \code{\link{nobs}}, \code{\link{print}},
-  \code{\link{ranef}}, \code{\link{resid}}, and
-  \code{\link{weights}}. All these methods have the same arguments as the
-  corresponding default methods. 
+  Further undocumented, available methods are: \command{\link{fitted}},
+  \command{\link{formula}}, \command{\link{getCall}},
+  \command{\link{logLik}}, \command{\link{model.frame}},
+  \command{\link{nobs}}, \command{\link{print}}, \command{\link{ranef}},
+  \command{\link{resid}}, and \command{\link{weights}}. All these
+  methods have the same arguments as the corresponding default methods. 
 }
 
 \seealso{
-  \code{\link{tvcm}}, \code{\link{tvcm-assessment}},
-  \code{\link{tvcm-plot}}
+  \command{\link{tvcm}}, \command{\link{tvcm-assessment}},
+  \command{\link{tvcm-plot}}
 }
 
 \author{Reto Buergin}

@@ -3,10 +3,10 @@
 \alias{olmm-control}
 \alias{olmm_control}
 
-\title{Control parameters for \code{\link{olmm}}.} 
+\title{Control parameters for \command{\link{olmm}}.} 
 
 \description{
-  Various parameters that control aspects for \code{\link{olmm}}.  
+  Various parameters that control aspects for \command{\link{olmm}}.  
 }
 
 \usage{
@@ -19,7 +19,7 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
 \arguments{
  \item{fit}{character string. The name of the function to be used for the 
     optimization.}
-  \item{doFit}{logical scalar. When \code{FALSE} an unfitted \code{\link{olmm}}  
+  \item{doFit}{logical scalar. When \code{FALSE} an unfitted \command{\link{olmm}}  
     object is returned. See details.}
   \item{numGrad}{logical scalar indicating whether the score function
     should be retrieved numerically.}
@@ -45,14 +45,15 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
   Initial values may decrease the computation time and avoid
   divergence. The \code{start} argument accepts a vector with named
   elements according to the column names of the
-  \code{\link{model.matrix}}. At the time being, initial values for
+  \command{\link{model.matrix}}. At the time being, initial values for
   adjacent-categories models must be transformed into the
-  baseline-category model form.
+  baseline-category model form. 
 
   Notice that an additional argument \code{control}, e.g.,
   \code{control = list(trace = 1)}, can be passed access control
-  parameters of the optimizers. For arguments, see \code{\link{ucminf}},
-  \code{\link{nlminb}} or \code{\link{optim}}. 
+  parameters of the optimizers. For arguments, see
+  \command{\link{ucminf}}, \command{\link{nlminb}} or
+  \command{\link{optim}}.   
 }
 
 \value{
@@ -62,7 +63,7 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
 
 \author{Reto Buergin}
 
-\seealso{\code{\link{olmm}}}
+\seealso{\command{\link{olmm}}}
 
 \examples{
 olmm_control(doFit = FALSE)

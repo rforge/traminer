@@ -279,7 +279,7 @@ tvcm_control <- function(lossfun = neglogLik2,
                          dfpar = 2.0, dfsplit = 0.0,
                          maxoverstep = ifelse(sctest, Inf, 0),
                          sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
-                         trim = 0.1, estfun = list(), ninpute = 5L,
+                         trim = 0.1, estfun = list(),
                          maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
                          cv = !sctest, folds = folds_control("kfold", 5),
                          prune = cv, keeploss = FALSE, papply = mclapply,
@@ -301,7 +301,6 @@ tvcm_control <- function(lossfun = neglogLik2,
   stopifnot(is.logical(bonferroni) && length(bonferroni) == 1L)
   stopifnot(is.numeric(trim) && length(trim) == 1L && trim >= 0.0 & trim < 0.5)
   stopifnot(is.list(estfun))
-  stopifnot(is.numeric(ninpute) && length(ninpute) == 1L)
   stopifnot(is.numeric(maxfacsplit) && length(maxfacsplit) == 1L && maxfacsplit > 1L)
   stopifnot(is.numeric(maxordsplit) && length(maxordsplit) == 1L && maxordsplit > 1L)
   stopifnot(is.numeric(maxnumsplit) && length(maxnumsplit) == 1L && maxnumsplit > 1L)
@@ -365,7 +364,6 @@ tvcm_control <- function(lossfun = neglogLik2,
                   alpha = alpha,
                   bonferroni = bonferroni,
                   estfun = estfun,
-                  ninpute = ninpute,
                   maxfacsplit = maxfacsplit,
                   maxordsplit = maxordsplit,
                   maxnumsplit = maxnumsplit,

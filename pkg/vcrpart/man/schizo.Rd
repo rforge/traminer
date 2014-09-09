@@ -6,7 +6,7 @@
 
 \title{National Institute of Mental Health shizophrenia study}
 
-\description{Schizophrenia data from a randomized controlled trial with
+\description{Schizophrenia data from a randomized controlled trial with 
   patients assigned to either drug or placebo group. "Severity of
   Illness" was measured, at weeks 0, 1, \ldots, 6, on a four category
   ordered scale. Most of the observations where made on weeks 0, 1, 3,
@@ -29,8 +29,8 @@
   }
 }
 
-\details{The documentation file was copied from the \pkg{mixcat} package and 
-  slightly modified.}
+\details{The documentation file was copied from the \pkg{mixcat} package 
+  and slightly modified.}
 
 \source{\url{http://tigger.uic.edu/~hedeker/ml.html}}
 

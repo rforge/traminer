@@ -6,10 +6,10 @@
 
 \title{Poverty in Switzerland}
 
-\description{Poverty measurements of elderly people (older than the Swiss
-  legal retirement age) in Switzerland. The data are the (complete)
-  subsample of participants of the canton Valais of the
-  Vivre-Leben-Vivere (VLV) survey data.} 
+\description{Poverty measurements of elderly people (older than the
+  Swiss legal retirement age) in Switzerland. The data are the
+  (complete) subsample of participants of the canton Valais of the
+  Vivre-Leben-Vivere (VLV) survey data.}  
 
 \usage{data(poverty)}
 
@@ -22,7 +22,8 @@
       individuals origin from the canton Wallis.}
     \item{\code{Gender}}{whether person is a male or a female.}
     \item{\code{AgeGroup}}{to which age group the person belongs to.}
-    \item{\code{Edu}}{ordered 3-category measurement on the persons education.}
+    \item{\code{Edu}}{ordered 3-category measurement on the persons
+      education.} 
     \item{\code{CivStat}}{civil status.}
     \item{\code{NChild}}{number of children.}
     \item{\code{Working}}{whether the person is still working (even
@@ -54,9 +55,10 @@
   Poverty is defined by a threshold of 2400 Swiss francs per person in
   the household. Specifically, the \code{poverty} variable was retrieved
   from a self-rated ordinal variable with nine categories on household 
-  income and was adjusted by the OECD equivalence scales methodology (see
+  income and was adjusted by the OECD equivalence scales methodology
+  (see
   \url{http://www.oecd.org/eco/growth/OECD-Note-EquivalenceScales.pdf})
-  to account for the household size.
+  to account for the household size. 
 
   The variables \code{Canton}, \code{Gender} and \code{AgeGroup}
   represent the stratification variables of the survey design. 
@@ -71,7 +73,7 @@
 \source{VLV survey, see also \url{http://cigev.unige.ch/recherches/vlv.html}}
 
 \references{Ludwig, C., Cavalli, S. and Oris,
-  M. \sQuote{Vivre/Leben/Vivere}: An interdisciplinary survey addressing
+  M. \sQuote{Vivre/Leben/Vivere}: An interdisciplinary survey addressing 
   progress and inequalities of ageing over the past 30 years in
   Switzerland. \emph{Archives of Gerontology and Geriatrics}. 
   

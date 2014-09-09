@@ -9,9 +9,10 @@
 \alias{print.fvcm}
 \alias{ranef.fvcm}
 
-\title{Methods for \code{fvcm} objects}
+\title{Methods for \command{\link{fvcm}} objects}
 
-\description{Standard methods for computing on \code{\link{fvcm}} objects.}
+\description{Standard methods for computing on \command{\link{fvcm}}
+  objects.} 
 
 \usage{
 \method{oobloss}{fvcm}(object, fun = NULL, ranef = FALSE, ...)
@@ -26,45 +27,46 @@
 }
 
 \arguments{
-  \item{object, x}{an object of class \code{\link{fvcm}}.}
-  \item{fun}{the loss function. The default loss function is defined
-    as the sum of the deviance residuals. For a user defined
-    function \code{fun}, see the examples of
-    \code{\link{oobloss.tvcm}}.} 
+  \item{object, x}{an object of class \command{\link{fvcm}}.} 
+  \item{fun}{the loss function. The default loss function is defined 
+    as the sum of the deviance residuals. For a user defined function
+    \command{fun}, see the examples of 
+    \command{\link{oobloss.tvcm}}.} 
   \item{newdata}{an optional data frame in which to look for variables
-    with which to predict. If omitted, the training data are used.}
+    with which to predict. If omitted, the training data are used.} 
   \item{type}{character string indicating the type of plot or
-    prediction. See \code{\link{plot.tvcm}} or
-    \code{\link{predict.tvcm}}.}
+    prediction. See \command{\link{plot.tvcm}} or
+    \command{\link{predict.tvcm}}.} 
   \item{tree}{integer vector. Which trees should be plotted.}
   \item{ask}{logical. Whether an input should be asked before printing
-    the next panel.}
+    the next panel.} 
   \item{ranef}{logical scalar or matrix indicating whether predictions
-    should be based on random effects. See \code{\link{predict.olmm}}.}
+    should be based on random effects. See
+    \command{\link{predict.olmm}}.} 
   \item{na.action}{function determining what should be done with missing
     values for fixed effects in \code{newdata}. The default is to
-    predict \code{NA}: see \code{\link{na.pass}}.}
+    predict \code{NA}: see \command{\link{na.pass}}.} 
   \item{verbose}{logical scalar. If \code{TRUE} verbose output is
     generated during the validation.}
   \item{...}{further arguments passed to other methods.}
 }
 
 \details{
-  \code{\link{oobloss.fvcm}} estimates the out-of-bag loss based on
+  \command{\link{oobloss.fvcm}} estimates the out-of-bag loss based on
   predictions of the model that aggregates only those trees in which the
   observation didn't appear (cf. Hastie et al, 2001, sec. 15). The
   prediction error is computed as the sum of prediction errors obtained
-  with \code{fun}, which are the deviance residuals by default.
+  with \code{fun}, which are the deviance residuals by default. 
 
   The plot and the prediction methods are analogous to
-  \code{\link{plot.tvcm}} resp. \code{\link{predict.tvcm}}. Note that
-  the plot options \code{mean} and \code{conf.int} for \code{type =
-    "coef"} are not available (and internally set to
-  \code{FALSE}). 
+  \command{\link{plot.tvcm}} resp. \command{\link{predict.tvcm}}. Note
+  that the plot options \code{mean} and \code{conf.int} for
+  \code{type ="coef"} are not available (and internally set to
+  \code{FALSE}).  
 
-  Further undocumented, available methods are \code{\link{fitted}},
-  \code{\link{print}} and \code{\link{ranef}}. All these latter methods 
-  have the same arguments as the corresponding default methods.  
+  Further undocumented, available methods are \command{\link{fitted}},
+  \command{\link{print}} and \command{\link{ranef}}. All these latter
+  methods have the same arguments as the corresponding default methods. 
 }
 
 \author{Reto Buergin}
@@ -80,16 +82,17 @@
   statistical learning, Springer.
 }
 
-\seealso{\code{\link{fvcm}}, \code{\link{tvcm-methods}}}
+\seealso{\command{\link{fvcm}}, \command{\link{tvcm-methods}}}
 
 \examples{
+
 ## ------------------------------------------------------------------- #
 ## Dummy example 1:
 ##
 ## Fitting a random forest tvcm on artificially generated ordinal
-## longitudinal data. The parameters 'maxstep = 1' and 'K = 2' are 
+## longitudinal data. The parameters 'maxstep = 1' and 'K = 2' are     
 ## chosen to restrict the computations.
-## ------------------------------------------------------------------- #
+## ------------------------------------------------------------------- # 
 
 ## load the data
 
@@ -97,12 +100,14 @@ data(vcrpart_1)
 
 ## fit and analyse the model
 
-control <- fvcm_control(sctest = TRUE, mtry = 2, maxstep = 1, 
-                        folds = folds_control(type = "subsampling", K = 2, prob = 0.75))
+control <-
+  fvcm_control(sctest = TRUE, mtry = 2, maxstep = 1, 
+               folds = folds_control(type = "subsampling", K = 2, prob = 0.75))
 
-model.1 <- fvcolmm(y ~ -1 + wave + vc(z3, z4, by = treat, intercept = TRUE) + re(1|id),
-                   family = cumulative(), subset = 1:100,
-                   data = vcrpart_1, control = control)
+model.1 <-
+  fvcolmm(y ~ -1 + wave + vc(z3, z4, by = treat, intercept = TRUE) + re(1|id),
+          family = cumulative(), subset = 1:100,
+          data = vcrpart_1, control = control)
 
 ## estimating the out of bag loss
 suppressWarnings(oobloss(model.1))
@@ -131,13 +136,14 @@ head(predict(model.1, type = "ranef"))
 head(predict(model.1, type = "response", ranef = FALSE))
 head(predict(model.1, type = "response", ranef = TRUE))
 
+
 ## ------------------------------------------------------------------- #
 ## Dummy example 2:
 ##
 ## Fitting a random forest tvcm on artificially generated normally
-## distributed data. The parameters 'maxstep = 3' and 'K = 3' are chosen
-## to restrict the computations and 'minsize = 5' to obtain at least
-## a few splits given the small sample size.
+## distributed data. The parameters 'maxstep = 3' and 'K = 3' are
+## chosen to restrict the computations and 'minsize = 5' to obtain at
+## least a few splits given the small sample size.
 ## ------------------------------------------------------------------- #
 
 data(vcrpart_2)

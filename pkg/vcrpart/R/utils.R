@@ -104,10 +104,10 @@ appendDefArgs <- function(args, default) {
 
 deparseCall <- function(x) {
   
-    if (is.null(x)) return(character())
-      rval <- paste(deparse(x), collapse = "\n")
-      if (grepl("structure(list(", rval, fixed = TRUE)) rval <- character()
-    return(rval)
+  if (is.null(x)) return(character())
+  rval <- paste(deparse(x), collapse = "\n")
+  if (grepl("structure(list(", rval, fixed = TRUE)) rval <- character()
+  return(rval)
 }
 
 
@@ -317,11 +317,11 @@ vcrpart_contr.sum <- function(x, weights = rep.int(1.0, length(x))) {
 ## --------------------------------------------------------- #
 
 vcrpart_fitted <- function(object, ...) {
-    call <- call(name = "predict", object = object)
-    dotargs <- list(...)
-    dotargs$newdata <- NULL
-    for (arg in names(dotargs)) call[[arg]] <- list(...)[[arg]]
-    return(eval(call))
+  call <- call(name = "predict", object = object)
+  dotargs <- list(...)
+  dotargs$newdata <- NULL
+  for (arg in names(dotargs)) call[[arg]] <- list(...)[[arg]]
+  return(eval(call))
 }
 
 
@@ -649,21 +649,21 @@ vcrpart_formula <- function(formula, family = cumulative(),
 ## --------------------------------------------------------- #
 
 vcrpart_formula_delEnv <- function(formList) {
-    if (!is.null(formList$fe)) {
-        environment(formList$fe$eta$ce) <- NULL
-        environment(formList$fe$eta$ge) <- NULL
-    }
-    for (pid in seq_along(formList$vc)) {
-        environment(formList$vc[[pid]]$eta$ce) <- NULL
-        environment(formList$vc[[pid]]$eta$ge) <- NULL
-        environment(formList$vc[[pid]]$cond$ce) <- NULL
-        environment(formList$vc[[pid]]$cond$ge) <- NULL
-    }
-    if (!is.null(formList$fe)) {
-        environment(formList$fe$eta$ce) <- NULL
-        environment(formList$fe$eta$ge) <- NULL
-    }
-    environment(formList$original) <- NULL
-    environment(formList$all) <- NULL
-    return(formList)
+  if (!is.null(formList$fe)) {
+    environment(formList$fe$eta$ce) <- NULL
+    environment(formList$fe$eta$ge) <- NULL
+  }
+  for (pid in seq_along(formList$vc)) {
+    environment(formList$vc[[pid]]$eta$ce) <- NULL
+    environment(formList$vc[[pid]]$eta$ge) <- NULL
+    environment(formList$vc[[pid]]$cond$ce) <- NULL
+    environment(formList$vc[[pid]]$cond$ge) <- NULL
+  }
+  if (!is.null(formList$fe)) {
+    environment(formList$fe$eta$ce) <- NULL
+    environment(formList$fe$eta$ge) <- NULL
+  }
+  environment(formList$original) <- NULL
+  environment(formList$all) <- NULL
+  return(formList)
 }

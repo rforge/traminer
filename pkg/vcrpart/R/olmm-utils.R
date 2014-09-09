@@ -126,42 +126,42 @@ olmm_optim_setup <- function(x, env = parent.frame()) {
 
 
 olmm_optim_warnings <- function(output, FUN) {
-
-    if (FUN == "optim") {
-        switch(as.character(output$convergence),
-               "1" = warning("Stopped by small step (xtol)."),
-               "20" = warning("Inadmissible initial parameters."),
-               "21" = warning("Inadmissible immediate parameters."),
-               "10" = warning("Degeneracy of the Nelder-Mead simplex."),
-               "51" = warning("Warning from 'L-BFGS-B'."),
-               "52" = warning("Error from 'L-BFGS-B'."),
-               NULL)
-    }
-
-    if (FUN == "nlminb") {
-        if (output$convergence != 0) warning(output$message)
-    }
+  
+  if (FUN == "optim") {
+    switch(as.character(output$convergence),
+           "1" = warning("Stopped by small step (xtol)."),
+           "20" = warning("Inadmissible initial parameters."),
+           "21" = warning("Inadmissible immediate parameters."),
+           "10" = warning("Degeneracy of the Nelder-Mead simplex."),
+           "51" = warning("Warning from 'L-BFGS-B'."),
+           "52" = warning("Error from 'L-BFGS-B'."),
+           NULL)
+  }
+  
+  if (FUN == "nlminb") {
+    if (output$convergence != 0) warning(output$message)
+  }
+  
+  if (FUN == "ucminf") {
     
-    if (FUN == "ucminf") {
-
-        switch(as.character(output$convergence),
-               "2" =
-               if (output$info["maxgradient"] > 1e-3)
-               warning("Stopped by small step (xtol)."),
-               "3" = 
-               warning("Stopped by function evaluation limit (maxeval)."),
-               "4" =
-               if (output$info["maxgradient"] > 1e-3)
-               warning("Stopped by zero step from line search."),
-               "-2" =
-               warning("Computation did not start: length(par) = 0."),
-               "-4" =
-               warning("Computation did not start: stepmax is too small."),
-               "-5" =
-               warning("Computation did not start: grtol or xtol <= 0"),
-               "-6" =
-               warning("Computation did not start: maxeval <= 0"),NULL)
-    }
+    switch(as.character(output$convergence),
+           "2" =
+           if (output$info["maxgradient"] > 1e-3)
+           warning("Stopped by small step (xtol)."),
+           "3" = 
+           warning("Stopped by function evaluation limit (maxeval)."),
+           "4" =
+           if (output$info["maxgradient"] > 1e-3)
+           warning("Stopped by zero step from line search."),
+           "-2" =
+           warning("Computation did not start: length(par) = 0."),
+           "-4" =
+           warning("Computation did not start: stepmax is too small."),
+           "-5" =
+           warning("Computation did not start: grtol or xtol <= 0"),
+           "-6" =
+           warning("Computation did not start: maxeval <= 0"),NULL)
+  }
 }
 
 
@@ -291,83 +291,83 @@ olmm_check_mm <- function(x) {
 
 olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
 
-    ## checks
-    if (!is.null(start)) {
-        if (!is.numeric(start) || is.null(names(start)))
-            stop("'start' argument should be a named numeric vector")
-        if (!all(names(start) %in% unlist(parNames)))
-            start <- start[names(start) %in% unlist(parNames)]
+  ## checks
+  if (!is.null(start)) {
+    if (!is.numeric(start) || is.null(names(start)))
+      stop("'start' argument should be a named numeric vector")
+    if (!all(names(start) %in% unlist(parNames)))
+      start <- start[names(start) %in% unlist(parNames)]
       }
-
-    ## set fixed effects
-
-    ## default values
-    intDef <- switch(dims["family"],
-                     qlogis(ppoints(dims["nEta"])),
-                     rep.int(0.0, dims["nEta"]),
-                     rep.int(0.0, dims["nEta"]))
-    fixef <- c(matrix(c(rep.int(intDef, dims["pInt"]), rep.int(0.0, dims["nEta"] * (dims["pCe"] - dims["pInt"]))), dims["pCe"], dims["nEta"], byrow = TRUE), rep.int(0.0, dims["pGe"]))
-    names(fixef) <- parNames$fixef
-
-    ## overwrite with 'start'
-    subs <- intersect(names(fixef), names(start))
-    fixef[subs] <- start[subs]
-
-    ## make a fixed effects matrix
-    fixef <- rbind(matrix(as.numeric(fixef[1:(dims["pCe"] * dims["nEta"])]), dims["pCe"], dims["nEta"], byrow = FALSE), if (dims["pGe"] > 0) matrix(rep(as.numeric(fixef[(dims["pCe"] * dims["nEta"] + 1):dims["p"]]), each = dims["nEta"]), dims["pGe"], dims["nEta"], byrow = TRUE) else NULL)
-    rownames(fixef) <- colnames(X)
-    colnames(fixef) <-  colnames(eta)
-
-    if (dims["family"] == 3L && dims["pCe"] > 0L) {
-        
-        ## transform adjacent category parameters into baseline category
-        ## parameters
-        T <- 1 * lower.tri(diag(dims["nEta"]), diag = TRUE)
-        fixef[1:dims["pCe"],] <- fixef[1:dims["pCe"],] %*% T
-    }
-
-    ## set random effect variance components
-
-    ## default values
-    ranefCholFac <- c(ranefElMat %*%  c(diag(dims["q"])))
-    names(ranefCholFac) <- parNames$ranefCholFac
-            
-    ## overwrite with 'start'
-    subs <- intersect(names(ranefCholFac), names(start))
-    ranefCholFac[subs] <- start[subs]
-
-    ## make a matrix
-    ranefCholFac <-
-        matrix(t(ranefElMat) %*% ranefCholFac, dims["q"], dims["q"])
-    ## set row- and column names
-    tmp <- c((if (dims["qCe"] > 0) paste("Eta", rep(seq(1, dims["nEta"], 1), each = dims["qCe"]), ":", rep.int(colnames(W)[attr(W, "merge") == 1], dims["nEta"]), sep = "") else NULL), (if (dims["qGe"] > 0) colnames(W)[attr(W, "merge") == 2] else NULL))
-    rownames(ranefCholFac) <- tmp
-    colnames(ranefCholFac) <- tmp
-
-    if (dims["family"] == 3 && dims["qCe"] > 0) {
-
-        ## transform adjacent category parameters into baseline category
-        ## parameters
-        for (i in 1:dims["qCe"]) {
-            subs <- seq(i, dims["qCe"] * dims["nEta"], dims["qCe"])
-            for (j in 1:(dims["nEta"] - 1)) {
-                ranefCholFac[subs[j], ] <-
-                    colSums(ranefCholFac[subs[j:dims["nEta"]], ]) 
-            }
-        }
-        ranefCholFac <- t(chol(ranefCholFac %*% t(ranefCholFac)))
-    }
+  
+  ## set fixed effects
+  
+  ## default values
+  intDef <- switch(dims["family"],
+                   qlogis(ppoints(dims["nEta"])),
+                   rep.int(0.0, dims["nEta"]),
+                   rep.int(0.0, dims["nEta"]))
+  fixef <- c(matrix(c(rep.int(intDef, dims["pInt"]), rep.int(0.0, dims["nEta"] * (dims["pCe"] - dims["pInt"]))), dims["pCe"], dims["nEta"], byrow = TRUE), rep.int(0.0, dims["pGe"]))
+  names(fixef) <- parNames$fixef
+  
+  ## overwrite with 'start'
+  subs <- intersect(names(fixef), names(start))
+  fixef[subs] <- start[subs]
+  
+  ## make a fixed effects matrix
+  fixef <- rbind(matrix(as.numeric(fixef[1:(dims["pCe"] * dims["nEta"])]), dims["pCe"], dims["nEta"], byrow = FALSE), if (dims["pGe"] > 0) matrix(rep(as.numeric(fixef[(dims["pCe"] * dims["nEta"] + 1):dims["p"]]), each = dims["nEta"]), dims["pGe"], dims["nEta"], byrow = TRUE) else NULL)
+  rownames(fixef) <- colnames(X)
+  colnames(fixef) <-  colnames(eta)
+  
+  if (dims["family"] == 3L && dims["pCe"] > 0L) {
     
-    ## coefficients
-    coefficients <- numeric()
-    if (dims["pCe"] > 0L) coefficients <- fixef[1:dims["pCe"],]
-    if (dims["pGe"] > 0) coefficients <- c(coefficients,fixef[(dims["pCe"] + 1):dims["pEta"], 1])
-    coefficients <- c(coefficients, c(ranefElMat %*% c(ranefCholFac)))
-    names(coefficients) <- unlist(parNames)
+    ## transform adjacent category parameters into baseline category
+    ## parameters
+    T <- 1 * lower.tri(diag(dims["nEta"]), diag = TRUE)
+    fixef[1:dims["pCe"],] <- fixef[1:dims["pCe"],] %*% T
+  }
+  
+  ## set random effect variance components
+  
+  ## default values
+  ranefCholFac <- c(ranefElMat %*%  c(diag(dims["q"])))
+  names(ranefCholFac) <- parNames$ranefCholFac
+  
+  ## overwrite with 'start'
+  subs <- intersect(names(ranefCholFac), names(start))
+  ranefCholFac[subs] <- start[subs]
+  
+  ## make a matrix
+  ranefCholFac <-
+    matrix(t(ranefElMat) %*% ranefCholFac, dims["q"], dims["q"])
+  ## set row- and column names
+  tmp <- c((if (dims["qCe"] > 0) paste("Eta", rep(seq(1, dims["nEta"], 1), each = dims["qCe"]), ":", rep.int(colnames(W)[attr(W, "merge") == 1], dims["nEta"]), sep = "") else NULL), (if (dims["qGe"] > 0) colnames(W)[attr(W, "merge") == 2] else NULL))
+  rownames(ranefCholFac) <- tmp
+  colnames(ranefCholFac) <- tmp
+  
+  if (dims["family"] == 3 && dims["qCe"] > 0) {
+    
+    ## transform adjacent category parameters into baseline category
+    ## parameters
+    for (i in 1:dims["qCe"]) {
+      subs <- seq(i, dims["qCe"] * dims["nEta"], dims["qCe"])
+      for (j in 1:(dims["nEta"] - 1)) {
+        ranefCholFac[subs[j], ] <-
+          colSums(ranefCholFac[subs[j:dims["nEta"]], ]) 
+      }
+    }
+    ranefCholFac <- t(chol(ranefCholFac %*% t(ranefCholFac)))
+  }
+  
+  ## coefficients
+  coefficients <- numeric()
+  if (dims["pCe"] > 0L) coefficients <- fixef[1:dims["pCe"],]
+  if (dims["pGe"] > 0) coefficients <- c(coefficients,fixef[(dims["pCe"] + 1):dims["pEta"], 1])
+  coefficients <- c(coefficients, c(ranefElMat %*% c(ranefCholFac)))
+  names(coefficients) <- unlist(parNames)
 
-    return(list(fixef = fixef,
-                ranefCholFac = ranefCholFac,
-                coefficients = coefficients))
+  return(list(fixef = fixef,
+              ranefCholFac = ranefCholFac,
+              coefficients = coefficients))
 }
 
 

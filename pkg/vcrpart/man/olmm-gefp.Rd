@@ -5,12 +5,12 @@
 \alias{predecor_control}
 \alias{estfun.olmm}
 
-\title{Methods for empirical processes of \code{\link{olmm}} objects}
+\title{Methods for empirical processes of \command{\link{olmm}} objects}  
 
 \description{Methods to extract and pre-decorrelate the estimating
-  equations (the negative marginal maximum likelihood scores) and compute the
-  empirical fluctuation process (the decorrelated, cumulative score
-  process) of a fitted \code{\link{olmm}} object.
+  equations (the negative marginal maximum likelihood scores) and
+  compute the empirical fluctuation process (the decorrelated,
+  cumulative score process) of a fitted \command{\link{olmm}} object. 
 } 
 
 \usage{
@@ -28,12 +28,12 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
 }
 
 \arguments{
-  \item{x, object}{a fitted \code{\link{olmm}} object.}
+  \item{x, object}{a fitted \command{\link{olmm}} object.}
   \item{predecor}{logical scalar. Indicates whether the within-subject
     correlation of the estimating equations should be removed by a linear
     transformation. See details.}
   \item{control}{a list of control parameter as produced by
-    \code{\link{predecor_control}}.}
+    \command{\link{predecor_control}}.}
   \item{nuisance}{integer vector. Defines the coefficients which are
     regarded as nuisance and therefore omitted from the transformation.}
   \item{impute}{logical scalar. Whether missing values should be
@@ -50,40 +50,42 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
     matrix.} 
   \item{maxit}{the maximum number of iterations used to compute the
     transformation matrix.}
-  \item{silent}{logical scalar. Should the report of warnings be suppressed?}
+  \item{silent}{logical scalar. Should the report of warnings be
+    suppressed?} 
   \item{verbose}{logical scalar. Produces messages.}
   \item{scores}{a function or a matrix. Function to extract the
     estimating equations from \code{object}, e.g.
-    \code{\link{estfun.olmm}}, or a matrix representing the estimating
+    \command{\link{estfun.olmm}}, or a matrix representing the estimating
     equations.} 
-  \item{order.by}{a numeric or factor vector. The explanatory variable to 
-    be used to order the entries in the estimating equations. If set to 
-    \code{NULL} (the default) the observations are assumed to be ordered.}
-  \item{subset}{logical vector. For extracts the subset of the estimating 
-    equations to be used.}
+  \item{order.by}{a numeric or factor vector. The explanatory variable
+    to be used to order the entries in the estimating equations. If set
+    to \code{NULL} (the default) the observations are assumed to be
+    ordered.}
+  \item{subset}{logical vector. For extracts the subset of the
+    estimating equations to be used.}
   \item{parm}{integer, logical or a character vector. Extracts the
     columns of the estimating equations.}
-  \item{center}{logical scalar. \code{TRUE} subtracts, if necessary, the
+  \item{center}{logical scalar. \code{TRUE} subtracts, if necessary, the 
     column means of the estimating equations.}
   \item{drop}{logical. Whether singularities should be handled
     automatically (otherwise singularities yield an error).}
   \item{...}{arguments passed to other
-    functions. \code{\link{gefp.olmm}} passes these arguments to
+    functions. \command{\link{gefp.olmm}} passes these arguments to
     \code{scores} if \code{scores} is a function.}
 }
 
 \value{
-  \code{\link{predecor_control}} returns a list of control parameters
+  \command{\link{predecor_control}} returns a list of control parameters
   for computing the pre-decorrelation transformation
-  matrix. \code{\link{estfun.olmm}} returns a \code{\link{matrix}} with
-  the estimating equations and \code{\link{gefp.olmm}} a list of class class
-  \code{"gefp"}.  
+  matrix. \command{\link{estfun.olmm}} returns a \command{\link{matrix}}
+  with the estimating equations and \command{\link{gefp.olmm}} a list of
+  class class \code{"gefp"}.  
 }
 
 \details{
   Complements the \code{estfun} method of the package \code{sandwich}
   and the \code{gefp} method of the package \code{strucchange} for
-  \code{\link{olmm}} objects. \code{\link{estfun.olmm}} allows to
+  \command{\link{olmm}} objects. \command{\link{estfun.olmm}} allows to
   pre-decorrelate the intra-individual correlation of observation
   scores, see the argument \code{predecor}. The value returned by
   \code{gefp.olmm} may be used for testing coefficient constancy
@@ -105,24 +107,26 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   scores would take if the data were balanced. Specifically, in each
   iteration of the imputation, (i) a set of predictors is drawn from the 
   empirical distribution of the model matrix, (ii) responses are drawn 
-  based on these predictors of (i) and \code{object} (cf. \code{\link{simulate.olmm}}) 
-  and (iii) the predictors of (i) and the responses of (ii) are added 
-  \code{object} and the scores are recomputed. The obtained sets of 
-  scores are averaged and then used to for transforming the scores instead 
-  of the original scores. The imputation algorithm can be controlled 
-  with \code{maxit.impute} (the number of imputation iterations), 
-  \code{abstol.impute} the maximum permitted quantile of differences 
-  between scores of the previous and the current step and \code{ratio.impute} 
-  specifies the quantile to be taken.
+  based on these predictors of (i) and \code{object}
+  (cf. \command{\link{simulate.olmm}}) and (iii) the predictors of (i)
+  and the responses of (ii) are added  \code{object} and the scores are
+  recomputed. The obtained sets of scores are averaged and then used to
+  for transforming the scores instead of the original scores. The
+  imputation algorithm can be controlled with \code{maxit.impute} (the
+  number of imputation iterations), \code{abstol.impute} the maximum
+  permitted quantile of differences between scores of the previous and
+  the current step and \code{ratio.impute} specifies the quantile to be
+  taken. 
   
-  Given a score matrix produced by \code{\link{estfun.olmm}}, the
+  Given a score matrix produced by \command{\link{estfun.olmm}}, the
   empirical fluctuation process can be computed by
-  \code{\link{gefp.olmm}}. See Zeileis and Hornik
-  (2007). \code{\link{gefp.olmm}} provides with \code{subset} and
+  \command{\link{gefp.olmm}}. See Zeileis and Hornik
+  (2007). \command{\link{gefp.olmm}} provides with \code{subset} and
   \code{parm} arguments specifically designed for nodewise tests in the
-  \code{\link{tvcm}} algorithm. Using \code{subset} extracts the partial
-  fluctuation process of the selected subset. Further, \code{center = TRUE} 
-  makes sure that the partial fluctuation process (starts and) ends with zero. 
+  \command{\link{tvcm}} algorithm. Using \code{subset} extracts the
+  partial fluctuation process of the selected subset. Further,
+  \code{center = TRUE} makes sure that the partial fluctuation process
+  (starts and) ends with zero.   
 }
 
 \references{
@@ -136,7 +140,7 @@ regression for longitudinal ordinal responses. Submitted article.
 
 \author{Reto Buergin}
 
-\seealso{\code{\link{olmm}}}
+\seealso{\command{\link{olmm}}}
 
 \examples{
 ## ------------------------------------------------------------------- #

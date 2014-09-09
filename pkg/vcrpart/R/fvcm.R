@@ -112,25 +112,25 @@ fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
                          ptry = 1, ntry = 1, vtry = 5,
                          alpha = 1.0, maxoverstep = Inf, ...) {
 
-    ## modify the 'papply' argument
-    mc <- match.call()
-    if ("papply" %in% names(mc)) {
-        papply <- deparse(mc$papply)
-    } else {
-        papply <- deparse(formals(tvcm_control)$papply)
-    }
-
-    ## combine the parameter to a list and disble cross validation and pruning 
-    call <- list(maxstep = maxstep, folds = folds,
-                 ptry = ptry, ntry = ntry, vtry = vtry,
-                 alpha = alpha, maxoverstep = Inf,
-                 papply = papply, cv = FALSE, prune = FALSE)
-    call <- appendDefArgs(call, list(...))
-
-    ## call 'tvcm_control'
-    call <- append(list(name = as.name("tvcm_control")), call)
-    mode(call) <- "call"
-    return(eval(call))
+  ## modify the 'papply' argument
+  mc <- match.call()
+  if ("papply" %in% names(mc)) {
+    papply <- deparse(mc$papply)
+  } else {
+    papply <- deparse(formals(tvcm_control)$papply)
+  }
+  
+  ## combine the parameter to a list and disble cross validation and pruning 
+  call <- list(maxstep = maxstep, folds = folds,
+               ptry = ptry, ntry = ntry, vtry = vtry,
+               alpha = alpha, maxoverstep = Inf,
+               papply = papply, cv = FALSE, prune = FALSE)
+  call <- appendDefArgs(call, list(...))
+  
+  ## call 'tvcm_control'
+  call <- append(list(name = as.name("tvcm_control")), call)
+  mode(call) <- "call"
+  return(eval(call))
 }
 
 

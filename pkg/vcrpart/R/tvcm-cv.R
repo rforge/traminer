@@ -134,7 +134,7 @@ tvcm_folds <- function(object, control) {
                  freq = weights(extract(object, "model")))
   if (weights == "freq" && any(!freq == round(freq)))
     stop("some of the weights are not integers.")
-
+  
   if (is.null(subject)) subject <- factor(rep(1:length(freq), freq))
   N <- nlevels(subject)
     

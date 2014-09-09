@@ -1,4 +1,4 @@
-## --------------------------------------------------------- #
+##'--------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
 ##' Date:            2014-09-07
@@ -29,7 +29,7 @@
 ##' Last modifications:
 ##' 2014-09-07: added 'prunepath' generic
 ##' 2014-07-17: Update the descriptions
-## --------------------------------------------------------- #
+##'--------------------------------------------------------- #
 
 cvloss <- function(object, ...) UseMethod("cvloss")
 
