@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-07
+##' Date:            2014-09-09
 ##'
 ##' Description:
 ##' Function for model selection and assessment for 'tvcm' objects.
@@ -15,6 +15,8 @@
 ##' plot.cvloss.tvcm:    plot fot 'cv.tvcm' objects
 ##'
 ##' Last modifications:
+##' 2014-09-09: tvcm_folds: the 'seed' attribute is now the number
+##'             of the seed and not the RNG state anymore.
 ##' 2014-09-07: modifications for direct call from 'tvcm'
 ##' 2014-09-02: - modifications on 'tvcm_get_node'. The former
 ##'               implementation was a time-killer an therefore
@@ -183,7 +185,7 @@ tvcm_folds <- function(object, control) {
   assign(".Random.seed", oldSeed, envir=globalenv())
   attr(folds, "type") <- type
   attr(folds, "value") <- ifelse(weights == "freq", "weights", "freq")
-  attr(folds, "seed") <- RNGstate
+  attr(folds, "seed") <- seed
   return(folds)
 }
 

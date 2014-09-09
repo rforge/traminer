@@ -19,7 +19,7 @@
 ##' tvcm_setsplits_splitnode: 
 ##' tvcm_setsplits_rselect:   randomly select partitions, variables and nodes
 ##' tvcm_grow_sctest:         run coefficient constancy tests
-##' tvcm_grow_loss:           grid based loss minimization
+##' tvcm_grow_gridsearch:           grid based loss minimization
 ##' tvcm_grow_splitnode:      split in variable x.
 ##' tvcm_formula:             extract separate formulas for
 ##'                           model and partitioning from
@@ -75,7 +75,7 @@
 ##' 2014-07-22: modified some function names
 ##' 2014-07-06: implement method to deal with many nominal categories
 ##' 2014-06-30: implement random selection if split is not unique
-##' 2014-06-23: correct bug for 'start' argument in 'tvcm_grow_loss' 
+##' 2014-06-23: correct bug for 'start' argument in 'tvcm_grow_gridsearch' 
 ##' 2014-06-17: modify documentation style
 ##' 2014-06-16: deleted several 'tvcm_prune_XXX' functions
 ##' 2014-06-03: modify 'tvcm_formula' to allow partition-wise
@@ -111,9 +111,6 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
   partData <- object$data
   control <- object$info$control
   family <- model$family
-  start <- object$dotargs$start
-  for (arg in names(object$info$dotargs))
-    assign(arg, object$info$dotargs[[arg]])
   
   if (!is.null(subset)) {
     mf <- mf[subset,,drop = FALSE]
@@ -281,9 +278,9 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
       ## ------------------------------------------------- #
       
       ## compute the loss of all candidate splits and extract the best split
-      loss <- try(tvcm_grow_loss(splits, partid, nodeid, varid, 
-                                 model, nodes, where, partData,
-                                 control, mcall, formList, step), silent = TRUE)
+      loss <- try(tvcm_grow_gridsearch(splits, partid, nodeid, varid, 
+                                       model, nodes, where, partData,
+                                       control, mcall, formList, step), silent = TRUE)
       
       ## handling stops
       if (inherits(loss, "try-error")) {
@@ -302,7 +299,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         }
         
         if (run > 0L) {
-          noverstep <- if (loss$ploss < 0) noverstep + 1L else 0L
+          noverstep <- if (loss$plossred < control$dfsplit) noverstep + 1L else 0L
           if (noverstep > control$maxoverstep) {
             run <- 0L
             if (control$maxoverstep > 0L) {
@@ -343,7 +340,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         splitpath[[step]]$nodeid <- loss$nodeid
         splitpath[[step]]$varid <- loss$varid
         splitpath[[step]]$cutid <- loss$cutid
-        splitpath[[step]]$ploss <- loss$ploss
+        splitpath[[step]]$plossred <- loss$plossred
       }
       splitpath[[step]]$lossgrid <- loss$lossgrid 
     }
@@ -366,13 +363,13 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         
         cat("Model comparison:\n")
         print(data.frame("loss" = c(control$lossfun(model),
-                           control$lossfun(model) - loss$loss),
-                         "penalized loss reduction" =  c("", format(loss$ploss)),
+                           control$lossfun(model) - loss$lossred),
+                         "penalized loss reduction" =  c("", format(loss$plossred)),
                          row.names = paste("step", step + c(-1, 0)),
                          check.names = FALSE))
         
       } else {
-        cat("\n\nStopping the algorithm.\nMessage:", as.character(stopinfo), "\n")
+        cat("\n\nStopping partitioning.\nMessage:", as.character(stopinfo), "\n")
         if (inherits("try-error", stopinfo)) warning(as.character(stopinfo))
         
       }
@@ -401,10 +398,12 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
     
   } else {
 
-    ## delete environments of calls
+    ## delete environments
     environment(mcall) <- NULL
     environment(object$info$call) <- NULL
-
+    formList <- vcrpart_formula_delEnv(formList)
+    attr(attr(partData, "terms"), ".Environment") <- NULL
+    
     ## build 'tvcm' object
     tree <- party(nodes[[1L]],
                   data = partData,
@@ -496,8 +495,16 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
 
   ## return error if fitting failed
   if (inherits(object, "try-error")) stop("model fitting failed.")
-  if (doFit && !object$conv) stop("no convergence")
-    
+  if (doFit && !is.null(object$converged) && !object$converged)
+      stop("no convergence")
+
+  ## delete heavy objects
+  if (inherits(object, "glm")) {
+    attr(attr(object$model, "terms"), ".Environment") <- NULL
+    environment(object$formula) <- NULL
+    attr(object$terms, ".Environment") <- NULL
+  }
+  
   ## return model
   return(object)
 }
@@ -505,14 +512,14 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
 
 ##' -------------------------------------------------------- #
 ##' Updates the model matrix and re-fits the current node
-##' model. Used for the grid-search in 'tvcm_grow_loss'.
+##' model. Used for the grid-search in 'tvcm_grow_gridsearch'.
 ##'
 ##' @param object a prototype model
 ##' @param mcall   the mcall for the prototype model
 ##'
 ##' @return A list of formulas ('root', 'tree' and 'original').
 ##'
-##' @details Used in 'tvcm' and 'tvcm_grow_loss'. Note that the
+##' @details Used in 'tvcm' and 'tvcm_grow_gridsearch'. Note that the
 ##' function will modify the slots of the original object as well!
 ##'
 ##' To do:
@@ -683,7 +690,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
         sum(w[subs]) < 2 * control$minsize[pid]) {
       rval <- matrix(, 0, ifelse(is.numeric(z), 3L, nlevels(z) + 2L))
       colnames(rval) <- c(if (is.numeric(z)) "cut" else levels(z),
-                          "loss", "df")
+                          "lossred", "df")
       attr(rval, "type") <- "loss"
       attr(rval, "keeplosscount") <- 0
       return(rval)
@@ -720,7 +727,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
       } else {
         rval <- matrix(, 0L, 3L)
       }
-      colnames(rval) <- c("cut", "loss", "df")
+      colnames(rval) <- c("cut", "lossred", "df")
       
     } else if (is.factor(z)) { # categorical variables
       
@@ -750,11 +757,11 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
           
         } else  {
           
-          ## Heuristic reduction of splits: in tvcm_grow_loss,
+          ## Heuristic reduction of splits: in tvcm_grow_gridsearch,
           ## the 'isolated' coefficients of each category are
           ## computed. The coefficients are used for ordering
           ## the categories and finally the variable is treated
-          ## as ordinal. See tvcm_grow_loss          
+          ## as ordinal. See tvcm_grow_gridsearch          
           rval <- diag(nl)
           type <- "coef"
         }
@@ -778,12 +785,12 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
       }
       
       rval <- cbind(rval, rep.int(NA, nrow(rval)), rep.int(NA, nrow(rval)))
-      colnames(rval) <- c(levels(z), "loss", "df")
+      colnames(rval) <- c(levels(z), "lossred", "df")
       
     } else {
       
       rval <- matrix(, 0L, 3L)
-      colnames(rval) <- c("cut", "loss", "df")
+      colnames(rval) <- c("cut", "lossred", "df")
     }
     attr(rval, "type") <- type
     attr(rval, "keeplosscount") <- 0
@@ -808,7 +815,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
               (spart != partid[pid] |
                attr(split, "keeplosscount") >= control$keeploss)) {
             attr(split, "keeplosscount") <- 0
-            split[, c("loss", "df")] <- NA
+            split[, c("lossred", "df")] <- NA
           } else {
             attr(split, "keeplosscount") <- attr(split, "keeplosscount") + 1L
           } 
@@ -885,9 +892,9 @@ tvcm_setsplits_sctest <- function(splits, partid, spart,
     for (nid in seq_along(nodeid[[pid]]))
       for (vid in seq_along(varid[[pid]])) {
         if (pid == spart & nid == snode & vid == svar) {
-          splits[[pid]][[nid]][[vid]][, "loss"] <- NA
+          splits[[pid]][[nid]][[vid]][, "lossred"] <- NA
         } else {
-          splits[[pid]][[nid]][[vid]][, "loss"] <- -Inf
+          splits[[pid]][[nid]][[vid]][, "lossred"] <- -Inf
         }
       }
   ## return updated 'splits'
@@ -990,7 +997,7 @@ tvcm_setsplits_rselect <- function(splits, partid, nodeid, varid, control) {
       for (vid in seq_along(varid[[pid]])) 
         if (nrow(splits[[pid]][[nid]][[vid]]) > 0 &&
             !(pid %in% spart & vid %in% svar[[pid]] & nid %in% snode[[pid]]))
-          splits[[pid]][[nid]][[vid]][, "loss"] <- -Inf
+          splits[[pid]][[nid]][[vid]][, "lossred"] <- -Inf
 
   ## return updated 'splits'
   return(splits)
@@ -1153,37 +1160,28 @@ tvcm_sctest_bonf <- function(test, type) {
 ##' @return A nested list with loss matrices. Partitions of nodes
 ##'    are nested in partitions for variables. 
 ##'
-##' @details Used in 'tvcm'.
+##' @details Used in 'tvcm'. 'tvcm_grow_lossRed' is a help
+##'    function of 'tvcm_grow_gridsearch'
 ##'-------------------------------------------------------- #
 
-tvcm_grow_loss <- function(splits, partid, nodeid, varid, 
-                           model, nodes, where, partData, 
-                           control, mcall, formList, step) {
-
-  verbose <- control$verbose; control$verbose <- FALSE;
-
-  loss0 <- control$lossfun(model)
-  mfName <- switch(deparse(mcall[[1]]), glm = "model", olmm = "frame")
-  
-  if (verbose) cat("\n* computing splits ")
-  
-  ## function to get the splitstatistic for a given cutpoint
-  getSplitstat <- function(cutpoint, type = "loss",
-                           pid, nid, vid, 
-                           model, modelNuis,
-                           nuisance) {
-    
+tvcm_grow_lossred <- function(cutpoint, type = "loss",
+                              pid, nid, vid, 
+                              model, modelNuis, nuisance,
+                              where, partData,
+                              control, loss0, mfName) {
+      
     ## set node indicator
     subs <- where[[pid]] == levels(where[[pid]])[nid]
     z <- partData[, vid]    
     if (is.numeric(z)) {
-      zs <- z <= cutpoint
+        zs <- z <= cutpoint
     } else {
-      zs <- z %in% levels(z)[cutpoint > 0L]            
+        zs <- z %in% levels(z)[cutpoint > 0L]            
     }
     model[[mfName]]$Left <- 1 * (subs & zs)
     model[[mfName]]$Right <- 1 * (subs & !zs)
-
+    parm <- grep("Left", names(coef(model)), value = TRUE)
+ 
     ## fit the 'update' model
     model <- tvcm_grow_update(model)
     
@@ -1195,26 +1193,36 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
         if (is.null(modelNuis)) {
           return(rval)
         } else {
-          modelNuis[[mfName]]$Left <- 1 * (subs & zs)
-          modelNuis[[mfName]]$Right <- 1 * (subs & !zs)
-          modelNuis <- tvcm_grow_update(modelNuis)
-          rval[1L] <- rval[1L] - (loss0 - control$lossfun(modelNuis))
-          return(rval)
+            modelNuis[[mfName]]$Left <- 1 * (subs & zs)
+            modelNuis[[mfName]]$Right <- 1 * (subs & !zs)
+            modelNuis <- tvcm_grow_update(modelNuis)
+            rval[1L] <- rval[1L] - (loss0 - control$lossfun(modelNuis))
+            return(rval)
         }  
-      } else {
-        return(c(NA, NA))        
-      }
     } else {
-      parm <- grep("Left", names(coef(model)), value = TRUE)
+        return(c(NA, NA))        
+    }
+  } else {
       nuis <- gsub("Node[A-Z]", "Left", nuisance)
       parm <- setdiff(parm, nuis)  
       if (inherits(model, "try-error")) {
-        return(rep.int(NA, length(parm)))
-      } else {
+          return(rep.int(NA, length(parm)))
+    } else {
         return(coef(model)[parm])
-      }
     }
   }
+}
+
+tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid, 
+                                 model, nodes, where, partData, 
+                                 control, mcall, formList, step) {
+
+  verbose <- control$verbose; control$verbose <- FALSE;
+
+  loss0 <- control$lossfun(model)
+  mfName <- switch(deparse(mcall[[1]]), glm = "model", olmm = "frame")
+  
+  if (verbose) cat("\n* computing splits ")
 
   mcall$data <- eval(mcall$data, environment(mcall))
   w <- weights(model)
@@ -1262,19 +1270,21 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
           for (vid in seq_along(splits[[pid]][[nid]])) {
             cp <- splits[[pid]][[nid]][[vid]]
             type <- attr(cp, "type")
-            subs <- is.na(cp[, "loss"])
-            cp <- cp[, !colnames(cp) %in% c("loss", "df"), drop = FALSE]
+            subs <- is.na(cp[, "lossred"])
+            cp <- cp[, !colnames(cp) %in% c("lossred", "df"), drop = FALSE]
             if (any(subs)) {
-              st <- apply(cp, 1, getSplitstat, type = type,
+              st <- apply(cp, 1, tvcm_grow_lossred, type = type,
                           pid = partid[pid],
                           nid = nodeid[[partid[pid]]][nid],
                           vid = varid[[partid[pid]]][vid],
                           model = sModel, modelNuis = sModelN,
-                          nuisance = control$nuisance[[pid]])
+                          nuisance = control$nuisance[[pid]],
+                          where = where, partData = partData,
+                          control = control, loss0 = loss0, mfName = mfName)
               if (is.matrix(st)) st <- t(st) else st <- matrix(st, ncol = 1L)
 
               if (type == "loss") {
-                splits[[pid]][[nid]][[vid]][subs, c("loss", "df")] <- st
+                splits[[pid]][[nid]][[vid]][subs, c("lossred", "df")] <- st
                 
               } else if (type == "coef") {
                 
@@ -1319,17 +1329,19 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
                 }
                 
                 ## compute the loss of the new splits
-                st <- apply(cp, 1, getSplitstat, type = "loss",
+                st <- apply(cp, 1, tvcm_grow_lossred, type = "loss",
                             pid = partid[pid],
                             nid = nodeid[[partid[pid]]][nid],
                             vid = varid[[partid[pid]]][vid],
                             model = sModel,
                             modelNuis = sModelN,
-                            nuisance = control$nuisance[[pid]])
+                            nuisance = control$nuisance[[pid]],
+                            where = where, partData = partData,
+                            control = control, loss0 = loss0, mfName = mfName)
 
                 if (is.matrix(st)) st <- t(st) else st <- matrix(st, ncol = 2L)
                 split <- cbind(cp, st)
-                colnames(split) <- c(levels(z), "loss", "df")
+                colnames(split) <- c(levels(z), "lossred", "df")
                 attr(split, "type") <- "coef"
                 splits[[pid]][[nid]][[vid]] <- split
               }
@@ -1342,17 +1354,17 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
   
   ## function that extracts the loss reduction (eventually corrected by the
   ## number of predictors)
-  getLossDiff <- function(x) {
-    if (is.list(x)) return(lapply(x, getLossDiff))
+  getPenLossRed <- function(x) {
+    if (is.list(x)) return(lapply(x, getPenLossRed))
     if (is.matrix(x))
         if (nrow(x) > 0L)
-            return(x[, "loss"] - control$dfpar * x[, "df"]) else return(numeric())
+            return(x[, "lossred"] - control$dfpar * x[, "df"]) else return(numeric())
     return(x)
   }
-  loss <- getLossDiff(splits)
+  loss <- getPenLossRed(splits)
   
   ## function that extracts the maximum loss reduction
-  getMaxLossDiff <- function(x) {
+  getMaxPenLossRed <- function(x) {
       x <- unlist(x)
       if (length(x) == 0L) return(-Inf)
       x <- na.omit(x)
@@ -1364,18 +1376,18 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
   if (maxLossDiff > -Inf) {
     
     ## select the partition, node and variable
-    spart <- which(sapply(sapply(loss, getMaxLossDiff), identical, maxLossDiff))
+    spart <- which(sapply(sapply(loss, getMaxPenLossRed), identical, maxLossDiff))
     if (length(spart) > 1L) spart <- sample(spart, 1L)
     snode <-
-      which(sapply(sapply(loss[[spart]], getMaxLossDiff), identical, maxLossDiff))
+      which(sapply(sapply(loss[[spart]], getMaxPenLossRed), identical, maxLossDiff))
     if (length(snode) > 1L) snode <- sample(snode, 1L)
-    svar <- which(sapply(sapply(loss[[spart]][[snode]], getMaxLossDiff),
+    svar <- which(sapply(sapply(loss[[spart]][[snode]], getMaxPenLossRed),
                          identical, maxLossDiff))
     if (length(svar) > 1L) svar <- sample(svar, 1L)
     
     ## select the cut
     stat <- splits[[spart]][[snode]][[svar]]
-    cutid <- which(stat[, "loss"] == max(stat[, "loss"]))
+    cutid <- which(stat[, "lossred"] == max(stat[, "lossred"]))
     if (length(cutid) > 1L) cutid <- sample(cutid, 1L)
     
     if (verbose) cat("OK")
@@ -1384,9 +1396,9 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
                 nodeid = nodeid[[partid[spart]]][snode],
                 varid = varid[[partid[spart]]][svar],
                 cutid = cutid,
-                cut = stat[cutid, !colnames(stat) %in% c("loss", "df")],
-                loss = as.numeric(stat[cutid, "loss"]),
-                ploss = maxLossDiff,
+                cut = stat[cutid, !colnames(stat) %in% c("lossred", "df")],
+                lossred = as.numeric(stat[cutid, "lossred"]),
+                plossred = maxLossDiff,
                 df = as.numeric(stat[cutid, "df"]),
                 lossgrid = splits))
   } else {
@@ -1394,8 +1406,8 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
     if (verbose) cat("failed")
     
     return(list(partid = NULL, nodeid = NULL, varid = NULL, 
-                cutid = NULL, cut = NULL, loss = NULL,
-                lossgrid = splits))
+                cutid = NULL, cut = NULL, lossred = NULL,
+                plossred = NULL, lossgrid = splits))
     
   }
 }
@@ -1406,7 +1418,7 @@ tvcm_grow_loss <- function(splits, partid, nodeid, varid,
 ##' tree structire.
 ##'
 ##' @param nodes    an object of class 'partynode'.
-##' @param loss     a list produced by 'tvcm_grow_loss'.
+##' @param loss     a list produced by 'tvcm_grow_gridsearch'.
 ##' @param partData a 'data.frame' with the partitioning variables.
 ##' @param step     integer. The current algorithm step.
 ##'
@@ -1645,7 +1657,7 @@ tvcm_formula <- function(formList, root, family = cumulative(),
       return(formList$vc[[pid]]$nuisance)
     })
   
-    ## update formulas for tvcm_grow_loss
+    ## update formulas for tvcm_grow_gridsearch
     fUpdate <- vector("list", length(formList$vc))
     for (pid in seq_along(fUpdate)) {
       fUpdate[[pid]] <- vector("list", 2L)
@@ -1929,7 +1941,11 @@ tvcm_get_vcparm <- function(object) {
         if (inherits(object$info$model, "olmm")) {
             etaList <- vcrpart_formula(eta)
             parmCe <- all.vars(etaList$fe$eta$ce)
-            parmCe <- paste("Eta", 1:object$info$model$dims["nEta"], ":", parmCe, sep = "")
+            if (length(parmCe) > 0L) {
+                parmCe <- paste("Eta", 1:object$info$model$dims["nEta"], ":", parmCe, sep = "")
+            } else {
+                parmCe <- NULL
+            }
             parmGe <- all.vars(etaList$fe$eta$ge)
             parm <- c(parmCe, parmGe)
         } else {

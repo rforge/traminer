@@ -8,7 +8,7 @@ importFrom("parallel", mclapply)
 importFrom("grid", gpar, unit, unit.c, convertHeight, convertWidth, convertUnit,
            viewport, pushViewport, upViewport, popViewport, plotViewport,
            grid.layout, grid.rect, grid.points, grid.lines, grid.segments, grid.text,
-           depth, grid.xaxis, grid.yaxis, grid.newpage, arrow) # add 'depth'
+           depth, grid.xaxis, grid.yaxis, grid.newpage, arrow)
 importFrom("stats",
            AIC, BIC, anova, coef, coefficients, deviance,
            extractAIC, fitted, formula, getCall, logLik,

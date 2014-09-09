@@ -375,11 +375,14 @@ olmm <- function(formula, data, family = cumulative(),
   xlevels <- .getXlevels(attr(fullmf, "terms"), fullmf)
   if (is.null(xlevels)) storage.mode(xlevels) <- "list"
 
-  ## terms
+  ## get terms and delete environments
+  formList <- vcrpart_formula_delEnv(formList)
   terms <- list(feCe = terms(formList$fe$eta$ce, keep.order = TRUE),
                 feGe = terms(formList$fe$eta$ge, keep.order = TRUE),
                 reCe = terms(formList$re$eta$ce, keep.order = TRUE),
                 reGe = terms(formList$re$eta$ge, keep.order = TRUE))
+  environment(formula) <- NULL
+  attr(attr(fullmf, "terms"), ".Environment") <- NULL
   
   ## define fit object
   
@@ -420,7 +423,7 @@ olmm <- function(formula, data, family = cumulative(),
                    control = control,
                    optim = optim,
                    output = list(),
-                   conv = FALSE),
+                   converged = FALSE),
               class = "olmm")
 
   ## delete big data blocks
@@ -468,10 +471,10 @@ olmm <- function(formula, data, family = cumulative(),
 
     ## warnings from optimization
     olmm_optim_warnings(object$output, FUN)
-    object$conv <- switch(object$optim$fit,
-                          optim = object$output$convergence == 0,
-                          nlminb = object$output$convergence == 0,
-                          ucminf = object$output$convergence %in% c(1, 2, 4))
+    object$converged <- switch(object$optim$fit,
+                               optim = object$output$convergence == 0,
+                               nlminb = object$output$convergence == 0,
+                               ucminf = object$output$convergence %in% c(1, 2, 4))
     
     ## numeric estimate of fisher information
     if (dims["numHess"] == 1L) {

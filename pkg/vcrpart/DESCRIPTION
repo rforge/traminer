@@ -10,8 +10,8 @@ Authors@R: c(
 Maintainer: Reto Buergin <rbuergin@gmx.ch>
 Description: The package provides a recursive partitioning algorithm for varying coefficient generalized linear models and ordinal 2-stage linear mixed models. Special features are coefficient-wise partitioning, fixated coefficients and partitioning of time-varying variables in longitudinal ordinal regression.
 License: GPL (>= 2)
-Depends: R (>= 3.1.0), partykit
-Imports: stats, grid, parallel, graphics, methods, nlme, rpart, numDeriv, ucminf, zoo, sandwich, strucchange
+Depends: R (>= 3.1.0), parallel, partykit
+Imports: stats, grid, graphics, methods, nlme, rpart, numDeriv, ucminf, zoo, sandwich, strucchange
 LazyLoad: yes
 NeedsCompilation: yes
 Packaged: 2014-09-08 16:30:00 UTC; rbuergin

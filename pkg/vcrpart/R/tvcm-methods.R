@@ -451,6 +451,13 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
       if (inherits(tree$info$model, "try-error"))
           stop("tree model fitting failed.")
 
+      ## heavy terms
+      if (inherits(tree$info$model, "glm")) {
+        attr(attr(tree$info$model$model, "terms"), ".Environment") <- NULL
+        environment(tree$info$model$formula) <- NULL
+        attr(tree$info$model$terms, ".Environment") <- NULL
+      }
+      
       ## update control
       tree$info$control <-
           tvcm_grow_setcontrol(tree$info$control, tree$info$model, formList, vcRoot)
@@ -732,7 +739,7 @@ print.splitpath.tvcm <- function(x, ...) {
       cat("\nNode:", x[[i]]$node)
       cat("\nCutpoint: ")
       cat(paste("{",paste(x[[i]]$cutpoint, collapse = "}, {"), "}", sep = ""))
-      cat("\nPenalized loss reduction:", format(x[[i]]$ploss, ...), "\n")
+      cat("\nPenalized loss reduction:", format(x[[i]]$plossred, ...), "\n")
   }
     
     if (!is.null(x[[i]]$sctest) | !is.null(x[[i]]$lossgrid))

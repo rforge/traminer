@@ -8,18 +8,20 @@
 ##' most of the functions are not exported and documented inline.
 ##'
 ##' Functions:
-##' addEmptyChar:         add empty spaces to a character
-##' appendDefArgs:        over-write default arguments
-##' deparseCall:          convert a 'call' into a 'character'
-##' formatMatrix:         format matrices for print functions
-##' vcrpart_copy:         duplicate R objects
-##' vcrpart_value_space:  extract the values space of data data.frame
-##' fe, vc, re, ce, ge    special terms for formulas. Are exported.
-##' vcrpart_contr.sum:    compute weighted sum contrasts
-##' vcrpart_fitted:       extract model fitted values
-##' vcrpart_formula_eta:  constructs a formula for linear predictors
-##' vcrpart_formula_cond: constructs a formula for contitioning variables
-##' vcrpart_formula:      extracts a list of predictor formulas
+##' addEmptyChar:          add empty spaces to a character
+##' appendDefArgs:         over-write default arguments
+##' deparseCall:           convert a 'call' into a 'character'
+##' formatMatrix:          format matrices for print functions
+##' vcrpart_copy:          duplicate R objects
+##' vcrpart_value_space:   extract the values space of data data.frame
+##' fe, vc, re, ce, ge     special terms for formulas. Are exported.
+##' vcrpart_contr.sum:     compute weighted sum contrasts
+##' vcrpart_fitted:        extract model fitted values
+##' vcrpart_formula_eta:   constructs a formula for linear predictors
+##' vcrpart_formula_cond:  constructs a formula for contitioning variables
+##' vcrpart_formula:       extracts a list of predictor formulas
+##' vcrpart_formula_delEnv: deletes environments of lists of formulas
+##'                         from vcrpart_formula.
 ##'
 ##' Last modifications:
 ##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
@@ -633,4 +635,35 @@ vcrpart_formula <- function(formula, family = cumulative(),
   fAll <- as.formula(fAll, env = env)
   rval$all <- fAll
   return(rval)
+}
+
+
+## --------------------------------------------------------- #
+##' Delete the environments of formulas in
+##' \code{\link{vcrpart_formula}}
+##'
+##' @param formList a list of formulas as produced by
+##'    \code{\link{vcrpart_formula}}.
+##'
+##' @return A list of formulas.
+## --------------------------------------------------------- #
+
+vcrpart_formula_delEnv <- function(formList) {
+    if (!is.null(formList$fe)) {
+        environment(formList$fe$eta$ce) <- NULL
+        environment(formList$fe$eta$ge) <- NULL
+    }
+    for (pid in seq_along(formList$vc)) {
+        environment(formList$vc[[pid]]$eta$ce) <- NULL
+        environment(formList$vc[[pid]]$eta$ge) <- NULL
+        environment(formList$vc[[pid]]$cond$ce) <- NULL
+        environment(formList$vc[[pid]]$cond$ge) <- NULL
+    }
+    if (!is.null(formList$fe)) {
+        environment(formList$fe$eta$ce) <- NULL
+        environment(formList$fe$eta$ge) <- NULL
+    }
+    environment(formList$original) <- NULL
+    environment(formList$all) <- NULL
+    return(formList)
 }

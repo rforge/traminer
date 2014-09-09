@@ -1,29 +1,25 @@
-		 CHANGES IN tvcm VERSION 0.2-1
+Changes in Version 0.2-1
 
-GENERAL
+    o   First CRAN release.
 
-    o    complete revision of syntaxes, argument names and 
-         default parameters. R commands for the former version 0.1-14 
-         are hardly compatibel. Please contact reto.buergin@unige.ch 
+    o   'tvcm' and 'fvcm' allow for multiple 'vc' terms, i.e. 
+        coefficient-specific partitions
+
+    o    Complete revision of syntaxes, argument names and  default 
+         parameters. R commands for the former version 0.1-14 are 
+         hardly compatibel. Please contact <rbuergin@gmx.ch> 
          in case of questions.
-    o    the default splitting criterion of 'tvcm' was changed from 
+
+    o    The default splitting criterion of 'tvcm' was changed from 
          (old) coefficient constancy tests combined with greedy loss 
          minimization to (new) exhaustive greedy loss minimization. Splitting 
          based on the (old) requires to set the argument 'sctest = TRUE' in 
          'tvcm_control'
 
-NEW FEATURES
-     
-     o   'tvcm' and 'fvcm' allow for multiple 'vc' terms.
-     
-
-IMPROVEMENTS
-
-     o	 the greedy loss reduction minimization stage of 'tvcm' does now 
+     o	 The greedy loss reduction minimization stage of 'tvcm' does now 
          fixate coefficients which are not splitted at the estimates of 
          the current model. The technique intends acceleration.
 
-     o   cross-validation is now integrated in the 'tvcm' function.
+     o   Cross-validation is now integrated in the 'tvcm' function.
 
-     o   several functions such as 'cvloss' are parallelized by using the
-         'parallel' package.
+     o   'cvloss' and 'prune' are parallelized using the 'parallel' package.

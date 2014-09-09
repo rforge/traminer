@@ -14,7 +14,9 @@
 ##' all functions are documented as *.Rd files
 ##'
 ##' Last modifications:
-##' 2014-09-08: resolved a problem with 'offset'
+##' 2014-09-08: - resolved a problem with 'offset'
+##'             - removed the environment from the model, which
+##'               require a lot of memory
 ##' 2014-09-06: - incorporate automatic cross-validation and pruning
 ##' 2014-09-04: - assign only those arguments of '...' to 'fit'
 ##'               that appear in 'formals(fit)'
@@ -126,7 +128,6 @@ tvcm <- function(formula, data, fit, family,
   
   ## create a call
   if (control$verbose) cat("OK\n* setting arguments ... ")
-  start <- list(...)$start
   weights <- model.weights(mf)
   if (missing(offset)) offset <- NULL
   if (!is.null(offset) & !is.null(model.offset(mf)))
@@ -198,7 +199,7 @@ tvcm <- function(formula, data, fit, family,
   ## partitioning variables
   partVars <- lapply(formList$vc, function(x) attr(terms(x$cond), "term.labels"))
   
-  ## define partitioning data
+  ## define partitionig data
   if (!is.null(formList$vc)) {
     partForm <- formula(paste("~", paste(unique(unlist(partVars)), collapse = "+")))
   } else {  
@@ -209,8 +210,6 @@ tvcm <- function(formula, data, fit, family,
     stop("partitioning variables must be either 'numeric' or (ordered) 'factor'.")  
   attr(partData, "terms") <- attr(mf, "terms")
   attr(partData, "na.action") <- attr(mf, "na.action")
-
-  ## grow the tree
 
   ## replicates the required structure of 'tvcm' objects
   object <- structure(list(data = partData,
@@ -226,8 +225,11 @@ tvcm <- function(formula, data, fit, family,
                              dotargs = dotargs)),
                       class = "tvcm")
 
+  ## grow the tree
   if (control$cv) {
     if (control$verbose) cat("\n* starting partitioning and cross validation ...\n")
+
+    ## prepare the call
     cvCall <- list(name = as.name("cvloss"),
                    object = quote(object),
                    folds = quote(control$folds),
@@ -240,14 +242,14 @@ tvcm <- function(formula, data, fit, family,
     cvCall[papplyArgs] <- control[papplyArgs]
     mode(cvCall) <- "call"
     
-    ## calls cvloss
+    ## call cvloss
     tree <- eval(cvCall)
     if (control$verbose)
       cat("\nestimated dfsplit =", format(tree$info$cv$dfsplit.hat, digits = 3), "\n")
     
   } else {
     
-    ## calls directly 'tvcm_grow'
+    ## call directly 'tvcm_grow'
     if (control$verbose) cat("\n* starting partitioning ...\n")
     tree <- tvcm_grow(object)
   }
@@ -257,7 +259,7 @@ tvcm <- function(formula, data, fit, family,
     if (control$verbose) cat("\n* pruning ... ")
     tree <- prune(tree, dfsplit = tree$info$cv$dfsplit.hat, papply = control$papply)
     if (control$verbose) cat("OK")
-  }
+  }  
   
   if (control$verbose) {
     cat("\n\nFitted model:\n")
