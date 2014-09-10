@@ -529,7 +529,6 @@ panel_coef <- function(object, parm = NULL,
       
       grid.xaxis(at = 1:ncol(coefList[[i]]), label = plot_gp[[i]]$xlabel,
                  gp = gpar(lineheight = 0.5))
-      
       grid.rect()
       upViewport(3L)
 
