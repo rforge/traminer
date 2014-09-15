@@ -5,6 +5,10 @@ Bug fixes:
   - seqformat(): fixed error occurring when converting from STS to TSE
     with a tevent matrix containing empty strings (i.e. "")
 
+Misc:
+  - Two additional exported aliases to TraMineR internal functions:
+    TraMineRInternalSeqeage and and TraMineRInternalLegend.
+
 ## =========
 Version 1.8-8
 
