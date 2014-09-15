@@ -1,6 +1,11 @@
 ﻿                CHANGES IN TraMineRextras VERSION 0.3.3 [2013-10-30]
 
     o   seqgranularity(): new method "mostfreq"
+    
+    o   seqedplot(): replaced calls of TraMineR internal functions seqeage
+        and TraMineR.legend functions with respectively
+        TraMineRInternalSeqeage and TraMineRInternalLegend
+        (should be transparent to the end user).
 
 
                 CHANGES IN TraMineRextras VERSION 0.2.2 [2013-10-30]
