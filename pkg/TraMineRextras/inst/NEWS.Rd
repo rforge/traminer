@@ -4,6 +4,10 @@
 \subsection{Changes in existing functions}{
   \itemize{
     \item{\code{seqgranularity()}: new method \code{"mostfreq"}}
+    \item{\code{seqedplot()}: replaced calls of TraMineR internal functions \code{seqeage}
+        and \code{TraMineR.legend} functions with respectively
+        \code{TraMineRInternalSeqeage} and \code{TraMineRInternalLegend}
+        (should be transparent to the end user).}
 }
 }
 }
