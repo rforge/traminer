@@ -1,9 +1,32 @@
+Changes in Version 0.2-2
+
+    o    Improvements for the 'panel_coef' function: Points and 
+         lines falling outside the pre-specified 'ylim' intervals 
+         are now suppressed.
+
+    o    Added variable centering as default for split selection.
+
+    o    The definition of the tuning parameters for 'tvcm' were 
+         modified. The main tuning parameter is now 'cp' (as in 
+         the 'rpart' function). See the help of 'tvcm' and 
+         'tvcm_control' for details. 
+
+    o    Additional 'nimpute' argument for 'tvcm_control()'.
+
+    o    Added detail section to the help page of 'tvcm_control'
+
+    o    Removed AIC table from 'print.tvcm' (AIC and BIC seem not
+         relevant measures for models fitted by 'tvcm').
+
+    o    Added 'PL' data set
+
+
 Changes in Version 0.2-1
 
-    o   First CRAN release.
+    o    First CRAN release.
 
-    o   'tvcm' and 'fvcm' allow for multiple 'vc' terms, i.e. 
-        coefficient-specific partitions
+    o    'tvcm' and 'fvcm' allow for multiple 'vc' terms, i.e. 
+         coefficient-specific partitions
 
     o    Complete revision of syntaxes, argument names and  default 
          parameters. R commands for the former version 0.1-14 are 

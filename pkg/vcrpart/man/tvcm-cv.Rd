@@ -27,9 +27,7 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
       prob = 0.5, weights = c("case", "freq"),
       seed = NULL)
 
-\method{cvloss}{tvcm}(object, folds = folds_control(),
-       fun = NULL, dfpar = NULL, direction = c("backward", "forward"),
-       papply = mclapply, verbose = FALSE, ...)
+\method{cvloss}{tvcm}(object, folds = folds_control(), ...)
 
 \method{print}{cvloss.tvcm}(x, ...)
 
@@ -38,10 +36,8 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
 \method{oobloss}{tvcm}(object, newdata = NULL, weights = NULL,
         fun = NULL, ...)
 
-\method{prune}{tvcm}(tree, dfsplit = NULL, dfpar = NULL,
-      direction = c("backward", "forward"),
-      alpha = NULL, maxstep = NULL, terminal = NULL,
-      papply = mclapply, keeploss = FALSE, original,...)
+\method{prune}{tvcm}(tree, cp = NULL, alpha = NULL, maxstep = NULL,
+      terminal = NULL, original = FALSE, ...)
 }
 
 \arguments{
@@ -61,34 +57,16 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   \item{seed}{an numeric scalar that defines the seed.}
   \item{folds}{a list with control arguments as produced by
     \command{\link{folds_control}}.}
-  \item{fun}{the loss function for the validation sets. By default, the
-    (possibly weighted) mean of the deviance residuals as defined by the
-    \command{\link{family}} of the fitted \code{object} is applied.}
-  \item{dfpar}{a numeric scalar larger than zero. The per parameter penalty
-    to be applied. If the 2 log-likelihood prediction error is used,
-    this value is typically set to 2. If \code{NULL}, the value of
-    \code{dfpar} of the partitioning stage is used, see
-    \code{tvcm_control()}}  
-  \item{direction}{either \code{"backward"} (the default) or
-    \code{"forward"}. Indicates the pruning algorithm to be
-    used. \code{"backward"} applies backward pruning where in each
-    iteration the inner node that produces the smallest per-node
-    increase is collapsed. \code{"forward"} applies premature stopping
-    when no new split would improve the model.}
-  \item{papply}{(parallel) apply function, defaults to
-    \code{\link[parallel]{mclapply}}. To run \code{cvloss} sequentially
-    (i.e. not in parallel), use \command{\link{lapply}}. Special arguments
-    for that apply function can be assigned as well.}
-  \item{newdata}{a data.frame of out-of-bag data (including the response
-    variable). See also \command{\link{predict.tvcm}}.}
-  \item{verbose}{logical scalar. If \code{TRUE} verbose output is
-    generated during the validation.}
   \item{legend}{logical scalar. Whether a legend should be added.}
   \item{details}{logical scalar. Whether the foldwise validation errors
     and the in-sample prediction error should be shown.}
-  \item{dfsplit}{numeric scalar. The per-split cost \code{dfsplit} with
-    which the partitions are to be cross-validated. If no \code{dfsplit}
-    is specified (default), the parameter is ignored for pruning.}
+  \item{fun}{the loss function for the validation sets. By default, the
+    (possibly weighted) mean of the deviance residuals as defined by the
+    \command{\link{family}} of the fitted \code{object} is applied.}
+  \item{newdata}{a data.frame of out-of-bag data (including the response
+    variable). See also \command{\link{predict.tvcm}}.}
+  \item{cp}{numeric scalar. The complexity parameter to be cross-validated 
+    resp. the penalty with which the model should be pruned.}
   \item{alpha}{numeric significance level. Represents the stopping
     parameter for \command{\link{tvcm}} objects grown with
     \code{sctest = TRUE}, see \command{\link{tvcm_control}}. A node is
@@ -97,15 +75,6 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   \item{maxstep}{integer. The maximum number of steps of the algorithm.} 
   \item{terminal}{a list of integer vectors with the ids of the nodes
     the subnodes of which should be merged. }
-  \item{keeploss}{logical scalar or numeric. If and how many times the
-    statistics should be reused in following iterations. Specifically,
-    the option activates approximating the AIC reduction per split based
-    on AIC reduction of the last iteration adjusted by AIC reduction of
-    the last collapse. Values different from \code{FALSE} or 0 will
-    accelerate the algorithm at the expense of accuracy. In cases of
-    multiple \command{\link{vc}} terms, only the statistics corresponding
-    to the \command{\link{vc}} term in which a node was collapsed in the
-  previous iteration are considered to be reused.} 
   \item{original}{logical scalar. Whether pruning should be based on the
     trees from partitioning rather than on the current trees.}
   \item{...}{other arguments to be passed.} 
@@ -117,19 +86,23 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   partitions by pruning. Both steps can be carried out with a single
   \command{\link{tvcm}} and several parameters can be specified with
   \command{\link{tvcm_control}}. The here presented functions may be
-  interesting for advanced users who want to process the two stages with
+  interesting for advanced users who want to process the two stages by
   separate calls.  
 
   The \command{\link{prune}} method collapses inner nodes of the overly
   large tree fitted with \command{\link{tvcm}} according to the tuning
-  parameter \code{dfsplit} to minimize the estimated in-sample
-  prediction error. The in-sample prediction error is, in what follows,
-  defined as the mean of the in-sample loss plus \code{dfpar} times the
-  number of coefficients plus \code{dfsplit} times the number of
-  splits. In the common likelihood setting, the loss is equal - 2 times
-  the maximum likelihood and \code{dfpar = 2}. The per-split penalty
-  \code{dfsplit} generally unknown and estimated by using
-  cross-validation.  
+  parameter \code{cp}, the goal being to minimize the cost-complexity
+  in-sample error. The cost-complexity in-sample error is, in what 
+  follows, defined as the in-sample error plus \code{cp} times the
+  complexity of the model. Specifically, in the considered likelihood
+  setting, the in-sample error is equal - 2 times the log-likelihood at
+  the estimated parameters. Further, the complexity of the model is
+  defined as \code{dfpar} times the number of coefficients times
+  \code{dfsplit} times the number of splits. By default (see
+  \command{\link{tvcm_control}}), the complexity is just the number of
+  splits since \code{dfpar = 0} and \code{dfpar = 0} and \code{dfsplit =
+    1}. The complexity penalty \code{cp} is generally unknown and
+  estimated by using cross-validation.  
 
   \command{\link{folds_control}} and \command{\link{cvloss}} allow for
   estimating \code{dfsplit} by cross-validation. The function
@@ -140,9 +113,8 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   replacement). For 2-stage models (with random-effects) fitted by
   \command{\link{olmm}}, the subsets are based on subject-wise i.e. first
   stage sampling. For models where weights represent frequencies of
-  observation units with exactly the same values in all variables (e.g.,
-  data from contingency tables), the option \code{weights = "freq"}
-  should be used.  
+  observation units (e.g., data from contingency tables), the option
+  \code{weights = "freq"} should be used.  
 
   \command{\link{cvloss}} repeatedly fits \command{\link{tvcm}} objects
   based on the internally created folds and evaluates mean out-of-bag
@@ -167,27 +139,31 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   \command{\link{family}} resp. \command{\link{family.olmm}}. Otherwise,
   the loss function can be defined manually by the argument \code{fun},
   see the examples below. In general the sum of deviance residual is
-  equal the -2 log-likelihood. A special case is the gaussian family,
-  where the deviance residuals are computed as \eqn{\sum_{i=1}^N w_i
-  (y_i-\mu)^2} that is, the deviance residuals ignore the term
-  \eqn{\log{2\pi\sigma^2}}. Therefore, the sum of deviance residuals for
-  the gaussian model (and possibly others) is not exactly the -2
-  log-likelihood prediction error but shifted by a constant. Another
-  special case are models with random effects. For models based on
-  \command{\link{olmm}}, the deviance residuals are based on the
-  marginal predictions (where random effects are integrated out).
+  equal the sum of the -2 log-likelihood errors. A special case is the
+  gaussian family, where the deviance residuals are computed as
+  \eqn{\sum_{i=1}^N w_i (y_i-\mu)^2}, that is, the deviance residuals
+  ignore the term \eqn{\log{2\pi\sigma^2}}. Therefore, the sum of
+  deviance residuals for the gaussian model (and possibly others) is not
+  exactly the sum of -2 log-likelihood prediction errors (but shifted by
+  a constant). Another special case are models with random effects. For
+  models based on \command{\link{olmm}}, the deviance residuals are
+  retrieved from marginal predictions (where random effects are
+  integrated out). 
 
   The \command{\link{prune}} function is used to select a nested model
-  of the current model, i.e. a model which collapses leaves to their
-  inner nodes based on the estimated prediction error. The estimated
-  prediction error is defined as the AIC of the model plus \code{dfsplit}
-  times the number of splits. Pruning with \code{direction = "backward"}
-  works as follows: In each iteration, all nested models of the current
-  model are evaluated, i.e. models which collapse one of the inner nodes
-  of the current model. The inner node that yields the smallest increase 
-  in the estimated prediction error is collapsed and the resulting model
-  substitutes the current model. The algorithm is stopped as soon as all
-  nested models have a higher estimated prediction error than the
+  of the current model, i.e. a model which collapses terminal nodes to
+  their inner nodes based by minimizing the in-sample error (see
+  above). Pruning works as follows: In each iteration, all models that
+  collapse one inner node of the current models are fitted. The inner
+  node that yields the smallest increase in the in-sample error per
+  complexity unit (e.g., by the number of splits) is collapsed and the
+  resulting model substitutes the current model. The algorithm is
+  stopped as soon as the increase of in-sample error per complexity
+  unit of several nested models is larger than \code{cp}, 
+
+
+  all nested models
+  have a higher estimated prediction error than the 
   current model, which will be returned. 
 }
 

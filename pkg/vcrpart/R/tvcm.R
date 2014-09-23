@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2014-09-06
+##' Date:        2014-09-20
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -14,6 +14,11 @@
 ##' all functions are documented as *.Rd files
 ##'
 ##' Last modifications:
+##' 2014-09-20: - add argument 'ninupute' the 'tvcm_control'
+##' 2014-09-19: - do not call 'cvloss' if no varying coefficients
+##' 2014-09-17: - defined definition of penalization
+##'             - deleted parameter 'maxoverstep'
+##'             - added parameters 'mindev', 'cp'
 ##' 2014-09-08: - resolved a problem with 'offset'
 ##'             - removed the environment from the model, which
 ##'               require a lot of memory
@@ -24,7 +29,7 @@
 ##'               produced by 'vcrpart_formula'. The modification
 ##'               was due to acceleration techniques ('vcrpart_formula'
 ##'               is usually slow!)
-##' 2014-08-29: - implement adjustment of loss reduction by number
+##' 2014-08-29: - implement adjustment of deviance by number
 ##'               of predictor of coefficient-group
 ##' 2014-07-31: - set 'sctest = FALSE' as the default
 ##'             - return an error if multiple trees and 'sctest = TRUE'
@@ -36,6 +41,9 @@
 ##'               and 'maxoverstep'
 ##' 2014-06-26: incorporate new function 'tvcm_grow_setsplits'
 ##' 2014-06-16: allow coefficient-wise trees
+##'
+##' To do:
+##' -
 ##' -------------------------------------------------------- #
 
 tvcolmm <- function(formula, data, family = cumulative(),
@@ -73,6 +81,15 @@ tvcm <- function(formula, data, fit, family,
   if (control$verbose) cat("* checking arguments ... ")
   stopifnot(inherits(formula, "formula"))
   stopifnot(inherits(control, "tvcm_control"))
+
+  ## check and set 'family'
+  if (missing(family)) stop("no 'family'.")
+  if (is.character(family)) {
+    family <- get(family, mode = "function", envir = parent.frame())
+  } else if (is.function(family)) {
+    family <- family()
+  }
+  if (!class(family) %in% c("family", "family.olmm")) stop("'family' not recognized")
   
   ## check and set 'fit'
   if (missing(fit)) {
@@ -85,15 +102,6 @@ tvcm <- function(formula, data, fit, family,
     if (is.function(fit)) fit <- deparse(mc$fit)
   }
   if (!fit %in% c("glm", "olmm")) stop("'fit' not recognized.")
-    
-  ## check and set 'family'
-  if (missing(family)) stop("no 'family'.")
-  if (is.character(family)) {
-      family <- get(family, mode = "function", envir = parent.frame())
-  } else if (is.function(family)) {
-      family <- family()
-  }
-  if (!class(family) %in% c("family", "family.olmm")) stop("'family' not recognized")
   if (fit != "olmm") control$estfun <- NULL
   
   ## set formulas
@@ -106,7 +114,8 @@ tvcm <- function(formula, data, fit, family,
   env <- environment(eval.parent(mc$formula))
   formList <- vcrpart_formula(formula, family, env)
   nPart <- length(formList$vc)  
-
+  if (nPart < 1L) control$cv <- FALSE
+    
   direct <- any(sapply(formList$vc, function(x) x$direct))
   if (length(direct) == 0L) direct <- FALSE
   control$direct <- direct
@@ -167,7 +176,8 @@ tvcm <- function(formula, data, fit, family,
     if (nPart > 1L)
       stop("coefficient constancy tests can be used only ",
            "if a single 'vc' term is specified.")
-    if (!is.null(formList$vc) && (formList$vc[[1L]]$direct & formList$fe$intercept != "none"))
+    if (!is.null(formList$vc) && (formList$vc[[1L]]$direct &
+                                  formList$fe$intercept != "none"))
       stop("if 'sctest = TRUE', searching for intercept is only possible if the",
            "global intercept is removed. Use something like 'formula = y ~ -1 + ...'")
   }
@@ -177,8 +187,8 @@ tvcm <- function(formula, data, fit, family,
 
   ## set imputation in 'control'
   if (!inherits(model, "olmm") | inherits(model, "olmm") &&
-      length(unique(table(model$subject))) == 1L)
-    control$ninpute <- 1L
+      length(unique(table(model$subject))) == 1L) 
+    control$nimpute <- 1L
   
   ## specify which coefficients are considered as 'nuisance' parameters
   if (control$verbose && control$sctest)
@@ -245,7 +255,7 @@ tvcm <- function(formula, data, fit, family,
     ## call cvloss
     tree <- eval(cvCall)
     if (control$verbose)
-      cat("\nestimated dfsplit =", format(tree$info$cv$dfsplit.hat, digits = 3), "\n")
+      cat("\nestimated cp =", format(tree$info$cv$cp.hat, digits = 3), "\n")
     
   } else {
     
@@ -257,7 +267,7 @@ tvcm <- function(formula, data, fit, family,
   ## pruning
   if (control$prune && inherits(tree, "tvcm")) {
     if (control$verbose) cat("\n* pruning ... ")
-    tree <- prune(tree, dfsplit = tree$info$cv$dfsplit.hat, papply = control$papply)
+    tree <- prune(tree, cp = tree$info$cv$cp.hat, papply = control$papply)
     if (control$verbose) cat("OK")
   }  
   
@@ -272,56 +282,63 @@ tvcm <- function(formula, data, fit, family,
   return(tree)
 }
 
-
-tvcm_control <- function(lossfun = neglogLik2, 
-                         maxstep = Inf, maxwidth = Inf,
-                         minsize = 30, maxdepth = Inf,
-                         dfpar = 2.0, dfsplit = 0.0,
-                         maxoverstep = ifelse(sctest, Inf, 0),
+tvcm_control <- function(minsize = 30, mindev = 2.0,
                          sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
-                         trim = 0.1, estfun = list(),
+                         trim = 0.1, estfun.args = list(), nimpute = 5, 
                          maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
+                         maxstep = Inf, maxwidth = Inf, maxdepth = Inf,
+                         lossfun = neglogLik2, ooblossfun = NULL,
+                         cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
                          cv = !sctest, folds = folds_control("kfold", 5),
-                         prune = cv, keeploss = FALSE, papply = mclapply,
-                         verbose = FALSE, ...) {
+                         prune = cv, papply = mclapply, papply.args = list(),
+                         center = TRUE, verbose = FALSE, ...) {
   mc <- match.call()
   
   ## check available arguments
-  stopifnot(is.function(lossfun))
-  stopifnot(is.numeric(maxstep) && length(maxstep) == 1L && maxstep >= 0L)
-  stopifnot(is.numeric(maxwidth) && all(maxwidth > 0L))
   stopifnot(is.null(minsize) | (is.numeric(minsize) && all(minsize > 0)))
-  stopifnot(is.numeric(maxdepth) &&  all(maxdepth >= 0))
-  stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
-  stopifnot(is.numeric(dfsplit) && length(dfsplit) == 1L)
-  stopifnot(is.numeric(maxoverstep) && length(maxoverstep) == 1L)
+  stopifnot(is.numeric(mindev) && length(mindev) == 1L)
+
   stopifnot(is.logical(sctest) && length(sctest) == 1L)
-  if (length(alpha) != 1L)
   stopifnot(is.numeric(alpha) && length(alpha) == 1L && alpha >= 0.0 && alpha <= 1.0)
   stopifnot(is.logical(bonferroni) && length(bonferroni) == 1L)
+
   stopifnot(is.numeric(trim) && length(trim) == 1L && trim >= 0.0 & trim < 0.5)
-  stopifnot(is.list(estfun))
+  stopifnot(is.list(estfun.args))
+  stopifnot(is.numeric(nimpute) && length(nimpute) == 1L && nimpute > 0)
+  nimpute <- max(1.0, round(nimpute))
+
   stopifnot(is.numeric(maxfacsplit) && length(maxfacsplit) == 1L && maxfacsplit > 1L)
   stopifnot(is.numeric(maxordsplit) && length(maxordsplit) == 1L && maxordsplit > 1L)
   stopifnot(is.numeric(maxnumsplit) && length(maxnumsplit) == 1L && maxnumsplit > 1L)
+
+  stopifnot(is.numeric(maxstep) && length(maxstep) == 1L && maxstep >= 0L)
+  stopifnot(is.numeric(maxwidth) && all(maxwidth > 0L))
+  stopifnot(is.numeric(maxdepth) &&  all(maxdepth >= 0))
+
+  stopifnot(is.function(lossfun))
+  stopifnot(is.null(ooblossfun) | is.function(ooblossfun))
+
+  stopifnot(is.numeric(cp) && length(cp) == 1L)
+  stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
+  stopifnot(is.numeric(dfsplit) && length(dfsplit) == 1L)
+
   stopifnot(is.logical(cv) && length(cv) == 1L)
   stopifnot(inherits(folds, "folds"))
+  
   stopifnot(is.logical(prune) && length(prune) == 1L)
   if (!cv & prune) stop("'prune = TRUE' requires 'cv = TRUE'")
-  stopifnot((is.logical(keeploss) | is.numeric(keeploss)) &&
-            length(keeploss) == 1L)
-  keeploss <- as.numeric(keeploss)
-  if (is.numeric(verbose)) verbose <- as.logical(verbose)
-  stopifnot(is.logical(verbose) && length(verbose) == 1L)
-  
-  ## check hidden arguments
-  ptry <- ifelse(is.null(list(...)$ptry), Inf,  list(...)$ptry)
-  stopifnot(is.numeric(ptry) && length(ptry) == 1L && ptry > 0)
-  ntry <- if (is.null(list(...)$ntry)) Inf else list(...)$ntry
-  stopifnot(is.numeric(ntry) && all(ntry > 0))
-  vtry <- if (is.null(list(...)$vtry)) Inf else list(...)$vtry
-  stopifnot(is.numeric(vtry) && all(vtry > 0))
 
+  stopifnot(is.logical(center) && length(center) == 1L)
+  stopifnot(is.logical(verbose) && length(verbose) == 1L)
+
+  ## set the default parameters for 'gefp.estfun' calls
+  estfun.args <- appendDefArgs(estfun.args, list(predecor = TRUE,
+                                                 nuisance = NULL,
+                                                 silent = FALSE))
+  if (!is.null(estfun.args$level) && estfun.args$level != "observation")
+    warning("'level' argument for 'estfun' is set to 'observation'")
+  estfun.args$level <- "observation"
+  
   ## check and set 'papply'
   stopifnot(is.character(papply) | is.function(papply))
   if (is.function(papply)) {
@@ -331,51 +348,61 @@ tvcm_control <- function(lossfun = neglogLik2,
       papply <- deparse(formals(tvcm_control)$papply)
     }
   }
+  stopifnot(is.list(papply.args))
   
-  ## set the default parameters for 'gefp.estfun' calls
-  estfun <- appendDefArgs(estfun, list(predecor = TRUE,
-                                       nuisance = NULL,
-                                       silent = FALSE))
-  if (!is.null(estfun$level) && estfun$level != "observation")
-    warning("'level' argument for 'estfun' is set to 'observation'")
-  estfun$level <- "observation"
-
+  ## check hidden arguments
+  ptry <- ifelse(is.null(list(...)$ptry), Inf,  list(...)$ptry)
+  stopifnot(is.numeric(ptry) && length(ptry) == 1L && ptry > 0)
+  ntry <- if (is.null(list(...)$ntry)) Inf else list(...)$ntry
+  stopifnot(is.numeric(ntry) && all(ntry > 0))
+  vtry <- if (is.null(list(...)$vtry)) Inf else list(...)$vtry
+  stopifnot(is.numeric(vtry) && all(vtry > 0))
+  
   ## ensure backward compability
   if ("maxevalsplit" %in% names(list(...))) maxnumsplit <- list(...)$maxevalsplit
   if ("minbucket" %in% names(list(...))) minsize <- list(...)$minbucket
+
+  functional.factor <- ifelse("functional.factor" %in% names(list(...)),
+                              list(...)$functional.factor, "LMuo")
+  functional.ordered <- ifelse("functional.ordered" %in% names(list(...)),
+                               list(...)$functional.ordered, "LMuo")
+  functional.numeric <- ifelse("functional.numeric" %in% names(list(...)),
+                               list(...)$functional.numeric, "supLM")
   
   ## create a list of parameters of class 'tvcm_control'
   return(structure(
-           appendDefArgs(
-             list(...),
-             list(lossfun = lossfun,
-                  maxstep = maxstep,
-                  maxwidth = maxwidth,
-                  minsize = minsize,
-                  maxdepth = maxdepth,
-                  dfpar = dfpar,
-                  dfsplit = dfsplit,
-                  maxoverstep = maxoverstep,
-                  ptry = ptry,
-                  ntry = ntry,
-                  vtry = vtry,
-                  trim = trim,
-                  sctest = sctest,
-                  alpha = alpha,
-                  bonferroni = bonferroni,
-                  estfun = estfun,
-                  maxfacsplit = maxfacsplit,
-                  maxordsplit = maxordsplit,
-                  maxnumsplit = maxnumsplit,
-                  cv = cv,
-                  folds = folds,
-                  prune = prune,
-                  keeploss = keeploss,
-                  papply = papply,
-                  verbose = verbose,
-                  parm = NULL, intercept = NULL, 
-                  functional.factor = "LMuo",
-                  functional.ordered = "LMuo",
-                  functional.numeric = "supLM")),
+           list(minsize = minsize,     
+                mindev = mindev,
+                sctest = sctest,
+                alpha = alpha,
+                bonferroni = bonferroni,
+                trim = trim,
+                estfun.args = estfun.args,
+                nimpute = nimpute,
+                maxfacsplit = maxfacsplit,
+                maxordsplit = maxordsplit,
+                maxnumsplit = maxnumsplit,
+                maxstep = maxstep,
+                maxwidth = maxwidth,
+                maxdepth = maxdepth,
+                lossfun = lossfun,
+                ooblossfun = ooblossfun,
+                cp = cp,
+                dfpar = dfpar,
+                dfsplit = dfsplit,
+                cv = cv,
+                folds = folds,
+                prune = prune,
+                papply = papply,
+                papply.args = papply.args,
+                center = center,
+                verbose = verbose,
+                ptry = ptry,
+                ntry = ntry,
+                vtry = vtry,                 
+                parm = NULL, intercept = NULL,
+                functional.factor = "LMuo",
+                functional.ordered = "LMuo",
+                functional.numeric = "supLM"),
           class = "tvcm_control"))
 }

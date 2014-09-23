@@ -18,7 +18,7 @@
   \describe{
     \item{\code{Poor}}{binary response variable on whether the person
       is considered as poor or not. 0 = no and 1 = yes.}
-    \item{\code{Canton}}{the canton where the person is living. All
+    \item{\code{Canton}}{the canton where the person lives. All
       individuals origin from the canton Wallis.}
     \item{\code{Gender}}{whether person is a male or a female.}
     \item{\code{AgeGroup}}{to which age group the person belongs to.}

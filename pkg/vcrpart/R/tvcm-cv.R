@@ -47,7 +47,6 @@
 ##'             - cvloss: add 'direction' as new parameter 
 ## --------------------------------------------------------- #
 
-
 oobloss.tvcm <- function(object, newdata = NULL, weights = NULL, 
                          fun = NULL, ...) {
   
@@ -190,38 +189,36 @@ tvcm_folds <- function(object, control) {
 }
 
 
-cvloss.tvcm <- function(object, folds = folds_control(),
-                        fun = NULL, dfpar = NULL,
-                        direction = c("backward", "forward"),
-                        papply = mclapply, verbose = FALSE, ...) {
+cvloss.tvcm <- function(object, folds = folds_control(), ...) {
   
   mc <- match.call()
+
+  control <- extract(object, "control")
   stopifnot(inherits(folds, "folds"))
+  control$folds <- folds
   
-  if (is.null(dfpar)) dfpar <- object$info$control$dfpar
-  dfsplit <- object$info$control$dfsplit
+  ## set the verbose (no verbose is shown when evaluating the validation sets)
+  object$info$control$verbose <- FALSE
+
+  ## desactivate parallelization in single evaluations
+  object$info$control$papply <- "lapply"
+  object$info$control$papply.args <- list()
   
-  stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
+  ## (hidden) type of evaluation ('loss', 'forest' etc.)
   type <- list(...)$type
   if (is.null(type)) type <- "loss"
+
+  ## (hidden) whether the original sample should be evaluated
   original <- list(...)$original
   if (is.null(original)) original <- FALSE
-  direction <- match.arg(direction)
-  foldsMat <- tvcm_folds(object, folds)
-  stopifnot(is.character(papply) | is.function(papply))
-  if (is.function(papply)) {
-    if ("papply" %in% names(mc)) {
-      papply <- deparse(mc$papply)
-    } else {
-      papply <- deparse(formals(tvcm_control)$papply)
-    }
-  }
-  papplyArgs <- list(...)[names(list(...)) %in% names(formals(papply))]
-  keeploss <- list(...)$keeploss
-  if (is.null(keeploss)) keeploss <- object$info$control$keeploss
 
-  control <- object$info$control
-  control$verbose <- FALSE
+  ## get folds
+  foldsMat <- tvcm_folds(object, folds)
+
+  ## get initial complexity penalty
+  cp <- control$cp
+  
+  ## weights and model frame
   weights <- weights(object$info$model)
   mf <- model.frame(object)
   
@@ -229,11 +226,12 @@ cvloss.tvcm <- function(object, folds = folds_control(),
 
   cvFun <- function(i) {
 
+    ## the return value of 'cvFun'
     cv <- vector(mode = "list", length = switch(type, loss = 2L, forest = 3L))
     
-    if (verbose) {
-      if (papply == "lapply" && i > 1L) cat("\n")
-      if (papply != "lapply") cat("[", i, "]") else cat("* fold", i, "...")
+    if (control$verbose) {
+      if (control$papply == "lapply" && i > 1L) cat("\n")
+      if (control$papply != "lapply") cat("[", i, "]") else cat("* fold", i, "...")
     }
     
     if (i > 0L) {
@@ -250,8 +248,8 @@ cvloss.tvcm <- function(object, folds = folds_control(),
         ibWeights <- weights[ibSubs]
         oobWeights <- weights[oobSubs]
       }
-      object$info$control <- control
     } else {
+      object$info$control <- control
       ibSubs <- NULL
       ibWeights <- NULL
     }
@@ -271,20 +269,19 @@ cvloss.tvcm <- function(object, folds = folds_control(),
         run <- 1L
         
         while (run > 0L) {
-          ibTree <- try(prune(ibTree, dfsplit, dfpar, direction,
-                              papply = "lapply", keeploss = keeploss), TRUE)
+          ibTree <- try(prune(tree = ibTree, cp = cp), TRUE)
           if (!inherits(ibTree, "try-error")) {
             ## save the out-of-bag loss and the current tuning parameter
             oobLoss <- oobloss(ibTree, newdata = mf[oobSubs,,drop = FALSE],
-                               weights = oobWeights, fun = fun)
+                               weights = oobWeights, fun = control$ooblossfun)
             cv[[1L]] <-
-              cbind(cv[[1L]], c(dfsplit))
+              cbind(cv[[1L]], c(cp))
             cv[[2L]] <-
               cbind(cv[[2L]], c(control$lossfun(ibTree), oobLoss))
 
             ## set a new and stronger tuning parameter
             tab <- ibTree$info$prunepath[[length(ibTree$info$prunepath)]]$tab
-            if (nrow(tab) > 1L) dfsplit <- min(tab$dfsplit[-1L])
+            if (nrow(tab) > 1L) cp <- min(tab[, "pdeviance"][-1L])
             if (nrow(tab) == 1L) run <- 0L
             
           } else {
@@ -295,7 +292,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
         }
   
       } else if (type == "forest") {        
-        if (verbose && papply == "lapply") cat("...")
+        if (control$verbose && control$papply == "lapply") cat("...")
         ibTreePr <- ibTree
         cv[[1]] <- ibTree$info$node
         cv[[2]] <- coef(extract(ibTree, "model"))
@@ -307,8 +304,8 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       cv <- NULL
 
     }
-    if (verbose) {
-      if (papply != "lapply") {
+    if (control$verbose) {
+      if (control$papply != "lapply") {
         if (is.null(cv)) cat("failed")
       } else {
         if (is.null(cv)) cat("failed") else cat(" OK")
@@ -318,10 +315,10 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     return(cv)
   }
 
-  call <- list(name = as.name(papply),
+  call <- list(name = as.name(control$papply),
                X = quote(seq(ifelse(original, 0, 1), ncol(foldsMat))),
                FUN = quote(cvFun))
-  call[names(papplyArgs)] <- papplyArgs
+  call[names(control$papply.args)] <- control$papply.args
   mode(call) <- "call"
   cv <- eval(call)
   
@@ -330,7 +327,9 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     ## extract tree on all data
     if (original) {
       tree <- cv[[1L]]
+      tree$info$control <- control
       cv <- cv[2:length(cv)]
+      if (is.null(tree)) stop("partitioning failed.")
     } else {
       tree <- NULL
     }
@@ -367,14 +366,14 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       }
      
       ## make a matrix with the 'loss' for each fold
-      ## at each dfsplit in 'grid'
+      ## at each cp in 'grid'
       
       cv <- lapply(cv, function(x) {
         x[[2]][is.nan(x[[2]]) | is.infinite(x[[2]])] <- NA;
         return(x)
       })
       
-      ## ib-loss
+      ## ib-loss (computes the average loss)
       ibLoss <- t(sapply(cv, getVals, grid = grid, rowsG = 1L, rowsL = 1L))
       if (length(grid) == 1L) ibLoss <- t(ibLoss)
      
@@ -388,7 +387,7 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       rownames(ibLoss) <- paste("fold", 1L:length(cv))
       colnames(ibLoss) <- cn
       
-      ## oob-loss
+      ## oob-loss (computes the average loss)
       oobLoss <- t(sapply(cv, getVals, grid = grid, rowsG = 1L, rowsL = 2L))
       if (length(grid) == 1L) oobLoss <- t(oobLoss)
        
@@ -405,16 +404,15 @@ cvloss.tvcm <- function(object, folds = folds_control(),
       rval <- append(rval, list(ibloss = ibLoss, oobloss = oobLoss))
       meanLoss <- colMeans(rval$oobloss, na.rm = TRUE)
 
-      ## dfsplit with minimal loss
+      ## cp with minimal loss
       minSubs <- which(meanLoss == min(meanLoss))
       if (length(minSubs) > 1L) minSubs <- max(minSubs)
-      rval$dfsplit.hat <- max(0, mean(c(rval$grid, Inf)[minSubs:(minSubs + 1)]))
+      rval$cp.hat <- max(0, mean(c(rval$grid, Inf)[minSubs:(minSubs + 1)]))
 
       rval$foldsMat <- foldsMat
       class(rval) <- "cvloss.tvcm"     
     }
 
-    rval$direction <- direction
     rval$call <- deparseCall(getCall(object))
 
     if (original) {
@@ -437,34 +435,33 @@ cvloss.tvcm <- function(object, folds = folds_control(),
     rval$folds <- foldsMat
   }
   
-  if (verbose) cat("\n")
+  if (control$verbose) cat("\n")
   
   return(rval)
 }
 
 
 print.cvloss.tvcm <- function(x, ...) {
-  cat(ifelse(x$direction == "backward", "Backwards", "Forward"),
-      "cross-validated average loss", "\n\n")
+  cat("Cross-Validated Average Loss", "\n\n")
   cat("Call: ", x$call, "\n\n")
   rval <- colMeans(x$oobloss, na.rm = TRUE)
   if (length(rval) > 10L)
     rval <- rval[seq(1L, length(rval), length.out = 10)]
   print(rval)
   cat("\n")
-  cat("dfsplit with minimal loss:", format(x$dfsplit.hat, digits = 3), "\n")
+  cat("cp with minimal loss:", format(x$cp.hat, digits = 3), "\n")
   return(invisible(x))
 }
 
 
 plot.cvloss.tvcm <- function(x, legend = TRUE, details = TRUE, ...) {
   
-  xlab <- "dfsplit"
-  ylab <- "average loss(dfsplit)"
+  xlab <- "cp"
+  ylab <- "average loss(cp)"
   type <- "s"
   lpos <- "topleft"
   lsubs <- if (details) 1L:3L else 1L
-  if (x$dfsplit.hat < Inf) lsubs <- c(lsubs, 4L)
+  if (x$cp.hat < Inf) lsubs <- c(lsubs, 4L)
   lcol <- c("black", "grey80", "black", "black")
   llty <- c(1, 1, 3, 2)
 
@@ -502,15 +499,15 @@ plot.cvloss.tvcm <- function(x, legend = TRUE, details = TRUE, ...) {
     ltext <- c("average oob estimate",
                "foldwise oob estimates",
                "in-sample estimate",
-               "dfsplit with minimal oob-loss")
+               "cp with minimal oob-loss")
     legend(lpos, ltext[lsubs], col = lcol[lsubs], lty = llty[lsubs])
   }
   
-  if (x$dfsplit.hat < Inf) {
-    subsMin <- max(which(x$grid <= x$dfsplit.hat))
+  if (x$cp.hat < Inf) {
+    subsMin <- max(which(x$grid <= x$cp.hat))
     minLoss <- colMeans(x$oobloss, na.rm = TRUE)[subsMin]
-    segments(x$dfsplit.hat, par()$usr[3], x$dfsplit.hat, minLoss, lty = 2)
-    axis(1, x$dfsplit.hat, format(x$dfsplit.hat, digits = 3),
+    segments(x$cp.hat, par()$usr[3], x$cp.hat, minLoss, lty = 2)
+    axis(1, x$cp.hat, format(x$cp.hat, digits = 3),
          line = 1, tick = FALSE)
   } 
 }

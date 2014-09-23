@@ -33,14 +33,13 @@
 
 plot.tvcm <- function(x, type = c("default", "coef", 
                            "simple", "partdep", "cv"),
-                      main = NULL, part = NULL,
+                      main, part = NULL,
                       drop_terminal = TRUE,
                       tnex = 1, newpage = TRUE, ask = NULL, 
                       pop = TRUE, gp = gpar(), ...) {
 
   ## checks
   type <- match.arg(type)
-  stopifnot(is.null(main) | is.character(main))
   stopifnot(is.logical(drop_terminal) && length(drop_terminal) == 1L)
   stopifnot(is.numeric(tnex) && length(tnex) == 1L)
   stopifnot(is.logical(newpage) && length(newpage) == 1L)
@@ -49,13 +48,15 @@ plot.tvcm <- function(x, type = c("default", "coef",
   
   if (type == "partdep") {
 
-      call <- list(as.name("panel_partdep"), object = quote(x), ask = ask, main = main)
-      call <- append(call, list(...))
-      mode(call) <- "call"
-      eval(call)
+    if (missing(main)) main <- NULL
+    call <- list(as.name("panel_partdep"), object = quote(x), ask = ask, main = main)
+    call <- append(call, list(...))
+    mode(call) <- "call"
+    eval(call)
 
   } else if (type == "cv") {
 
+    if (missing(main)) main <- NULL
     if (is.null(x$info$cv)) {
       warning("no information on cross validation.")
     } else {
@@ -65,29 +66,29 @@ plot.tvcm <- function(x, type = c("default", "coef",
   } else {
     
     ## tree plots
-
     if (is.null(part)) part <- seq_along(x$info$node)
     if (is.character(part)) {
-      levs <- LETTERS[seq_along(x$info$node)]
-      if (any(!part %in% levs)) stop("unknown 'part'.")
-      part <- which(part %in% levs)
+      part <- which(LETTERS[seq_along(x$info$node)] %in% part)
     } else if (is.numeric(part)) {
       part <- as.integer(part)
     } else {
       stop("'part' must be a 'character' or a 'integer'.")
     }
+    if (length(part) < 1L) stop("no valid 'part' specified.")
 
     ## whether an input is expected before plotting the next tree
     if (is.null(ask))
       ask <- ifelse(length(part) == 1L, FALSE, TRUE)
     
     ## repeat the title
-    if (is.null(main)) {
-      main <- tvcm_print_vclabs(x)
-      main <- main[part]
+    if (missing(main)) {
+      main <- tvcm_print_vclabs(x$info$formula)[part]
+    } else if (is.character(main)){
+      main <- rep(main, length.out = length(part))
     } else {
-        main <- rep(main, length.out = length(part))
+      main <- NULL
     }
+    
     ## terminal panel
     tp_fun <-
       switch(type,
@@ -271,7 +272,7 @@ panel_get_main <- function(object, node, id, nobs) {
   if (id) rval <-
     paste(rval, paste(names(object)[id_node(node)], sep = ""))
   if (id && nobs) rval <- paste(rval, ": ", sep = "")
-  if (nobs) rval <- paste(rval, "nobs = ", node$info$dims["n"], sep = "")
+  if (nobs) rval <- paste(rval, "n = ", node$info$dims["n"], sep = "")
   return(rval)
 }
 
@@ -401,6 +402,7 @@ panel_coef <- function(object, parm = NULL,
   }
   
   ## population mean
+  meanCoef <- NULL
   if (mean) {
 
     mean_gp <- argsToList(mean_gp)
@@ -413,10 +415,6 @@ panel_coef <- function(object, parm = NULL,
       sum(weights(object))
     meanCoef <- colSums(coef * matrix(w, nrow(coef), ncol(coef)))
     meanCoef <- lapply(parm, function(trms) meanCoef[trms, drop = FALSE])
-    if (conf.int) {
-      meanSd <- sqrt(colSums(sd^2 * matrix(w, nrow(coef), ncol(coef))^2))
-      meanSd <- lapply(parm, function(trms) sqrt(meanSd[trms, drop = FALSE]))
-    }
   }
 
   qN <- qnorm(0.975)
@@ -459,63 +457,71 @@ panel_coef <- function(object, parm = NULL,
                     unit(plot_gp[[i]]$xlim[2], "native"), unit(0, "native"),
                     gp = gpar(col = "black"))
 
-      if (conf.int) {
-        
-        grid.segments(unit(1:ncol(coefList[[i]]), "native"),
-                      unit(coefList[[i]][as.character(id_node(node)),] -
-                           qN * sdList[[i]][as.character(id_node(node)),], "native"),
-                      unit(1:ncol(coefList[[i]]), "native"),
-                      unit(coefList[[i]][as.character(id_node(node)),] +
-                           qN * sdList[[i]][as.character(id_node(node)),], "native"),
-                      arrow = arrow(angle = conf.int_gp[[i]]$angle,
-                        length = conf.int_gp[[i]]$length, 
-                        ends = conf.int_gp[[i]]$ends,
-                        type = conf.int_gp[[i]]$type),
-                      gp = plot_gp[[i]]$gp)
-        
-        if (FALSE) {
-          
-          grid.segments(unit(1:ncol(coefList[[i]]), "native"),
-                        unit(meanCoef[[i]] - qN * meanSd[[i]], "native"),
-                        unit(1:ncol(coefList[[i]]), "native"),
-                        unit(meanCoef[[i]] + qN * meanSd[[i]], "native"),
-                        arrow = arrow(angle = conf.int_gp[[1]]$angle,
-                        length = conf.int_gp[[i]]$length, 
-                        ends = conf.int_gp[[i]]$ends,
-                        type = conf.int_gp[[i]]$type),
-                        gp = mean_gp[[i]]$gp)
+      subs <- coefList[[i]][as.character(id_node(node)),] >= plot_gp[[i]]$ylim[1L] &
+          coefList[[i]][as.character(id_node(node)),]<= plot_gp[[i]]$ylim[2L]
 
-        }
-        
+      subsMean <- NULL
+      if (mean) {
+          subsMean <- meanCoef[[i]] > plot_gp[[i]]$ylim[1L] &
+              meanCoef[[i]] > plot_gp[[i]]$ylim[1L]
       }
-      
+
+      ## option 'conf.int = TRUE'
+      if  (conf.int) {
+
+          ## crop the lines
+          lwr <- coefList[[i]][as.character(id_node(node)),] -
+              qN * sdList[[i]][as.character(id_node(node)),]
+          lwr[lwr < plot_gp[[i]]$ylim[1L]] <- plot_gp[[i]]$ylim[1L]
+          lwr[lwr > plot_gp[[i]]$ylim[2L]] <- NA
+          upr <- coefList[[i]][as.character(id_node(node)),] +
+              qN * sdList[[i]][as.character(id_node(node)),]
+          upr[upr > plot_gp[[i]]$ylim[2L]] <- plot_gp[[i]]$ylim[2]
+          upr[upr < plot_gp[[i]]$ylim[1L]] <- NA
+          subsCi <- !is.na(lwr) & !is.na(upr)
+          
+          ## plot
+          if (any(subsCi))
+              grid.segments(unit(which(subsCi), "native"),
+                            unit(lwr[subsCi], "native"),
+                            unit(which(subsCi), "native"),
+                            unit(upr[subsCi], "native"),
+                            arrow = arrow(angle = conf.int_gp[[i]]$angle,
+                                length = conf.int_gp[[i]]$length, 
+                                ends = conf.int_gp[[i]]$ends,
+                                type = conf.int_gp[[i]]$type),
+                            gp = plot_gp[[i]]$gp)
+          
+      }
+
+      ## option 'type = "p"'
       if (plot_gp[[i]]$type %in% c("p", "b")) {
           
-        if (mean) {
-          grid.points(unit(1:ncol(coefList[[i]]), "native"),
-                      unit(meanCoef[[i]], "native"),
-                      pch = mean_gp[[i]]$pch, gp = mean_gp[[i]]$gp)
-        }
+        if (mean && any(subsMean))
+            grid.points(unit(which(subsMean), "native"),
+                        unit(meanCoef[[i]][subsMean], "native"),
+                        pch = mean_gp[[i]]$pch, gp = mean_gp[[i]]$gp)
         
-        grid.points(unit(1:ncol(coefList[[i]]), "native"),
-                    unit(coefList[[i]][as.character(id_node(node)),],
-                         "native"),
-                    pch = plot_gp[[i]]$pch, gp = plot_gp[[i]]$gp)
+        if (any(subs)) 
+            grid.points(unit(which(subs), "native"),
+                        unit(coefList[[i]][as.character(id_node(node)),][subs],
+                             "native"),
+                        pch = plot_gp[[i]]$pch, gp = plot_gp[[i]]$gp)
       }
 
-      
+      ## option 'type = "l"'
       if (plot_gp[[i]]$type %in% c("l", "b")) {
 
-        if (mean) {
-          grid.lines(unit(1:ncol(coefList[[i]]), "native"),
-                     unit(meanCoef[[i]], "native"),
+        if (mean && any(subsMean)) 
+          grid.lines(unit(which(subsMean), "native"),
+                     unit(meanCoef[[i]][subsMean], "native"),
                      gp = mean_gp[[i]]$gp)
-        }
-        
-        grid.lines(unit(1:ncol(coefList[[i]]), "native"),
-                   unit(coefList[[i]][as.character(id_node(node)),],
-                        "native"),
-                   gp = plot_gp[[i]]$gp)
+
+        if (any(subs))
+            grid.lines(unit(which(subs), "native"),
+                       unit(coefList[[i]][as.character(id_node(node)),][subs],
+                            "native"),
+                       gp = plot_gp[[i]]$gp)
       }
       
       if (id_node(node) == min(nodeids(object, terminal = TRUE))) {

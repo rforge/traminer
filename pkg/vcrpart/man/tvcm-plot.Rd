@@ -14,8 +14,7 @@
 \usage{
 \method{plot}{tvcm}(x, type = c("default", "coef", 
         "simple", "partdep", "cv"),
-     main = NULL, part = NULL,
-     drop_terminal = TRUE,
+     main, part = NULL, drop_terminal = TRUE,
      tnex = 1, newpage = TRUE, ask = NULL,
      pop = TRUE, gp = gpar(), ...)
 
@@ -49,8 +48,8 @@ panel_coef(object, parm = NULL,
   \item{pop}{a logical whether the viewport tree should be popped before
     return.}
   \item{gp}{graphical parameters. See \command{\link{gpar}}.}
-  \item{part}{integer scalar. The partition i.e. varying coefficient
-    component to be plotted.} 
+  \item{part}{integer or letter. The partition i.e. varying 
+    coefficient component to be plotted.} 
   \item{parm}{character vector (\command{\link{panel_partdep}} and
     \command{\link{panel_coef}}) or list of character vectors
     (\command{\link{panel_coef}}) with names of model

@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
+##' Date:            2014-09-22
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-08
 ##'
 ##' Description:
 ##' S3 methods for tvcm objects
@@ -29,10 +29,15 @@
 ##' weights:             extract the weights
 ##'
 ##' Modifications:
+##' 2014-09-17: prune.tvcm:
+##'             - 'keepdev' argument in 'prune.tvcm' dropped (to complicated
+##'               to explain)
+##'             - add 'control' argument 
+##' 2014-09-15: 'tab', 'ntab' and 'otab' are not matrices
 ##' 2014-09-02: added 'prunepath.tvcm' and 'print.prunepath.tvcm' functions
 ##' 2014-09-02: various modifications in 'prune.tvcm' for accelerations:
 ##'             - 'do.call' was replaced by 'eval'
-##'             - new option 'keeploss' (reuses information of the previous
+##'             - new option 'keepdev' (reuses information of the previous
 ##'               pruning step)
 ##'             - new option 'papply' (even though the accrelation is not
 ##'               as efficient as expected)
@@ -48,7 +53,7 @@ coefficients.tvcm <- coef.tvcm
 
 extract.tvcm <- function(object, what = c("control", "model", 
                                    "nodes", "sctest", "p.value",
-                                   "lossgrid", "selected", 
+                                   "devgrid", "selected", 
                                    "coef", "sd", "var"),
                          steps = NULL, ...) {
   
@@ -69,9 +74,9 @@ extract.tvcm <- function(object, what = c("control", "model",
     rval <- lapply(splitpath[steps], function(x) x$sctest)
     return(rval)
     
-  } else if (what == "lossgrid" && !is.null(splitpath)) {
+  } else if (what == "devgrid" && !is.null(splitpath)) {
     
-    rval <- lapply(splitpath[steps], function(x) x$lossgrid)
+    rval <- lapply(splitpath[steps], function(x) x$grid)
     return(rval)
     
   } else if (what == "model") {
@@ -263,19 +268,9 @@ tvcm_print <- function(x, type = c("print", "summary"),
     cat(paste("   Tests: alpha = ", format(x$info$control$alpha, ...),
               if (x$info$control$bonferroni) ", nodewise Bonferroni corrected\n",
               sep = ""))
-  
-  if (type == "summary") {
-    cat("\nGoodness of fit:\n")
-    lLik <- logLik(x)
-    AICtab <- data.frame(AIC = AIC(lLik),
-                         BIC = BIC(lLik),
-                         logLik = as.vector(lLik),
-                         row.names = "")
-    print(AICtab, ...)
-  } 
     
   if (length(coef$re) > 0L) {
-    cat("\nRandom effects:\n")
+    cat("\nRandom Effects:\n")
     VarCorr <- VarCorr(extract(x, "model"))
     if (x$info$fit == "olmm") {
       VarCorr <- olmm_rename(VarCorr, yLevs, x$info$family, etalab)
@@ -286,7 +281,7 @@ tvcm_print <- function(x, type = c("print", "summary"),
   }
     
   if (length(coef$fe) > 0L) {
-    cat("\nFixed effects:\n")
+    cat("\nFixed Effects:\n")
     if (type == "print") {
       coefMat <- matrix(coef$fe, 1)
       colnames(coefMat) <- names(coef$fe) 
@@ -326,10 +321,10 @@ tvcm_print <- function(x, type = c("print", "summary"),
     
   class(terminal_panel) <- "grapcon_generator"
 
-  vcLabs <- tvcm_print_vclabs(x)
+  vcLabs <- tvcm_print_vclabs(x$info$formula)
 
   for (pid in seq_along(coef$vc)) {
-    cat(paste("\nVarying coefficient: ", vcLabs[pid], "\n", sep = ""))
+    cat(paste("\nVarying Coefficient: ", vcLabs[pid], "\n", sep = ""))
     x$node <- x$info$node[[pid]]
     print.party(x, terminal_panel = terminal_panel,
                 tp_args = list(partid = pid))
@@ -355,32 +350,13 @@ print.tvcm <- function(x, ...)
   tvcm_print(x, type = "print", ...)
 
 
-prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
-                       direction = c("backward", "forward"),
-                       alpha = NULL, maxstep = NULL, terminal = NULL,
-                       papply = mclapply, keeploss = FALSE, original = FALSE,
-                       ...) {
+prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
+                       terminal = NULL, original = FALSE, ...) {
 
   mc <- match.call()
-  
-  ## checking arguments
-  direction <- match.arg(direction)
-  if (is.null(dfpar)) dfpar <- tree$info$control$dfpar
-  stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
-  stopifnot(is.character(papply) | is.function(papply))
-  if (is.function(papply)) {
-    if ("papply" %in% names(mc)) {
-      papply <- deparse(mc$papply)
-    } else {
-      papply <- deparse(formals(prune.tvcm)$papply)
-    }
-  }
-  papplyArgs <- list(...)[names(list(...)) %in% names(formals(papply))]
-  stopifnot((is.logical(keeploss) | is.numeric(keeploss)) &&
-            length(keeploss) == 1L)
-  keeploss <- as.numeric(keeploss)
-  
-  tunepar <- c(!is.null(dfsplit),
+
+  ## checking arguments  
+  tunepar <- c(!is.null(cp),
                !is.null(alpha),
                !is.null(maxstep),
                !is.null(terminal))
@@ -388,10 +364,10 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
   if (sum(tunepar) < 1L) stop("no tuning parameter specified.")
   if (sum(tunepar) > 1L) stop("only one tuning parameter is allowed.")
   
-  tunepar <- c("dfsplit", "alpha", "maxstep", "terminal")[tunepar]
+  tunepar <- c("cp", "alpha", "maxstep", "terminal")[tunepar]
   
-  if (tunepar == "dfsplit") {
-    stopifnot(is.numeric(dfsplit) && length(dfsplit) == 1L)
+  if (tunepar == "cp") {
+    stopifnot(is.numeric(cp) && length(cp) == 1L)
 
   } else if (tunepar == "alpha") {
     if (!tree$info$control$sctest) {
@@ -426,252 +402,209 @@ prune.tvcm <- function(tree, dfsplit = NULL, dfpar = NULL,
 
   refit <- function(tree) {
 
-      ## extract new formula
-      env <- environment()
-      formList <- tree$info$formula
-      vcRoot <- sapply(tree$info$node, width) == 1L
-      ff <- tvcm_formula(formList, vcRoot, tree$info$family, env)
-
-      ## overwrite node predictors
-      data <- model.frame(tree)
-      data[, paste("Node", LETTERS[seq_along(tree$info$node)], sep = "")] <-
-          tvcm_get_node(tree, tree$data, TRUE, tree$fitted[,"(weights)"], formList)
-      
-      ## refit model
-      call <- list(name = as.name(tree$info$fit),
-                   formula = quote(ff$full),
-                   data = quote(data),
-                   family = quote(tree$info$family),
-                   weights = tree$fitted[,"(weights)"])
-      call[names(tree$info$dotargs)] <- tree$info$dotargs
-      mode(call) <- "call"
-      tree$info$model <- suppressWarnings(try(eval(call), TRUE))
-      
-      ## check if the refitting failed
-      if (inherits(tree$info$model, "try-error"))
-          stop("tree model fitting failed.")
-
-      ## heavy terms
-      if (inherits(tree$info$model, "glm")) {
-        attr(attr(tree$info$model$model, "terms"), ".Environment") <- NULL
-        environment(tree$info$model$formula) <- NULL
-        attr(tree$info$model$terms, ".Environment") <- NULL
-      }
-      
-      ## update control
-      tree$info$control <-
-          tvcm_grow_setcontrol(tree$info$control, tree$info$model, formList, vcRoot)
-          
-      return(tree)
+    ## extract new formula
+    env <- environment()
+    formList <- tree$info$formula
+    vcRoot <- sapply(tree$info$node, width) == 1L
+    ff <- tvcm_formula(formList, vcRoot, tree$info$family, env)
+    
+    ## overwrite node predictors
+    data <- model.frame(tree)
+    data[, paste("Node", LETTERS[seq_along(tree$info$node)], sep = "")] <-
+      tvcm_get_node(tree, tree$data, TRUE, tree$fitted[,"(weights)"], formList)
+    
+    ## refit model
+    call <- list(name = as.name(tree$info$fit),
+                 formula = quote(ff$full),
+                 data = quote(data),
+                 family = quote(tree$info$family),
+                 weights = tree$fitted[,"(weights)"])
+    call[names(tree$info$dotargs)] <- tree$info$dotargs
+    mode(call) <- "call"
+    tree$info$model <- suppressWarnings(try(eval(call), TRUE))
+    
+    ## check if the refitting failed
+    if (inherits(tree$info$model, "try-error"))
+      stop("tree model fitting failed.")
+    
+    ## heavy terms
+    if (inherits(tree$info$model, "glm")) {
+      attr(attr(tree$info$model$model, "terms"), ".Environment") <- NULL
+      environment(tree$info$model$formula) <- NULL
+      attr(tree$info$model$terms, ".Environment") <- NULL
+    }
+    
+    ## update control
+    tree$info$control <-
+      tvcm_grow_setcontrol(tree$info$control, tree$info$model, formList, vcRoot)
+    
+    return(tree)
   }
-
+  
   ## get the original tree
   if (original && !identical(tree$info$node, tree$info$grownode)) {
-      tree$node <- tree$info$grownode[[1L]]
-      tree$info$node <- tree$info$grownode
-      tree <- refit(tree)         
+    tree$node <- tree$info$grownode[[1L]]
+    tree$info$node <- tree$info$grownode
+    tree <- refit(tree)         
   }
   
   if (tunepar %in% c("alpha", "maxstep", "terminal")) {
-       
-      ## prune the tree structure
-      node <- tvcm_prune_node(tree, alpha, maxstep, terminal)
     
-      ## refit the model if something has changed
-      if (!identical(node, tree$info$node)) {
-      
-          ## attach nodes
-          tree$node <- node[[1L]]
-          tree$info$node <- node
-
-          ## refit the model
-          tree <- refit(tree)     
-      }
-      
-  } else if (tunepar == "dfsplit") {
+    ## prune the tree structure
+    node <- tvcm_prune_node(tree, alpha, maxstep, terminal)
     
-    if (direction == "backward") {
+    ## refit the model if something has changed
+    if (!identical(node, tree$info$node)) {
       
-      ## prune as long as there remain 'weak' links   
-      run <- 1L; step <- 0L;
-      cols <- c("loss", "npar", "nspl")
-      prunepath <- list()
-      keeplosscount <- 0
+      ## attach nodes
+      tree$node <- node[[1L]]
+      tree$info$node <- node
       
-      while (run > 0) {
+      ## refit the model
+      tree <- refit(tree)     
+    }
+    
+  } else if (tunepar == "cp") {
+    
+    ## prune as long as there remain 'weak' links   
+    run <- 1L; step <- 0L;
+    cols <- c("part", "node", "loss", "npar", "nsplit", "pdeviance")
+    evalcols <- c("loss", "npar", "nsplit")
+    prunepath <- list()
+    
+    while (run > 0) {
+      
+      run <- 0 ; step <- step + 1L;
+      ncollapse <- NULL
+      
+      ids <- lapply(tree$info$node, function(node) {
+        setdiff(nodeids(node), nodeids(node, terminal = TRUE))
+      })
+      
+      ids00 <- lapply(seq_along(tree$info$node),
+                      function(pid) {
+                        unlist(nodeapply(tree$info$node[[pid]], ids[[pid]],
+                                         function(node) node$info$id$original))
+                      })
+      
+      ## 'call' to evaluate the collapses        
+      prStatCall <- list(name = as.name(tree$info$control$papply),
+                         X = quote(subs),
+                         FUN = quote(prStat))
+      prStatCall[names(tree$info$control$papply.args)] <-
+        tree$info$control$papply.args
+      mode(prStatCall) <- "call"
+      
+      ntab <- matrix(, length(unlist(ids)), length(cols))
+      colnames(ntab) <- cols
+      ntab[, "part"] <- rep(seq_along(tree$info$node), sapply(ids, length))
+      ntab[, "node"] <- unlist(ids)
+      ntab[, "loss"] <- rep.int(Inf, length(unlist(ids)))
+      
+      if (nrow(ntab) > 0L) {
         
-        run <- 0 ; step <- step + 1L;
-        ncollapse <- NULL
-        
-        ids <- lapply(tree$info$node, function(node) {
-          setdiff(nodeids(node), nodeids(node, terminal = TRUE))
-        })
-        
-        ids00 <- lapply(seq_along(tree$info$node),
-                        function(pid) {
-                          unlist(nodeapply(tree$info$node[[pid]], ids[[pid]],
-                                           function(node) node$info$id$original))
-                        })
-
-        ## 'call' to evaluate the collapses        
-        prStatCall <- list(name = as.name(papply), X = quote(subs),
-                           FUN = quote(prStat))
-        prStatCall[names(papplyArgs)] <- papplyArgs
-        mode(prStatCall) <- "call"
-        
-        ntab <- data.frame(
-                  part = rep(seq_along(tree$info$node), sapply(ids, length)),
-                  node = unlist(ids),
-                  loss = rep.int(Inf, length(unlist(ids))),
-                  npar = rep.int(NA, length(unlist(ids))),
-                  nspl = rep.int(NA, length(unlist(ids))),
-                  dfsplit = rep.int(NA, length(unlist(ids))))
-              
-        if (nrow(ntab) > 0L) {
+        if (step > 1L) {
           
-          if (step > 1L) {
-            
-            ## search for the parents of the previously selecte node
-            spart <- otab$part[ocollapse]
-            snode <- otab$node[ocollapse]
-            root <- 1L
-            npath <- c(root); opath <- c(root);
-            while (root != snode) {
-              nkids <- unlist(nodeapply(tree$info$node[[spart]], root,
-                                        function(node)
-                                        sapply(node$kids, function(kids) kids$id)))
-              okids <- unlist(nodeapply(tree$info$node[[spart]], nkids,
-                                        function(node) node$info$id$last))
-              kidkids <- nodeapply(tree$info$node[[spart]], nkids, nodeids)
-              kid <- sapply(kidkids, function(x) snode %in% x)
-              root <- nkids[kid]
-              if (root != snode) {
-                npath <- c(npath, nkids[kid])
-                opath <- c(opath, okids[kid])
-              }
+          ## search for the parents of the previously selecte node
+          spart <- otab[ocollapse, "part"]
+          snode <- otab[ocollapse, "node"]
+          root <- 1L
+          npath <- c(root); opath <- c(root);
+          while (root != snode) {
+            nkids <-
+              unlist(nodeapply(tree$info$node[[spart]], root,
+                               function(node)
+                               sapply(node$kids, function(kids) kids$id)))
+            okids <- unlist(nodeapply(tree$info$node[[spart]], nkids,
+                                      function(node) node$info$id$last))
+            kidkids <- nodeapply(tree$info$node[[spart]], nkids, nodeids)
+            kid <- sapply(kidkids, function(x) snode %in% x)
+            root <- nkids[kid]
+            if (root != snode) {
+              npath <- c(npath, nkids[kid])
+              opath <- c(opath, okids[kid])
             }
-            
-            ## insert results of parent models
-            ntab[ntab$node %in% npath & ntab$part == spart, cols] <-
-              otab[otab$node %in% opath & otab$part == spart, cols]
-            
-
-            if (keeplosscount < keeploss) {
-            
-              ## approximate the remaining ids from the selected partition
-              otab$loss <- otab$loss + (otab$loss[ocollapse] - loss0)
-              otab$npar <- otab$npar - (npar0 - otab$npar[ocollapse])
-              otab$nspl <- otab$nspl - (nspl0 - otab$nspl[ocollapse])
-              nids <- nodeids(tree$info$node[[spart]])
-              oids <- unlist(nodeapply(tree$info$node[[spart]],
-                                       nodeids(tree$info$node[[spart]]),
-                                       function(node) node$info$id$last))
-              subs <- ntab$node %in% nids &
-                ntab$part %in% spart & is.infinite(ntab$loss)
-              subs <- nids %in% ntab$node[subs]
-              nids <- nids[subs]
-              oids <- oids[subs]
-              ntab[ntab$node %in% nids & ntab$part == spart, cols] <-
-                otab[otab$node %in% oids & otab$part == spart, cols]
-              keeplosscount <- keeplosscount + 1
-              
-            } else keeplosscount <- 0
           }
           
-          subs <- which(is.infinite(ntab$loss))
-          if (length(subs) > 0L) {
-            
-            ## reestimate all models which collapse each on inner node
-            prStat <- function(i) {
+          ## insert results of parent models
+          ntab[ntab[, "node"] %in% npath & ntab[, "part"] == spart, evalcols] <-
+            otab[otab[, "node"] %in% opath & otab[, "part"] == spart, evalcols]
+        }
+      }
+      
+      loss0 <- tree$info$control$lossfun(tree)
+      npar0 <- extractAIC(tree)[1L]
+      nsplit0 <- sum(sapply(tree$info$node, width) - 1L)
+      
+      subs <- which(is.infinite(ntab[, "loss"]))
+      if (length(subs) > 0L) {
+        
+        ## re-estimate all models which collapse each on inner node
+        prStat <- function(i) {
+          term <- lapply(seq_along(tree$info$node),
+                         function(pid) {
+                           if (pid == ntab[i, "part"]) return(ntab[i, "node"])
+                           return(NULL)
+                         })
+          prTree <- try(prune(tree, terminal = term, papply = lapply), TRUE)
+          if (!inherits(prTree, "try-error"))
+            return(c(prTree$info$control$lossfun(prTree),
+                     extractAIC(prTree$info$model)[1L],
+                     sum(sapply(prTree$info$node, width) - 1L)))
+          return(c(Inf, NA, NA))
+        }
+        stat <- eval(prStatCall)
+        ntab[subs, evalcols] <- t(sapply(stat, function(x) x))
+      }
+      
+      if (nrow(ntab) > 0L) {
+        if (any(ntab[, "loss"] < Inf)) {
+          
+          ## minimum dfsplit such that the smaller model improves the fit
+          ntab[, "pdeviance"] <-
+            (ntab[, "loss"] - loss0) /
+              (tvcm_complexity(npar0, tree$info$control$dfpar,
+                               nsplit0, tree$info$control$dfsplit) -
+               tvcm_complexity(ntab[, "npar"], tree$info$control$dfpar,
+                               ntab[, "nsplit"], tree$info$control$dfsplit))
+          
+          ## prune selected inner node
+          if (any(ntab[, "pdeviance"] <= cp)) {
+            ncollapse <- which(!is.na(ntab[, "pdeviance"]) &
+                               !is.nan(ntab[, "pdeviance"]) &
+                               ntab[, "pdeviance"] == min(ntab[, "pdeviance"]))
+            if (length(ncollapse) > 1L) ncollapse <- sample(ncollapse, 1L)
+            if (length(ncollapse) > 0L) {
               term <- lapply(seq_along(tree$info$node),
                              function(pid) {
-                               if (pid == ntab$part[i]) return(ntab$node[i])
+                               if (pid == ntab[ncollapse, "part"])
+                                 return(ntab[ncollapse, "node"])
                                return(NULL)
                              })
-              prTree <- try(prune(tree, terminal = term, papply = lapply), TRUE)
-              if (!inherits(prTree, "try-error"))
-                return(c(prTree$info$control$lossfun(prTree),
-                         extractAIC(prTree$info$model)[1L],
-                         sum(sapply(prTree$info$node, width) - 1L)))
-              return(c(Inf, NA, NA))
+              tree <- prune(tree, terminal = term)
+              run <- 1
             }
-            stat <- eval(prStatCall)
-            ntab[subs, cols] <- t(sapply(stat, function(x) x))
           }
+          otab <- ntab
+          ocollapse <- ncollapse
           
-          if (any(ntab$loss < Inf)) {
-            
-            ## minimum dfsplit such that the smaller model improves the fit
-            loss0 <- tree$info$control$lossfun(tree)
-            npar0 <- extractAIC(tree)[1L]
-            nspl0 <- sum(sapply(tree$info$node, width) - 1L)
-            ntab$dfsplit <- (ntab$loss + dfpar * ntab$npar - loss0 - dfpar * npar0) /
-              (nspl0 - ntab$nspl)
-            
-            ## prune selected inner node
-            if (any(ntab$dfsplit <= dfsplit)) {
-              ncollapse <- which(!is.na(ntab$dfsplit) &
-                                 !is.nan(ntab$dfsplit) &
-                                 ntab$dfsplit == min(ntab$dfsplit))
-              if (length(ncollapse) > 1L) ncollapse <- sample(ncollapse, 1L)
-              if (length(ncollapse) > 0L) {
-                term <- lapply(seq_along(tree$info$node),
-                               function(pid) {
-                                 if (pid == ntab$part[ncollapse])
-                                   return(ntab$node[ncollapse])
-                                 return(NULL)
-                               })
-                tree <- prune(tree, terminal = term, keeploss = TRUE)
-                run <- 1
-              }
-            }
-            otab <- ntab
-            ocollapse <- ncollapse
-            
-          } else {
-            stop("fitting of nested models failed.")
-          }
+        } else {
+          stop("fitting of nested models failed.")
         }
-        
-        ## create a 'data.frame' for the 'prunepath' method
-        tab <- data.frame(
-                 part = NA,
-                 node = NA,
-                 loss = tree$info$control$lossfun(tree),
-                 npar = extractAIC(tree)[1L],
-                 nspl = sum(sapply(tree$info$node, width) - 1L),
-                 dfsplit = NA,
-                 row.names = "<none>")
-        if (nrow(ntab) > 0L) {
-          ntab$node <- unlist(ids00)
-          rownames(ntab) <- seq_along(rownames(ntab))
-          tab <- rbind(tab, ntab)
-        }
-        prunepath[[step]] <- list(step = step, tab = tab)
       }
+      
+      ## create a 'data.frame' for the 'prunepath' method
+      
+      tab <- matrix(c(NA, NA, loss0, npar0, nsplit0, NA),
+                    ncol = length(cols), dimnames = list("<none>", cols))
+      if (nrow(ntab) > 0L) {
+        ntab[, "node"] <- unlist(ids00)
+        rownames(ntab) <- seq(1L, nrow(ntab), length.out = nrow(ntab))
+        tab <- rbind(tab, ntab)
+      }
+      prunepath[[step]] <- list(step = step, tab = tab)
     }
     tree$info$prunepath <- prunepath
-    
-  } else if (direction == "forward") {
-    
-    ## table with information from the latest step
-    tab <- data.frame(
-             step = seq(0, tree$info$nstep, 1L),
-             loss = sapply(tree$info$splitpath, function(x) x$loss),
-             npar = sapply(tree$info$splitpath, function(x) x$npar),
-             nspl = sapply(tree$info$splitpath, function(x) x$nspl))
-    
-    ## maximum dfsplit such that the larger model improves the fit
-    tab$dfsplit <- c(-(diff(tab$loss) + dfpar * diff(tab$npar)) / diff(tab$nspl), 0)
-    subs <- tab$dfsplit > dfsplit
-    
-    if (any(subs)) {
-      
-      maxstep <- max(tab$step[subs])
-      tree <- prune(tree, maxstep = maxstep)
-      tab <- tab[subs, ]
-    }
-    tree$info$prunepath <- tab
   }
   
   ## return pruned model  
@@ -686,12 +619,12 @@ prunepath.tvcm <- function(tree, steps = 1L, ...) {
 }
 
 
-print.prunepath.tvcm <- function(x, ...) {
+print.prunepath.tvcm <- function(x, na.print = "", ...) {
   for (i in seq_along(x)) {
     if (!is.null(x[[i]])) {
       if (i != 1L) cat("\n")
       cat("Step:", x[[i]]$step, "\n")
-      print(x[[i]]$tab, ...)
+      print(x[[i]]$tab, na.print = na.print, ...)
     }
   }
 }
@@ -720,7 +653,7 @@ splitpath.tvcm <- function(tree, steps = 1L,
     if (!details) {
         for (i in seq_along(steps)) {
             rval[[i]]$sctest <- NULL
-            rval[[i]]$lossgrid <- NULL
+            rval[[i]]$grid <- NULL
         }
     }
     class(rval) <- "splitpath.tvcm"
@@ -736,32 +669,32 @@ print.splitpath.tvcm <- function(x, ...) {
       cat(" (no splitting processed)\n")
     } else {
       cat("\nPartition:", LETTERS[x[[i]]$partid])
-      cat("\nSplitting variable:", x[[i]]$var)
       cat("\nNode:", x[[i]]$node)
+      cat("\nVariable:", x[[i]]$var)
       cat("\nCutpoint: ")
       cat(paste("{",paste(x[[i]]$cutpoint, collapse = "}, {"), "}", sep = ""))
-      cat("\nPenalized loss reduction:", format(x[[i]]$plossred, ...), "\n")
+      cat("\nDeviance:", format(x[[i]]$deviance, ...))
   }
     
-    if (!is.null(x[[i]]$sctest) | !is.null(x[[i]]$lossgrid))
-      cat("\nDetails:\n")
     if (!is.null(x[[i]]$sctest)) {
-      cat("\nCoefficient constancy tests (p-value):\n")
+      cat("\nCoefficient Constancy Tests (p-value):\n")
       for (pid in seq_along(x[[i]]$sctest)) {
         cat(paste("\nPartition ", LETTERS[pid], ":\n", sep = ""))
         print(as.data.frame(x[[i]]$sctest[[pid]]), ...)
       }
-    }
-    if (!is.null(x[[i]]$lossgrid)) {
-      cat("\nLoss-minimizing grid search (loss reduction):\n")
-      for (pid in seq_along(x[[i]]$lossgrid)) {
-        for (nid in seq_along(x[[i]]$lossgrid[[pid]])) {
-          for (vid in seq_along(x[[i]]$lossgrid[[pid]][[nid]])) {
-            if (length(x[[i]]$lossgrid[[pid]][[nid]][[vid]]) > 0L) {
-              cat("\nPartition:", names(x[[i]]$lossgrid)[pid],
-                  "Node:", sub("Node", "",names(x[[i]]$lossgrid[[pid]])[nid]),
-                  "Variable:", names(x[[i]]$lossgrid[[pid]][[nid]])[vid], "\n")
-              print(as.data.frame(x[[i]]$lossgrid[[pid]][[nid]][[vid]]), ...)
+    } else cat("\n")
+    
+    if (!is.null(x[[i]]$grid)) {
+      cat("\nDeviance Statistics:\n")
+      for (pid in seq_along(x[[i]]$grid)) {
+        for (nid in seq_along(x[[i]]$grid[[pid]])) {
+          for (vid in seq_along(x[[i]]$grid[[pid]][[nid]])) {
+            if (is.null(x[[i]]$sctest) | !is.null(x[[i]]$sctest) &&
+                any(x[[i]]$grid[[pid]][[nid]][[vid]][, "deviance"] > -Inf)) {
+              cat("\nPartition:", LETTERS[pid],
+                  "Node:", sub("Node", "",names(x[[i]]$grid[[pid]])[nid]),
+                  "Variable:", names(x[[i]]$grid[[pid]][[nid]])[vid], "\n")
+              print(as.data.frame(x[[i]]$grid[[pid]][[nid]][[vid]]), ...)
             }
           }
         }

@@ -110,7 +110,7 @@ fvcm <- function(..., control = fvcm_control()) {
 
 fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
                          ptry = 1, ntry = 1, vtry = 5,
-                         alpha = 1.0, maxoverstep = Inf, ...) {
+                         alpha = 1.0, mindev = 0.0, ...) {
 
   ## modify the 'papply' argument
   mc <- match.call()
@@ -123,7 +123,7 @@ fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
   ## combine the parameter to a list and disble cross validation and pruning 
   call <- list(maxstep = maxstep, folds = folds,
                ptry = ptry, ntry = ntry, vtry = vtry,
-               alpha = alpha, maxoverstep = Inf,
+               alpha = alpha, mindev = mindev,
                papply = papply, cv = FALSE, prune = FALSE)
   call <- appendDefArgs(call, list(...))
   

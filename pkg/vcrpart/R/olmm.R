@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:       Reto Buergin, rbuergin@gmx.ch
-##' Date:         2014-09-08
+##' Date:         2014-09-20
 ##'
 ##' References:
 ##' ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
@@ -13,6 +13,7 @@
 ##'
 ##'
 ##' Modifications:
+##' 2014-09-19: allow 'family' to be of class 'function'
 ##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-06-17: convert routine to S3 class
 ##' 2014-05-03: moved several control parameters to 'control' argument
@@ -137,7 +138,15 @@ olmm <- function(formula, data, family = cumulative(),
   stopifnot(inherits(control, "olmm_control"))
   
   ## link and family
-  stopifnot(class(family) == "family.olmm")
+  if (is.character(family)) {
+    family <- get(family, mode = "function", envir = parent.frame())
+  } else if (is.function(family)) {
+    family <- family()
+  }
+  if (!inherits(family, "family.olmm")) {
+    print(family)
+    stop("'family' not recognized")
+  }  
   linkNum <- switch(family$link, logit = 1L, probit = 2L, cauchy = 3L)
   famNum <- switch(family$family, cumulative = 1L, baseline = 2L, adjacent = 3L)
   

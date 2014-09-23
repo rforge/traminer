@@ -56,32 +56,32 @@ tvcglm(formula, data, family,
 }
 
 \details{ 
-  The TVCM partitioning algorithm works as follows: Starting with
-  \eqn{M_k = 1} stratum (i.e. node) for all \eqn{K} \command{\link{vc}}
-  terms, the algorithm splits in each iteration one of the current
-  \eqn{K \sum_{k=1}^K M_k} nodes into two new nodes. For selecting the
-  \code{vc} term, the node, the variable and the cutpoint in each
-  iteration, there are two procedures available. 
+  TVCM partitioning works as follows: In each iteration we fit the
+  current model and select a binary split for one of the current
+  terminal nodes. The selection requires 4 decisions: the \code{vc}
+  term, the node, the variable and the cutpoint in the selected
+  variable. The algorithm starts with \eqn{M_k = 1} node for each for
+  each of the \eqn{K} \command{\link{vc}} terms and iterates until the
+  criteria defined by \code{control} are reached, see
+  \command{\link{tvcm_control}}. The following two paragraphs explain
+  the two available procedures to select the split and choose the final
+  model. 
 
-  The first and default procedure (cf. Buergin and Ritschard, 2014b) is
-  a two-stage procedure which builds overly fine partitions in the first
-  stage and selects the best-sized partitions by pruning in the second
-  stage. For the second stage, which is automatically processed, we
-  refer to \command{\link{tvcm-assessment}}. The partitioning stage
-  selects,  in each iteration, the split that maximizes the penalized
-  loss reduction statistic that compares the current with the one-step
-  ahead model (see also argument \code{lossfun} in
-  \command{\link{tvcm_control}}). By default, the penalized loss
-  reduction statistic is the Akaike Information Criterion (Akaike,
-  1974), but alternatives could be specified by the \code{control}
-  argument. The algorithm is continued to build until the criteria
-  specified in \code{control} are reached. By default, only the
-  \code{minsize} (minimum node size) criteron are specified (andthat the
-  penalized loss reduction is larger than 0). For large data sets with
-  many partitioning variables, this can be slow and, therefore,
-  \command{\link{tvcm_control}} provides further criteria. In
-  particular, you may increase the minimum permitted penalized loss
-  reduction by \code{dfsplit}. 
+  The first and default procedure (cf. Buergin and Ritschard, 2014b)
+  uses two stages. The first stage builds too overly fine partitions and
+  the second stage selects the best-sized partitions by pruning. For the
+  second stage, which is automatically processed, we refer to
+  \command{\link{tvcm-assessment}}. The partitioning stage selects, in
+  each iteration, the split that maximizes the deviance relative to the
+  current model. The loss function to compute the deviance is defined by
+  the \code{lossfun} argument in \command{\link{tvcm_control}}. It is
+  also possible to penalize the deviance, which may be interesting if
+  \code{vc} terms include different number of coefficients. See the
+  arguments \code{cp}, \code{dfpar} and \code{dfsplit} in
+  \command{\link{tvcm_control}} to define such a penalization. The
+  default stopping parameters are \code{minsize = 30} (a minimum 
+  node size of 30) and \code{mindev = 2} (the deviance of the best split
+  must be larger than two to continue).
 
   The second procedure (cf. Buergin and Ritschard, 2014a) is, for
   technical reasons, restricted to the cases where a single
@@ -185,8 +185,8 @@ poverty$EduHigh <- 1 * (poverty$Edu == "high")
 model.Pov <-
   tvcglm(Poor ~ -1 +  vc(CivStat) + vc(CivStat, by = EduHigh) + NChild, 
          family = binomial(), data = poverty, subset = 1:200,
-         control = tvcm_control(verbose = TRUE,
-           folds = folds_control(K = 1, type = "subsampling", seed = 4)))
+         control = tvcm_control(verbose = TRUE, papply = lapply,
+           folds = folds_control(K = 1, type = "subsampling", seed = 7)))
 
 ## diagnosis
 plot(model.Pov, "cv")

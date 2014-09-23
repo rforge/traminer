@@ -9,47 +9,23 @@
 }
 
 \usage{
-tvcm_control(lossfun = neglogLik2, 
-             maxstep = Inf, maxwidth = Inf,
-             minsize = 30, maxdepth = Inf,
-             dfpar = 2.0, dfsplit = 0.0,
-             maxoverstep = ifelse(sctest, Inf, 0),
+tvcm_control(minsize = 30, mindev = 2.0,
              sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
-             trim = 0.1, estfun = list(),
+             trim = 0.1, estfun.args = list(), nimpute = 5L, 
              maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
+             maxstep = Inf, maxwidth = Inf, maxdepth = Inf,
+             lossfun = neglogLik2, ooblossfun = NULL,
+             cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
              cv = !sctest, folds = folds_control("kfold", 5),
-             prune = cv, keeploss = FALSE, papply = mclapply,
-             verbose = FALSE, ...)
-
+             prune = cv, papply = mclapply, papply.args = list(),
+             center = TRUE, verbose = FALSE, ...)
 }
 
 \arguments{
-  \item{lossfun}{a function that extracts a loss measure from a
-    fitted object, e.g., two times the negative log likelihood
-    (default).}
-  \item{maxstep}{integer. The maximum number of iterations i.e. the
-    total number of splits processed.} 
-  \item{maxwidth}{integer (vector). The maximum width of the tree(s).}  
-  \item{minsize}{numeric. The minimum sum of weights in a terminal
-    node. The default is the number of varying coefficients times 10.
-    The parameter specifies also the trimming in parameter coefficient
-    tests for numeric variables (if \code{sctest = TRUE}).}
-  \item{maxdepth}{integer (vector). The maximum depth of the tree(s).} 
-  \item{dfpar}{a numeric scalar larger than zero. The per-parameter
-    penalty to be applied for stopping. See also argument
-    \code{maxoverstep}.} 
-  \item{dfsplit}{a numeric scalar larger than zero. The per-split
-    penalty to be applied for stopping. See also argument
-    \code{maxoverstep}.} 
-  \item{maxoverstep}{integer scalar. The maximum number of consecutive 
-    times the penalized reduction statistic is allowed to be smaller
-    than \code{dfsplit} before stopping. Specifically, the penalized
-    loss is computed as the loss (see argument \code{lossfun}) of the
-    model plus \code{dfpar} times the number of coefficients  (as
-    extracted from \command{\link{extractAIC}}), and the penalized loss
-    reduction statistic is the difference between the penalized loss of
-    the current model and the penalized loss of the selected (best) update
-    model. The argument is disabled if \code{sctest = TRUE}.}   
+  \item{minsize}{numeric (vector). The minimum permitted sum of
+    weights of terminal nodes (of each partition).}
+  \item{mindev}{numeric scalar. The minimum permitted increase in the
+    loss function for a new split.}
   \item{sctest}{logical scalar. Defines whether coefficient constancy
     tests should be used for variable and node selection.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is
@@ -62,41 +38,76 @@ tvcm_control(lossfun = neglogLik2,
   \item{trim}{numeric between 0 and 1. Specifies the trimming parameter
     in coefficient constancy tests for continuous partitioning
     variables.} 	
-  \item{estfun}{list of arguments to be passed to
-    \command{\link{gefp.olmm}}.}  
-  \item{maxfacsplit}{integer.}
-  \item{maxordsplit}{integer.}
-  \item{maxnumsplit}{integer. The maximum number of evaluation for
-    splits on numeric partitioning variables.}
-  \item{cv}{logical scalar. Whether or not the \code{dfsplit} parameter
-    should be cross-validated.}
+  \item{estfun.args}{list of arguments to be passed to
+    \command{\link{gefp.olmm}}. The argument is specific for models
+    fitted with \command{\link{olmm}} with random effects.}
+  \item{nimpute}{the number of times coefficient constancy tests
+    should be repeated in each iteration. See details.}
+  \item{maxfacsplit}{integer. For nominal partitioning variables with
+    more the \code{maxfacsplit} the categories are ordered an treated as
+    ordinal.}
+  \item{maxordsplit}{integer. The maximum number of splits of ordered
+    partitioning variables to be evaluated.}
+  \item{maxnumsplit}{integer. The maximum number of splits of numeric
+    partitioning variables to be evaluated.}
+  \item{maxstep}{integer. The maximum number of iterations i.e. number
+    of splits to be processed.}  
+  \item{maxwidth}{integer (vector). The maximum width of the partition(s).}  
+  \item{maxdepth}{integer (vector). The maximum depth of the partition(s).} 
+  \item{lossfun}{a function to extract the loss of the model, typically
+    minus two times the negative log likelihood (see
+    \command{\link{neglogLik2}}).} 
+  \item{ooblossfun}{a function to extract the loss of validation sets
+    during cross-validation. The function will be assigned to the
+    \code{fun} argument of \command{\link{oobloss}}.}
+  \item{cp}{numeric scalar. The penalty to be multiplied with the
+    complexity of the model during partitioning. The complexity of the
+    model is defined as the number of coefficients times \code{dfpar}
+    plus the number of splits times \code{dfsplit}. By default, \code{cp
+      = 0} (no penalization during partitioning) and \code{dfpar = 0} and
+    \code{dfsplit = 1} (the complexity is measured as the total number
+    of splits). \code{cp} also presents the minimum evaluated value at
+    cross-validation.}
+  \item{dfpar}{numeric scalar. The degree of freedom per model
+    coefficient. Is used to compute the complexity of the model, see
+    \code{cp}.}  
+  \item{dfsplit}{a numeric scalar. The degree of freedom per split. Is
+    used to compute the complexity of the model, see \code{cp}.}   
+  \item{cv}{logical scalar. Whether or not the \code{cp} parameter
+    should be cross-validated. If \code{TRUE} \command{\link{cvloss}} is
+    called.} 
   \item{folds}{a list of parameters to create folds as produced by 
-   \command{\link{folds_control}}.}
-  \item{prune}{logical scalar. Whether or not the overly large
-    partitions should be pruned by the estimated \code{dfsplit} parameter
-    from cross-validation. Note that \code{prune = TRUE} conflicts with
-    \code{cv = FALSE}} 
-  \item{keeploss}{logical scalar or a numeric equal or larger than
-    0. Indicates if and how many times the computed penalized loss
-    reduction statistics should be reused in the following
-    iterations. Specifically, the option activates approximating the
-    penalized loss reduction statistic of a split based on the penalized
-    loss reduction statistic of the same split in the previous
-    iteration. Values different from \code{FALSE} or 0 will accelerate the
-    algorithm at the expense of accuracy. In cases of multiple
-    \command{\link{vc}} terms, only the statistics corresponding to the
-    \command{\link{vc}} term which was splitted in the previous iteration
-    are reused.}  
-   \item{papply}{(parallel) apply function, defaults to
+    \command{\link{folds_control}}. Is used for cross-validation.}
+  \item{prune}{logical scalar. Whether or not the initial tree should be
+    pruned by the estimated \code{cp} parameter from
+    cross-validation. Cannot be \code{TRUE} if \code{cv = FALSE}.} 
+  \item{papply}{(parallel) apply function, defaults to
     \code{\link[parallel]{mclapply}}. The function will parallelize the 
     partition stage and the evaluation of the cross-validation folds as
-    well as the final pruning stage.}  
+    well as the final pruning stage.}
+  \item{papply.args}{a list of arguments to be passed to \code{papply}.}
+  \item{center}{logical integer. Whether the predictor variables of
+    update models during the grid search should be centered. Note that
+    \code{TRUE} will not modify the predictors of the fitted model.} 
   \item{verbose}{logical. Should information about the fitting process
-    (such as test statistics, \eqn{p} values, 
-    selected splitting variables and split points) be printed to the
-    screen?}
-  \item{\ldots}{further, undocumented arguments to be passed. These can
-    include arguments for the \code{papply} function.} 
+    be printed to the screen?}
+  \item{\ldots}{further, undocumented arguments to be passed.} 
+}
+
+\details{
+  The arguments \code{alpha}, \code{bonferroni}, \code{trim},
+  \code{estfun.args}, \code{nimpute} are relevant only if \code{sctest =
+  TRUE}. Moreover, the argument \code{nimpute} is relevant only for the
+  special case where the model is fitted by \command{\link{olmm}}
+  including random effects and the data are unbalanced (individuals have
+  different numbers of observations). In these cases, the internally
+  used \command{\link{estfun.olmm}} function to extract the
+  (decorrelated) likelihood scores will balance out the data by
+  generating observations from the model under the \eqn{H_0} of the
+  test. To account for the randomness of generating obervations, the
+  test procedure is \code{nimpute} times repeated. The final p-values
+  are then the averages of the repetations. The procedure is explained
+  in detail in Buergin and Ritschard (2014a). 
 }
 
 \value{

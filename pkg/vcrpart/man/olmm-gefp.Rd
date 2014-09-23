@@ -102,22 +102,15 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   i'} and \eqn{t \neq t'}.
   
   The pre-decorrelation approach above is principally limited to
-  balanced data. If the data of \code{object} are not balanced, a
-  multiple imputation algorithm is applied to estimate the values that
-  scores would take if the data were balanced. Specifically, in each
-  iteration of the imputation, (i) a set of predictors is drawn from the 
-  empirical distribution of the model matrix, (ii) responses are drawn 
-  based on these predictors of (i) and \code{object}
-  (cf. \command{\link{simulate.olmm}}) and (iii) the predictors of (i)
-  and the responses of (ii) are added  \code{object} and the scores are
-  recomputed. The obtained sets of scores are averaged and then used to
-  for transforming the scores instead of the original scores. The
-  imputation algorithm can be controlled with \code{maxit.impute} (the
-  number of imputation iterations), \code{abstol.impute} the maximum
-  permitted quantile of differences between scores of the previous and
-  the current step and \code{ratio.impute} specifies the quantile to be
-  taken. 
-  
+  balanced data. If the data of \code{object} are not balanced, the data
+  are balanced out by (i) drawing a set of predictors from the empirical
+  distribution of the model matrix of \code{object}, (ii) drawing
+  responses based on the predictors of (i) and \code{object}
+  (cf. \command{\link{simulate.olmm}}) and (iii) add the predictors of
+  (i) and the responses of (ii) to \code{object} and recompute the
+  scores based on the original coefficients. Note that, the column sum
+  of the returned score matrix is not necessarily zero in these cases. 
+   
   Given a score matrix produced by \command{\link{estfun.olmm}}, the
   empirical fluctuation process can be computed by
   \command{\link{gefp.olmm}}. See Zeileis and Hornik
