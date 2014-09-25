@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:       Reto Buergin, rbuergin@gmx.ch
-##' Date:         2014-09-20
+##' Date:         2014-09-25
 ##'
 ##' References:
 ##' ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
@@ -13,6 +13,10 @@
 ##'
 ##'
 ##' Modifications:
+##' 2014-09-25: - removed bug for numeric estimation of covariance of
+##'               'olmm' objects
+##'             - define 'score_sbj' and 'score_obs' slot even if
+##'               'numGrad = FALSE' (otherwise olmm_update_marg gives error)
 ##' 2014-09-19: allow 'family' to be of class 'function'
 ##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-06-17: convert routine to S3 class
@@ -22,9 +26,9 @@
 ##' 2014-04-22: implement change in 'form' object
 ##' 2013-09-15: Free() commands were added in olmm.c
 ##' 2013-09-07: C implementation for updating the marginal Likelihood
-##' 	       and predicting random-effects was stabilized by 
-##'	       replacing many alloca's by the R built-in function
-##'	       Calloc, which may slow the estimation
+##' 	        and predicting random-effects was stabilized by 
+##'	        replacing many alloca's by the R built-in function
+##'	        Calloc, which may slow the estimation
 ##' 2013-07-27: change 'start' handling and add 'restricted'
 ##'             argument
 ##' 2013-07-19: correct use of numGrad argument (from now the slots
@@ -107,6 +111,18 @@ olmm_control <- function(fit = c("nlminb", "ucminf", "optim"), doFit = TRUE,
                          numGrad = FALSE, numHess = numGrad, nGHQ = 7L,
                          start = NULL, restricted = NULL, verbose = FALSE, ...) {
     fit <- match.arg(fit)
+    stopifnot(is.logical(doFit) && length(doFit) == 1)
+    stopifnot(is.logical(numGrad) && length(numGrad) == 1)
+    stopifnot(is.logical(numHess) && length(numHess) == 1)
+    if (!numHess & numGrad)
+        stop("'numHess' must be TRUE if numGrad is 'TRUE'")
+    stopifnot(is.numeric(nGHQ) && length(nGHQ) == 1)
+    if (nGHQ != round(nGHQ))
+      warning(paste("'nGHQ' is set to ", nGHQ, ".", sep = ""))
+    nGHQ <- as.integer(round(nGHQ))
+    stopifnot(is.null(start) | is.numeric(start))
+    stopifnot(is.null(restricted) | is.character(restricted))
+    stopifnot(is.logical(verbose) && length(verbose) == 1)
     rval <- append(list(fit = fit,
                         doFit = doFit,
                         numGrad = numGrad,
@@ -149,10 +165,6 @@ olmm <- function(formula, data, family = cumulative(),
   }  
   linkNum <- switch(family$link, logit = 1L, probit = 2L, cauchy = 3L)
   famNum <- switch(family$family, cumulative = 1L, baseline = 2L, adjacent = 3L)
-  
-  ## numerical methods for score and hessian matrix
-  if (!control$numHess & control$numGrad)
-    stop("'numHess' must be 'TRUE' if 'numGrad' is 'TRUE'")
 
   ## evaluate contrasts
   con <- lapply(1:ncol(data), function(i) attr(data[, i], "contrasts"))
@@ -161,14 +173,9 @@ olmm <- function(formula, data, family = cumulative(),
   if (missing(contrasts)) contrasts <- NULL
   contrasts <- appendDefArgs(contrasts, con)
   
-  ## number of Gauss-Hermite quadrature points
-  if (control$nGHQ != as.integer(round(control$nGHQ)))
-    warning(paste("'nGHQ' has been set to ", control$nGHQ, ".", sep = ""))
-  control$nGHQ <- as.integer(round(control$nGHQ))
-  
   ## optimizer control option
   optim <- olmm_optim_setup(x = control, env = environment())
-  control$numGrad <- control$numHess <- is.null(optim$gr)
+  ## control$numGrad <- control$numHess <- is.null(optim$gr)
   
   ## set environment
   env <- if (!is.null(list(...)$env)) list(...)$env else parent.frame(n = 1L)
@@ -334,16 +341,11 @@ olmm <- function(formula, data, family = cumulative(),
   ll <- c(0.0)
   
   ## score function
-  if (!control$numGrad) {
-    score_obs <- matrix(0, dims["n"], dims["nPar"])
-    rownames(score_obs) <- rownames(X)
-    colnames(score_obs) <- unlist(parNames)
-    score_sbj <- matrix(0, dims["N"], dims["nPar"],
-                        dimnames = list(levels(subject), unlist(parNames)))
-  } else {
-    score_obs <- matrix(, 0L, 0L)
-    score_sbj <- matrix(, 0L, 0L)
-  }
+  score_obs <- matrix(0, dims["n"], dims["nPar"])
+  rownames(score_obs) <- rownames(X)
+  colnames(score_obs) <- unlist(parNames)
+  score_sbj <- matrix(0, dims["N"], dims["nPar"],
+                      dimnames = list(levels(subject), unlist(parNames)))
   score <- rep.int(0, dims["nPar"])
   names(score) <- unlist(parNames)
 
@@ -494,8 +496,9 @@ olmm <- function(formula, data, family = cumulative(),
       object$info[] <- # replace the info slot
         - hessian(func = object$optim[[2L]],
                   x = object$coefficients,
-                  method.args = list(r = 2, show.details = TRUE),
-                  restricted = object$restricted)
+                  method.args = list(func =
+                    if (dims["numGrad"]) object$optim[[3L]] else NULL),
+                  restricted = rep.int(FALSE, dims["nPar"]))
       if (dims["verb"] > 0L) cat("OK")
     }
 

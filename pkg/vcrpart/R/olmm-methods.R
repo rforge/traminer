@@ -890,11 +890,11 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
 
   ## title
   methTitle <- "Ordinal Linear"
-  if (dims["hasRanef"] > 0L) methTitle <- paste(methTitle, "mixed")
+  if (dims["hasRanef"] > 0L) methTitle <- paste(methTitle, "Mixed")
   methTitle <- paste(methTitle, "Model")
   if (dims["hasRanef"] > 0L)
-    paste(methTitle, " fit by Marginal Maximum\n",
-          "Likelihood with Gauss-Hermite Quadrature", sep = "")
+    methTitle <- paste(methTitle, " fit by Marginal Maximum\n",
+                       "Likelihood with Gauss-Hermite Quadrature", sep = "")
 
   na.action <- naprint(attr(model.frame(object), "na.action"))
   na.action <- if (na.action == "") character() else paste("(", na.action, ")", sep = "")

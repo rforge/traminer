@@ -469,49 +469,57 @@ panel_coef <- function(object, parm = NULL,
       ## option 'conf.int = TRUE'
       if  (conf.int) {
 
-          ## crop the lines
-          lwr <- coefList[[i]][as.character(id_node(node)),] -
-              qN * sdList[[i]][as.character(id_node(node)),]
-          lwr[lwr < plot_gp[[i]]$ylim[1L]] <- plot_gp[[i]]$ylim[1L]
-          lwr[lwr > plot_gp[[i]]$ylim[2L]] <- NA
-          upr <- coefList[[i]][as.character(id_node(node)),] +
-              qN * sdList[[i]][as.character(id_node(node)),]
-          upr[upr > plot_gp[[i]]$ylim[2L]] <- plot_gp[[i]]$ylim[2]
-          upr[upr < plot_gp[[i]]$ylim[1L]] <- NA
-          subsCi <- !is.na(lwr) & !is.na(upr)
-          
-          ## plot
-          if (any(subsCi))
-              grid.segments(unit(which(subsCi), "native"),
-                            unit(lwr[subsCi], "native"),
-                            unit(which(subsCi), "native"),
-                            unit(upr[subsCi], "native"),
-                            arrow = arrow(angle = conf.int_gp[[i]]$angle,
-                                length = conf.int_gp[[i]]$length, 
-                                ends = conf.int_gp[[i]]$ends,
-                                type = conf.int_gp[[i]]$type),
-                            gp = plot_gp[[i]]$gp)
-          
+        ## crop the lines
+        nCoef <- length(coefList[[i]][as.character(id_node(node)),])
+        endCi <- rep(conf.int_gp[[i]]$ends, length.out = nCoef)
+        lenCi <- rep(conf.int_gp[[i]]$length, length.out = nCoef)        
+        lwr <- coefList[[i]][as.character(id_node(node)),] -
+          qN * sdList[[i]][as.character(id_node(node)),]
+        endCi[lwr < plot_gp[[i]]$ylim[1L]] <- "last"
+        lwr[lwr < plot_gp[[i]]$ylim[1L]] <- plot_gp[[i]]$ylim[1L]
+        lwr[lwr > plot_gp[[i]]$ylim[2L]] <- NA
+        upr <- coefList[[i]][as.character(id_node(node)),] +
+          qN * sdList[[i]][as.character(id_node(node)),]
+        endCi[upr > plot_gp[[i]]$ylim[2L] & endCi == "last"] <- "none"
+        endCi[upr > plot_gp[[i]]$ylim[2L] & endCi == "both"] <- "first"
+        upr[upr > plot_gp[[i]]$ylim[2L]] <- plot_gp[[i]]$ylim[2]
+        upr[upr < plot_gp[[i]]$ylim[1L]] <- NA
+        subsCi <- !is.na(lwr) & !is.na(upr)
+        lenCi[endCi == "none"] <- 0
+        endCi[endCi == "none"] <- "both"
+        
+        ## plot
+        if (any(subsCi))
+          grid.segments(unit(which(subsCi), "native"),
+                        unit(lwr[subsCi], "native"),
+                        unit(which(subsCi), "native"),
+                        unit(upr[subsCi], "native"),
+                        arrow = arrow(angle = conf.int_gp[[i]]$angle,
+                          length = lenCi, 
+                          ends = endCi,
+                          type = conf.int_gp[[i]]$type),
+                        gp = plot_gp[[i]]$gp)
+        
       }
-
+      
       ## option 'type = "p"'
       if (plot_gp[[i]]$type %in% c("p", "b")) {
           
         if (mean && any(subsMean))
-            grid.points(unit(which(subsMean), "native"),
-                        unit(meanCoef[[i]][subsMean], "native"),
-                        pch = mean_gp[[i]]$pch, gp = mean_gp[[i]]$gp)
+          grid.points(unit(which(subsMean), "native"),
+                      unit(meanCoef[[i]][subsMean], "native"),
+                      pch = mean_gp[[i]]$pch, gp = mean_gp[[i]]$gp)
         
         if (any(subs)) 
-            grid.points(unit(which(subs), "native"),
-                        unit(coefList[[i]][as.character(id_node(node)),][subs],
-                             "native"),
-                        pch = plot_gp[[i]]$pch, gp = plot_gp[[i]]$gp)
+          grid.points(unit(which(subs), "native"),
+                      unit(coefList[[i]][as.character(id_node(node)),][subs],
+                           "native"),
+                      pch = plot_gp[[i]]$pch, gp = plot_gp[[i]]$gp)
       }
-
+      
       ## option 'type = "l"'
       if (plot_gp[[i]]$type %in% c("l", "b")) {
-
+        
         if (mean && any(subsMean)) 
           grid.lines(unit(which(subsMean), "native"),
                      unit(meanCoef[[i]][subsMean], "native"),

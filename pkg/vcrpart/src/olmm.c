@@ -204,15 +204,22 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   R_CheckStack();
 
   /* numeric valued objects */
-  double *X = X_SLOT(x), *W = W_SLOT(x), 
-    *weights_obs = WEIGHTS_SLOT(x), *weights_sbj = WEIGHTSSBJ_SLOT(x),
-    *offset = OFFSET_SLOT(x), *eta = ETA_SLOT(x), 
-    *fixef = FIXEF_SLOT(x), *ranefCholFac = RANEFCHOLFAC_SLOT(x),
-    *logLik_sbj = LOGLIKSBJ_SLOT(x), *logLik = LOGLIK_SLOT(x), 
-    *score_obs = SCOREOBS_SLOT(x), *score_sbj = SCORESBJ_SLOT(x), 
+  double *X = X_SLOT(x),
+    *W = W_SLOT(x),
+    *weights_obs = WEIGHTS_SLOT(x),
+    *weights_sbj = WEIGHTSSBJ_SLOT(x),
+    *offset = OFFSET_SLOT(x), 
+    *eta = ETA_SLOT(x), 
+    *fixef = FIXEF_SLOT(x), 
+    *ranefCholFac = RANEFCHOLFAC_SLOT(x),
+    *logLik_sbj = LOGLIKSBJ_SLOT(x), 
+    *logLik = LOGLIK_SLOT(x), 
+    *score_obs = SCOREOBS_SLOT(x), 
+    *score_sbj = SCORESBJ_SLOT(x), 
     *score = SCORE_SLOT(x),
     *info = INFO_SLOT(x),
-    *ghw = GHW_SLOT(x), *ghx = GHX_SLOT(x), 
+    *ghw = GHW_SLOT(x), 
+    *ghx = GHX_SLOT(x), 
     *ranefElMat = RANEFELMAT_SLOT(x);
   R_CheckStack();
 
