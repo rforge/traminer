@@ -58,7 +58,6 @@ extract.tvcm <- function(object, what = c("control", "model",
                          steps = NULL, ...) {
   
   what <- match.arg(what)
-
   splitpath <- object$info$splitpath
   if (length(splitpath) > 0 && is.null(steps))
     steps <- seq(1L, object$info$nstep)
@@ -468,7 +467,7 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
     
     ## prune as long as there remain 'weak' links   
     run <- 1L; step <- 0L;
-    cols <- c("part", "node", "loss", "npar", "nsplit", "pdeviance")
+    cols <- c("part", "node", "loss", "npar", "nsplit", "li")
     evalcols <- c("loss", "npar", "nsplit")
     prunepath <- list()
     
@@ -561,7 +560,7 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
         if (any(ntab[, "loss"] < Inf)) {
           
           ## minimum dfsplit such that the smaller model improves the fit
-          ntab[, "pdeviance"] <-
+          ntab[, "li"] <-
             (ntab[, "loss"] - loss0) /
               (tvcm_complexity(npar0, tree$info$control$dfpar,
                                nsplit0, tree$info$control$dfsplit) -
@@ -569,10 +568,10 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
                                ntab[, "nsplit"], tree$info$control$dfsplit))
           
           ## prune selected inner node
-          if (any(ntab[, "pdeviance"] <= cp)) {
-            ncollapse <- which(!is.na(ntab[, "pdeviance"]) &
-                               !is.nan(ntab[, "pdeviance"]) &
-                               ntab[, "pdeviance"] == min(ntab[, "pdeviance"]))
+          if (any(ntab[, "li"] <= cp)) {
+            ncollapse <- which(!is.na(ntab[, "li"]) &
+                               !is.nan(ntab[, "li"]) &
+                               ntab[, "li"] == min(ntab[, "li"]))
             if (length(ncollapse) > 1L) ncollapse <- sample(ncollapse, 1L)
             if (length(ncollapse) > 0L) {
               term <- lapply(seq_along(tree$info$node),
@@ -614,6 +613,11 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
 
 prunepath.tvcm <- function(tree, steps = 1L, ...) {
   rval <- tree$info$prunepath[steps]
+  rval <- lapply(rval, function(x) {
+    x$tab <- as.data.frame(x$tab)
+    x$tab$part <- LETTERS[x$tab$part]
+    return(x)
+  })
   class(rval) <- "prunepath.tvcm"
   return(rval)
 }
@@ -624,7 +628,7 @@ print.prunepath.tvcm <- function(x, na.print = "", ...) {
     if (!is.null(x[[i]])) {
       if (i != 1L) cat("\n")
       cat("Step:", x[[i]]$step, "\n")
-      print(x[[i]]$tab, na.print = na.print, ...)
+      print(as.matrix(x[[i]]$tab), na.print = na.print, quote = FALSE, ...)
     }
   }
 }
@@ -673,7 +677,7 @@ print.splitpath.tvcm <- function(x, ...) {
       cat("\nVariable:", x[[i]]$var)
       cat("\nCutpoint: ")
       cat(paste("{",paste(x[[i]]$cutpoint, collapse = "}, {"), "}", sep = ""))
-      cat("\nDeviance:", format(x[[i]]$deviance, ...))
+      cat("\nLoss Reduction:", format(x[[i]]$lr, ...))
   }
     
     if (!is.null(x[[i]]$sctest)) {
@@ -685,12 +689,12 @@ print.splitpath.tvcm <- function(x, ...) {
     } else cat("\n")
     
     if (!is.null(x[[i]]$grid)) {
-      cat("\nDeviance Statistics:\n")
+      cat("\nLoss Reduction Statistics:\n")
       for (pid in seq_along(x[[i]]$grid)) {
         for (nid in seq_along(x[[i]]$grid[[pid]])) {
           for (vid in seq_along(x[[i]]$grid[[pid]][[nid]])) {
             if (is.null(x[[i]]$sctest) | !is.null(x[[i]]$sctest) &&
-                any(x[[i]]$grid[[pid]][[nid]][[vid]][, "deviance"] > -Inf)) {
+                any(x[[i]]$grid[[pid]][[nid]][[vid]][, "lr"] > -Inf)) {
               cat("\nPartition:", LETTERS[pid],
                   "Node:", sub("Node", "",names(x[[i]]$grid[[pid]])[nid]),
                   "Variable:", names(x[[i]]$grid[[pid]][[nid]])[vid], "\n")

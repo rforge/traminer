@@ -281,7 +281,7 @@ cvloss.tvcm <- function(object, folds = folds_control(), ...) {
 
             ## set a new and stronger tuning parameter
             tab <- ibTree$info$prunepath[[length(ibTree$info$prunepath)]]$tab
-            if (nrow(tab) > 1L) cp <- min(tab[, "pdeviance"][-1L])
+            if (nrow(tab) > 1L) cp <- min(tab[, "li"][-1L])
             if (nrow(tab) == 1L) run <- 0L
             
           } else {

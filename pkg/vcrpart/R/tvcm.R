@@ -282,7 +282,7 @@ tvcm <- function(formula, data, fit, family,
   return(tree)
 }
 
-tvcm_control <- function(minsize = 30, mindev = 2.0,
+tvcm_control <- function(minsize = 30, minlr = 2.0,
                          sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
                          trim = 0.1, estfun.args = list(), nimpute = 5, 
                          maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
@@ -296,7 +296,7 @@ tvcm_control <- function(minsize = 30, mindev = 2.0,
   
   ## check available arguments
   stopifnot(is.null(minsize) | (is.numeric(minsize) && all(minsize > 0)))
-  stopifnot(is.numeric(mindev) && length(mindev) == 1L)
+  stopifnot(is.numeric(minlr) && length(minlr) == 1L)
 
   stopifnot(is.logical(sctest) && length(sctest) == 1L)
   stopifnot(is.numeric(alpha) && length(alpha) == 1L && alpha >= 0.0 && alpha <= 1.0)
@@ -372,7 +372,7 @@ tvcm_control <- function(minsize = 30, mindev = 2.0,
   ## create a list of parameters of class 'tvcm_control'
   return(structure(
            list(minsize = minsize,     
-                mindev = mindev,
+                minlr = minlr,
                 sctest = sctest,
                 alpha = alpha,
                 bonferroni = bonferroni,

@@ -9,7 +9,7 @@
 }
 
 \usage{
-tvcm_control(minsize = 30, mindev = 2.0,
+tvcm_control(minsize = 30, minlr = 2.0,
              sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
              trim = 0.1, estfun.args = list(), nimpute = 5L, 
              maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
@@ -24,8 +24,8 @@ tvcm_control(minsize = 30, mindev = 2.0,
 \arguments{
   \item{minsize}{numeric (vector). The minimum permitted sum of
     weights of terminal nodes (of each partition).}
-  \item{mindev}{numeric scalar. The minimum permitted increase in the
-    loss function for a new split.}
+  \item{minlr}{numeric scalar. The minimum permitted training error
+    reduction of a new split.}
   \item{sctest}{logical scalar. Defines whether coefficient constancy
     tests should be used for variable and node selection.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is
@@ -54,12 +54,12 @@ tvcm_control(minsize = 30, mindev = 2.0,
     of splits to be processed.}  
   \item{maxwidth}{integer (vector). The maximum width of the partition(s).}  
   \item{maxdepth}{integer (vector). The maximum depth of the partition(s).} 
-  \item{lossfun}{a function to extract the loss of the model, typically
-    minus two times the negative log likelihood (see
-    \command{\link{neglogLik2}}).} 
-  \item{ooblossfun}{a function to extract the loss of validation sets
-    during cross-validation. The function will be assigned to the
-    \code{fun} argument of \command{\link{oobloss}}.}
+  \item{lossfun}{a function to extract the training error, typically
+    minus two times the negative log likelihood of the fitted model (see
+    \command{\link{neglogLik2}}).}  
+  \item{ooblossfun}{a loss function that defines how to compute the
+    validation error during cross-validation. The function will be
+    assigned to the \code{fun} argument of \command{\link{oobloss}}.}
   \item{cp}{numeric scalar. The penalty to be multiplied with the
     complexity of the model during partitioning. The complexity of the
     model is defined as the number of coefficients times \code{dfpar}

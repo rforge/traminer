@@ -22,7 +22,7 @@ fvcglm(..., family, control = fvcm_control())
 
 fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
              ptry = 1, ntry = 1, vtry = 5, 
-             alpha = 1.0, mindev = 0.0, ...)
+             alpha = 1.0, minlr = 0.0, ...)
 
 }
 
@@ -57,7 +57,7 @@ fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
     iteration. If \code{0 < vtry < 1}, \code{ntry} is interpreted as the
     relative number of variables to select regarding the total number of
     variables of the corresponding term.} 
-  \item{mindev, alpha}{These two parameters are merely specified to
+  \item{minlr, alpha}{These two parameters are merely specified to
     disable the default stopping rules for \command{\link{tvcm}}. See
     also \command{\link{tvcm_control}} for details.} 
 }

@@ -1,14 +1,12 @@
 Changes in Version 0.2-2
 
-    o    Improvements for the 'panel_coef' function: Points and 
-         lines falling outside the pre-specified 'ylim' intervals 
-         are now suppressed.
+    o    Improvement for 'panel_coef': Points and lines surpassing
+         the boxes are now suppressed.
 
     o    Added variable centering as default for split selection.
 
-    o    The definition of the tuning parameters for 'tvcm' were 
-         modified. The main tuning parameter is now 'cp' (as in 
-         the 'rpart' function). See the help of 'tvcm' and 
+    o    Redefinition of tuning parameters for 'tvcm' were. The main 
+         tuning parameter is now 'cp'. See the help of 'tvcm' and 
          'tvcm_control' for details. 
 
     o    Additional 'nimpute' argument for 'tvcm_control()'.
@@ -18,7 +16,10 @@ Changes in Version 0.2-2
     o    Removed AIC table from 'print.tvcm' (AIC and BIC seem not
          relevant measures for models fitted by 'tvcm').
 
-    o    Added 'PL' data set
+    o    Added 'PL' data set.
+
+    o    Removed bug for numeric estimation of covariance of 'olmm'
+         objects.
 
 
 Changes in Version 0.2-1

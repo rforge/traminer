@@ -72,16 +72,17 @@ tvcglm(formula, data, family,
   the second stage selects the best-sized partitions by pruning. For the
   second stage, which is automatically processed, we refer to
   \command{\link{tvcm-assessment}}. The partitioning stage selects, in
-  each iteration, the split that maximizes the deviance relative to the
-  current model. The loss function to compute the deviance is defined by
-  the \code{lossfun} argument in \command{\link{tvcm_control}}. It is
-  also possible to penalize the deviance, which may be interesting if
-  \code{vc} terms include different number of coefficients. See the
-  arguments \code{cp}, \code{dfpar} and \code{dfsplit} in
-  \command{\link{tvcm_control}} to define such a penalization. The
-  default stopping parameters are \code{minsize = 30} (a minimum 
-  node size of 30) and \code{mindev = 2} (the deviance of the best split
-  must be larger than two to continue).
+  each iteration, the split that maximizes the training error reduction
+  compared to the current model. The training function is defined by the
+  loss function specified by the \code{lossfun} argument in
+  \command{\link{tvcm_control}}. It is also possible to penalize the
+  training error, which may be interesting if \code{vc} terms include
+  different number of coefficients. See the  arguments \code{cp},
+  \code{dfpar} and \code{dfsplit} in \command{\link{tvcm_control}} to
+  define such a penalization. The default stopping parameters are
+  \code{minsize = 30} (a minimum node size of 30) and \code{minlr = 2}
+  (the training error reduction of the best split must be larger than
+  two to continue). 
 
   The second procedure (cf. Buergin and Ritschard, 2014a) is, for
   technical reasons, restricted to the cases where a single
@@ -91,7 +92,7 @@ tvcglm(formula, data, family,
   exhibits the exhaustive search above and is computationally much less
   burdensome. The procedure selects the split by first choosing the node
   and the variable with M-fluctuation tests (cf. Zeileis and Hornik,
-  2007) and second choosing the cutpoint by the deviance reduction
+  2007) and second choosing the cutpoint by the training error reduction
   statistic, as above. To use this option it is necessary to set
   \code{sctest=TRUE} in \command{\link{tvcm_control}}. The algorithm is
   stopped as soon as all nodewise Bonferroni corrected p-values of
