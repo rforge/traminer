@@ -9,7 +9,7 @@
 }
 
 \usage{
-tvcm_control(minsize = 30, minlr = 2.0,
+tvcm_control(minsize = 30, mindev = 2.0,
              sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
              trim = 0.1, estfun.args = list(), nimpute = 5L, 
              maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
@@ -22,10 +22,13 @@ tvcm_control(minsize = 30, minlr = 2.0,
 }
 
 \arguments{
-  \item{minsize}{numeric (vector). The minimum permitted sum of
-    weights of terminal nodes (of each partition).}
-  \item{minlr}{numeric scalar. The minimum permitted training error
-    reduction of a new split.}
+  \item{minsize}{numeric (vector). The minimum sum of weights in
+    terminal nodes.}
+  \item{mindev}{numeric scalar. The minimum permitted training error 
+    reduction a split must exhibit to be considered 
+     
+
+of a new split.}
   \item{sctest}{logical scalar. Defines whether coefficient constancy
     tests should be used for variable and node selection.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is

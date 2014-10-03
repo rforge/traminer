@@ -80,7 +80,7 @@ tvcglm(formula, data, family,
   different number of coefficients. See the  arguments \code{cp},
   \code{dfpar} and \code{dfsplit} in \command{\link{tvcm_control}} to
   define such a penalization. The default stopping parameters are
-  \code{minsize = 30} (a minimum node size of 30) and \code{minlr = 2}
+  \code{minsize = 30} (a minimum node size of 30) and \code{mindev = 2}
   (the training error reduction of the best split must be larger than
   two to continue). 
 

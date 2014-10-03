@@ -19,7 +19,7 @@
 ##' tvcm_setsplits_splitnode: 
 ##' tvcm_setsplits_rselect:   randomly select partitions, variables and nodes
 ##' tvcm_grow_sctest:         run coefficient constancy tests
-##' tvcm_grow_gridsearch:     compute the lr statistics
+##' tvcm_grow_gridsearch:     compute the dev statistics
 ##' tvcm_grow_splitnode:      split in variable x.
 ##' tvcm_formula:             extract separate formulas for
 ##'                           model and partitioning from
@@ -51,7 +51,7 @@
 ##'             option
 ##' 2014-09-17: - delete 'keepdev' argument (also for prune.tvcm)
 ##'             - add function 'tvcm_complexity'
-##' 2014-09-15: changed 'lr' labels to 'lr' etc.
+##' 2014-09-15: changed 'dev' labels to 'dev' etc.
 ##' 2014-09-10: - add 'control' argument for 'tvcm_grow_update'
 ##'               to allow the control of variable centering
 ##'             - add variable centering in 'tvcm_grow_update'
@@ -292,7 +292,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
           
         }
 
-        ## set lr statistic of not to selected nodes to 'Inf' to avoid
+        ## set dev statistic of not to selected nodes to 'Inf' to avoid
         ## model evaluations
         splits <- tvcm_setsplits_sctest(splits, partid, spart,
                                         nodeid, snode, varid, svar)
@@ -331,11 +331,11 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
             }
         
             if (run > 0L) {
-                if (dev$plr < control$minlr) {
+                if (dev$pendev < control$mindev) {
                     run <- 0
                     stopinfo <- paste("no split with",
                                       if (control$cp > 0) "penalized",
-                                      "loss reduction > minlr")
+                                      "loss reduction > mindev")
                     nstep <- nstep - 1L
                 }
             }
@@ -384,13 +384,13 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         print(data.frame(
                 cbind("loss" = c(
                         round(control$lossfun(model), 2),
-                        round(control$lossfun(model) - dev$lr, 2L)),
+                        round(control$lossfun(model) - dev$dev, 2L)),
                       ## if 'cp == 0'
-                      "lr" = if (control$cp == 0)
-                      c("", round(dev$lr, 2L)),
+                      "dev" = if (control$cp == 0)
+                      c("", round(dev$dev, 2L)),
                       ## if 'cp > 0'
-                      "penalized lr" = if (control$cp > 0)
-                      c("", round(dev$plr, 2L)),
+                      "penalized dev" = if (control$cp > 0)
+                      c("", round(dev$pendev, 2L)),
                       deparse.level = 2),
                       row.names = paste("step", step + c(-1, 0)),
                       check.names = FALSE))
@@ -740,11 +740,11 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
         sum(w[subs]) < 2 * control$minsize[pid]) {
       rval <- matrix(, 0, ifelse(is.numeric(z), 3L, nlevels(z) + 2L))
       colnames(rval) <- c(if (is.numeric(z)) "cut" else levels(z),
-                          "lr", "npar")
-      attr(rval, "type") <- "lr"
+                          "dev", "npar")
+      attr(rval, "type") <- "dev"
       return(rval)
     }
-    type <- "lr"      
+    type <- "dev"      
 
     if (is.numeric(z)) {
 
@@ -779,7 +779,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
       } else {
         rval <- matrix(, 0L, 3L)
       }
-      colnames(rval) <- c("cut", "lr", "npar")
+      colnames(rval) <- c("cut", "dev", "npar")
       
     } else if (is.factor(z)) {
 
@@ -845,12 +845,12 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
       }
       
       rval <- cbind(rval, rep.int(NA, nrow(rval)), rep.int(NA, nrow(rval)))
-      colnames(rval) <- c(levels(z), "lr", "npar")
+      colnames(rval) <- c(levels(z), "dev", "npar")
       
     } else {
       
       rval <- matrix(, 0L, 3L)
-      colnames(rval) <- c("cut", "lr", "npar")
+      colnames(rval) <- c("cut", "dev", "npar")
     }
     attr(rval, "type") <- type
     return(rval)
@@ -871,7 +871,7 @@ tvcm_grow_setsplits <- function(splits, spart, partid,
                              varid[[partid[pid]]][vid])
         } else {
           if (nrow(split) > 0L)
-            split[, c("lr", "npar")] <- NA
+            split[, c("dev", "npar")] <- NA
         }
         rval[[pid]][[nid]][[vid]] <- split
       }
@@ -940,9 +940,9 @@ tvcm_setsplits_sctest <- function(splits, partid, spart,
     for (nid in seq_along(nodeid[[pid]]))
       for (vid in seq_along(varid[[pid]])) {
         if (pid == spart & nid == snode & vid == svar) {
-          splits[[pid]][[nid]][[vid]][, "lr"] <- NA
+          splits[[pid]][[nid]][[vid]][, "dev"] <- NA
         } else {
-          splits[[pid]][[nid]][[vid]][, "lr"] <- -Inf
+          splits[[pid]][[nid]][[vid]][, "dev"] <- -Inf
         }
       }
   ## return updated 'splits'
@@ -1041,7 +1041,7 @@ tvcm_setsplits_rselect <- function(splits, partid, nodeid, varid, control) {
       for (vid in seq_along(varid[[pid]])) 
         if (nrow(splits[[pid]][[nid]][[vid]]) > 0 &&
             !(pid %in% spart & vid %in% svar[[pid]] & nid %in% snode[[pid]]))
-          splits[[pid]][[nid]][[vid]][, "lr"] <- -Inf
+          splits[[pid]][[nid]][[vid]][, "dev"] <- -Inf
 
   ## return updated 'splits'
   return(splits)
@@ -1205,15 +1205,15 @@ tvcm_sctest_bonf <- function(test, type) {
 ##' @return A nested list with loss matrices. Partitions of nodes
 ##'    are nested in partitions for variables. 
 ##'
-##' @details Used in 'tvcm'. 'tvcm_grow_lr' is a help
+##' @details Used in 'tvcm'. 'tvcm_grow_dev' is a help
 ##'    function of 'tvcm_grow_gridsearch'
 ##'-------------------------------------------------------- #
 
-tvcm_grow_lr <- function(cutpoint, type = "lr",
-                               pid, nid, vid, 
-                               model, modelNuis, nuisance,
-                               where, partData,
-                               control, loss0, mfName) {
+tvcm_grow_dev <- function(cutpoint, type = "dev",
+                          pid, nid, vid, 
+                          model, modelNuis, nuisance,
+                          where, partData,
+                          control, loss0, mfName) {
       
     ## set node indicator
     subs <- where[[pid]] == levels(where[[pid]])[nid]
@@ -1230,9 +1230,9 @@ tvcm_grow_lr <- function(cutpoint, type = "lr",
     ## fit the 'update' model
     model <- tvcm_grow_update(model, control)
     
-    if (type == "lr") {
+    if (type == "dev") {
       if (!inherits(model, "try-error")) {
-        rval <- c(loss0 - control$lossfun(model),
+        rval <- c((loss0 - control$lossfun(model)),
                   length(coef(model)[grep("Left", names(coef(model)))]) -
                   length(nuisance))
         if (is.null(modelNuis)) {
@@ -1315,20 +1315,22 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
               
             cp <- splits[[pid]][[nid]][[vid]]
             type <- attr(cp, "type")
-            cp <- cp[, !colnames(cp) %in% c("lr", "npar"), drop = FALSE]
+            subs <- is.na(cp[, "dev"])
+            cp <- cp[subs, !colnames(cp) %in% c("dev", "npar"), drop = FALSE]
             if (nrow(cp) > 0L) {
-              st <- apply(cp, 1, tvcm_grow_lr, type = type,
+              st <- apply(cp, 1, tvcm_grow_dev, type = type,
                           pid = partid[pid],
                           nid = nodeid[[partid[pid]]][nid],
                           vid = varid[[partid[pid]]][vid],
                           model = sModel, modelNuis = sModelN,
                           nuisance = control$nuisance[[pid]],
                           where = where, partData = partData,
-                          control = control, loss0 = loss0, mfName = mfName)
+                          control = control, loss0 = loss0,
+                          mfName = mfName)
               if (is.matrix(st)) st <- t(st) else st <- matrix(st, ncol = 1L)
 
-              if (type == "lr") {
-                splits[[pid]][[nid]][[vid]][, c("lr", "npar")] <- st
+              if (type == "dev") {
+                splits[[pid]][[nid]][[vid]][subs, c("dev", "npar")] <- st
                 
               } else if (type == "coef") {
                 
@@ -1373,7 +1375,7 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
                 }
                 
                 ## compute the loss of the new splits
-                st <- apply(cp, 1, tvcm_grow_lr, type = "lr",
+                st <- apply(cp, 1, tvcm_grow_dev, type = "dev",
                             pid = partid[pid],
                             nid = nodeid[[partid[pid]]][nid],
                             vid = varid[[partid[pid]]][vid],
@@ -1381,11 +1383,12 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
                             modelNuis = sModelN,
                             nuisance = control$nuisance[[pid]],
                             where = where, partData = partData,
-                            control = control, loss0 = loss0, mfName = mfName)
+                            control = control, loss0 = loss0,
+                            mfName = mfName)
 
                 if (is.matrix(st)) st <- t(st) else st <- matrix(st, ncol = 2L)
                 split <- cbind(cp, st)
-                colnames(split) <- c(levels(z), "lr", "npar")
+                colnames(split) <- c(levels(z), "dev", "npar")
                 attr(split, "type") <- "coef"
                 splits[[pid]][[nid]][[vid]] <- split
               }
@@ -1397,45 +1400,45 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
   }
   
   ## function that extracts the penalized loss reduction
-  getPenLr <- function(x) {
-    if (is.list(x)) return(lapply(x, getPenLr))
+  getPenDev <- function(x) {
+    if (is.list(x)) return(lapply(x, getPenDev))
     if (is.matrix(x))
       if (nrow(x) > 0L) {
         ## compute penalized loss
-        return(x[, "lr"] - control$cp *
+        return(x[, "dev"] - control$cp *
                tvcm_complexity(x[, "npar"], control$dfpar, 1, control$dfsplit))
       } else {
         return(numeric())
       }
     return(x)
   }
-  dev <- getPenLr(splits)
+  pendev <- getPenDev(splits)
   
   ## function that extracts the maximum loss reduction
-  getMaxPenLr <- function(x) {
+  getMaxPenDev <- function(x) {
       x <- unlist(x)
       if (length(x) == 0L) return(-Inf)
       x <- na.omit(x)
       if (length(x) > 0L) return(max(x)) else return(-Inf)
   }
 
-  maxpdev <- max(c(-Inf, na.omit(unlist(dev))))
+  maxpendev <- max(c(-Inf, na.omit(unlist(pendev))))
   
-  if (maxpdev > -Inf) {
+  if (maxpendev > -Inf) {
     
     ## select the partition, node and variable
-    spart <- which(sapply(sapply(dev, getMaxPenLr), identical, maxpdev))
+    spart <- which(sapply(sapply(pendev, getMaxPenDev), identical, maxpendev))
     if (length(spart) > 1L) spart <- sample(spart, 1L)
     snode <-
-      which(sapply(sapply(dev[[spart]], getMaxPenLr), identical, maxpdev))
+      which(sapply(sapply(pendev[[spart]], getMaxPenDev), identical, maxpendev))
     if (length(snode) > 1L) snode <- sample(snode, 1L)
-    svar <- which(sapply(sapply(dev[[spart]][[snode]], getMaxPenLr),
-                         identical, maxpdev))
+    svar <- which(sapply(sapply(pendev[[spart]][[snode]], getMaxPenDev),
+                         identical, maxpendev))
     if (length(svar) > 1L) svar <- sample(svar, 1L)
     
     ## select the cut
     stat <- splits[[spart]][[snode]][[svar]]
-    cutid <- which(stat[, "lr"] == max(stat[, "lr"], na.rm = TRUE))
+    cutid <- which(stat[, "dev"] == max(stat[, "dev"], na.rm = TRUE))
     if (length(cutid) > 1L) cutid <- sample(cutid, 1L)
     
     if (verbose) cat("OK")
@@ -1444,9 +1447,9 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
                 nodeid = nodeid[[partid[spart]]][snode],
                 varid = varid[[partid[spart]]][svar],
                 cutid = cutid,
-                cut = stat[cutid, !colnames(stat) %in% c("lr", "npar")],
-                lr = as.numeric(stat[cutid, "lr"]),
-                plr = maxpdev,
+                cut = stat[cutid, !colnames(stat) %in% c("dev", "npar")],
+                dev = as.numeric(stat[cutid, "dev"]),
+                pendev = maxpendev,
                 npar = as.numeric(stat[cutid, "npar"]),
                 grid = splits))
   } else {
@@ -1454,8 +1457,8 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
     if (verbose) cat("failed")
     
     return(list(partid = NULL, nodeid = NULL, varid = NULL, 
-                cutid = NULL, cut = NULL, lr = NULL,
-                plr = NULL, grid = splits))
+                cutid = NULL, cut = NULL, dev = NULL,
+                pendev = NULL, grid = splits))
     
   }
 }

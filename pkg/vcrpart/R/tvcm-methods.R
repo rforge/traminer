@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' Date:            2014-09-22
+##' Date:            2014-10-03
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
 ##'
 ##' Description:
@@ -29,6 +29,7 @@
 ##' weights:             extract the weights
 ##'
 ##' Modifications:
+##' 2014-10-03: add option 'cv' to 'extract.tvcm'
 ##' 2014-09-17: prune.tvcm:
 ##'             - 'keepdev' argument in 'prune.tvcm' dropped (to complicated
 ##'               to explain)
@@ -53,7 +54,7 @@ coefficients.tvcm <- coef.tvcm
 
 extract.tvcm <- function(object, what = c("control", "model", 
                                    "nodes", "sctest", "p.value",
-                                   "devgrid", "selected", 
+                                   "devgrid", "cv",  "selected", 
                                    "coef", "sd", "var"),
                          steps = NULL, ...) {
   
@@ -77,6 +78,13 @@ extract.tvcm <- function(object, what = c("control", "model",
     
     rval <- lapply(splitpath[steps], function(x) x$grid)
     return(rval)
+
+  } else if (what == "cv") {
+    if (is.null(object$info$cv)) {
+      warning("no information on cross-validation")
+    } else {
+      return(object$info$cv)
+    }
     
   } else if (what == "model") {
     
@@ -87,13 +95,13 @@ extract.tvcm <- function(object, what = c("control", "model",
     rval <-
       lapply(object$info$node,
              function(node) {
-                 if (depth(node) > 0L) {
-                     ids <- setdiff(nodeids(node), nodeids(node, terminal = TRUE))
-                     rval <- unlist(nodeapply(node, ids, function(node) node$split$varid))
-                     if (length(rval) > 0L) rval <- unique(colnames(object$data)[rval])
-                 } else {
-                     rval <- NULL
-                 }
+               if (depth(node) > 0L) {
+                 ids <- setdiff(nodeids(node), nodeids(node, terminal = TRUE))
+                 rval <- unlist(nodeapply(node, ids, function(node) node$split$varid))
+                 if (length(rval) > 0L) rval <- unique(colnames(object$data)[rval])
+               } else {
+                 rval <- NULL
+               }
                return(rval)
              })
     return(rval)
@@ -467,7 +475,7 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
     
     ## prune as long as there remain 'weak' links   
     run <- 1L; step <- 0L;
-    cols <- c("part", "node", "loss", "npar", "nsplit", "li")
+    cols <- c("part", "node", "loss", "npar", "nsplit", "dev")
     evalcols <- c("loss", "npar", "nsplit")
     prunepath <- list()
     
@@ -560,7 +568,7 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
         if (any(ntab[, "loss"] < Inf)) {
           
           ## minimum dfsplit such that the smaller model improves the fit
-          ntab[, "li"] <-
+          ntab[, "dev"] <-
             (ntab[, "loss"] - loss0) /
               (tvcm_complexity(npar0, tree$info$control$dfpar,
                                nsplit0, tree$info$control$dfsplit) -
@@ -568,10 +576,10 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
                                ntab[, "nsplit"], tree$info$control$dfsplit))
           
           ## prune selected inner node
-          if (any(ntab[, "li"] <= cp)) {
-            ncollapse <- which(!is.na(ntab[, "li"]) &
-                               !is.nan(ntab[, "li"]) &
-                               ntab[, "li"] == min(ntab[, "li"]))
+          if (any(ntab[, "dev"] <= cp)) {
+            ncollapse <- which(!is.na(ntab[, "dev"]) &
+                               !is.nan(ntab[, "dev"]) &
+                               ntab[, "dev"] == min(ntab[, "dev"]))
             if (length(ncollapse) > 1L) ncollapse <- sample(ncollapse, 1L)
             if (length(ncollapse) > 0L) {
               term <- lapply(seq_along(tree$info$node),
@@ -672,12 +680,12 @@ print.splitpath.tvcm <- function(x, ...) {
     if (is.null(unlist(x[[i]]$varid))) {
       cat(" (no splitting processed)\n")
     } else {
+      cat("\n\nSelected Split:")
       cat("\nPartition:", LETTERS[x[[i]]$partid])
       cat("\nNode:", x[[i]]$node)
       cat("\nVariable:", x[[i]]$var)
       cat("\nCutpoint: ")
       cat(paste("{",paste(x[[i]]$cutpoint, collapse = "}, {"), "}", sep = ""))
-      cat("\nLoss Reduction:", format(x[[i]]$lr, ...))
   }
     
     if (!is.null(x[[i]]$sctest)) {
@@ -689,12 +697,12 @@ print.splitpath.tvcm <- function(x, ...) {
     } else cat("\n")
     
     if (!is.null(x[[i]]$grid)) {
-      cat("\nLoss Reduction Statistics:\n")
+      cat("\nLoss Reduction Statistics:")
       for (pid in seq_along(x[[i]]$grid)) {
         for (nid in seq_along(x[[i]]$grid[[pid]])) {
           for (vid in seq_along(x[[i]]$grid[[pid]][[nid]])) {
             if (is.null(x[[i]]$sctest) | !is.null(x[[i]]$sctest) &&
-                any(x[[i]]$grid[[pid]][[nid]][[vid]][, "lr"] > -Inf)) {
+                any(x[[i]]$grid[[pid]][[nid]][[vid]][, "dev"] > -Inf)) {
               cat("\nPartition:", LETTERS[pid],
                   "Node:", sub("Node", "",names(x[[i]]$grid[[pid]])[nid]),
                   "Variable:", names(x[[i]]$grid[[pid]][[nid]])[vid], "\n")

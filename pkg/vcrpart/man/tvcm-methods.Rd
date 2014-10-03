@@ -35,7 +35,7 @@
 \method{extract}{tvcm}(object, what = c(
               "control", "model", 
               "nodes", "sctest", "p.value",
-              "devgrid", "selected",
+              "devgrid", "cv", "selected",
               "coef", "sd", "var"),
         steps = NULL, ...)
 
