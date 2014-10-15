@@ -7,12 +7,32 @@
 \title{Tree-based varying coefficient regression models}
 
 \description{
-  TVCM is a tree-based algorithm that aims to estimate varying
-  coefficient regression models. TVCM approximates varying coefficients
-  by piecewise constant functions, i.e., it estimates linear models with
-  stratum specific coefficients. The \command{\link{tvcm}} function
-  implements the partitioning algorithms described in Buergin and
-  Ritschard (2014b) (default) and Buergin and Ritschard (2014a).
+  TVCM is a tree-based algorithm to estimate varying coefficient
+  regression models. It approximates varying coefficients by piecewise
+  constant functions, i.e., it estimates coefficients of the regression
+  model separately for strata of the value space of partitioning
+  variables. The \command{\link{tvcm}} function implements the
+  partitioning algorithms described in Buergin and Ritschard (2014b) and
+  Buergin and Ritschard (2014a), which differ by their splitting
+  criteria. 
+
+  Buergin and Ritschard (2014b) is the default partitioning algorithm
+  which adds in each iteration a new split based on the reduction in
+  the objective function. 
+
+  Buergin and Ritschard (2014a) is used by setting
+  \code{tvcm_control(sctest = TRUE)} for the \command{\link{control}}
+  argument. This second algorithm adds a new split based on a two  
+  step procedure where (i) the node and the partitioning variable are
+  selected based on coefficient constancy tests and (ii) the cutpoint
+  in the selected node and variable is selected based on the reduction
+  in the objective function (as in Buergin and Ritschard (2014b)).
+
+  Buergin and Ritschard (2014a) is generally faster and is
+  (approximately) unbiased to select variables with many cutpoints,
+  while it is limited to build a single partition. By contrast, Buergin 
+  and Ritschard (2014b) can be used to build a separate partition for
+  each varying coefficient.
 }
 
 \usage{
@@ -131,7 +151,7 @@ tvcglm(formula, data, family,
     \code{model}.} 
 }
 
-\references{ 
+\references{
    Zeileis, A., Hothorn, T., and Hornik, K. (2008). Model-Based
    Recursive Partitioning. \emph{Journal of Computational and Graphical
    Statistics}, \bold{17}(2), 492--514. 

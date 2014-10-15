@@ -19,42 +19,22 @@ SEXP vcrpart_duplicate(SEXP x) {
 
 /**
  * ---------------------------------------------------------
- * Computes the split matrix for nominal variables for
- * the 'tvcm' alorithm.
+ * Get list elements
  *
- * @param xlev integer vector, all observed categories.
- * @param nl total number of categories.
- * @param xdlev integer vector, the levels observed.
- *    in the current node.
- * @param nld number of categories observed in the current
- *    node.
- * @param mi number of possible splits with the categories
- *    observed in the current node.
+ * @param list a list.
+ * @param str a character string.
  *
- * @return an integer vector of length nld * mi to be used
- *    to construct the split matrix.
+ * @return a list element
  * ---------------------------------------------------------
  */
 
-SEXP tvcm_nomsplits(SEXP nl, SEXP xdlev, SEXP nld, SEXP mi) {
-  
-  int *xdlev_c = INTEGER(xdlev);
-  const int nl_c = INTEGER(nl)[0], 
-    nld_c = INTEGER(nld)[0], 
-    mi_c = INTEGER(mi)[0];
-
-  SEXP indx = PROTECT(allocVector(INTSXP, nl_c * mi_c));
-  for (int i = 0; i < (nl_c * mi_c); i++) INTEGER(indx)[i] = 0;
-  int ii = 0;
-  if (mi_c > 0) {
-    for (int i = 0; i < mi_c; i++) {
-      ii = i + 1;
-      for (int l = 0; l < nld_c; l++) {
-	INTEGER(indx)[i * nl_c + xdlev_c[l] - 1] = ii % 2;
-	ii = ii / 2;
-      }
+SEXP getListElement(SEXP list, const char *str) {
+  SEXP elmt = R_NilValue, 
+    names = getAttrib(list, R_NamesSymbol); 
+  for (int i = 0; i < length(list); i++)
+    if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
+      elmt = VECTOR_ELT(list, i);
+      break;
     }
-  }
-  UNPROTECT(1);
-  return indx;
+  return elmt;
 }

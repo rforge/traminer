@@ -5,6 +5,6 @@
 #include <Rdefines.h>
 
 SEXP vcrpart_duplicate(SEXP x);
-SEXP tvcm_nomsplits(SEXP nl, SEXP xdlev, SEXP nld, SEXP mi);
+SEXP getListElement(SEXP list, const char *str);
 
 #endif

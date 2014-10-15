@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' Date:            2014-10-03
+##' Date:            2014-10-14
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
 ##'
 ##' Description:
@@ -29,6 +29,7 @@
 ##' weights:             extract the weights
 ##'
 ##' Modifications:
+##' 2014-10-14; adapt print.splitpath to new dev-grid structure
 ##' 2014-10-03: add option 'cv' to 'extract.tvcm'
 ##' 2014-09-17: prune.tvcm:
 ##'             - 'keepdev' argument in 'prune.tvcm' dropped (to complicated
@@ -702,11 +703,14 @@ print.splitpath.tvcm <- function(x, ...) {
         for (nid in seq_along(x[[i]]$grid[[pid]])) {
           for (vid in seq_along(x[[i]]$grid[[pid]][[nid]])) {
             if (is.null(x[[i]]$sctest) | !is.null(x[[i]]$sctest) &&
-                any(x[[i]]$grid[[pid]][[nid]][[vid]][, "dev"] > -Inf)) {
+                any(x[[i]]$grid[[pid]][[nid]][[vid]][[2L]] > -Inf)) {
               cat("\nPartition:", LETTERS[pid],
                   "Node:", sub("Node", "",names(x[[i]]$grid[[pid]])[nid]),
                   "Variable:", names(x[[i]]$grid[[pid]][[nid]])[vid], "\n")
-              print(as.data.frame(x[[i]]$grid[[pid]][[nid]][[vid]]), ...)
+              print(as.data.frame(
+                      cbind(x[[i]]$grid[[pid]][[nid]][[vid]][[1L]],
+                            "dev" = x[[i]]$grid[[pid]][[nid]][[vid]][[2L]],
+                            "npar" = x[[i]]$grid[[pid]][[nid]][[vid]][[3L]])), ...)
             }
           }
         }

@@ -311,7 +311,7 @@ panel_coef <- function(object, parm = NULL,
       rval <- function(node) {
           pushViewport(viewport())
           grid.text("(no split)")
-          upViewport()
+          upViewport(2L)
       }
       return(rval)
   }

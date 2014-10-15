@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-07
+##' Date:            2014-10-14
 ##'
 ##' Description:
 ##' Random forests and bagging for the 'tvcm' algorithm.
@@ -22,6 +22,9 @@
 ##' - set 'ptry', 'vtry' and 'ntry' automatically (see Hastie)
 ##'
 ##' Last modifications:
+##' 2014-10-14: found bug in predict.tvcm: now the 'coefi'
+##'             matrices are ordered by the column names of
+##'             'coef'.
 ##' 2014-09-07: - improvment of predict.tvcm function
 ##'               - treated bugs for 'type = "coef"'
 ##'               - deal with ordinal responses in cases not
@@ -346,7 +349,7 @@ predict.fvcm <- function(object, newdata = NULL,
     coefi <- predict(object, newdata = newdata, type = "coef",
                      ranef = FALSE, na.action = na.pass, ...)
     if (!is.matrix(coefi)) coefi <- matrix(coefi, nrow = nrow(newdata))
-
+    
     ## acount for skipped categories
     if (object$info$fit == "olmm" && ncol(coefi) < ncol(coef)) {        
         subsiCols <- table(mf[folds[, i] > 0, yName]) > 0L
@@ -366,6 +369,9 @@ predict.fvcm <- function(object, newdata = NULL,
         colnames(coefi) <- colnamesi          
     }
 
+    ## order columns of coefi
+    coefi <- coefi[, intersect(colnames(coef), colnames(coefi)), drop = FALSE]
+    
     ## index matrix for valid entries
     subsi <- subs    
     if (oob) subsi[folds[,i] > 0L, ] <- FALSE

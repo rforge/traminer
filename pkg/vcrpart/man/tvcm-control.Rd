@@ -11,9 +11,9 @@
 \usage{
 tvcm_control(minsize = 30, mindev = 2.0,
              sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
-             trim = 0.1, estfun.args = list(), nimpute = 5L, 
-             maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
-             maxstep = Inf, maxwidth = Inf, maxdepth = Inf,
+             trim = 0.1, estfun.args = list(), nimpute = 5, 
+             maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
+             maxstep = 1e3, maxwidth = 1e9, maxdepth = 1e9,
              lossfun = neglogLik2, ooblossfun = NULL,
              cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
              cv = !sctest, folds = folds_control("kfold", 5),
@@ -25,10 +25,10 @@ tvcm_control(minsize = 30, mindev = 2.0,
   \item{minsize}{numeric (vector). The minimum sum of weights in
     terminal nodes.}
   \item{mindev}{numeric scalar. The minimum permitted training error 
-    reduction a split must exhibit to be considered 
-     
-
-of a new split.}
+    reduction a split must exhibit to be considered of a new split.
+    The main role of this parameter is to save computing time by early
+    stopping. May be set lower for very few partitioning variables
+    resp. higher for many partitioning variables. }
   \item{sctest}{logical scalar. Defines whether coefficient constancy
     tests should be used for variable and node selection.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is
@@ -46,8 +46,8 @@ of a new split.}
     fitted with \command{\link{olmm}} with random effects.}
   \item{nimpute}{the number of times coefficient constancy tests
     should be repeated in each iteration. See details.}
-  \item{maxfacsplit}{integer. For nominal partitioning variables with
-    more the \code{maxfacsplit} the categories are ordered an treated as
+  \item{maxnomsplit}{integer. For nominal partitioning variables with
+    more the \code{maxnomsplit} the categories are ordered an treated as
     ordinal.}
   \item{maxordsplit}{integer. The maximum number of splits of ordered
     partitioning variables to be evaluated.}

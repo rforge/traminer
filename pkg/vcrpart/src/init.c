@@ -1,5 +1,6 @@
 #include "olmm.h"
 #include "utils.h"
+#include "tvcm.h"
 #include <R_ext/Rdynload.h>
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
@@ -10,7 +11,7 @@ static R_CallMethodDef CallEntries[] = {
   CALLDEF(olmm_update_u, 1),
   CALLDEF(olmm_pred_marg, 5),
   CALLDEF(vcrpart_duplicate, 1),
-  CALLDEF(tvcm_nomsplits, 4),
+  CALLDEF(tvcm_nomsplits, 1),
   {NULL, NULL, 0}
 };
 

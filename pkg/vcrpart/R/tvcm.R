@@ -285,8 +285,8 @@ tvcm <- function(formula, data, fit, family,
 tvcm_control <- function(minsize = 30, mindev = 2.0,
                          sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
                          trim = 0.1, estfun.args = list(), nimpute = 5, 
-                         maxfacsplit = 5L, maxordsplit = 10, maxnumsplit = 10,
-                         maxstep = Inf, maxwidth = Inf, maxdepth = Inf,
+                         maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
+                         maxstep = 1e3, maxwidth = 1e9, maxdepth = 1e9,
                          lossfun = neglogLik2, ooblossfun = NULL,
                          cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
                          cv = !sctest, folds = folds_control("kfold", 5),
@@ -307,7 +307,7 @@ tvcm_control <- function(minsize = 30, mindev = 2.0,
   stopifnot(is.numeric(nimpute) && length(nimpute) == 1L && nimpute > 0)
   nimpute <- max(1.0, round(nimpute))
 
-  stopifnot(is.numeric(maxfacsplit) && length(maxfacsplit) == 1L && maxfacsplit > 1L)
+  stopifnot(is.numeric(maxnomsplit) && length(maxnomsplit) == 1L && maxnomsplit > 1L)
   stopifnot(is.numeric(maxordsplit) && length(maxordsplit) == 1L && maxordsplit > 1L)
   stopifnot(is.numeric(maxnumsplit) && length(maxnumsplit) == 1L && maxnumsplit > 1L)
 
@@ -379,12 +379,12 @@ tvcm_control <- function(minsize = 30, mindev = 2.0,
                 trim = trim,
                 estfun.args = estfun.args,
                 nimpute = nimpute,
-                maxfacsplit = maxfacsplit,
-                maxordsplit = maxordsplit,
-                maxnumsplit = maxnumsplit,
-                maxstep = maxstep,
-                maxwidth = maxwidth,
-                maxdepth = maxdepth,
+                maxnomsplit = as.integer(maxnomsplit),
+                maxordsplit = as.integer(maxordsplit),
+                maxnumsplit = as.integer(maxnumsplit),
+                maxstep = as.integer(maxstep),
+                maxwidth = as.integer(maxwidth),
+                maxdepth = as.integer(maxdepth),
                 lossfun = lossfun,
                 ooblossfun = ooblossfun,
                 cp = cp,
