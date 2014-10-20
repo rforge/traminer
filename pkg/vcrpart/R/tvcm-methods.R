@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' Date:            2014-10-14
+##' Date:            2014-10-18
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
 ##'
 ##' Description:
@@ -12,6 +12,7 @@
 ##'
 ##' Methods:
 ##' coef, coefficients:
+##' depth:               depth of trees
 ##' extract:
 ##' fitted:
 ##' formula:
@@ -27,9 +28,11 @@
 ##' resid, residuals:    extract residuals
 ##' splitpath:           show information of the splitting procedure
 ##' weights:             extract the weights
-##'
+##' width:               width of trees
+##' 
 ##' Modifications:
-##' 2014-10-14; adapt print.splitpath to new dev-grid structure
+##' 2014-10-18: added 'depth' and 'width' methods
+##' 2014-10-14: adapt print.splitpath to new dev-grid structure
 ##' 2014-10-03: add option 'cv' to 'extract.tvcm'
 ##' 2014-09-17: prune.tvcm:
 ##'             - 'keepdev' argument in 'prune.tvcm' dropped (to complicated
@@ -51,6 +54,13 @@ coef.tvcm <- function(object, ...) tvcm_get_estimates(object, ...)
 
 
 coefficients.tvcm <- coef.tvcm 
+
+
+depth.tvcm <- function(x, root = FALSE, ...) {
+  rval <- sapply(x$info$node, depth, root = root)
+  names(rval) <- LETTERS[seq_along(rval)]
+  return(rval)
+}
 
 
 extract.tvcm <- function(object, what = c("control", "model", 
@@ -332,7 +342,8 @@ tvcm_print <- function(x, type = c("print", "summary"),
   vcLabs <- tvcm_print_vclabs(x$info$formula)
 
   for (pid in seq_along(coef$vc)) {
-    cat(paste("\nVarying Coefficient: ", vcLabs[pid], "\n", sep = ""))
+    cat(paste("\nVarying Coefficient ", LETTERS[pid],
+              ": ", vcLabs[pid], "\n", sep = ""))
     x$node <- x$info$node[[pid]]
     print.party(x, terminal_panel = terminal_panel,
                 tp_args = list(partid = pid))
@@ -722,4 +733,11 @@ print.splitpath.tvcm <- function(x, ...) {
 
 weights.tvcm <- function(object, ...) {
   weights(extract(object, "model"))
+}
+
+
+width.tvcm <- function(x, ...) {
+  rval <- sapply(x$info$node, width)
+  names(rval) <- LETTERS[seq_along(rval)]
+  return(rval)
 }

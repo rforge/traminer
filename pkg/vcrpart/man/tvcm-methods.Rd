@@ -3,6 +3,7 @@
 \alias{tvcm-methods}
 \alias{coef.tvcm}
 \alias{coefficients.tvcm}
+\alias{depth.tvcm}
 \alias{extract}
 \alias{extract.tvcm}
 \alias{formula.tvcm}
@@ -23,6 +24,7 @@
 \alias{splitpath.tvcm}
 \alias{summary.tvcm}
 \alias{weights.tvcm}
+\alias{width.tvcm}
 
 \title{Methods for \command{\link{tvcm}} objects}
 
@@ -31,6 +33,8 @@
 
 \usage{
 \method{coef}{tvcm}(object, ...)
+
+\method{depth}{tvcm}(x, root = FALSE, ...)
 
 \method{extract}{tvcm}(object, what = c(
               "control", "model", 
@@ -53,10 +57,13 @@
 
 \method{summary}{tvcm}(object, ...)
 
+\method{width}{tvcm}(x, ...)
 }
 
 \arguments{
-  \item{object, tree}{an object of class \command{\link{tvcm}}.}
+  \item{object, tree, x}{an object of class \command{\link{tvcm}}.}
+  \item{root}{logical scalar. Should the root count be counted in
+    \code{depth}?} 
   \item{steps}{integer vector. The iteration steps from which
     information should be extracted.} 
   \item{newdata}{an optional data frame in which to look for variables 

@@ -1958,7 +1958,7 @@ tvcm_get_terms <- function(names, ids, parm) {
   
   parm <- lapply(parm, function(x) {
     lapply(x, function(x) x[grepl("Node[A-Z]", x)])
-    })
+  })
   
   if (any(unlist(ids) == 1L)) {
     getNames <- function(x) {

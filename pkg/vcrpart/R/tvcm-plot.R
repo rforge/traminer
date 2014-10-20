@@ -100,8 +100,11 @@ plot.tvcm <- function(x, type = c("default", "coef",
              },
              "coef" = panel_coef,
              "simple" = panel_empty)
-    tp_args <-
+    tp_args <- if ("tp_args" %in% names(list(...))) {
+      list(...)$tp_args
+    } else {
       list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
+    }
     tp_args$part <- part
     tp_args$gp <- gp
       
@@ -111,17 +114,30 @@ plot.tvcm <- function(x, type = c("default", "coef",
              "default" = node_inner,
              "coef" = node_inner,
              "simple" = node_inner)
-    ip_args <-
+    ip_args <- if ("ip_args" %in% names(list(...))) {
+      list(...)$ip_args
+    } else {
       list(...)[names(list(...)) %in% names(formals(ip_fun))[-1]]
+    }
+    
+    ## edge panel
+    ep_fun <- edge_default    
+    ep_args <- if ("ep_args" %in% names(list(...))) {
+      list(...)$ep_args
+    } else {
+      list(...)[names(list(...)) %in% names(formals(ep_fun))[-1]]
+    }
     
     ## other arguments
     dotargs <- list(...)[names(list(...)) %in% names(formals(plot.party))[-1]]
-          
+    dotargs <- dotargs[setdiff(names(dotargs), c("tp_args", "ip_args", "ep_args"))]
+    
     ## prepare call
     call <- list(name = as.name("plot.party"),
                  x = quote(x),
                  terminal_panel = quote(tp_fun), tp_args = quote(tp_args),
                  inner_panel = quote(ip_fun), ip_args = quote(ip_args),
+                 edge_panel = quote(ep_fun), ep_args = quote(ep_args),
                  drop_terminal = quote(drop_terminal), tnex = quote(tnex),
                  newpage = quote(newpage), main = quote(main[pid]),
                  pop = pop, gp = gp)
@@ -572,3 +588,42 @@ panel_empty <- function(object, part = 1L, id = TRUE, nobs = TRUE, ...) {
   return(rval)
 }
 class(panel_empty) <- "grapcon_generator"
+
+edge_default <- function(obj, digits = 3, abbreviate = FALSE,
+                         justmin = Inf,
+                         just = c("alternate", "increasing", "decreasing", "equal")) {
+  meta <- obj$data
+  
+  justfun <- function(i, split) {
+    myjust <- if(mean(nchar(split)) > justmin) {
+      match.arg(just, c("alternate", "increasing", "decreasing", "equal"))
+    } else {
+      "equal"
+    }
+    k <- length(split)
+    rval <- switch(myjust,
+                   "equal" = rep.int(0, k),
+                   "alternate" = rep(c(0.5, -0.5), length.out = k),
+                   "increasing" = seq(from = -k/2, to =  k/2, by = 1),
+                   "decreasing" = seq(from =  k/2, to = -k/2, by = -1)
+                   )
+    unit(0.5, "npc") + unit(rval[i], "lines")
+  }
+  
+  ## panel function for simple edge labelling
+  function(node, i) {
+    split <- character_split(split_node(node), meta, digits = digits)$levels
+    y <- justfun(i, split)
+    split <- split[i]
+    ## try() because the following won't work for split = "< 10 Euro", for example.
+    if(any(grep(">", split) > 0) | any(grep("<", split) > 0)) {
+      tr <- suppressWarnings(try(parse(text = paste("phantom(0)", split)),
+                                 silent = TRUE))
+      if(!inherits(tr, "try-error")) split <- tr
+    }
+    grid.rect(y = y, gp = gpar(fill = "white", col = 0),
+              width = unit(1, "strwidth", split))
+    grid.text(split, y = y, just = "center")
+  }
+}
+class(edge_default) <- "grapcon_generator"

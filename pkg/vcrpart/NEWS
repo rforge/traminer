@@ -21,6 +21,7 @@ Changes in Version 0.2-2
     o    Removed bug for numeric estimation of covariance of 'olmm'
          objects.
 
+    o    Added 'depth' and 'width' methods.
 
 Changes in Version 0.2-1
 
