@@ -3,7 +3,9 @@
 \alias{fvcm}
 \alias{fvcm_control}
 \alias{fvcolmm}
+\alias{fvcolmm_control}
 \alias{fvcglm}
+\alias{fvcglm_control}
 
 \title{Bagging and random forests based on \command{\link{tvcm}}}
 
@@ -16,14 +18,19 @@
 
 fvcm(..., control = fvcm_control())
 
-fvcolmm(..., family = cumulative(), control = fvcm_control())
-
-fvcglm(..., family, control = fvcm_control())
-
 fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
              ptry = 1, ntry = 1, vtry = 5, 
              alpha = 1.0, mindev = 0.0, ...)
 
+fvcolmm(..., family = cumulative(), control = fvcolmm_control())
+
+fvcolmm_control(maxstep = 10, folds = folds_control("subsampling", 5),
+                ptry = 1, ntry = 1, vtry = 5, alpha = 1.0, ...)
+
+fvcglm(..., family, control = fvcglm_control())
+
+fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
+               ptry = 1, ntry = 1, vtry = 5, mindev = 0, ...)
 }
 
 \arguments{

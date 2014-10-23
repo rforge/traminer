@@ -513,7 +513,7 @@ vcrpart_formula <- function(formula, family = cumulative(),
 
   types <- c("fe", "vc", "re")
   terms <- terms(formula, specials = types, keep.order = TRUE)
-  yName <- rownames(attr(terms(formula), "factors"))
+  yName <- deparse((formula)[[2L]])
   termLabs <- attr(terms, "term.labels")
   termFac <- attr(terms, "factors")
   type <- rep.int("NA", length(termLabs))

@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-09-22
+##' Date:            2014-10-23
 ##'
 ##' Description:
 ##' methods for olmm objects.
@@ -40,7 +40,8 @@
 ##' weights:     Weights
 ##'
 ##' Modifications:
-##' 2014-09-22: - change 'Ninpute' to 'Nimpute' in estfun.olmm
+##' 2014-10-23: - fix bug in predict.olmm
+##' 2014-09-22: - (internal) change 'Ninpute' to 'Nimpute' in estfun.olmm
 ##' 2014-09-20: - use tile case in titles
 ##' 2014-09-08: - partial substitution of 'rep' by 'rep.int'
 ##'             - replace 'do.call' by 'call' in 'resid.olmm'
@@ -206,9 +207,10 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
   parm <- seq_along(x$coefficients) # internal variable
   if (!is.null(nuisance) & is.character(nuisance))
     nuisance <- which(names(coef(x)) %in% nuisance)
+  nuisance <- sort(union(nuisance, which(x$restricted)))
   parm <- setdiff(parm, nuisance)
   attr <- list() # default attributes
-  
+
   scores <- x$score_obs
   subsImp <- rep.int(FALSE, nrow(scores))
 
@@ -528,7 +530,7 @@ predict.olmm <- function(object, newdata = NULL,
   if (type == "ranef") return(ranef(object, ...))
   
   if (type == "prob") type <- "response"
-  formList <- vcrpart_formula(formula(object)) # extract formulas
+  formList <- vcrpart_formula(formula(object), object$family) # extract formulas
   offset <- list(...)$offset
   subset <- list(...)$subset
   dims <- object$dims

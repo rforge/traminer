@@ -1,19 +1,24 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2014-09-20
+##' Date:        2014-10-23
 ##'
 ##' Description:
 ##' The 'tvcm' function
 ##'
-##' tvcolmm      convenience function for 'tvcm'
-##' tvcglm       convenience function for 'tvcm'
-##' tvcm         the main fitting function
-##' tvcm_control control function for 'tvcm'
+##' tvcolmm         convenience function for 'tvcm'
+##' tvcolmm_control control function for 'tvcolmm'
+##' tvcglm          convenience function for 'tvcm'
+##' tvcglm_control  control function for 'tvglm'
+##' tvcm            the main fitting function
+##' tvcm_control    control function for 'tvcm'
 ##'
 ##' all functions are documented as *.Rd files
 ##'
 ##' Last modifications:
+##' 2014-10-23: - improved extraction of fitting arguments (see 'fitargs')
+##'             - added 'tvcolmm_control' and 'tvcglm_control' to better
+##'               distinguish between the articles.
 ##' 2014-09-20: - add argument 'ninupute' the 'tvcm_control'
 ##' 2014-09-19: - do not call 'cvloss' if no varying coefficients
 ##' 2014-09-17: - defined definition of penalization
@@ -48,26 +53,60 @@
 
 tvcolmm <- function(formula, data, family = cumulative(),
                     weights, subset, offset, na.action,
-                    control = tvcm_control(), ...) {
+                    control = tvcolmm_control(), ...) {
     mc <- match.call()
     mc[[1L]] <- as.name("tvcm")
     if (!"family" %in% names(mc) &
         (length(mc) < 4L |
          length(mc) >= 4L && !inherits(eval.parent(mc[[4L]]), "family.olmm")))
-        mc$family <- formals(tvcolmm)$family        
+        mc$family <- formals(tvcolmm)$family
+    if (!"control" %in% names(mc) &
+        (length(mc) < 9L |
+         length(mc) >= 9L && !inherits(eval.parent(mc[[4L]]), "tvcm_control")))
+        mc$control <- formals(tvcolmm)$control
     mc$fit <- "olmm"
     return(eval.parent(mc))
 }
 
 
+tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
+                            trim = 0.1, estfun.args = list(),
+                            nimpute = 5, minsize = 50,
+                            maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
+                            ...) {
+
+  mc <- match.call()
+  mc[[1L]] <- as.name("tvcm_control")
+  if (!"minsize" %in% names(mc) & length(mc) < 7L)
+    mc$minsize <- formals(tvcolmm_control)$minsize
+  mc$sctest <- TRUE
+  return(eval.parent(mc))
+}
+
+
 tvcglm <- function(formula, data, family,
                    weights, subset, offset, na.action,
-                   control = tvcm_control(), ...) { 
+                   control = tvcglm_control(), ...) { 
     mc <- match.call()
-    mc[[1L]] <- as.name("tvcm")       
+    mc[[1L]] <- as.name("tvcm")
+    if (!"control" %in% names(mc) &
+        (length(mc) < 9L |
+         length(mc) >= 9L && !inherits(eval.parent(mc[[4L]]), "tvcm_control")))
+        mc$control <- formals(tvcglm)$control
     mc$fit <- "glm"
     return(eval.parent(mc))
 }
+
+
+tvcglm_control <- function(minsize = 30, mindev = 2.0,
+                           maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
+                           cv = TRUE, folds = folds_control("kfold", 5),
+                           prune = cv, center = TRUE, ...) {
+  mc <- match.call()
+  mc[[1L]] <- as.name("tvcm_control")
+  return(eval.parent(mc))
+}
+
 
 
 tvcm <- function(formula, data, fit, family, 
@@ -149,7 +188,10 @@ tvcm <- function(formula, data, fit, family,
                data = quote(mf))
   mce <- match.call(expand.dots = TRUE)
   dotargs <- setdiff(names(mce), names(mc))
-  dotargs <- intersect(dotargs, names(formals(fit)))
+  fitargs <-
+    switch(fit,olmm = union(names(formals(olmm)), names(formals(olmm_control))),
+           glm = union(names(formals(glm)), names(formals(glm.control))), "")
+  dotargs <- intersect(dotargs, fitargs)
   dotargs <- setdiff(dotargs, names(mcall))
   dotargs <- list(...)[dotargs]
   mcall[names(dotargs)] <- dotargs
@@ -282,7 +324,7 @@ tvcm <- function(formula, data, fit, family,
   return(tree)
 }
 
-tvcm_control <- function(minsize = 30, mindev = 2.0,
+tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                          sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
                          trim = 0.1, estfun.args = list(), nimpute = 5, 
                          maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,

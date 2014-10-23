@@ -49,7 +49,9 @@ export(
   predecor_control,
   estfun.olmm,
   gefp.olmm,
-  tvcm_control, 
+  tvcm_control,
+  tvcolmm_control,
+  tvcglm_control,
   tvcm,
   tvcolmm,
   tvcglm, 
@@ -57,6 +59,8 @@ export(
   fvcolmm,
   fvcglm,
   fvcm_control,
+  fvcolmm_control,
+  fvcglm_control,
   folds_control)
 
 ## Exported methods for 'fvcm' class

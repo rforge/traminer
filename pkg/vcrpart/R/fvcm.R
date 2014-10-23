@@ -36,7 +36,7 @@
 ##' 2014-08-05: - changed specification for folds
 ##' -------------------------------------------------------- #
 
-fvcolmm <- function(..., family = cumulative(), control = fvcm_control()) {
+fvcolmm <- function(..., family = cumulative(), control = fvcolmm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
   mc$fit <- "olmm"
@@ -46,12 +46,31 @@ fvcolmm <- function(..., family = cumulative(), control = fvcm_control()) {
 }
 
 
-fvcglm <- function(..., family, control = fvcm_control()) {
+fvcolmm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
+                            ptry = 1, ntry = 1, vtry = 5, alpha = 1.0, ...) {
+
+  mc <- match.call()
+  mc[[1L]] <- as.name("fvcm_control")
+  mc$sctest <- TRUE
+  return(eval.parent(mc))
+}
+
+
+fvcglm <- function(..., family, control = fvcglm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
   mc$fit <- "glm"
   if ("weights" %in% names(mc)) mc$weights <- list(...)$weights
   if ("offset" %in% names(mc)) mc$offset <- list(...)$offset
+  return(eval.parent(mc))
+}
+
+
+fvcglm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
+                           ptry = 1, ntry = 1, vtry = 5, mindev = 0, ...) {
+
+  mc <- match.call()
+  mc[[1L]] <- as.name("fvcm_control")
   return(eval.parent(mc))
 }
 

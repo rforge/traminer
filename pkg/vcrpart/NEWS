@@ -1,5 +1,11 @@
 Changes in Version 0.2-2
 
+    o    The new implementation clearly distingueshes between the two
+         algorithms TVCOLMM and TVCGLM. The general function 'tvcm'
+         is still available, but applicants who want to refer to 
+         publications should used either the 'tvcolmm' or the 'tvcglm'
+         function.
+
     o    Improvement for 'panel_coef': Points and lines surpassing
          the boxes are now suppressed.
 
@@ -22,6 +28,8 @@ Changes in Version 0.2-2
          objects.
 
     o    Added 'depth' and 'width' methods.
+
+    o    Added convenience function 'tvcolmm_control'
 
 Changes in Version 0.2-1
 

@@ -6,7 +6,7 @@
 \alias{baseline}
 \alias{olmm}
 
-\title{Fitting ordinal two-stage linear mixed models}
+\title{Fitting ordinal and nominal two-stage linear mixed models}
 
 \description{
   Fits different types of two-stage linear mixed models for longitudinal 
