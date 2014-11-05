@@ -54,9 +54,10 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
     suppressed?} 
   \item{verbose}{logical scalar. Produces messages.}
   \item{scores}{a function or a matrix. Function to extract the
-    estimating equations from \code{object}, e.g.
-    \command{\link{estfun.olmm}}, or a matrix representing the estimating
-    equations.} 
+    estimating equations from \code{object} or a matrix representing the
+    estimating equations. If \code{NULL} (default), the
+    \command{\link{estfun.olmm}} function will be used with
+    argument \code{predecor} and additional arguments from \code{...}.} 
   \item{order.by}{a numeric or factor vector. The explanatory variable
     to be used to order the entries in the estimating equations. If set
     to \code{NULL} (the default) the observations are assumed to be

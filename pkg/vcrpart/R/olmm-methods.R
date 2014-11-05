@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-10-23
+##' Date:            2014-10-24
 ##'
 ##' Description:
 ##' methods for olmm objects.
@@ -40,6 +40,8 @@
 ##' weights:     Weights
 ##'
 ##' Modifications:
+##' 2014-10-24: - improve simulate.olmm
+##'             - improved 'estfun.olmm' call in 'gefp.olmm'
 ##' 2014-10-23: - fix bug in predict.olmm
 ##' 2014-09-22: - (internal) change 'Ninpute' to 'Nimpute' in estfun.olmm
 ##' 2014-09-20: - use tile case in titles
@@ -375,9 +377,13 @@ gefp.olmm <- function(object, scores = NULL, order.by = NULL, subset = NULL,
   
   ## extract scores (if scores is not a matrix)
   if (is.null(scores)) {
-    estfunCall <- call(name = "estfun.olmm", x = quote(object), predecor = predecor)
-    dotargs <- list(...)[names(formals(estfun.olmm))]
-    for (arg in names(dotargs)) estfunCall[arg] <- dotargs[[arg]]
+    estfunCall <- list(name = as.name("estfun.olmm"),
+                       x = quote(object),
+                       predecor = quote(predecor))
+    dotargs <- list(...)
+    dotargs <- dotargs[intersect(names(formals(estfun.olmm)), names(dotargs))]
+    estfunCall[names(dotargs)] <- dotargs
+    mode(estfunCall) <- "call"
     scores <- try(eval(estfunCall))
   } else if (is.function(scores)) {    
     scores <- scores(object)
@@ -568,13 +574,17 @@ predict.olmm <- function(object, newdata = NULL,
       ## fixed effects only
       getTerms <- function(x) attr(terms(x, keep.order = TRUE), "term.labels")
       terms <- lapply(formList$fe$eta, getTerms)
-      mfForm <- formula(paste("~", paste(unlist(terms), collapse = "+")))
+      if (length(unlist(terms)) > 0L) {
+        mfForm <- formula(paste("~", paste(unlist(terms), collapse = "+")))
+      } else {
+        mfForm <- ~ 1
+      }
     }
     mf <- model.frame(object)
     Terms <- delete.response(terms(mfForm))
     xlevels <- .getXlevels(attr(mf, "terms"), mf)
     xlevels <- xlevels[names(xlevels) %in%  all.vars(Terms)]
-    
+    xlevels <- xlevels[names(xlevels) != object$subjectName]
     newdata <- as.data.frame(model.frame(Terms, newdata,
                                          na.action = na.action,
                                          xlev = xlevels))    
@@ -612,7 +622,7 @@ predict.olmm <- function(object, newdata = NULL,
       rownames(W) <- rownames(newdata)
       
       ## check entered random effects
-      if (any(dim(ranef) != c(nlevels(subject), ncol(W))))
+      if (any(dim(ranef) != c(nlevels(subject), nrow(object$ranefCholFac))))
         stop("'ranef' matrix has wrong dimensions")
       
       if (any(!levels(subject) %in% rownames(ranef))) {
@@ -811,6 +821,23 @@ simulate.olmm <- function(object, nsim = 1, seed = NULL,
   if (!exists(".Random.seed", envir = .GlobalEnv)) runif(1) 
   RNGstate <- .Random.seed
   dotArgs$type <- "response"
+  if (is.logical(ranef) && ranef) {
+    if (object$subjectName %in% colnames(newdata)) {
+      subject <- droplevels(newdata[, object$subjectName])
+      ranef <- ranef(object)
+      if (any(!levels(subject) %in% rownames(ranef))) {
+        ranef <- matrix(rnorm(nlevels(subject) * ncol(ranef)),
+                        nrow = nlevels(subject), ncol = ncol(ranef),
+                        dimnames = list(levels(subject), colnames(ranef)))
+        ranef <- ranef %*% t(object$ranefCholFac)       
+      } else {
+        ranef <- ranef[rownames(ranef) %in% levels(subject),,drop = FALSE]
+      }
+    } else {
+      stop(paste("'newdata' must contain a column '",
+                 object$subjectName, "'", sep = ""))
+    }
+  }
   pred <- predict(object, newdata = newdata, type = "prob", ranef = ranef, ...)
   FUN <- function(x) sample(levels(object$y), 1, prob = x)
   rval <- as.data.frame(replicate(nsim, apply(pred, 1L, FUN)))

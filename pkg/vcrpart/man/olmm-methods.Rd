@@ -79,8 +79,15 @@
   \item{seed}{an object specifying if and how the random number
     generator should be initialized. See \command{\link{simulate}}}
   \item{newdata}{a data frame with predictor variables.}
-  \item{ranef}{whether the simulated responses should be based on
-    conditional probabilities.}
+  \item{ranef}{either a logical or a matrix (see
+    \command{\link{predict.olmm}}). whether the simulated responses should
+    be conditional on random effects. If \code{TRUE}, the \code{newdata}
+    data frame must contain the subject identification
+    variable. Further, if all subjects in \code{newdata} are in
+    \code{object}, the simulation will be based on the estimated random
+    effects as obtained with \command{\link{ranef}}. If any subject in
+    \code{newdata} is not in \code{object} the random effects are
+    simulated.}
   \item{sigma}{ignored but obligatory argument from original generic.} 
   \item{rdig}{ignored but obligatory argument from original generic.}
   \item{...}{potential further arguments passed to methods.}
@@ -144,18 +151,35 @@ data(schizo)
 schizo <- schizo[1:181,]
 schizo$id <- droplevels(schizo$id)
 
+## anova comparison
+## ----------------
+
 ## fit two alternative models for the 'schizo' data
 model.0 <- olmm(imps79o ~ tx + sqrt(week) + re(1|id), schizo)
 model.1 <- olmm(imps79o ~ tx + sqrt(week)+tx*sqrt(week)+re(1|id),schizo)
-
 anova(model.0, model.1)
+
+## simulate responses
+## ------------------
+
+## simulate responses based on estimated random effects
+simulate(model.0, newdata = schizo[1, ], ranef = TRUE, seed = 1)
+simulate(model.0, newdata = schizo[1, ], seed = 1,
+         ranef = ranef(model.0)[schizo[1, "id"],,drop=FALSE])
+## simulate responses based on simulated random effects
+newdata <- schizo[1, ]
+newdata$id <- factor("123456789")
+simulate(model.0, newdata = newdata, ranef = TRUE)
+
+## other methods
+## -------------
+
 coef(model.1)
 fixef(model.1)
 head(model.matrix(model.1, "fe-ge"))
 head(weights(model.1))
 ranefCov(model.1)
 head(resid(model.1))
-head(simulate(model.1))
 terms(model.1, "fe-ge")
 VarCorr(model.1)
 head(weights(model.1, "subject"))

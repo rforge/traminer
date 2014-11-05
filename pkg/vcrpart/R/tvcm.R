@@ -191,7 +191,7 @@ tvcm <- function(formula, data, fit, family,
   fitargs <-
     switch(fit,olmm = union(names(formals(olmm)), names(formals(olmm_control))),
            glm = union(names(formals(glm)), names(formals(glm.control))), "")
-  dotargs <- intersect(dotargs, fitargs)
+  dotargs <- intersect(fitargs, dotargs)
   dotargs <- setdiff(dotargs, names(mcall))
   dotargs <- list(...)[dotargs]
   mcall[names(dotargs)] <- dotargs
