@@ -331,6 +331,8 @@ panel_coef <- function(object, parm = NULL,
       }
       return(rval)
   }
+
+  ## extract subset of coefficients
   if (is.null(parm)) parm <- colnames(coef)
   if (!is.list(parm)) parm <- list(parm)
   if (is.numeric(unlist(parm))) {
