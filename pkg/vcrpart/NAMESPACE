@@ -63,6 +63,9 @@ export(
   fvcglm_control,
   folds_control)
 
+## Exported methods for 'glm' class
+S3method(fixef, glm)
+
 ## Exported methods for 'fvcm' class
 S3method(fitted, fvcm)
 S3method(predict, fvcm)

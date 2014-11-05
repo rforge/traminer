@@ -316,7 +316,7 @@ cvloss.tvcm <- function(object, folds = folds_control(), ...) {
   }
 
   call <- list(name = as.name(control$papply),
-               X = quote(seq(ifelse(original, 0, 1), ncol(foldsMat))),
+               X = quote(seq(ifelse(original, 0L, 1L), ncol(foldsMat))),
                FUN = quote(cvFun))
   call[names(control$papply.args)] <- control$papply.args
   mode(call) <- "call"

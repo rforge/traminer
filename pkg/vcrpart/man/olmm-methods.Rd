@@ -7,6 +7,7 @@
 \alias{deviance.olmm}
 \alias{formula.olmm}
 \alias{fixef}
+\alias{fixef.glm}
 \alias{fixef.olmm}
 \alias{getCall.olmm}
 \alias{logLik.olmm}

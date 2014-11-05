@@ -16,6 +16,8 @@
 ##' all functions are documented as *.Rd files
 ##'
 ##' Last modifications:
+##' 2014-11-05: - set seed at start of 'tvcm' and re-establish old seed
+##'               at the end
 ##' 2014-10-23: - improved extraction of fitting arguments (see 'fitargs')
 ##'             - added 'tvcolmm_control' and 'tvcglm_control' to better
 ##'               distinguish between the articles.
@@ -69,11 +71,9 @@ tvcolmm <- function(formula, data, family = cumulative(),
 }
 
 
-tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE,
-                            trim = 0.1, estfun.args = list(),
-                            nimpute = 5, minsize = 50,
+tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE, minsize = 50,
                             maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
-                            ...) {
+                            trim = 0.1, estfun.args = list(), nimpute = 5, ...) {
 
   mc <- match.call()
   mc[[1L]] <- as.name("tvcm_control")
@@ -121,6 +121,12 @@ tvcm <- function(formula, data, fit, family,
   stopifnot(inherits(formula, "formula"))
   stopifnot(inherits(control, "tvcm_control"))
 
+  ## set seed
+  if (!exists(".Random.seed", envir = .GlobalEnv)) runif(1)
+  oldSeed <- get(".Random.seed", mode="numeric", envir=globalenv())
+  if (!is.null(control$seed)) set.seed(control$seed)
+  RNGstate <- .Random.seed
+  
   ## check and set 'family'
   if (missing(family)) stop("no 'family'.")
   if (is.character(family)) {
@@ -317,6 +323,9 @@ tvcm <- function(formula, data, fit, family,
     cat("\n\nFitted model:\n")
     print(tree)
   }
+
+  ## reset seed
+  assign(".Random.seed", oldSeed, envir=globalenv())
   
   if (control$verbose)
     cat("* computations finished, return object\n")

@@ -49,6 +49,7 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
+##' 2014-11-05: parallelized 'estfun.olmm' call in 'tvcm_grow_sctest'
 ##' 2014-10-14: - modify dev-grid structure obtained from 'tvcm_grow_gridsearch'
 ##'               each combination of part/node/var has now a list of three
 ##'               elements where the first contains the cuts, the second the
@@ -116,6 +117,7 @@
 ##'             'tvcm_modify_modargs'
 ##'
 ##' Bottleneck functions:
+##' - tvcm_grow_sctest
 ##' - tvcm_grow_setsplits
 ##' - tvcm_grow_gridsearch
 ##' -------------------------------------------------------- #
@@ -1138,13 +1140,18 @@ tvcm_grow_sctest <- function(model, nodes, where, partid, nodeid, varid,
     rval[[pid]] <- array(, dim = dim, dimnames = dn)
   }
 
-  ## call 'estfun'
+  ## call 'estfun' (eventually parallelized)
   eCall <-
     list(name = as.name(ifelse(inherits(model, "olmm"),"estfun.olmm", "estfun")))
   eCall$x <- quote(model)
   eCall[names(control$estfun.args)] <- control$estfun.args
   mode(eCall) <- "call"
-  scores <- replicate(control$nimpute, eval(eCall))
+  pCall <- list(name = as.name(control$papply),
+               X = quote(seq(1L, control$nimpute, 1L)),
+               FUN = quote(function(i) eval(eCall)))  
+  pCall[names(control$papply.args)] <- control$papply.args
+  mode(pCall) <- "call"
+  scores <- simplify2array(eval(pCall))
   
   ## set the 'gefp' call (which is called in each iteration below)
   gCall <- call(name = "tvcm_grow_gefp", object = quote(model),
@@ -1884,7 +1891,7 @@ tvcm_grow_setcontrol <- function(control, model, formList, root, parm.only = TRU
   control$nuisance <- lapply(formList$vc, function(x) x$nuisance)
   control$estfun.args$nuisance <-
     unique(c(control$estfun.args$nuisance,
-             setdiff(names(coef(model)), unlist(control$parm))))
+             setdiff(names(coef(model)), names(fixef(model)))))             
   return(control)
 }
 

@@ -35,6 +35,8 @@ cvloss <- function(object, ...) UseMethod("cvloss")
 
 extract <- function(object, ...) UseMethod("extract")
 
+fixef.glm <- function(object, ...) coef(object)
+
 neglogLik2 <- function(object, ...) UseMethod("neglogLik2")
 
 neglogLik2.default <- function(object, ...)
