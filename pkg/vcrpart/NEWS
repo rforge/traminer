@@ -1,21 +1,24 @@
 Changes in Version 0.2-2
 
-    o    The new implementation clearly distingueshes between the two
-         algorithms TVCOLMM and TVCGLM. The general function 'tvcm'
-         is still available, but applicants who want to refer to 
-         publications should used either the 'tvcolmm' or the 'tvcglm'
-         function.
+    o    Added seed option to 'tvcm_control'.
+
+    o    The new implementation clearly distinguishes between the two 
+         functions 'tvcolmm' and 'tvcolmm' with separate help files. 
+	 The general function 'tvcm' is still available.
+
+    o    Added convenience function 'tvcolmm_control' and 
+         'tvglm_control'.
 
     o    Improvement for 'panel_coef': Points and lines surpassing
          the boxes are now suppressed.
 
     o    Added variable centering as default for split selection.
 
-    o    Redefinition of tuning parameters for 'tvcm' were. The main 
+    o    Redefinition of tuning parameters for 'tvcm'. The main 
          tuning parameter is now 'cp'. See the help of 'tvcm' and 
          'tvcm_control' for details. 
 
-    o    Additional 'nimpute' argument for 'tvcm_control()'.
+    o    Added 'nimpute' argument for 'tvcm_control'.
 
     o    Added detail section to the help page of 'tvcm_control'
 
@@ -29,7 +32,6 @@ Changes in Version 0.2-2
 
     o    Added 'depth' and 'width' methods.
 
-    o    Added convenience function 'tvcolmm_control'
 
 Changes in Version 0.2-1
 

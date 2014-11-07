@@ -18,7 +18,7 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
              cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
              cv = !sctest, folds = folds_control("kfold", 5),
              prune = cv, papply = mclapply, papply.args = list(),
-             center = TRUE, verbose = FALSE, ...)
+             center = TRUE, seed = NULL, verbose = FALSE, ...)
 }
 
 \arguments{
@@ -66,6 +66,8 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
     partition stage and the evaluation of the cross-validation folds as
     well as the final pruning stage.}
   \item{papply.args}{a list of arguments to be passed to \code{papply}.}
+  \item{seed}{an integer specifying which seed should be set at the
+    beginning.}
   \item{verbose}{logical. Should information about the fitting process
     be printed to the screen?}
   \item{\ldots}{further, undocumented arguments to be passed.} 

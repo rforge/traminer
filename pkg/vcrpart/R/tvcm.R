@@ -73,7 +73,8 @@ tvcolmm <- function(formula, data, family = cumulative(),
 
 tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE, minsize = 50,
                             maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
-                            trim = 0.1, estfun.args = list(), nimpute = 5, ...) {
+                            trim = 0.1, estfun.args = list(), nimpute = 5,
+                            seed = NULL, ...) {
 
   mc <- match.call()
   mc[[1L]] <- as.name("tvcm_control")
@@ -339,10 +340,10 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                          maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
                          maxstep = 1e3, maxwidth = 1e9, maxdepth = 1e9,
                          lossfun = neglogLik2, ooblossfun = NULL,
-                         cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
+                         cp = 0.0, dfpar = 0.0, dfsplit = 1.0, 
                          cv = !sctest, folds = folds_control("kfold", 5),
                          prune = cv, papply = mclapply, papply.args = list(),
-                         center = TRUE, verbose = FALSE, ...) {
+                         center = TRUE, seed = NULL, verbose = FALSE, ...) {
   mc <- match.call()
   
   ## check available arguments
@@ -452,6 +453,7 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                 ntry = ntry,
                 vtry = vtry,                 
                 parm = NULL, intercept = NULL,
+                seed = seed,
                 functional.factor = "LMuo",
                 functional.ordered = "LMuo",
                 functional.numeric = "supLM"),
