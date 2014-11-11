@@ -18,7 +18,7 @@
         main, xlab, ylab, xlim, ylim, ...)
 
 otsplot_control(cex = 1, lwd = 1/4, col = NULL,
-                hide.col = grey(0.8),
+                hide.col = grey(0.8), seed = NULL,
                 lorder = c("background", "foreground") ,
                 lcourse = c("upwards", "downwards"),
                 grid.scale = 1/5, grid.lwd = 1/2,
@@ -56,6 +56,8 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
   \item{col}{color palette vector for line coloring.}
   \item{hide.col}{Color for ordinal time-series filtered-out by the
     \code{filter} specification in \code{otsplot}.}
+  \item{seed}{an integer specifying which seed should be set at the
+    beginning.}
   \item{lorder}{line ordering. Either \code{"background"} or
     \code{"foreground"}.}
   \item{lcourse}{Method to connect simultaneous elements with the

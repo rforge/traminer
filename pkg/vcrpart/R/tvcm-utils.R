@@ -22,7 +22,7 @@
 ##' tvcm_setsplits_splitnode: 
 ##' tvcm_setsplits_rselect:   randomly select partitions, variables and nodes
 ##' tvcm_grow_sctest:         run coefficient constancy tests
-##' tvcm_grow_gridsearch:     compute the dev statistics
+##' tvcm_grow_exsearch:     compute the dev statistics
 ##' tvcm_grow_splitnode:      split in variable x.
 ##' tvcm_formula:             extract separate formulas for
 ##'                           model and partitioning from
@@ -49,8 +49,11 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
+##' 2014-11-11: modified transformation of nominal into ordinal variables
+##'             to accelerate exhaustive search. There is now a function
+##'             'tvcm_exsearch_nomToOrd'.
 ##' 2014-11-05: parallelized 'estfun.olmm' call in 'tvcm_grow_sctest'
-##' 2014-10-14: - modify dev-grid structure obtained from 'tvcm_grow_gridsearch'
+##' 2014-10-14: - modify dev-grid structure obtained from 'tvcm_grow_exsearch'
 ##'               each combination of part/node/var has now a list of three
 ##'               elements where the first contains the cuts, the second the
 ##'               the loss reduction and the third the difference in the number
@@ -66,7 +69,7 @@
 ##'             - deleted 'tvcm_setsplits_validcats'
 ##'             - added 'tvcm_getNumSplits', 'tvcm_getOrdSplits' and
 ##'               'tvcm_getNomSplits'
-##' 2014-09-22: deleted unnecessary 'subs' object in 'tvcm_grow_gridsearch'
+##' 2014-09-22: deleted unnecessary 'subs' object in 'tvcm_grow_exsearch'
 ##'             which I didn't remove when removing the 'keepdev'
 ##'             option
 ##' 2014-09-17: - delete 'keepdev' argument (also for prune.tvcm)
@@ -105,7 +108,7 @@
 ##' 2014-07-22: modified some function names
 ##' 2014-07-06: implement method to deal with many nominal categories
 ##' 2014-06-30: implement random selection if split is not unique
-##' 2014-06-23: correct bug for 'start' argument in 'tvcm_grow_gridsearch' 
+##' 2014-06-23: correct bug for 'start' argument in 'tvcm_grow_exsearch' 
 ##' 2014-06-17: modify documentation style
 ##' 2014-06-16: deleted several 'tvcm_prune_XXX' functions
 ##' 2014-06-03: modify 'tvcm_formula' to allow partition-wise
@@ -119,7 +122,7 @@
 ##' Bottleneck functions:
 ##' - tvcm_grow_sctest
 ##' - tvcm_grow_setsplits
-##' - tvcm_grow_gridsearch
+##' - tvcm_grow_exsearch
 ##' -------------------------------------------------------- #
 
 ##' -------------------------------------------------------- #
@@ -213,7 +216,8 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
     ## get current partitions and add them to the model data
     for (pid in seq_along(nodes)) {
       where[[pid]] <- factor(fitted_node(nodes[[pid]], partData))
-      where[[pid]] <- vcrpart_contr.sum(where[[pid]], weights)      
+      if (nlevels(where[[pid]]) > 1L)
+      contrasts(where[[pid]]) <- contr.wsum(where[[pid]], weights)      
       mf[, paste("Node", LETTERS[pid], sep = "")] <- where[[pid]]
     }
     
@@ -339,9 +343,9 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         ## ------------------------------------------------- #
       
         ## compute the dev of all candidate splits and extract the best split
-        dev <- try(tvcm_grow_gridsearch(splits, partid, nodeid, varid, 
-                                        model, nodes, where, partData,
-                                        control, mcall, formList, step),
+        dev <- try(tvcm_grow_exsearch(splits, partid, nodeid, varid, 
+                                      model, nodes, where, partData,
+                                      control, mcall, formList, step),
                    silent = TRUE)
         
         ## handling stops
@@ -569,14 +573,14 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
 
 ##' -------------------------------------------------------- #
 ##' Updates the model matrix and re-fits the current node
-##' model. Used for the grid-search in 'tvcm_grow_gridsearch'.
+##' model. Used for the grid-search in 'tvcm_grow_exsearch'.
 ##'
 ##' @param object a prototype model
 ##' @param mcall   the mcall for the prototype model
 ##'
 ##' @return A list of formulas ('root', 'tree' and 'original').
 ##'
-##' @details Used in 'tvcm' and 'tvcm_grow_gridsearch'. Note that the
+##' @details Used in 'tvcm' and 'tvcm_grow_exsearch'. Note that the
 ##' function will modify the slots of the original object as well!
 ##'
 ##' To do:
@@ -827,11 +831,11 @@ tvcm_getNomSplits <- function(z, w, minsize, maxnomsplit) {
     
   } else {
 
-    ## Heuristic reduction of splits: in tvcm_grow_gridsearch,
+    ## Heuristic reduction of splits: in tvcm_grow_exsearch,
     ## the 'isolated' coefficients of each category are
     ## computed. The coefficients are used for ordering
     ## the categories and finally the variable is treated
-    ## as ordinal. See tvcm_grow_gridsearch
+    ## as ordinal. See tvcm_grow_exsearch
 
     rval <- diag(nlevels(z))
     type <- "coef"
@@ -1262,62 +1266,113 @@ tvcm_sctest_bonf <- function(test, type) {
 ##' @return A nested list with loss matrices. Partitions of nodes
 ##'    are nested in partitions for variables. 
 ##'
-##' @details Used in 'tvcm'. 'tvcm_grow_dev' is a help
-##'    function of 'tvcm_grow_gridsearch'
+##' @details Used in 'tvcm'. 'tvcm_grow_ordnom' and
+##'    'tvcm_grow_dev' are help functions for 'tvcm_grow_exsearch'
 ##'-------------------------------------------------------- #
 
-tvcm_grow_dev <- function(cutpoint, type = "dev",
-                          pid, nid, vid, 
-                          model, modelNuis, nuisance,
-                          where, partData,
-                          control, loss0, mfName) {
-      
-    ## set node indicator
-    subs <- where[[pid]] == levels(where[[pid]])[nid]
-    z <- partData[, vid]    
-    if (is.numeric(z)) {
-        zs <- z <= cutpoint
-    } else {
-        zs <- z %in% levels(z)[cutpoint > 0L]            
-    }
-    model[[mfName]]$Left <- 1 * (subs & zs)
-    model[[mfName]]$Right <- 1 * (subs & !zs)
-    parm <- grep("Left", names(coef(model)), value = TRUE)
- 
-    ## fit the 'update' model
-    model <- tvcm_grow_update(model, control)
+tvcm_exsearch_nomToOrd <- function(cp, pid, nid, vid, 
+                                   mcall, weights,
+                                   where, partData,
+                                   control) {
+  
+  ## get partitioning variable
+  subs <- where[[pid]] == levels(where[[pid]])[nid]
+  z <- partData[, vid]
+  
+  ## get categories for which the coefficients should be estimated
+  levs <- which(colSums(cp) > 0)
     
-    if (type == "dev") {
-      if (!inherits(model, "try-error")) {
-        rval <- c((loss0 - control$lossfun(model)),
-                  length(coef(model)[grep("Left", names(coef(model)))]) -
-                  length(nuisance))
-        if (is.null(modelNuis)) {
-          return(rval)
-        } else {
-            modelNuis[[mfName]]$Left <- 1 * (subs & zs)
-            modelNuis[[mfName]]$Right <- 1 * (subs & !zs)
-            modelNuis <- tvcm_grow_update(modelNuis, control)
-            rval[1L] <- rval[1L] - (loss0 - control$lossfun(modelNuis))
-            return(rval)
-        }  
-    } else {
-        return(c(NA, NA))        
-    }
+  ## adjust formula
+  ff <- mcall$formula
+  aTerms <- attr(terms(ff),"term.labels")
+  lTerms <- grep("Left",aTerms,value=TRUE)
+  ff <- update(ff,paste(".~.-",paste(aTerms,collapse="-")))
+  lTerms <- unlist(lapply(levs, function(i) {
+    lapply(lTerms, function(t) sub("Left", paste("Left", i, sep = ""), t))
+  })) 
+  ff <- update(ff,paste(".~+",paste(lTerms,collapse="+"),"+."))
+  mcall$formula <- ff
+  
+  ## create a dummy for each category
+  newdata <- as.data.frame(lapply(levs, function(i) 1 * (z == levels(z)[i])))
+  colnames(newdata) <- paste("Left", levs, sep = "")
+  mcall$data <- cbind(mcall$data, newdata)
+  
+  ## fit the model
+  model <- tvcm_grow_fit(mcall, doFit = TRUE)
+  
+  if (!inherits(model, "try-error")) {
+    
+    ## extract coefficients
+    st <- coef(model)
+    ind <- sapply(paste("Left", levs, sep = ""), function(x) grep(x, names(st)))
+    if (!is.matrix(ind)) ind <- matrix(ind, nrow = 1)
+    ind <- t(ind)
+    st <- matrix(st[c(ind)], nrow(ind), ncol(ind))
+    
+    ## get ordering
+    score <- rep.int(0, nlevels(z))
+    score[levs] <- prcomp(st)$x[,1]
+    
+    ## transform 'z'              
+    z <- ordered(z, levels = levels(z)[order(score)])
+    cp <- tvcm_getOrdSplits(z[subs], weights[subs],
+                            control$minsize[pid],
+                            control$maxordsplit)
+    cp <- cp[, levels(partData[, vid])]
   } else {
-      nuis <- gsub("Node[A-Z]", "Left", nuisance)
-      parm <- setdiff(parm, nuis)  
-      if (inherits(model, "try-error")) {
-          return(rep.int(NA, length(parm)))
+
+    ## avoid splitting (better solution?)
+    cp <- cp[-(1:nrow(cp)), ]
+  }
+  attr(cp, "type") <- "coef"
+
+  ## return list
+  return(list(cp, rep(NA, nrow(cp)), rep(NA, nrow(cp))))
+}
+
+tvcm_exsearch_dev <- function(cutpoint, 
+                              pid, nid, vid, 
+                              model, modelNuis, nuisance,
+                              where, partData, 
+                              control, loss0, mfName) {
+      
+  ## set node indicator
+  subs <- where[[pid]] == levels(where[[pid]])[nid]
+  z <- partData[, vid]    
+  if (is.numeric(z)) {
+    zs <- z <= cutpoint
+  } else {
+    zs <- z %in% levels(z)[cutpoint > 0L]            
+  }
+  model[[mfName]]$Left <- 1 * (subs & zs)
+  model[[mfName]]$Right <- 1 * (subs & !zs)
+  parm <- grep("Left", names(coef(model)), value = TRUE)
+  
+  ## fit the 'update' model
+  model <- tvcm_grow_update(model, control)
+  
+  if (!inherits(model, "try-error")) {
+    rval <- c((loss0 - control$lossfun(model)),
+              length(coef(model)[grep("Left", names(coef(model)))]) -
+              length(nuisance))
+    if (is.null(modelNuis)) {
+      return(rval)
     } else {
-        return(coef(model)[parm])
-    }
+      modelNuis[[mfName]]$Left <- 1 * (subs & zs)
+      modelNuis[[mfName]]$Right <- 1 * (subs & !zs)
+      modelNuis <- tvcm_grow_update(modelNuis, control)
+      rval[1L] <- rval[1L] - (loss0 - control$lossfun(modelNuis))
+      return(rval)
+    }  
+  } else {
+    return(c(NA, NA))        
   }
 }
 
-tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid, 
-                                 model, nodes, where, partData, 
-                                 control, mcall, formList, step) {
+tvcm_grow_exsearch <- function(splits, partid, nodeid, varid, 
+                               model, nodes, where, partData, 
+                               control, mcall, formList, step) {
 
   verbose <- control$verbose; control$verbose <- FALSE;
 
@@ -1369,13 +1424,27 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
       for (nid in seq_along(splits[[pid]])) {
         if (length(unlist(splits[[pid]][[nid]])) > 0L) {
           for (vid in seq_along(splits[[pid]][[nid]])) {
-              
+
+            ## get reduced cupoints for nominal variables with many categories
+            if (attr(splits[[pid]][[nid]][[vid]][[1L]], "type") == "coef")
+              splits[[pid]][[nid]][[vid]] <-
+                tvcm_exsearch_nomToOrd(cp = splits[[pid]][[nid]][[vid]][[1L]],
+                                       pid = partid[pid],
+                                       nid = nodeid[[partid[pid]]][nid],
+                                       vid  = varid[[partid[pid]]][vid],
+                                       mcall = mcall, weights = w,
+                                       where = where, partData = partData,
+                                       control = control)
+            
+            ## extract cutpoints
             cp <- splits[[pid]][[nid]][[vid]][[1L]]
-            type <- attr(cp, "type")
             subs <- is.na(splits[[pid]][[nid]][[vid]][[2L]])
             cp <- cp[subs,, drop = FALSE]
+            
             if (nrow(cp) > 0L) {
-              st <- apply(cp, 1, tvcm_grow_dev, type = type,
+
+              ## employ exhaustive search
+              st <- apply(cp, 1, tvcm_exsearch_dev, 
                           pid = partid[pid],
                           nid = nodeid[[partid[pid]]][nid],
                           vid = varid[[partid[pid]]][vid],
@@ -1385,54 +1454,8 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
                           control = control, loss0 = loss0,
                           mfName = mfName)
               if (is.matrix(st)) st <- t(st) else st <- matrix(st, ncol = 1L)
-
-              if (type == "dev") {
-                splits[[pid]][[nid]][[vid]][[2L]][subs] <- st[, 1L]
-                splits[[pid]][[nid]][[vid]][[3L]][subs] <- st[, 2L]
-                                
-              } else if (type == "coef") {
-                
-                ## if 'z' is a nominal variable with many categories               
-                z <- partData[, varid[[partid[pid]]][vid]]
-                subs <- where[[partid[pid]]] ==
-                  levels(where[[partid[pid]]])[nodeid[[partid[pid]]][nid]]
-                
-                invalids <- attr(na.omit(st), "na.action")
-                if (length(invalids) > 0L) {
-                  cp <- cp[-invalids,,drop = FALSE]
-                  st <- st[-invalids,,drop = FALSE]
-                }
-                score <- rep.int(0, nlevels(z))
-                score[colSums(cp) > 0] <- prcomp(st)$x[,1]
-                
-                ## define 'z' as ordinal and retrieve the splits
-                z <- ordered(z, levels = levels(z)[order(score)])
-                cp <- tvcm_getOrdSplits(z[subs], w[subs],
-                                        control$minsize[partid[pid]],
-                                        control$maxordsplit)
-
-                
-                ## reorder the columns of 'cp' acc. to the original categories
-                cp <- cp[,order(order(score)), drop = FALSE]
-                
-                ## ensures that split is newly built
-                attr(cp, "type") <- "coef"
-                
-                ## compute the loss of the new splits
-                st <- apply(cp, 1, tvcm_grow_dev, type = "dev",
-                            pid = partid[pid],
-                            nid = nodeid[[partid[pid]]][nid],
-                            vid = varid[[partid[pid]]][vid],
-                            model = sModel,
-                            modelNuis = sModelN,
-                            nuisance = control$nuisance[[pid]],
-                            where = where, partData = partData,
-                            control = control, loss0 = loss0,
-                            mfName = mfName)
-
-                if (is.matrix(st)) st <- t(st) else st <- matrix(st, ncol = 2L)
-                splits[[pid]][[nid]][[vid]] <- list(cp, st[, 1L], st[, 2L])
-              }
+              splits[[pid]][[nid]][[vid]][[2L]][subs] <- st[, 1L]
+              splits[[pid]][[nid]][[vid]][[3L]][subs] <- st[, 2L]
             }
           }
         }
@@ -1514,7 +1537,7 @@ tvcm_grow_gridsearch <- function(splits, partid, nodeid, varid,
 ##' tree structure.
 ##'
 ##' @param nodes    an object of class 'partynode'.
-##' @param loss     a list produced by 'tvcm_grow_gridsearch'.
+##' @param loss     a list produced by 'tvcm_grow_exsearch'.
 ##' @param partData a 'data.frame' with the partitioning variables.
 ##' @param step     integer. The current algorithm step.
 ##'
@@ -1755,7 +1778,7 @@ tvcm_formula <- function(formList, root, family = cumulative(),
       return(formList$vc[[pid]]$nuisance)
     })
   
-    ## update formulas for tvcm_grow_gridsearch
+    ## update formulas for tvcm_grow_exsearch
     fUpdate <- vector("list", length(formList$vc))
     for (pid in seq_along(fUpdate)) {
       fUpdate[[pid]] <- vector("list", 2L)
@@ -1921,7 +1944,7 @@ tvcm_get_fitted <- function(pid, object, newdata, weights, setContrasts) {
   names(fitted) <- rownames(newdata) 
   if (nlevels(fitted) > 1L) {
     if (setContrasts) {
-      fitted <- vcrpart_contr.sum(fitted, weights)
+      contrasts(fitted) <- contr.wsum(fitted, weights)
     } else {
       contrasts(fitted) <-
         object$contrasts[, paste("Node", LETTERS[pid], sep = "")]

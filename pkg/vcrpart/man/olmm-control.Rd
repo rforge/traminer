@@ -19,8 +19,8 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
 \arguments{
  \item{fit}{character string. The name of the function to be used for the 
     optimization.}
-  \item{doFit}{logical scalar. When \code{FALSE} an unfitted \command{\link{olmm}}  
-    object is returned. See details.}
+  \item{doFit}{logical scalar. When \code{FALSE} an unfitted
+    \command{\link{olmm}} object is returned.}
   \item{numGrad}{logical scalar indicating whether the score function
     should be retrieved numerically.}
   \item{numHess}{logical scalar. Indicates whether the Hess matrix for
@@ -47,7 +47,7 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
   elements according to the column names of the
   \command{\link{model.matrix}}. At the time being, initial values for
   adjacent-categories models must be transformed into the
-  baseline-category model form. 
+  baseline-category model form.
 
   Notice that an additional argument \code{control}, e.g.,
   \code{control = list(trace = 1)}, can be passed access control
@@ -57,7 +57,7 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
 }
 
 \value{
-  A list of class \code{olmm_control} containing
+  A list of class \command{\link{olmm_control}} containing
   the control parameters.
 }
 

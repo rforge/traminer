@@ -1,3 +1,9 @@
+Changes in Version 0.2-3
+
+    o    Added contr.wsum function
+
+    o    Added 'seed' argument to 'otsplot_control'
+
 Changes in Version 0.2-2
 
     o    Added seed option to 'tvcm_control'.

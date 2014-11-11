@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-08
+##' Date:            2014-11-10
 ##'
 ##' Description:
 ##' General utility functions for the 'vcrpart' package.
@@ -24,6 +24,7 @@
 ##'                         from vcrpart_formula.
 ##'
 ##' Last modifications:
+##' 2014-11-10: exported function 'contr.wsum'
 ##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-09-07: added 'vcrpart_fitted' function to avoid replicated
 ##'             definitions of the same function.
@@ -271,33 +272,18 @@ ge <- function(formula) {
   return(attr(terms(formula, keep.order = TRUE), "term.labels"))
 }
 
-
-## --------------------------------------------------------- #
-##' Compute weighted sum contrasts
-##' 
-##' Computes weighted sum contrasts for the nodes
-##'
-##' @param x       a factor vector.
-##' @param weights a numeric weights vector of the same
-##'                length as 'x'
-##'
-##' @return a matrix of the number of rows equal to the number
-##'    of factor levels of 'x' and the number of rows equal to the
-##'    number of levels of 'x' minus 1
-##'
-##' @details Used in several functions, including 'tvcm',
-##'    'tvcm_grow'.
-## --------------------------------------------------------- #
-
-vcrpart_contr.sum <- function(x, weights = rep.int(1.0, length(x))) {
+contr.wsum <- function(x, weights = rep.int(1.0, length(x))) {
+  stopifnot(is.factor(x))
+  stopifnot(is.numeric(weights))
+  stopifnot(length(x) == length(weights))
+  con <- NULL
   if (nlevels(x) > 1L) {
     con <- contr.sum(levels(x))
     tab <- tapply(weights, x, sum)
     con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
     colnames(con) <- levels(x)[1:(nlevels(x) - 1)]
-    contrasts(x) <- con
   }
-  return(x)
+  return(con)
 }
 
 

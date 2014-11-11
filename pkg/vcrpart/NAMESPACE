@@ -28,6 +28,7 @@ export(
   adjacent,
   baseline,
   cumulative,
+  contr.wsum,
   cvloss,
   extract,
   fixef,

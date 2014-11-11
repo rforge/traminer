@@ -5,12 +5,12 @@
 \alias{predecor_control}
 \alias{estfun.olmm}
 
-\title{Methods for empirical processes of \command{\link{olmm}} objects}  
+\title{Methods for score processes of \command{\link{olmm}} objects}  
 
-\description{Methods to extract and pre-decorrelate the estimating
-  equations (the negative marginal maximum likelihood scores) and
-  compute the empirical fluctuation process (the decorrelated,
-  cumulative score process) of a fitted \command{\link{olmm}} object. 
+\description{Methods to extract and pre-decorrelate the (negative)
+  marginal maximum likelihood observation scores and compute the
+  standardized cumulative score processes of a fitted
+  \command{\link{olmm}} object.
 } 
 
 \usage{
@@ -84,16 +84,17 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
 }
 
 \details{
-  Complements the \code{estfun} method of the package \code{sandwich}
-  and the \code{gefp} method of the package \code{strucchange} for
+  Complements the \command{estfun} method of the package \pkg{sandwich}
+  and the \command{gefp} method of the package \pkg{strucchange} for
   \command{\link{olmm}} objects. \command{\link{estfun.olmm}} allows to
   pre-decorrelate the intra-individual correlation of observation
   scores, see the argument \code{predecor}. The value returned by
-  \code{gefp.olmm} may be used for testing coefficient constancy
-  regarding an explanatory variable \code{order.by} by the \code{sctest}
-  function of package \code{strucchange}, see the examples below. 
+  \command{gefp.olmm} may be used for testing coefficient constancy
+  regarding an explanatory variable \code{order.by} by the
+  \command{sctest} function of package \pkg{strucchange}, see the
+  examples below. 
 
-  If \code{predecor = TRUE} in \code{estfun.olmm}, a linear
+  If \code{predecor = TRUE} in \command{\link{estfun.olmm}}, a linear
   within-subject transformation is applied that removes (approximately) 
   the intra-subject correlation from the scores. Specifically,
   \eqn{u_{it}}, the ML score of the \eqn{t}'th observation of subject
@@ -129,7 +130,7 @@ Instability, \emph{Statistica Neerlandica}, \bold{61}, 488--508.
 doi:10.1111/j.1467-9574.2007.00371.x.
 
 Buergin R. and Ritschard G. (2014a), Tree-based varying coefficient 
-regression for longitudinal ordinal responses. Submitted article.
+regression for longitudinal ordinal responses. Article in progress.
 }
 
 \author{Reto Buergin}

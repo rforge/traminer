@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-09-08
+##' Date:            2014-11-10
 ##'
 ##' Description:
 ##' Ordinal time series plot and utility functions.
@@ -23,12 +23,13 @@
 ##'                       sequences
 ##'
 ##' Modifications:
+##' 2014-11-10: added 'seed' argument to 'otsplot'
 ##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-09-07: added header
 ##' -------------------------------------------------------- #
 
 otsplot_control <- function(cex = 1, lwd = 1/4, col = NULL,
-                            hide.col = grey(0.8),
+                            hide.col = grey(0.8), seed = NULL,
                             lorder = c("background", "foreground") ,
                             lcourse = c("upwards", "downwards"),
                             grid.scale = 1/5, grid.lwd = 1/2,
@@ -108,6 +109,12 @@ otsplot.default <- function(x, y, subject, weights, groups,
   cArgs <- do.call("olmm_control", cArgs)
   control <- appendDefArgs(cArgs, control)
 
+  ## set seed
+  if (!exists(".Random.seed", envir = .GlobalEnv)) runif(1)
+  oldSeed <- get(".Random.seed", mode="numeric", envir=globalenv())
+  if (!is.null(control$seed)) set.seed(control$seed)
+  RNGstate <- .Random.seed
+  
   ## check compatibility between 'filter' and 'lorder' control argument
   if (!is.null(filter)) control$plot_gp$lorder <- "foreground"
   
@@ -451,6 +458,9 @@ otsplot.default <- function(x, y, subject, weights, groups,
 
   pts <- reshape(pts, varying = list(freq = freqCols, width = widthCols, col = colCols), v.names = c("freq", "width", "col"), timevar = "groups", times = 1L:nGroups, direction = "long")
   lns <- reshape(lns, varying = list(freq = freqCols, width = widthCols, col = colCols), v.names = c("freq", "width", "col"), timevar = "groups", times = 1L:nGroups, direction = "long")
+
+  ## reset seed
+  assign(".Random.seed", oldSeed, envir=globalenv())
   
   ## plot data object
   return(structure(
