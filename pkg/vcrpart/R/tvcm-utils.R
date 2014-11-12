@@ -1305,7 +1305,9 @@ tvcm_exsearch_nomToOrd <- function(cp, pid, nid, vid,
     
     ## extract coefficients
     st <- coef(model)
-    ind <- sapply(paste("Left", levs, sep = ""), function(x) grep(x, names(st)))
+    stLabs <- strsplit(names(st), ":")
+    stLabs <- sapply(stLabs, function(x) x[grep("Left[1-9]+", x)])
+    ind <- sapply(paste("Left", levs, sep = ""), function(x) which(stLabs == x))
     if (!is.matrix(ind)) ind <- matrix(ind, nrow = 1)
     ind <- t(ind)
     st <- matrix(st[c(ind)], nrow(ind), ncol(ind))
