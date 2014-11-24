@@ -3,7 +3,7 @@ citHeader("To cite vcrpart in publications please use:")
 p1 <- person("Reto", "B\u00FCrgin", email = "rbuergin@gmx.ch")
 p2 <- person("Gilbert", "Ritschard", email = "gilbert.ritschard@unige.ch")
 
-citEntry(entry="misc",
+citEntry(entry="unpublished",
   author = personList(p1, p2),
   title = "Coefficient-wise tree-based varying coefficient regression with vcrpart",
   year = "2014",
@@ -11,12 +11,12 @@ citEntry(entry="misc",
   textVersion = "B\u00FCrgin R. and Ritschard G. (2014b), Coefficient-wise tree-based varying coefficient regression with vcrpart. Article in progress."
 )
 
-citEntry(entry="misc",
+citEntry(entry="unpublished",
   author = personList(p1, p2),
   title = "Tree-based varying-coefficient regression for longitudinal ordinal responses",
   year = "2014",
-  note = "Submitted",
-  textVersion = "B\u00FCrgin R. and Ritschard G. (2014a), Tree-based varying coefficient regression for longitudinal ordinal responses. Submitted article."
+  note = "Article in progress",
+  textVersion = "B\u00FCrgin R. and Ritschard G. (2014a), Tree-based varying coefficient regression for longitudinal ordinal responses. Article in progress."
 )
 
 citEntry(entry="article",
@@ -27,8 +27,7 @@ citEntry(entry="article",
   volume = "68",
   pages = "98-103",
   number = "2",
-  doi = "10.1080/00031305.2014.887591",
-  textVersion="B\u00FCrgin, R. & Ritschard, G. (2014), A decorated parallel coordinate plot for categorical longitudinal data, The American Statistician 68(2), 98-103.  DOI http://dx.doi.org/10.1080/00031305.2014.887591",
+  textVersion="B\u00FCrgin, R. & Ritschard, G. (2014), A decorated parallel coordinate plot for categorical longitudinal data, The American Statistician 68(2), 98-103.",
 )
 
 citFooter("See",sQuote("citation()"),"for citing R itself.")

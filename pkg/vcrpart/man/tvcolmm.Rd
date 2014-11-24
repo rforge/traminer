@@ -142,7 +142,7 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
 
    Zeileis, A., Hornik, K. (2007), Generalized M-Fluctuation Tests for
    Parameter Instability, \emph{Statistica Neerlandica}, \bold{61},
-   488--508. doi:10.1111/j.1467-9574.2007.00371.x. 
+   488--508. 
 
    Buergin R. and Ritschard G. (2014a), Tree-based varying coefficient
    regression for longitudinal ordinal responses. Article in progress.

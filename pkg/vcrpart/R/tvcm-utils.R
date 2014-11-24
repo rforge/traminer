@@ -1428,7 +1428,8 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
           for (vid in seq_along(splits[[pid]][[nid]])) {
 
             ## get reduced cupoints for nominal variables with many categories
-            if (attr(splits[[pid]][[nid]][[vid]][[1L]], "type") == "coef")
+            if (attr(splits[[pid]][[nid]][[vid]][[1L]], "type") == "coef" &&
+                any(is.na(splits[[pid]][[nid]][[vid]][[2L]])))
               splits[[pid]][[nid]][[vid]] <-
                 tvcm_exsearch_nomToOrd(cp = splits[[pid]][[nid]][[vid]][[1L]],
                                        pid = partid[pid],

@@ -81,7 +81,7 @@
     generator should be initialized. See \command{\link{simulate}}}
   \item{newdata}{a data frame with predictor variables.}
   \item{ranef}{either a logical or a matrix (see
-    \command{\link{predict.olmm}}). whether the simulated responses should
+    \command{\link{predict.olmm}}). Whether the simulated responses should
     be conditional on random effects. If \code{TRUE}, the \code{newdata}
     data frame must contain the subject identification
     variable. Further, if all subjects in \code{newdata} are in

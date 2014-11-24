@@ -4,6 +4,11 @@ Changes in Version 0.2-3
 
     o    Added 'seed' argument to 'otsplot_control'
 
+    o    Internal changes for exhaustive search of 'tvcm'
+
+    o    Improved documentation
+
+
 Changes in Version 0.2-2
 
     o    Added seed option to 'tvcm_control'.

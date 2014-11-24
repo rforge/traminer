@@ -96,23 +96,9 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
 
   If \code{predecor = TRUE} in \command{\link{estfun.olmm}}, a linear
   within-subject transformation is applied that removes (approximately) 
-  the intra-subject correlation from the scores. Specifically,
-  \eqn{u_{it}}, the ML score of the \eqn{t}'th observation of subject
-  \eqn{i}, is transformed to \eqn{u^*_{it} = u_{it} + T \sum_{t'=1, t'
-  \neq t}^{T_i} u_{it'}} such that \eqn{\mathrm{Cov}(u*_{it},
-  u*_{it'}) =  \mathrm{Cov}(u*_{it}, u*_{i't''})} for all \eqn{i \neq
-  i'} and \eqn{t \neq t'}.
+  the intra-subject correlation from the scores. Backgrounds are
+  provided by Buergin and Ritschard (2014a).
   
-  The pre-decorrelation approach above is principally limited to
-  balanced data. If the data of \code{object} are not balanced, the data
-  are balanced out by (i) drawing a set of predictors from the empirical
-  distribution of the model matrix of \code{object}, (ii) drawing
-  responses based on the predictors of (i) and \code{object}
-  (cf. \command{\link{simulate.olmm}}) and (iii) add the predictors of
-  (i) and the responses of (ii) to \code{object} and recompute the
-  scores based on the original coefficients. Note that, the column sum
-  of the returned score matrix is not necessarily zero in these cases. 
-   
   Given a score matrix produced by \command{\link{estfun.olmm}}, the
   empirical fluctuation process can be computed by
   \command{\link{gefp.olmm}}. See Zeileis and Hornik
@@ -127,7 +113,6 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
 \references{
 Zeileis A., Hornik K. (2007), Generalized M-Fluctuation Tests for Parameter
 Instability, \emph{Statistica Neerlandica}, \bold{61}, 488--508.
-doi:10.1111/j.1467-9574.2007.00371.x.
 
 Buergin R. and Ritschard G. (2014a), Tree-based varying coefficient 
 regression for longitudinal ordinal responses. Article in progress.

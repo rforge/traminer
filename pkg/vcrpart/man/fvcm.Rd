@@ -74,12 +74,13 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
   forests} (Breiman, 2001) ensemble algorithms for
   \command{\link{tvcm}}. The method consist in growing multiple trees by
   using \command{\link{tvcm}} and aggregating the fitted coefficient
-  functions. To enable bagging, use \code{ptry = Inf}, \code{ntry = Inf}
-  and \code{vtry = Inf} in \command{\link{fvcm_control}}.   
+  functions in the scale of the predictor function. To enable bagging,
+  use \code{ptry = Inf}, \code{ntry = Inf} and \code{vtry = Inf} in
+  \command{\link{fvcm_control}}.    
 
-  \command{\link{fvcolmm}} and \command{\link{fvcglm}} are convenience
-  functions for whether a \command{\link{olmm}} or a
-  \command{\link{glm}} model is fitted. 
+  \command{\link{fvcolmm}} and \command{\link{fvcglm}} are the
+  extensions for \command{\link{tvcolmm}} and
+  \command{\link{tvcglm}}.
 
   \command{\link{fvcm_control}} is a wrapper of
   \command{\link{tvcm_control}} and the arguments indicated specify
