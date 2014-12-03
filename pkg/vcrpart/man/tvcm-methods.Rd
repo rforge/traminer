@@ -14,8 +14,6 @@
 \alias{neglogLik2.tvcm}
 \alias{nobs.tvcm}
 \alias{predict.tvcm}
-\alias{prunepath}
-\alias{prunepath.tvcm}
 \alias{print.tvcm}
 \alias{ranef.tvcm}
 \alias{resid.tvcm}
@@ -53,8 +51,6 @@
 \method{splitpath}{tvcm}(tree, steps = 1L,
          details = FALSE, ...)
 
-\method{prunepath}{tvcm}(tree, steps = 1L, ...)
-
 \method{summary}{tvcm}(object, ...)
 
 \method{width}{tvcm}(x, ...)
@@ -91,11 +87,12 @@
   observation. In cases of multiple \command{\link{vc}} terms for the same
   predictor, the coefficients are summed up.
 
-  \command{\link{splitpath}} and \command{\link{prunepath}} are new
-  methods to trace the splitting resp. pruning procedures. They shows
-  several information, such as the loss reduction of new splits during
-  partitioning or the loss reduction of collapsing an inner node when
-  pruning. 
+  The \command{\link{splitpath}} function allows to backtrack the
+  partitioning procedure. By default, it shows which split was chosen in
+  the first iteration. The interesting iteration(s) can be selected by
+  the \code{steps} argument. With \code{details = TRUE} it is also
+  possible to backtrack the coefficient constancy tests and/or the loss
+  reduction statistics.  
 
   \command{\link{summary}} computes summary statistics of the fitted model, 
   including the estimated coefficients. The varying coefficient are printed

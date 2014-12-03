@@ -632,6 +632,7 @@ prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
 
 
 prunepath.tvcm <- function(tree, steps = 1L, ...) {
+  steps <- intersect(steps, seq_along(tree$info$prunepath))
   rval <- tree$info$prunepath[steps]
   rval <- lapply(rval, function(x) {
     x$tab <- as.data.frame(x$tab)

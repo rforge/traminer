@@ -3,14 +3,13 @@
 \alias{tvcm-assessment}
 \alias{prune}
 \alias{prune.tvcm}
-\alias{folds_control}
+\alias{prunepath}
+\alias{prunepath.tvcm}
 \alias{cvloss}
 \alias{cvloss.tvcm}
-\alias{loss}
-\alias{loss.tvcm}
+\alias{folds_control}
 \alias{oobloss}
 \alias{oobloss.tvcm}
-\alias{print.cvloss.tvcm}
 \alias{plot.cvloss.tvcm}
 
 \title{Model selection utility functions for \command{\link{tvcm}} objects.} 
@@ -25,14 +24,14 @@
 \method{prune}{tvcm}(tree, cp = NULL, alpha = NULL, maxstep = NULL,
       terminal = NULL, original = FALSE, ...)
 
+\method{prunepath}{tvcm}(tree, steps = 1L, ...)
+
+\method{cvloss}{tvcm}(object, folds = folds_control(), ...)
+
 folds_control(type = c("kfold", "subsampling", "bootstrap"),
       K = ifelse(type == "kfold", 5, 30),
       prob = 0.5, weights = c("case", "freq"),
       seed = NULL)
-
-\method{cvloss}{tvcm}(object, folds = folds_control(), ...)
-
-\method{print}{cvloss.tvcm}(x, ...)
 
 \method{plot}{cvloss.tvcm}(x, legend = TRUE, details = TRUE, ...)
 
@@ -42,29 +41,6 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
 
 \arguments{
   \item{object, tree}{an object of class \command{\link{tvcm}}.}
-  \item{x}{an object of class \code{cvloss.tvcm} as produced by
-    \command{\link{cvloss}}.} 
-  \item{type}{character string. The type of sampling scheme to be used
-    to divide the data of the input model in a learning and a validation
-    set.}    
-  \item{K}{integer scalar. The number of folds.} 
-  \item{prob}{numeric between 0 and 1. The probability for the
-    \code{"subsampling"} cross-validation scheme.}
-  \item{weights}{for \command{\link{folds_control}}, a character that
-    defines whether the weights of \code{object} are case weights or
-    frequencies of cases; for \command{\link{oobloss}}, a numeric vector
-    of weights corresponding to the rows of \code{newdata}.} 
-  \item{seed}{an numeric scalar that defines the seed.}
-  \item{folds}{a list with control arguments as produced by
-    \command{\link{folds_control}}.}
-  \item{legend}{logical scalar. Whether a legend should be added.}
-  \item{details}{logical scalar. Whether the foldwise validation errors 
-    should be shown.} 
-  \item{fun}{the loss function for the validation sets. By default, the
-    (possibly weighted) mean of the deviance residuals as defined by the
-    \command{\link{family}} of the fitted \code{object} is applied.}
-  \item{newdata}{a data.frame of out-of-bag data (including the response
-    variable). See also \command{\link{predict.tvcm}}.}
   \item{cp}{numeric scalar. The complexity parameter to be cross-validated 
     resp. the penalty with which the model should be pruned.}
   \item{alpha}{numeric significance level. Represents the stopping
@@ -78,30 +54,54 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
     be equal the number of partitions.}
   \item{original}{logical scalar. Whether pruning should be based on the
     trees from partitioning rather than on the current trees.}
+  \item{steps}{integer vector. The iteration steps from which
+    information should be extracted.}
+  \item{folds}{a list with control arguments as produced by
+    \command{\link{folds_control}}.}
+  \item{type}{character string. The type of sampling scheme to be used
+    to divide the data of the input model in a learning and a validation
+    set.}
+  \item{K}{integer scalar. The number of folds.} 
+  \item{weights}{for \command{\link{folds_control}}, a character that
+    defines whether the weights of \code{object} are case weights or
+    frequencies of cases; for \command{\link{oobloss}}, a numeric vector
+    of weights corresponding to the rows of \code{newdata}.}
+  \item{prob}{numeric between 0 and 1. The probability for the
+    \code{"subsampling"} cross-validation scheme.}
+  \item{seed}{an numeric scalar that defines the seed.}  
+  \item{x}{an object of class \code{cvloss.tvcm} as produced by
+    \command{\link{cvloss}}.}
+  \item{legend}{logical scalar. Whether a legend should be added.}
+  \item{details}{logical scalar. Whether the foldwise validation errors 
+    should be shown.}
+  \item{newdata}{a data.frame of out-of-bag data (including the response
+    variable). See also \command{\link{predict.tvcm}}.}
+  \item{fun}{the loss function for the validation sets. By default, the
+    (possibly weighted) mean of the deviance residuals as defined by the
+    \command{\link{family}} of the fitted \code{object} is applied.}
   \item{...}{other arguments to be passed.} 
 }
 
-\details{By default, \command{\link{tvcm}} is a two stage procedure that 
-  first grows overly large trees and second selects the best-sized trees by 
-  pruning. The here presented functions may be interesting for advanced users 
-  who want to process the model selection stage separately.
+\details{By default, \command{\link{tvcm}} processes tree-size selection 
+  in-built. The functions could be interesting for advanced users.
 
-  In normal practice, the \command{\link{prune}} function is used to collapse 
-  inner nodes of the tree structures by the tuning parameter \code{cp}. The 
-  aim of pruning by \code{cp} is to collapse inner nodes to minimize the 
-  cost-complexity criterion
+  The \command{\link{prune}} function is used to collapse inner nodes of
+  the tree structures by the tuning parameter \code{cp}. The aim of
+  pruning by \code{cp} is to collapse inner nodes to minimize the
+  cost-complexity criterion 
 
   \deqn{error(cp) = error(tree) + cp * complexity(tree)}
  
-  whereby, the training error \eqn{error(tree)} is defined by \code{lossfun} 
-  and \eqn{complexity(tree)} is defined as the total number of coefficients times
-  \code{dfpar} plus the total number of splits times \code{dfsplit}. The function
-  \code{lossfun} and the parameters \code{dfpar} and \code{dfsplit} are defined 
-  by the \code{control} argument of \command{\link{tvcm}}, see also 
-  \command{\link{tvcm_control}}. By default, \eqn{error(tree)} is minus two 
-  times the total likelihood of the model and \eqn{complexity(tree)} the number 
-  of splits. The minimization of \eqn{error(cp)} is implemented by the 
-  following iterative backward-stepwise algorithm 
+  where the training error \eqn{error(tree)} is defined by
+  \code{lossfun} and \eqn{complexity(tree)} is defined as the total
+  number of coefficients times \code{dfpar} plus the total number of
+  splits times \code{dfsplit}. The function \code{lossfun} and the
+  parameters \code{dfpar} and \code{dfsplit} are defined  by the
+  \code{control} argument of \command{\link{tvcm}}, see also
+  \command{\link{tvcm_control}}. By default, \eqn{error(tree)} is minus
+  two times the total likelihood of the model and \eqn{complexity(tree)}
+  the number of splits. The minimization of \eqn{error(cp)} is
+  implemented by the following iterative backward-stepwise algorithm 
 
   \enumerate{
   \item fit all \code{subtree} models that collapse one inner node of the 
@@ -116,7 +116,7 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   }
 
   The penalty \code{cp} is generally unknown and is estimated adaptively from 
-  the data. \command{\link{cvloss}} implements the cross-validation 
+  the data. The \command{\link{cvloss}} function implements the cross-validation 
   method to do this. \command{\link{cvloss}} repeats for each fold the following 
   steps
  
@@ -127,18 +127,26 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
     \code{cp} the average validation error.
   }
 
-  Doing so yields for each fold a  sequence of values for \code{cp} and a 
-  sequence of average validation errors. The obtained sequences for \code{cp} 
-  are combined to a fine grid and the average validation error is averaged 
-  correspondingly. From these two sequences we choose the \code{cp} that 
-  minimizes the validation error. Notice that the average validation error
-  is computed as the total prediction error of the validation set divided  
-  by the sum of validation set weights. See also the argument \code{ooblossfun} in 
-  \command{\link{tvcm_control}} and the function \command{\link{oobloss}}.
+  Doing so yields for each fold a sequence of values for \code{cp} and
+  a sequence of average validation errors. These sequences are then
+  combined to a finer grid and the average validation error is averaged 
+  correspondingly. From these two sequences we choose the \code{cp}
+  value that minimizes the validation error. Notice that the average
+  validation error is computed as the total prediction error of the
+  validation set divided  by the sum of validation set weights. See also
+  the argument \code{ooblossfun} in \command{\link{tvcm_control}} and
+  the function \command{\link{oobloss}}.
 
+  The \command{\link{prunepath}} function can be used to backtrack the
+  pruning algorithm. By default, it shows the results from collapsing
+  inner nodes in the first iteration. The interesting iteration(s) can
+  be selected by the \code{steps} argument. The output shows several
+  information on the performances when collapsing inner nodes. The node
+  labels shown in the output refer to the initial tree.
+  
   The function \command{\link{folds_control}} is used to specify the 
   cross-validation scheme, where a random 5-fold cross-validation scheme 
-  is set as the default. Alternatives are \code{type = "subsampling"} 
+  is used by default. Alternatives are \code{type = "subsampling"} 
   (random draws without replacement) and \code{type = "bootstrap"} (random 
   draws with replacement). For 2-stage models (with random-effects) 
   fitted by \command{\link{olmm}}, the subsets are based on subject-wise 
@@ -215,6 +223,13 @@ model <- tvcglm(y ~ vc(z1, z2, by = x1) + vc(z1, by = x2),
 cv <- cvloss(model, folds = folds_control(type = "kfold", K = 2, seed = 1))
 cv
 plot(cv)
+
+## prune model with estimated 'cp'
+model.p <- prune(model, cp = cv$cp.hat)
+
+
+## backtrack pruning
+prunepath(model.p, steps = 1:3)
 
 ## out-of-bag error
 oobloss(model, newdata = vcrpart_2[76:100,])

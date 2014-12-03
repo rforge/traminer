@@ -1,3 +1,12 @@
+Changes in Version 0.3-1
+
+    o    Improvements for 'prunepath' method. 
+
+    o    Moved documentation of 'prunepath' to 'tvcm-assessment'.
+
+    o    Added example for 'prune'.
+
+
 Changes in Version 0.2-3
 
     o    Added contr.wsum function
