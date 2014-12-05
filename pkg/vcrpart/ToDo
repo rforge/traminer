@@ -1,0 +1,4 @@
+- Check Gauss-Hermite integration points of the 'lme4' package
+- Check if 'ucminf' works again
+- Adopt prediction function for 'olmm' for prediction for in-sample individuals
+- Check nloptr package
