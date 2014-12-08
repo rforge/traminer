@@ -1,0 +1,39 @@
+06.12.2014
+° deleted unnecessary folder /R/examples/
+
+03.12.2014
+° export.internal.R created cataloguing all internal functions
+° trmatplot.default.R edited to check for numeric seed
+
+26.11.2014
+° renaming functions for objects of class "depmix.fitted" to begin with depmix.fitted
+° removing march.Dcmm specific arguments from depmix.fitted.trmatplot and trmatplot.default, and the trmatplot.Rd file
+° deleted trmatplot.R
+° .Rd file for march.Dcmm.trmatplot created
+
+° backed up all above changes
+
+° removing all march references and functions to build and check
+° renamed depmix.fitted.trmatplot to trmatplot.depmix.fitted
+
+24.11.2014
+° building package
+° check OK after depends changed to R(>=3.1.1) EXCEPT: type hstate and cspal
+° checking NAMESPACE and R/AllGenerics.R files before testing to build
+° failed to build: unknown NAMESPACE directive
+
+20.11.2014
+° /R/trmatplot.default.R added. Now includes all arguments (march.Dcmm too) and is called to by all other trmatplot functions. 
+° trmatplot now includes 'type' and 'hstate' arguments for march.Dcmm objects. .Rd file updated with description.
+
+18.11.2014
+° cspal option added to trmatplot. NAMESPACE, example and .Rd file all updated. 
+
+07.11.2014
+° example in trmatplot.Rd changed so that in the fourth example, when pfilter="tmax", num=2
+° added /R/AllGeneric.R which assigns method "trmatplot" to function "trmatplot"
+° NAMESPACE now exports method trmatplot for ojects of class "depmix.fitted"
+
+05.11.2014
+° colorspace hcl  cited in trmatplot.Rd file
+

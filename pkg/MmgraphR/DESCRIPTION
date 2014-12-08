@@ -1,0 +1,19 @@
+Package: MmgraphR
+Type: Package
+Title: Graphing for Markov Models and Hidden Markov Models
+Version: 0.1
+Date: 2014-10-24
+Authors@R: c( person("Pauline (Poulcheria)", "Adamopoulou", role = c("aut",
+    "cre", "cph"), email = "padamopo@gmail.com"), person("Gilbert",
+    "Ritschard", role = c("ths"), email = "gilbert.ritschard@unige.ch"), person
+    ("Andre", "Berchtold", role = c("ths"), email = "andre.berchtold@unil.ch"),
+    person ("Reto", "Buergin", role = c("ctb"), email = "rbuergin@gmx.ch"))
+Maintainer: Pauline (Poulcheria) Adamopoulou <padamopo@gmail.com>
+Description: Produces parallel coordinate plots of probability transition matrices from Markov and hidden Markov models.
+Depends:
+    R(>= 3.1.1)
+Imports:
+    TraMineR,
+    colorspace
+License: GPL(>= 2)
+LazyData: true
