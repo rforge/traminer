@@ -1,3 +1,11 @@
+09.12.2014
+° MmgraphR failed to build.
+° NAMESPACE changed to include full import of "colorspace" and "TraMineR"
+° DESCRIPTION changed to include "colorspace" and "TraMineR" in 'Depends'
+
+08.12.2014
+° Mmgraph deleted from and MmgraphR uploaded onto R-forge. Status: building.
+
 06.12.2014
 ° deleted unnecessary folder /R/examples/
 

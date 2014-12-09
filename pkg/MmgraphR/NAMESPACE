@@ -1,9 +1,10 @@
 export(trmatplot)
-importFrom(TraMineR,seqdef)
-importFrom(TraMineR,seqpcplot)
-importFrom(colorspace,rainbow_hcl)
-importFrom(colorspace,heat_hcl)
-importFrom(colorspace,terrain_hcl)
+import("TraMineR", "colorspace")
+#importFrom(TraMineR,seqdef)
+#importFrom(TraMineR,seqpcplot)
+#importFrom(colorspace,rainbow_hcl)
+#importFrom(colorspace,heat_hcl)
+#importFrom(colorspace,terrain_hcl)
 
 #Export method "trmatplot" for class "default"
 S3method(trmatplot, default)
