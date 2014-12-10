@@ -543,9 +543,10 @@ olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
 ##' -------------------------------------------------------- #
 
 olmm_decormat <- function(scores, subject, control = predecor_control()) {
-
+  
   stopifnot(inherits(control, "predecor_control"))
   Nmax <- max(table(subject))
+  
   ## estimate variances and covariances
   sVar <- olmm_scoreVar(scores, subject)
   sCovWin <- olmm_scoreCovWin(scores, subject)

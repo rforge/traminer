@@ -49,6 +49,13 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
+##' 2014-12-10: - added 'drop = FALSE' commands in 'tvcm_exsearch_nomToOrd'
+##'               which produced errors
+##'             - 'tvcm_getNumSplits' yielded sometimes more than 'maxnumsplit'
+##'               values. Now a random selection is applied for these cases
+##' 2014-12-09: implemented accurate search model. Involves changes in
+##'             'tvcm_formula', 'tvcm_grow_exsearch', 'tvcm_exsearch_dev'
+##'             and 'tvcm_control'.
 ##' 2014-11-11: modified transformation of nominal into ordinal variables
 ##'             to accelerate exhaustive search. There is now a function
 ##'             'tvcm_exsearch_nomToOrd'.
@@ -750,6 +757,10 @@ tvcm_getNumSplits <- function(z, w, minsize, maxnumsplit) {
 
     ## delete largest value
     rval <- rval[rval < maxz]
+
+    ## sometimes the while loop yields too many values ...
+    if (length(rval) > maxnumsplit)
+      rval <- sort(sample(rval, 9))
     
   } else {
 
@@ -1060,25 +1071,25 @@ tvcm_setsplits_splitnode <- function(splits, spart, snode, nodeid) {
 
 tvcm_setsplits_rselect <- function(splits, partid, nodeid, varid, control) {
 
-  ## get the node partitions
+  ## get the candidate node
   nodeidC <- nodeid
   for (pid in seq_along(partid))
     for (nid in seq_along(nodeid[[pid]]))
       if (all(sapply(splits[[pid]][[nid]], function(x) length(x) == 0L)))
         nodeidC[[pid]] <- setdiff(nodeidC[[pid]], nid)
 
-  ## get the partition candidates
+  ## get the candidate partitions
   partidC <- partid
   for (pid in seq_along(partid))
-    if (length(nodeidC[[pid]]) == 0L) setdiff(partidC, pid)
+    if (length(nodeidC[[pid]]) == 0L)
+      partidC <- setdiff(partidC, pid)
 
-  ## get variable candidates for each partition
+  ## get candidates variables for each partition
   varidC <- varid
   for (pid in seq_along(partid))
     for (vid in seq_along(varid[[pid]]))
       if (all(sapply(splits[[pid]], length) == 0L))
         varidC[[pid]] <- setdiff(varidC[[pid]], vid)
-
 
   ## random selections
   spart <- sort(sample(partidC, min(length(partidC), control$ptry)))
@@ -1089,9 +1100,9 @@ tvcm_setsplits_rselect <- function(splits, partid, nodeid, varid, control) {
   snode <- lapply(seq_along(nodeidC), function(pid) {
     s <- sample(length(nodeidC[[pid]]), min(length(nodeidC[[pid]]),control$vtry[pid]))
     return(nodeidC[[pid]][sort(s)])
-  })
+  })  
 
-  ## delete not selected nodes from 'splits'
+  ## delete unselected nodes
   for (pid in seq_along(partid)) 
     for (nid in seq_along(nodeid[[pid]])) 
       for (vid in seq_along(varid[[pid]])) 
@@ -1321,11 +1332,11 @@ tvcm_exsearch_nomToOrd <- function(cp, pid, nid, vid,
     cp <- tvcm_getOrdSplits(z[subs], weights[subs],
                             control$minsize[pid],
                             control$maxordsplit)
-    cp <- cp[, levels(partData[, vid])]
+    cp <- cp[, levels(partData[, vid]),drop=FALSE]
   } else {
 
     ## avoid splitting (better solution?)
-    cp <- cp[-(1:nrow(cp)), ]
+    cp <- cp[-(1:nrow(cp)),,drop=FALSE]
   }
   attr(cp, "type") <- "coef"
 
@@ -1335,7 +1346,9 @@ tvcm_exsearch_nomToOrd <- function(cp, pid, nid, vid,
 
 tvcm_exsearch_dev <- function(cutpoint, 
                               pid, nid, vid, 
-                              model, modelNuis, nuisance,
+                              model, start,
+                              modelNuis, startNuis, 
+                              nuisance,
                               where, partData, 
                               control, loss0, mfName) {
       
@@ -1347,28 +1360,37 @@ tvcm_exsearch_dev <- function(cutpoint,
   } else {
     zs <- z %in% levels(z)[cutpoint > 0L]            
   }
-  model[[mfName]]$Left <- 1 * (subs & zs)
-  model[[mfName]]$Right <- 1 * (subs & !zs)
-  parm <- grep("Left", names(coef(model)), value = TRUE)
-  
-  ## fit the 'update' model
+
+  if (control$fast) {
+    model[[mfName]]$Left <- 1 * (subs & zs)
+    model[[mfName]]$Right <- 1 * (subs & !zs)
+  } else {
+    model[[mfName]][subs & zs, paste("Node", LETTERS[pid], sep = "")] <- "Left"
+    model[[mfName]][subs & !zs, paste("Node", LETTERS[pid], sep = "")] <- "Right"
+    model[[mfName]][!subs, paste("Node", LETTERS[pid], sep = "")] <-
+      as.integer(droplevels(where[[pid]][!subs]))
+  }
+  model$coefficients <- vcrpart_copy(start)
   model <- tvcm_grow_update(model, control)
+  rval <- rep(NA, 2L)
   
   if (!inherits(model, "try-error")) {
-    rval <- c((loss0 - control$lossfun(model)),
-              length(coef(model)[grep("Left", names(coef(model)))]) -
-              length(nuisance))
+    rval[1L] <- loss0 - control$lossfun(model)
+    rval[2L] <- length(coef(model)[grep("Right", names(coef(model)))])
     if (is.null(modelNuis)) {
       return(rval)
     } else {
       modelNuis[[mfName]]$Left <- 1 * (subs & zs)
       modelNuis[[mfName]]$Right <- 1 * (subs & !zs)
+      modelNuis$coefficients <- vcrpart_copy(startNuis)
       modelNuis <- tvcm_grow_update(modelNuis, control)
       rval[1L] <- rval[1L] - (loss0 - control$lossfun(modelNuis))
+      rval[2L] <- rval[2L] -
+        length(coef(modelNuis)[grep("Right", names(coef(modelNuis)))])
       return(rval)
-    }  
+    } 
   } else {
-    return(c(NA, NA))        
+    return(rval)        
   }
 }
 
@@ -1385,40 +1407,66 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
 
   mcall$data <- eval(mcall$data, environment(mcall))
   w <- weights(model)
-  mcall$offset <- predict(model, type = "link")
+
+  if (control$fast)
+      mcall$offset <- predict(model, type = "link")
+  
   if (inherits(model, "glm")) {
     mcall$x <- TRUE
     mcall$y <- TRUE
     mcall$model <- TRUE
   } else if (inherits(model, "olmm")) {
-    mcall$restricted <- grep("ranefCholFac", names(coef(model)), value = TRUE)
-    mcall$start <- coef(model)[mcall$restricted]
+    if (control$fast) {
+      mcall$restricted <- grep("ranefCholFac", names(coef(model)), value = TRUE)
+      mcall$start <- coef(model)[mcall$restricted]
+    }
   }
 
-  ff <- tvcm_formula(formList, rep.int(FALSE, length(partid)), 
+  if (control$fast) {
+    root <- rep.int(FALSE, length(partid))
+  } else {
+    root <- sapply(nodes, width) == 1
+  }
+  
+  ff <- tvcm_formula(formList, root, 
                      eval(mcall$family, environment(mcall)),
-                     environment(mcall), full = FALSE, update = TRUE)
+                     environment(mcall), full = FALSE,
+                     update = TRUE, fast = control$fast)
+
   Left <- sample(c(0, 1), nobs(model), replace = TRUE)
   Right <- Left - 1
+  Node <- lapply(where, function(x) {
+    levs <- c("Left", "Right", seq(1, nlevels(x) - 1, length.out = nlevels(x) - 1))
+    return(factor(rep(levs, length.out = length(x)), levels = levs))
+  })
   
   for (pid in seq_along(partid)) { 
     if (length(unlist(splits[[pid]])) > 0L) {
      
       mcall$formula <- ff$update[[pid]][[1L]]
+
       mcall$data$Left <- Left
-      mcall$data$Right <- Right 
+      mcall$data$Right <- Right      
+      mcall$data[, paste("Node", LETTERS[pid], sep = "")] <- Node[[pid]]
+
       sModel <- tvcm_grow_fit(mcall, doFit = FALSE)
-      sModel$coefficients[grepl("Left", names(sModel$coefficients))] <- 0.0
-      sModel$coefficients[grepl("Right", names(sModel$coefficients))] <- 0.0
+      sStart <- vcrpart_copy(sModel$coefficients)
+      sStart[intersect(names(sStart), names(coef(model)))] <-
+        coef(model)[intersect(names(sStart), names(coef(model)))]
+      
       sModel$control <- model$control
       
       if (length(control$nuisance[[pid]]) == 0L) {
         sModelN <- NULL
+        sNStart <- NULL
       } else {
         mcallN <- mcall
+        mcallN$offset <- predict(model, type = "link")
         mcallN$formula <- ff$update[[pid]][[2L]]
         sModelN <- tvcm_grow_fit(mcallN, doFit = FALSE)
-        sModelN$coefficients[] <- 0.0
+        sNStart <- sModelN$coefficients
+        sNStart[intersect(names(sNStart), names(coef(model)))] <-
+          coef(model)[intersect(names(sNStart), names(coef(model)))]
         sModelN$control <- model$control
       } 
       
@@ -1451,11 +1499,13 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
                           pid = partid[pid],
                           nid = nodeid[[partid[pid]]][nid],
                           vid = varid[[partid[pid]]][vid],
-                          model = sModel, modelNuis = sModelN,
+                          model = sModel, start = sStart,
+                          modelNuis = sModelN, startNuis = sNStart,
                           nuisance = control$nuisance[[pid]],
                           where = where, partData = partData,
                           control = control, loss0 = loss0,
                           mfName = mfName)
+
               if (is.matrix(st)) st <- t(st) else st <- matrix(st, ncol = 1L)
               splits[[pid]][[nid]][[vid]][[2L]][subs] <- st[, 1L]
               splits[[pid]][[nid]][[vid]][[3L]][subs] <- st[, 2L]
@@ -1649,8 +1699,9 @@ tvcm_grow_splitnode <- function(nodes, where, dev, partData, step, weights) {
 
 tvcm_formula <- function(formList, root, family = cumulative(),
                          env = parent.frame(),
-                         full = TRUE, update = FALSE) {
+                         full = TRUE, update = FALSE, fast = TRUE) {
 
+    
   yName <- rownames(attr(terms(formList$original), "factors"))[1L]
 
   ## puts the predictors for fixed effects and varying effects
@@ -1689,8 +1740,7 @@ tvcm_formula <- function(formList, root, family = cumulative(),
       rval <- paste(rval, paste(feTerms, collapse = "+"), sep = "")
     if (rval != "" && inherits(family, "family.olmm"))
       rval <- paste(effect, "(", rval, ")", sep = "")
-
-    
+   
     return(c(vcTerms, feTerms))
   }
   
@@ -1774,6 +1824,10 @@ tvcm_formula <- function(formList, root, family = cumulative(),
   ## update formulas
   
   fUpdate <- NULL
+
+  feCeTerms <- getTerms(formList, "ce", rep(FALSE, length(root)), family)
+  feGeTerms <- getTerms(formList, "ge", rep(FALSE, length(root)), family)
+  
   if (update) {
 
     ## get nuisance terms
@@ -1786,25 +1840,39 @@ tvcm_formula <- function(formList, root, family = cumulative(),
     for (pid in seq_along(fUpdate)) {
       fUpdate[[pid]] <- vector("list", 2L)
       nLab <- paste("Node", LETTERS[pid], sep = "")
-      
+
+      if (fast) {
+        feIntTmp <- "none"
+        feCeTmp <- feCeTerms[grep(nLab, feCeTerms)]
+        feGeTmp <- feGeTerms[grep(nLab, feGeTerms)]
+        feCeTmp <- c(gsub(nLab, "Left", feCeTmp), gsub(nLab, "Right", feCeTmp))
+        feGeTmp <- c(gsub(nLab, "Left", feGeTmp), gsub(nLab, "Right", feGeTmp))
+      } else {
+        rootTmp <- root
+        rootTmp[pid] <- FALSE
+        feIntTmp <- formList$fe$intercept
+        if (!is.null(vcInt) && any(direct) && rootTmp[direct])
+          feIntTmp <- "ce"
+        feCeTmp <- getTerms(formList, "ce", rootTmp, family)
+        feGeTmp <- getTerms(formList, "ge", rootTmp, family)         
+      }
+
       ## full formula
-      feCeTmp <- feCeTerms[grep(nLab, feCeTerms)]
-      feCeTmp <- c(gsub(nLab, "Left", feCeTmp), gsub(nLab, "Right", feCeTmp))
-      feGeTmp <- feGeTerms[grep(nLab, feGeTerms)]
-      feGeTmp <- c(gsub(nLab, "Left", feGeTmp), gsub(nLab, "Right", feGeTmp))
       fUpdate[[pid]][[1L]] <-
-        getForm(yName,feCeTmp,feGeTmp,"none",reForm, family, env)
+          getForm(yName,feCeTmp,feGeTmp,feIntTmp,reForm, family, env)
       
-      ## null formula
+      ## null formula (always use approximative model, even if fast = FALSE)
       feCeTmp <- feCeTerms[grep(nLab, feCeTerms)]
-      feCeTmp <- feCeTmp[grep(nLab, feCeTmp)]
       feCeTmp <- intersect(feCeTmp, nuisance[[pid]])
-      feCeTmp <- c(gsub(nLab, "Left", feCeTmp), gsub(nLab, "Right", feCeTmp))
+      
       feGeTmp <- feGeTerms[grep(nLab, feGeTerms)]
-      feGeTmp <- feGeTmp[grep(nLab, feGeTmp)]
       feGeTmp <- intersect(feGeTmp, nuisance[[pid]])
+
+      feCeTmp <- c(gsub(nLab, "Left", feCeTmp), gsub(nLab, "Right", feCeTmp))
       feGeTmp <- c(gsub(nLab, "Left", feGeTmp), gsub(nLab, "Right", feGeTmp))
-      fUpdate[[pid]][[2L]] <- getForm(yName,feCeTmp,feGeTmp,"none",reForm,family, env)
+           
+      fUpdate[[pid]][[2L]] <-
+          getForm(yName,feCeTmp,feGeTmp,"none",reForm,family, env)
     }
   }
   return(list(full = fFull, update = fUpdate))

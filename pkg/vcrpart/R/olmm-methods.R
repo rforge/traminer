@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-10-24
+##' Date:            2014-12-08
 ##'
 ##' Description:
 ##' methods for olmm objects.
@@ -40,6 +40,7 @@
 ##' weights:     Weights
 ##'
 ##' Modifications:
+##' 2014-12-07: - add argument 'center' to 'predecor_control'
 ##' 2014-10-24: - improve simulate.olmm
 ##'             - improved 'estfun.olmm' call in 'gefp.olmm'
 ##' 2014-10-23: - fix bug in predict.olmm
@@ -157,20 +158,21 @@ deviance.olmm <- function(object, ...) return(-as.numeric(2.0 * logLik(object)))
 
 
 predecor_control <- function(impute = TRUE, seed = NULL,
-                             symmetric = TRUE,  reltol = 1e-6,
-                             maxit = 250L, minsize = 1L, 
+                             symmetric = TRUE, center = FALSE,
+                             reltol = 1e-6, maxit = 250L, minsize = 1L, 
                              verbose = FALSE, silent = FALSE) {
   stopifnot(is.logical(impute) && length(impute) == 1L)
   stopifnot(is.null(seed) | is.numeric(seed) && length(seed) == 1L)
   stopifnot(is.logical(symmetric) && length(symmetric) == 1L)
+  stopifnot(is.logical(center) && length(center) == 1L)
   stopifnot(is.numeric(reltol) && reltol > 0 && length(reltol) == 1L)
   stopifnot(is.numeric(maxit) && maxit > 0 && length(maxit) == 1L)
   stopifnot(is.numeric(minsize) && minsize > 0 && length(minsize) == 1L)
   stopifnot(is.logical(verbose) && length(verbose) == 1L)
   stopifnot(is.logical(silent) && length(silent) == 1L)
   return(structure(list(impute = impute, seed = seed, 
-                        symmetric = symmetric, reltol = reltol,
-                        maxit = maxit, minsize = minsize, 
+                        symmetric = symmetric, center = center,
+                        reltol = reltol, maxit = maxit, minsize = minsize, 
                         verbose = verbose, silent = silent),
                    class = "predecor_control"))
 }
@@ -214,12 +216,12 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
   attr <- list() # default attributes
 
   scores <- x$score_obs
-  subsImp <- rep.int(FALSE, nrow(scores))
 
   if (control$verbose) cat("OK")
   
   ## impute data
-  
+
+  subsImp <- rep.int(FALSE, nrow(scores))  
   if (predecor && any(Ni != Nmax)) {
     
     Nimpute <- Nmax - Ni
@@ -251,21 +253,21 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
     x$eta <- rbind(x$eta, matrix(0.0, sum(Nimpute), x$dims["nEta"]))
     x$score_obs <- rbind(x$score_obs, matrix(0.0, sum(Nimpute), x$dims["nPar"]))    
 
-    ## simulate responses
-    if (control$impute) {
-      
-      if (control$verbose) cat("\n* impute scores ... ")
-      
-      ## set seed
-      if (!is.null(control$seed)) set.seed(control$seed)
+    ## simulate responses      
+    if (control$verbose) cat("\n* impute scores ... ")
+    
+    ## set seed
+    if (!is.null(control$seed)) set.seed(control$seed)
 
+    if (control$impute) {
+    
       ## impute predictors
       times <- Nimpute[x$subject[!subsImp]]
       rows <- unlist(tapply(1:sum(Ni), x$subject[!subsImp], function(x) sample(x, times[x[1L]], replace = TRUE)))
       x$frame[subsImp,] <- x$frame[rows,,drop=FALSE]
       x$X[subsImp, ] <- x$X[rows,,drop=FALSE]
       x$W[subsImp, ] <- x$W[rows,,drop=FALSE]
-
+      
       ## draw responses
       subsW <- c(rep(which(attr(xOld$W, "merge") == 1L), x$dims["nEta"]),
                  which(attr(xOld$W, "merge") == 2L))
@@ -280,15 +282,16 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
         ordered(apply(probs, 1L, function(x) sample(yLevs, 1L, prob = x)), yLevs)
       
       ## recompute scores
-      .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")
-
-      scores <- 0.0 * x$score_obs
-      scores[!subsImp, ] <- x$score_obs[!subsImp,,drop=FALSE]
-      
-      if (control$verbose) cat("OK")
+      .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")      
     }
-  }
+    
+    scores <- x$score_obs
 
+    if (control$center && max(abs(cSums <- colSums(scores))) > 1e-6)
+      scores <- scores -
+        matrix(cSums / nrow(scores), nrow(scores), ncol(scores), byrow = TRUE)
+  }
+  
   ## drop the nuisance coefficients
   scores <- scores[, parm, drop = FALSE]
   

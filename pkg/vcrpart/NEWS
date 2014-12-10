@@ -6,6 +6,15 @@ Changes in Version 0.3-1
 
     o    Added example for 'prune'.
 
+    o    Internal changes in 'estfun.olmm' and new argument 'center' for 
+         the function 'predecor_control'
+
+    o    New argument 'fast' for 'tvcm_control' to control whether an
+         approximative or the accurate model at exhaustive search
+
+    o    Corrected bugs in 'tvcm_exsearch_nomToOrd' and 'tvcm_getNumSplits' 
+         which appeared in in special cases
+
 
 Changes in Version 0.2-3
 

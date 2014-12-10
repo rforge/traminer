@@ -18,7 +18,8 @@ estfun.olmm(x, predecor = FALSE, control = predecor_control(),
             nuisance = NULL, ...)
 
 predecor_control(impute = TRUE, seed = NULL, 
-                 symmetric = TRUE, reltol = 1e-6,
+                 symmetric = TRUE, center = FALSE,
+                 reltol = 1e-6,
                  maxit = 250L, minsize = 1L,
                  verbose = FALSE, silent = FALSE)
 

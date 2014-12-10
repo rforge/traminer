@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2014-10-23
+##' Date:        2014-12-08
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -13,9 +13,11 @@
 ##' tvcm            the main fitting function
 ##' tvcm_control    control function for 'tvcm'
 ##'
-##' all functions are documented as *.Rd files
-##'
 ##' Last modifications:
+##' 2014-12-08: - enable 'sctest = FALSE' in 'tvcolmm_control'
+##'             - remove checks on length of argument list, which is
+##'               not necessary because R assigns the argument names
+##'               automatically
 ##' 2014-11-05: - set seed at start of 'tvcm' and re-establish old seed
 ##'               at the end
 ##' 2014-10-23: - improved extraction of fitting arguments (see 'fitargs')
@@ -78,9 +80,10 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE, minsize = 50,
 
   mc <- match.call()
   mc[[1L]] <- as.name("tvcm_control")
-  if (!"minsize" %in% names(mc) & length(mc) < 7L)
+  if (!"minsize" %in% names(mc))
     mc$minsize <- formals(tvcolmm_control)$minsize
-  mc$sctest <- TRUE
+  if (!"sctest" %in% names(mc))
+    mc$sctest <- TRUE
   return(eval.parent(mc))
 }
 
@@ -90,13 +93,11 @@ tvcglm <- function(formula, data, family,
                    control = tvcglm_control(), ...) { 
     mc <- match.call()
     mc[[1L]] <- as.name("tvcm")
-    if (!"control" %in% names(mc) &
-        (length(mc) < 9L |
-         length(mc) >= 9L && !inherits(eval.parent(mc[[4L]]), "tvcm_control")))
-        mc$control <- formals(tvcglm)$control
+    if (!"control" %in% names(mc))
+      mc$control <- formals(tvcglm)$control
     mc$fit <- "glm"
     return(eval.parent(mc))
-}
+  }
 
 
 tvcglm_control <- function(minsize = 30, mindev = 2.0,
@@ -339,11 +340,11 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                          trim = 0.1, estfun.args = list(), nimpute = 5, 
                          maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
                          maxstep = 1e3, maxwidth = 1e9, maxdepth = 1e9,
-                         lossfun = neglogLik2, ooblossfun = NULL,
+                         lossfun = neglogLik2, ooblossfun = NULL, fast = TRUE,
                          cp = 0.0, dfpar = 0.0, dfsplit = 1.0, 
                          cv = !sctest, folds = folds_control("kfold", 5),
                          prune = cv, papply = mclapply, papply.args = list(),
-                         center = TRUE, seed = NULL, verbose = FALSE, ...) {
+                         center = fast, seed = NULL, verbose = FALSE, ...) {
   mc <- match.call()
   
   ## check available arguments
@@ -370,6 +371,8 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
   stopifnot(is.function(lossfun))
   stopifnot(is.null(ooblossfun) | is.function(ooblossfun))
 
+  stopifnot(is.logical(fast) && length(fast) == 1L)
+  
   stopifnot(is.numeric(cp) && length(cp) == 1L)
   stopifnot(is.numeric(dfpar) && length(dfpar) == 1L)
   stopifnot(is.numeric(dfsplit) && length(dfsplit) == 1L)
@@ -439,6 +442,7 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                 maxdepth = as.integer(maxdepth),
                 lossfun = lossfun,
                 ooblossfun = ooblossfun,
+                fast = fast,
                 cp = cp,
                 dfpar = dfpar,
                 dfsplit = dfsplit,

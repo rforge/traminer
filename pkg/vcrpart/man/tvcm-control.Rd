@@ -14,11 +14,11 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
              trim = 0.1, estfun.args = list(), nimpute = 5, 
              maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
              maxstep = 1e3, maxwidth = 1e9, maxdepth = 1e9,
-             lossfun = neglogLik2, ooblossfun = NULL,
+             lossfun = neglogLik2, ooblossfun = NULL, fast = TRUE,
              cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
              cv = !sctest, folds = folds_control("kfold", 5),
              prune = cv, papply = mclapply, papply.args = list(),
-             center = TRUE, seed = NULL, verbose = FALSE, ...)
+             center = fast, seed = NULL, verbose = FALSE, ...)
 }
 
 \arguments{
@@ -48,6 +48,11 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
   \item{ooblossfun}{a loss function that defines how to compute the
     validation error during cross-validation. The function will be
     assigned to the \code{fun} argument of \command{\link{oobloss}}.}
+  \item{fast}{logical scalar. Whether the approximative model should be
+    used to search for the next split. The approximative search model
+    uses the fitted values of the current model as offsets and estimates
+    only the coefficients of the added split. If \code{FALSE}, the
+    accurate search model is used.}
   \item{cp}{numeric scalar. The penalty to be multiplied with the
     complexity of the model during partitioning. The complexity of the
     model is defined as the number of coefficients times \code{dfpar}
