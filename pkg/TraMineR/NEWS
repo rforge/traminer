@@ -1,6 +1,10 @@
 ## =========
 Version 1.9-9 (Development version)
 
+Changes in existing functions:
+  - seqpm(): New sep argument to allow searching for string patterns when 
+    states are not labelled with single characters.
+
 Bug fixes:
   - seqformat(): fixed error occurring when converting from STS to TSE
     with a tevent matrix containing empty strings (i.e. "")
