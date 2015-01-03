@@ -26,8 +26,9 @@
 
 \source{The data are tabulated in Hartzel et al. (2001).}
 
-\references{Hartzel, J., Agresti A. and Caffo, B. (2001). Multinomial
-  Logit Random Effect Models, \emph{Statistical Modelling} \bold{1}:
-  81--102} 
+\references{
+  Hartzel, J., A. Agresti and B. Caffo (2001). Multinomial Logit Random
+  Effect Models, \emph{Statistical Modelling} \bold{1}(2), 81--102.
+}  
 
 \keyword{datasets}

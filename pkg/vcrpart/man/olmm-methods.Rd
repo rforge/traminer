@@ -125,18 +125,18 @@
 \author{Reto Buergin}
 
 \references{
-  Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data}, 10
-  edn, Wiley.
+  Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data} (2
+  ed.), Wiley.
 
   Tutz, G. (2012). \emph{Regression for Categorical Data}, Cambridge
   Series in Statistical and Probabilistic Mathematics.
   
-  Li, C. and Sheperd, B. E. (2012). A new residual for ordinal
-  outcomes, \emph{Biometrika} \bold{99} (2): 437-480
+  Li, C. and B. E. Sheperd (2012). A New Residual for Ordinal
+  Outcomes, \emph{Biometrika}, \bold{99}(2), 437-480.
 
-  Bates D, Maechler M, Bolker BM and Walker S (2014). lme4: 
-  Linear mixed-effects models using Eigen and S4. Submitted to 
-  \emph{Journal of Statistical Software}
+  Bates, D., M. Maechler, B. M. Bolker and S. Walker (2014). lme4: 
+  Linear Mixed-Effects Models Using Eigen and S4. Submitted to 
+  \emph{Journal of Statistical Software}.
 }
 
 \seealso{\command{\link{olmm}}, \command{\link{predict.olmm}},

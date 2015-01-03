@@ -81,25 +81,24 @@ tvcm(formula, data, fit, family,
 }
 
 \references{
-  Zeileis, A., Hothorn, T., and Hornik, K. (2008). Model-Based
+  Zeileis, A., T. Hothorn, and K. Hornik (2008). Model-Based
   Recursive Partitioning. \emph{Journal of Computational and Graphical
     Statistics}, \bold{17}(2), 492--514.
 
-  Wang, J. C., Hastie, T. (2014), Boosted Varying-Coefficient
+  Wang, J. C. and T. Hastie (2014), Boosted Varying-Coefficient
   Regression Models for Product Demand Prediction, \emph{Journal of
-    Computational and Graphical Statistics}, \bold{23}, 361--382.
+    Computational and Graphical Statistics}, \bold{23}(2), 361--382.
   
-  Torsten Hothorn, Achim Zeileis (2014). partykit: A Modular Toolkit
-  for Recursive Partytioning in R. Working Paper 2014-10. \emph{Working 
-  Papers in Economics and Statistics, Research Platform Empirical and
-  Experimental Economics, Universitaet Innsbruck}. URL
-  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2014-10} 
+  Hothorn, T. and A. Zeileis (2014). partykit: A Modular Toolkit
+  for Recursive Partytioning in R. In \emph{Working Papers in Economics
+  and Statistics, Research Platform Empirical and Experimental
+  Economics}, Number 2014-10. Universitaet Innsbruck.
   
-  Buergin R. and Ritschard G. (2014a), Tree-based varying coefficient
-  regression for longitudinal ordinal responses. Article in progress. 
+  Buergin R. and G. Ritschard (2014b), Tree-Based Varying Coefficient
+  Regression for Longitudinal Ordinal Responses. Article in progress. 
   
-  Buergin R. and Ritschard G. (2014b), Coefficient-wise tree-based
-  varying coefficient regression with vcrpart. Article in progress.
+  Buergin R. and G. Ritschard (2014c), Coefficient-Wise Tree-Based
+  Varying Coefficient Regression with vcrpart. Article in progress.
 }
 
 \seealso{\command{\link{tvcolmm}}, \command{\link{tvcglm}},

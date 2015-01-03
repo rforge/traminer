@@ -72,14 +72,14 @@
 \author{Reto Buergin}
 
 \references{
-  Leo Breiman (1996). Bagging Predictors. \emph{Machine Learning},
-  123--140
+  Breiman, L. (1996). Bagging Predictors. \emph{Machine Learning},
+  \bold{24}(2), 123--140.
   
-  Leo Breiman (2001). Random Forests. \emph{Machine Learning},
+  Breiman, L. (2001). Random Forests. \emph{Machine Learning},
   \bold{45}(1), 5--32.
-
-  T. Hastie, R. Tibshirani, J. Friedman (2001), The elements of
-  statistical learning, Springer.
+  
+  Hastie, T., R. Tibshirani and J. Friedman (2001), The Elements of 
+  Statistical Learning (2 ed.), Springer-Verlag.
 }
 
 \seealso{\command{\link{fvcm}}, \command{\link{tvcm-methods}}}

@@ -34,7 +34,7 @@
 
 \source{\url{http://tigger.uic.edu/~hedeker/ml.html}}
 
-\references{Hedeker, D. and Gibbons, R. (2006). Longitudinal Data
+\references{Hedeker, D. and R. Gibbons (2006). Longitudinal Data
   Analysis. Wiley, Palo Alto, CA.}
 
 \keyword{datasets}

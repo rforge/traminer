@@ -116,13 +116,13 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
 \author{Reto Buergin and Gilbert Ritschard}
 
 \references{
-  Reto Buergin and Gilbert Ritschard, G. (2014). A decorated parallel
-  coordinate plot for categorical longitudinal data, \emph{The American
-    Statistician} \bold{68}: 98-103
+  Buergin, R. and G. Ritschard (2014a). A Decorated Parallel Coordinate 
+  Plot for Categorical Longitudinal Data, \emph{The American
+  Statistician} \bold{68}(2): 98--103. 
 
-  Ross Ihaka, Paul Murrell, Kurt Hornik, Jason C. Fisher, Achim Zeileis (2013). 
+  Ihaka, R., P. Murrell, K. Hornik, J. C. Fisher and A. Zeileis (2013).
   colorspace: Color Space Manipulation. R package version 1.2-4. URL
-  \url{http://CRAN.R-project.org/package=colorspace}
+  \url{http://CRAN.R-project.org/package=colorspace}.
 }
 
 \examples{

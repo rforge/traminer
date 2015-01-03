@@ -191,11 +191,12 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
 }
 
 \references{
-  Breiman, L., Friedman, J.H., Olshen, R.A. and Stone, C.J. (1984) 
-  \emph{Classification and Regression Trees}. Wadsworth.
+  Breiman, L., J. H. Friedman, R. A. Olshen and C.J. Stone (1984)  
+  \emph{Classification and Regression Trees}. Volume 19. The Wadsworth
+  Statistics / Probability Series.
 
-  T. Hastie, R. Tibshirani, J. Friedman (2001), The elements of
-  statistical learning, Springer.
+  Hastie, T., R. Tibshirani and J. Friedman (2001), The Elements of 
+  Statistical Learning (2 ed.), Springer-Verlag.
 }
 
 \seealso{

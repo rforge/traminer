@@ -7,24 +7,27 @@ Changes in Version 0.3-1
     o    Added example for 'prune'.
 
     o    Internal changes in 'estfun.olmm' and new argument 'center' for 
-         the function 'predecor_control'
+         the function 'predecor_control'.
 
     o    New argument 'fast' for 'tvcm_control' to control whether an
-         approximative or the accurate model at exhaustive search
+         approximative or the accurate model at exhaustive search.
 
     o    Corrected bugs in 'tvcm_exsearch_nomToOrd' and 'tvcm_getNumSplits' 
-         which appeared in in special cases
+         which appeared in in special cases.
 
+    o    Improved help manual for 'tvcglm' and 'tvcolmm'.
+
+    o    Revised references.
 
 Changes in Version 0.2-3
 
-    o    Added contr.wsum function
+    o    Added contr.wsum function.
 
-    o    Added 'seed' argument to 'otsplot_control'
+    o    Added 'seed' argument to 'otsplot_control'.
 
-    o    Internal changes for exhaustive search of 'tvcm'
+    o    Internal changes for exhaustive search of 'tvcm'.
 
-    o    Improved documentation
+    o    Improved documentation.
 
 
 Changes in Version 0.2-2
@@ -49,7 +52,7 @@ Changes in Version 0.2-2
 
     o    Added 'nimpute' argument for 'tvcm_control'.
 
-    o    Added detail section to the help page of 'tvcm_control'
+    o    Added detail section to the help page of 'tvcm_control'.
 
     o    Removed AIC table from 'print.tvcm' (AIC and BIC seem not
          relevant measures for models fitted by 'tvcm').
@@ -67,7 +70,7 @@ Changes in Version 0.2-1
     o    First CRAN release.
 
     o    'tvcm' and 'fvcm' allow for multiple 'vc' terms, i.e. 
-         coefficient-specific partitions
+         coefficient-specific partitions.
 
     o    Complete revision of syntaxes, argument names and  default 
          parameters. R commands for the former version 0.1-14 are 
@@ -78,7 +81,7 @@ Changes in Version 0.2-1
          (old) coefficient constancy tests combined with greedy loss 
          minimization to (new) exhaustive greedy loss minimization. Splitting 
          based on the (old) requires to set the argument 'sctest = TRUE' in 
-         'tvcm_control'
+         'tvcm_control'.
 
      o	 The greedy loss reduction minimization stage of 'tvcm' does now 
          fixate coefficients which are not splitted at the estimates of 

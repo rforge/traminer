@@ -7,10 +7,10 @@
 \alias{fvcglm}
 \alias{fvcglm_control}
 
-\title{Bagging and random forests based on \command{\link{tvcm}}}
+\title{Bagging and Random Forests based on \command{\link{tvcm}}}
 
 \description{
-  Bagging (Breiman, 1996) and random forest (Breiman, 2001) ensemble
+  Bagging (Breiman, 1996) and Random Forest (Breiman, 2001) ensemble
   algorithms for \command{\link{tvcm}}.
 }
 
@@ -70,8 +70,8 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
 }
 
 \details{
-  Implements the \emph{bagging} (Breiman, 1996) and \emph{random
-  forests} (Breiman, 2001) ensemble algorithms for
+  Implements the \emph{Bagging} (Breiman, 1996) and \emph{Random
+  Forests} (Breiman, 2001) ensemble algorithms for
   \command{\link{tvcm}}. The method consist in growing multiple trees by
   using \command{\link{tvcm}} and aggregating the fitted coefficient
   functions in the scale of the predictor function. To enable bagging,
@@ -102,14 +102,14 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
 \author{Reto Buergin}
 
 \references{
-  Leo Breiman (1996). Bagging Predictors. \emph{Machine Learning},
-  123--140
+  Breiman, L. (1996). Bagging Predictors. \emph{Machine Learning},
+  \bold{24}(2), 123--140.
   
-  Leo Breiman (2001). Random Forests. \emph{Machine Learning},
+  Breiman, L. (2001). Random Forests. \emph{Machine Learning},
   \bold{45}(1), 5--32.
 
-  T. Hastie, R. Tibshirani, J. Friedman (2001), The elements of
-  statistical learning, Springer.
+  Hastie, T., R. Tibshirani and J. Friedman (2001), The Elements of 
+  Statistical Learning (2 ed.), Springer-Verlag.
 }
 
 \seealso{\command{\link{fvcm-methods}}, \command{\link{tvcm}}, 

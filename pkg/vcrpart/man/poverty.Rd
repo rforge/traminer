@@ -72,13 +72,13 @@
 
 \source{VLV survey, see also \url{http://cigev.unige.ch/recherches/vlv.html}}
 
-\references{Ludwig, C., Cavalli, S. and Oris,
-  M. \sQuote{Vivre/Leben/Vivere}: An interdisciplinary survey addressing 
+\references{Ludwig, C., S. Cavalli and M. Oris
+  \sQuote{Vivre/Leben/Vivere}: An interdisciplinary survey addressing
   progress and inequalities of ageing over the past 30 years in
-  Switzerland. \emph{Archives of Gerontology and Geriatrics}. 
+  Switzerland. \emph{Archives of Gerontology and Geriatrics}.  
   
-  Gabriel, R., Oris, M. Studer, M. and Baeriswyl, M. The persistance of
-  social stratification? Submitted.
+  Gabriel, R., M. Oris, M. Studer and M. Baeriswyl (2014). The
+  Persistance of Social Stratification? Submitted.
 } 
 
 \keyword{datasets}

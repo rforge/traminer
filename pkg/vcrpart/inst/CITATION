@@ -5,29 +5,29 @@ p2 <- person("Gilbert", "Ritschard", email = "gilbert.ritschard@unige.ch")
 
 citEntry(entry="unpublished",
   author = personList(p1, p2),
-  title = "Coefficient-wise tree-based varying coefficient regression with vcrpart",
+  title = "Coefficient-Wise Tree-Based Varying Coefficient Regression with vcrpart",
   year = "2014",
   note = "Article in progress",
-  textVersion = "B\u00FCrgin R. and Ritschard G. (2014b), Coefficient-wise tree-based varying coefficient regression with vcrpart. Article in progress."
+  textVersion = "B\u00FCrgin, R. and G. Ritschard (2014c), Coefficient-Wise Tree-Based Varying Coefficient Regression with vcrpart. Article in progress."
 )
 
 citEntry(entry="unpublished",
   author = personList(p1, p2),
-  title = "Tree-based varying-coefficient regression for longitudinal ordinal responses",
+  title = "Tree-Based Varying-Coefficient Regression for Longitudinal Ordinal Responses",
   year = "2014",
   note = "Article in progress",
-  textVersion = "B\u00FCrgin R. and Ritschard G. (2014a), Tree-based varying coefficient regression for longitudinal ordinal responses. Article in progress."
+  textVersion = "B\u00FCrgin, R. and G. Ritschard (2014b), Tree-Based Varying Coefficient Regression for Longitudinal Ordinal Responses. Article in progress."
 )
 
 citEntry(entry="article",
   author = personList(p1, p2),
-  title = "A decorated parallel coordinate plot for categorical longitudinal data",
+  title = "A Decorated Parallel Coordinate Plot for Categorical Longitudinal Data",
   journal = "The American Statistician",
   year = "2014",
   volume = "68",
-  pages = "98-103",
+  pages = "98--103",
   number = "2",
-  textVersion="B\u00FCrgin, R. & Ritschard, G. (2014), A decorated parallel coordinate plot for categorical longitudinal data, The American Statistician 68(2), 98-103.",
+  textVersion="B\u00FCrgin, R. and G. Ritschard (2014a), A Decorated Parallel Coordinate Plot for Categorical Longitudinal Data, The American Statistician 68(2), 98-103.",
 )
 
 citFooter("See",sQuote("citation()"),"for citing R itself.")

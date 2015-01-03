@@ -178,30 +178,30 @@ olmm(formula, data, family = cumulative(),
 \author{Reto Buergin}
 
 \references{
-  Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data}, 10
-  edn, Wiley.
+  Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data} (2
+  ed.), Wiley.
   
-  Hartzel, J., Agresti A. and Caffo, B. (2001). Multinomial Logit Random
-  Effect Models, \emph{Statistical Modelling} \bold{1}: 81--102
+  Hartzel, J., A. Agresti and B. Caffo (2001). Multinomial Logit Random
+  Effect Models, \emph{Statistical Modelling} \bold{1}(2), 81--102.
   
-  Hedeker, D. and Gibbons, R. (1994). A random-effects ordinal
-  regression model for multilevel analysis, \emph{Biometrics} \bold{20}
-  (4): 933--944
+  Hedeker, D. and R. Gibbons (1994). A Random-Effects Ordinal
+  Regression Model for Multilevel Analysis, \emph{Biometrics}
+  \bold{20}(4), 933--944. 
 
-  Tutz, G. and Hennevogl W. (1996). Random effects in ordinal regression 
-  models, \emph{Computational Statistics & Data Analysis} \bold{22} (5):
-  537--557
+  Tutz, G. and W. Hennevogl (1996). Random Effects in Ordinal Regression 
+  Models, \emph{Computational Statistics & Data Analysis} \bold{22}(5),
+  537--557. 
 
   Tutz, G. (2012). \emph{Regression for Categorical Data}, Cambridge
   Series in Statistical and Probabilistic Mathematics.
 
-  Frederick Novomestky (2012). matrixcalc: Collection of functions for 
-  matrix calculations. R package version 1.0-3. URL 
+  Novomestky, F. (2012). matrixcalc: Collection of Functions for 
+  Matrix Calculations. R package version 1.0-3. URL 
   \url{http://CRAN.R-project.org/package=matrixcalc}
 
-  Gordon Smyth, Yifang Hu, Peter Dunn, Belinda Phipson and Yunshun Chen 
-  (2014). statmod: Statistical Modeling. R package version 1.4.20. 
-  URL \url{http://CRAN.R-project.org/package=statmod}
+  Smyth, G., Y. Hu, P. Dunn, B. Phipson and Y. Chen (2014). statmod:
+  Statistical Modeling. R package version 1.4.20. URL
+  \url{http://CRAN.R-project.org/package=statmod} 
 }
 
 \seealso{\command{\link{olmm-methods}}, \command{\link{olmm_control}},

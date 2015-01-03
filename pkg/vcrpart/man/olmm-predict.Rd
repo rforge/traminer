@@ -61,6 +61,12 @@
 
 \author{Reto Buergin}
 
+\references{
+  Skrondal, A., S. Rabe-Hesketh (2009). Prediction in multilevel
+  generalized linear models. \emph{Journal of the Royal Statistical
+  Society: Series A (Statistics in Society)}, \bold{172}(3), 659--687.  
+}
+
 \seealso{\command{\link{olmm}}, \command{\link{olmm-methods}}}
 
 \examples{

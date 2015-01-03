@@ -8,14 +8,14 @@
 
 \description{The \command{\link{tvcglm}} function implements the
   tree-based varying coefficient regression algorithm for generalized
-  linear models introduced by Buergin and Ritschard (2014b). The
+  linear models introduced by Buergin and Ritschard (2014c). The
   algorithm approximates varying coefficients by piecewise constant
   functions using recursive partitioning, i.e., it estimates the
-  coefficients of the model separately for strata of the value space of
-  partitioning variables. The special feature of the algorithm is to
-  assign each varying coefficient a partition, which enhances the
-  possibilities for model specification and to select moderator
-  variables individually by coefficient
+  selected coefficients individually by strata of the value space of
+  partitioning variables. The special feature of the provided algorithm
+  is that it allows building for each varying coefficient an individual
+  partition, which enhances the possibilities for model specification
+  and to select partitioning variables individually by coefficient.
 }
 
 \usage{
@@ -32,11 +32,19 @@ tvcglm_control(minsize = 30, mindev = 2.0,
 \arguments{
   \item{formula}{a symbolic description of the model to fit, e.g.,
 
-    \code{y ~ vc(z1, \ldots, zL, by = x1 + \ldots + xP) + re(1|id)}
+    \code{y ~ vc(z1, z2, z3) + vc(z1, z2, by = x1) + vc(z2, z3, by = x2)}
     
-    where \code{vc} term specifies the varying fixed coefficients. Only
-    one such \code{vc} term is allowed. For details,
-    see \command{\link{olmm}} and \command{\link{vcrpart-formula}}.}
+    where the \code{vc} terms specify the varying fixed
+    coefficients. The unnamed arguments within \code{vc} terms are
+    interpreted as partitioning variables (i.e., moderators). The
+    \code{by} argument specifies the associated predictor variable. If
+    no such predictor variable is specified (e.g., see the first term in
+    the above example formula), the \code{vc} term is interpreted as a
+    varying intercept, i.e., an nonparametric estimate of the direct
+    effect of the partitioning variables. For details, see
+    \command{\link{vcrpart-formula}}. Note that the global intercept may
+    be removed by a \code{-1} term, according to the desired
+    interpretation of the model.} 
   \item{family}{the model family. An object of class
     \command{\link{family.olmm}}.}   
   \item{data}{a data frame containing the variables in the model.}
@@ -75,29 +83,30 @@ tvcglm_control(minsize = 30, mindev = 2.0,
 }
 
 \details{
-  The TVCGLM algorithm uses two stages. The first stage (partitioning)
-  builds too overly fine partitions and the second stage (pruning)
-  selects the best-sized partitions by collapsing inner nodes. For the
-  second stage, which is automatically processed, we refer to
-  \command{\link{tvcm-assessment}}. The partitioning stage iterates the
-  following steps:
+  \command{\link{tvcglm}} processes two stages. The first stage, called 
+  partitioning stage, builds overly fine partitions for each \code{vc}
+  term; the second stage, called pruning stage, selects the best-sized
+  partitions by collapsing inner nodes. For details on the pruning
+  stage, see \command{\link{tvcm-assessment}}. The partitioning stage
+  iterates the following steps: 
 
   \enumerate{
     \item Fit the current generalized linear model
 
     \code{y ~ NodeA:x1 + \ldots + NodeK:xK}
     
-    with \command{\link{glm}}, where \code{NodeK} is a categorical
-    variable with terminal node labels \code{1}, \ldots for the
-    \eqn{K}-th varying coefficient. 
+    with \command{\link{glm}}, where \code{Nodek} is a categorical
+    variable with terminal node labels for the \eqn{k}-th varying
+    coefficient. 
 
-    \item Search and globally optimal split among the candidate
-    splits by exhaustive -2 likelihood training error grid search,
-    by cycling through all partitions, nodes and moderator variables. 
+    \item Search the globally best split among the candidate splits by
+    an exhaustive -2 likelihood training error search that cycles
+    through all possible splits.
 
-    \item If the -2 likelihood training error reduction through the best
+    \item If the -2 likelihood training error reduction of the best
     split is smaller than \code{mindev} or there is no candidate split
-    satisfying the minimum node size \code{minsize}, stop the algorithm.
+    satisfying the minimum node size \code{minsize}, stop the
+    algorithm. 
 
     \item Else incorporate the best split and repeat the procedure.
   }
@@ -108,6 +117,10 @@ tvcglm_control(minsize = 30, mindev = 2.0,
   (a minimum node size of 30) and \code{mindev = 2} (the training error
   reduction of the best split must be larger than two to continue).
 
+  The algorithm implements a number of split point reduction methods to
+  decrease the computational complexity. See the arguments
+  \code{maxnomsplit}, \code{maxordsplit} and \code{maxnumsplit}.
+
   The algorithm can be seen as an extension of CART (Breiman et. al.,
   1984) and PartReg (Wang and Hastie, 2014), with the new feature that
   partitioning can be processed coefficient-wise.
@@ -117,20 +130,22 @@ tvcglm_control(minsize = 30, mindev = 2.0,
 }
 
 \references{
-  Breiman, L., Friedman, J.H., Olshen, R.A. and Stone, C.J. (1984) 
-  \emph{Classification and Regression Trees}. Wadsworth.
+  Breiman, L., J. H. Friedman, R. A. Olshen and C.J. Stone (1984)  
+  \emph{Classification and Regression Trees}. Volume 19. The Wadsworth
+  Statistics / Probability Series.
   
   Wang, J. C., Hastie, T. (2014), Boosted Varying-Coefficient
   Regression Models for Product Demand Prediction, \emph{Journal of
-    Computational and Graphical Statistics}, \bold{23}, 361--382.
+    Computational and Graphical Statistics}, \bold{23}(2), 361--382. 
   
-  Buergin R. and Ritschard G. (2014b). Coefficient-wise tree-based
-  varying coefficient regression with vcrpart. Article in progress.
+  Buergin R. and G. Ritschard (2014c). Coefficient-Wise Tree-Based
+  Varying Coefficient Regression with vcrpart. Article in progress.
 }
 
 \seealso{\command{\link{tvcm_control}}, \command{\link{tvcm-methods}},
   \command{\link{tvcm-plot}}, \command{\link{tvcm-plot}},
-  \command{\link{tvcm-assessment}}, \command{\link{glm}}}
+  \command{\link{tvcm-assessment}}, \command{\link{fvcglm}},
+  \command{\link{glm}}} 
 
 \examples{
 ## ------------------------------------------------------------------- #  
