@@ -10,7 +10,7 @@ Changes in Version 0.3-1
          the function 'predecor_control'.
 
     o    New argument 'fast' for 'tvcm_control' to control whether an
-         approximative or the accurate model at exhaustive search.
+         approximative or the accurate model is used at exhaustive search.
 
     o    Corrected bugs in 'tvcm_exsearch_nomToOrd' and 'tvcm_getNumSplits' 
          which appeared in in special cases.

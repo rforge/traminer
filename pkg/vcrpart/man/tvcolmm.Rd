@@ -22,7 +22,8 @@ tvcolmm(formula, data, family = cumulative(),
         control = tvcolmm_control(), ...)
 
 tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
-                maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
+                maxnomsplit = 5, maxordsplit = 9,
+                maxnumsplit = 9, fast = TRUE,
                 trim = 0.1, estfun.args = list(), nimpute = 5,
                 seed = NULL, ...)
 }
@@ -65,7 +66,10 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
   \item{minsize}{numeric scalar. The minimum sum of weights in terminal
     nodes.}
   \item{maxnomsplit, maxordsplit, maxnumsplit}{integer scalars for split
-    candidate reduction. See \command{\link{tvcm_control}}}
+    candidate reduction. See \command{\link{tvcm_control}}.}
+  \item{fast}{logical scalar. Whether the approximative model should be
+    used to search for the next split. See
+    \command{\link{tvcm_control}}.}
   \item{trim}{numeric between 0 and 1. Specifies the trimming parameter
     in coefficient constancy tests for continuous partitioning
     variables. See also the argument \code{from} of function

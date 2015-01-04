@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2014-12-08
+##' Date:        2015-01-04
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -74,7 +74,8 @@ tvcolmm <- function(formula, data, family = cumulative(),
 
 
 tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE, minsize = 50,
-                            maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
+                            maxnomsplit = 5, maxordsplit = 9,
+                            maxnumsplit = 9, fast = TRUE,
                             trim = 0.1, estfun.args = list(), nimpute = 5,
                             seed = NULL, ...) {
 
