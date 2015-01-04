@@ -89,12 +89,10 @@ olmm(formula, data, family = cumulative(),
   
   For alternative fitting functions, see for example the 
   functions \code{clmm} of \pkg{ordinal},
-  \code{cumlogitRE} of package \pkg{glmmAK},
   \code{nplmt} of package \pkg{mixcat},
   \code{DPolmm} of package \pkg{DPpackage}, 
   \code{lcmm} of package \pkg{lcmm},
-  \code{MCMCglmm} of package \pkg{MCMCglmm},
-  \code{sabre} of package \pkg{sabreR} or
+  \code{MCMCglmm} of package \pkg{MCMCglmm} or
   \code{OrdinalBoost} of package \pkg{GMMBoost}. 
 
   The implementation adopts functions of the packages \pkg{statmod}

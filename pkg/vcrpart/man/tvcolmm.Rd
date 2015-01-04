@@ -10,7 +10,7 @@
   tree-based longitudinal varying coefficient regression algorithm
   proposed in Buergin and Ritschard (2014b). The algorithm approximates
   varying fixed coefficients in the cumulative logit mixed model by a
-  (multivariate) piecewise constant functions using recursive
+  (multivariate) piecewise constant function using recursive
   partitioning, i.e., it estimates the fixed effect component of the
   model separately for strata of the value space of partitioning
   variables. 
@@ -36,10 +36,10 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
     one such \code{vc} term is allowed with
     \command{\link{tvcolmm}} (in contrast to command{\link{tvcglm}}
     where multiple \code{vc} terms can be specified). The above example 
-    formula removes the global intercept and adds a locally varying
-    intercept, by adding a \code{-1} term and specfiying \code{intercept
-    = TRUE} in the \code{vc} term. If a varying intercept is desired, we
-    recommend to always remove the global intercept. For more details on
+    formula removes the global intercepts and adds locally varying
+    intercepts, by adding a \code{-1} term and specfiying \code{intercept
+    = TRUE} in the \code{vc} term. If varying intercepts are desired, we
+    recommend to always remove the global intercepts. For more details on
     the formula specification, see \command{\link{olmm}} and
     \command{\link{vcrpart-formula}}.}   
   \item{family}{the model family. An object of class
@@ -92,8 +92,8 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
     with \command{\link{olmm}}, where \code{Node} is a categorical
     variable with terminal node labels \code{1}, \ldots, \code{M}. 
 
-    \item Test for the constancy of the fixed effects \code{Node:x1,
-    \ldots} separately for each moderator \code{z1}, \ldots, \code{zL}
+    \item Test the constancy of the fixed effects \code{Node:x1,
+    \ldots}, separately for each moderator \code{z1}, \ldots, \code{zL}
     in each node \code{1}, \ldots, \code{M}. This yields \code{L} times
     \code{M} (possibly Bonferroni corrected) \eqn{p}-values for
     rejecting coefficient constancy.
@@ -102,7 +102,7 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
     then select the node and the variable corresponding to the minimum
     \eqn{p}-value. Search and incorporate the optimal
     among the candidate splits in the selected node and variable by
-    exhaustive likelihood maximization grid search.
+    exhaustive likelihood search.
     
     \item Else if minimum \eqn{p}-value is larger than \code{alpha},
     stop the algorithm and return the current model.
@@ -125,9 +125,13 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
   the technique of Hajjem et. al (2011) and Sela and Simonoff (2012) to
   incorporate regression trees into mixed models.
 
-  The algorithm implements a number of split point reduction methods to
-  decrease the computational complexity. See the arguments
-  \code{maxnomsplit}, \code{maxordsplit} and \code{maxnumsplit}.
+  For the exhaustive search, the algorithm implements a number of split
+  point reduction methods to decrease the computational complexity. See
+  the arguments \code{maxnomsplit}, \code{maxordsplit} and
+  \code{maxnumsplit}. By default, the algorithm also uses the
+  approximative search model approach proposed in Buergin and Ritschard
+  (2014c). To disable this option to use the original algorithm, set
+  \code{fast = FALSE} in \command{\link{tvcolmm_control}}.
 
   Special attention is given to varying intercepts, i.e. the terms that
   account for the direct effects of the moderators. A common
@@ -135,7 +139,9 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
 
   \code{y ~ -1 + vc(z1, \ldots, zL, by = x1 + \ldots + xP, intercept = TRUE) + re(1 + w1 + \ldots |id)}
 
-  Doing so replaces the globale intercept by local intercepts.
+  Doing so replaces the globale intercept by local intercepts. As
+  mentioned, if a varying intercepts are desired, we recommend to always
+  remove the global intercept. 
  }
 
 \value{An object of class \command{\link{tvcm}}
