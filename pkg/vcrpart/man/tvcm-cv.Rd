@@ -82,8 +82,9 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   \item{...}{other arguments to be passed.} 
 }
 
-\details{By default, \command{\link{tvcm}} processes tree-size selection 
-  in-built. The functions could be interesting for advanced users.
+\details{\command{\link{tvcglm}} and \command{\link{tvcm}} processe
+  tree-size selection by default. The functions could be interesting for
+  advanced users. 
 
   The \command{\link{prune}} function is used to collapse inner nodes of
   the tree structures by the tuning parameter \code{cp}. The aim of
