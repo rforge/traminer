@@ -1,4 +1,10 @@
-﻿                CHANGES IN TraMineRextras VERSION 0.3.3 [2014-09-15]
+﻿                CHANGES IN TraMineRextras VERSION 0.3.3 [2015-01-12]
+
+New function
+
+    o   seqtabstocc(): frequencies of state co-occurrence patterns 
+
+Changes in existing functions
 
     o   seqgranularity(): new method "mostfreq"
 

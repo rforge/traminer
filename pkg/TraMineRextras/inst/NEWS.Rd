@@ -1,6 +1,10 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 \section{Changes in version 0.3.3 [2014-09-15]}{
+\subsection{New functions}{
+  \itemize{
+    \item{\code{seqtabstocc()}: frequencies of state co-occurrence patterns}
+}}
 \subsection{Changes in existing functions}{
   \itemize{
     \item{\code{seqgranularity()}: new method \code{"mostfreq"}}
@@ -8,9 +12,7 @@
         and \code{TraMineR.legend} functions with respectively
         \code{TraMineRInternalSeqeage} and \code{TraMineRInternalLegend}
         (should be transparent to the end user).}
-}
-}
-}
+}}}
 \section{Changes in version 0.2.2 [2013-10-30]}{
 \itemize{
     \item{Fixed issue with calling Rinternals from within extern "C" {}
