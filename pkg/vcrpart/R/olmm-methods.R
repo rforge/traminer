@@ -571,26 +571,21 @@ predict.olmm <- function(object, newdata = NULL,
   } else {
     
     ## data preparation
-    if (is.matrix(ranef)) {
-      mfForm <- formList$all # whole equation
-    } else {
-      ## fixed effects only
-      getTerms <- function(x) attr(terms(x, keep.order = TRUE), "term.labels")
-      terms <- lapply(formList$fe$eta, getTerms)
-      if (length(unlist(terms)) > 0L) {
-        mfForm <- formula(paste("~", paste(unlist(terms), collapse = "+")))
-      } else {
-        mfForm <- ~ 1
-      }
-    }
+    mfForm <- formList$all
+    if (!object$subjectName %in% colnames(newdata) |
+        (is.logical(ranef) && ranef))
+      mfForm <- update(mfForm, paste(". ~ . -", object$subjectName))
     mf <- model.frame(object)
     Terms <- delete.response(terms(mfForm))
     xlevels <- .getXlevels(attr(mf, "terms"), mf)
     xlevels <- xlevels[names(xlevels) %in%  all.vars(Terms)]
     xlevels <- xlevels[names(xlevels) != object$subjectName]
+    
     newdata <- as.data.frame(model.frame(Terms, newdata,
                                          na.action = na.action,
-                                         xlev = xlevels))    
+                                         xlev = xlevels))
+
+    
     if (!is.null(cl <- attr(Terms, "dataClasses")))
       .checkMFClasses(cl, mf)   
  
@@ -604,44 +599,46 @@ predict.olmm <- function(object, newdata = NULL,
     if (is.null(offset))
       offset <- matrix(0.0, nrow(X), dims["nEta"])
     
-    if (is.logical(ranef) && ranef)
-      ranef <- matrix(0.0, nrow(X), dims["qEta"])      
-      
+    if (is.logical(ranef) && ranef) {
+      ranef <- matrix(0.0, nrow(X), ncol(object$u),
+                      dimnames = list(paste("New", 1:nrow(X), sep = ""),
+                        colnames(object$u)))
+      message("set random effects to 0.")
+    }
+
+    if (is.matrix(ranef) && ncol(ranef) != ncol(object$u)) 
+      stop("random effects matrix has wrong dimensions")
+    
     ## random effects
-    if (is.matrix(ranef)) {
-      if (!object$subjectName %in% colnames(newdata)) {
-        stop(paste("column '", object$subjectName,
-                   "' not found in the 'newdata'.", sep = ""))
-      } else {
-        subject <- factor(newdata[, object$subjectName])
+    if (object$subjectName %in% colnames(newdata)) {
+
+      subject <- factor(newdata[, object$subjectName])
+      
+      if (is.matrix(ranef)) {
+        if (any(!levels(subject) %in% rownames(ranef))) {
+          stop(paste("random effects missing for subjects",
+                     paste(setdiff(levels(subject), rownames(ranef)),
+                           collapse = ", ")))
+        }
+        ranef <- ranef[rownames(ranef) %in% levels(subject),,drop = FALSE]
       }
       
-      ## extract model formulas
-      W <- olmm_merge_mm(model.matrix(terms(formList$re$eta$ce, keep.order = TRUE),
-                                      newdata, attr(object$W, "contrasts")),
-                         model.matrix(terms(formList$re$eta$ge, keep.order = TRUE),
-                                      newdata, attr(object$W, "contrasts")),
-                                      FALSE)
-      rownames(W) <- rownames(newdata)
-      
-      ## check entered random effects
-      if (any(dim(ranef) != c(nlevels(subject), nrow(object$ranefCholFac))))
-        stop("'ranef' matrix has wrong dimensions")
-      
-      if (any(!levels(subject) %in% rownames(ranef))) {
-        stop(paste("random effects missing for subjects",
-                   paste(setdiff(levels(subject), rownames(ranef)),
-                         collapse = ", ")))
-      } else {
-        ranef <- ranef[levels(subject),, drop = FALSE]
-      }
-      
+      subject <- factor(subject, levels = unique(c(levels(object$subject),
+                                   levels(subject))))
+        
     } else {
 
-      ## set random effects to zero
-      W <- matrix(0.0, nrow(X), dims["q"])
-      subject <- factor(rep.int(1L, nrow(W)))
+      subject <- factor(paste("New", 1:nrow(X), sep = ""))
+      
     }
+          
+    ## extract model formulas
+    W <- olmm_merge_mm(model.matrix(terms(formList$re$eta$ce, keep.order = TRUE),
+                                    newdata, attr(object$W, "contrasts")),
+                       model.matrix(terms(formList$re$eta$ge, keep.order = TRUE),
+                                    newdata, attr(object$W, "contrasts")),
+                       FALSE)
+    rownames(W) <- rownames(newdata)
   }
   
   if (!is.null(subset)) {
@@ -650,8 +647,7 @@ predict.olmm <- function(object, newdata = NULL,
     if (!is.null(subject)) subject <- subject[subset]
     offset <- offset[subset,,drop = FALSE]
     if (is.matrix(ranef))
-      ranef <- ranef[sort(unique(as.integer(subject))), , drop = FALSE]
-    if (!is.null(subject)) subject <- factor(subject)
+      ranef <- ranef[rownames(ranef) %in% levels(subject), , drop = FALSE]
   }
 
   yLevs <- levels(object$y)
@@ -663,13 +659,29 @@ predict.olmm <- function(object, newdata = NULL,
     ## predict marginal ...
     if (is.logical(ranef) && !ranef & type %in% c("response", "class")) {
 
-      probs <- matrix(0, nrow(X), ncol(eta) + 1L)
-      colnames(probs) <- levels(object$y)
-      rownames(probs) <- rownames(X)
-      .Call("olmm_pred_marg", object, eta, W, nrow(X), probs, PACKAGE = "vcrpart")
+      if (any(subject %in% levels(object$subject))) {
+
+        ## cluster-averaged expectation (works also if person is not present)
+        probs <- matrix(0, nrow(X), ncol(eta) + 1L)
+        colnames(probs) <- levels(object$y)
+        rownames(probs) <- rownames(X)
+        .Call("olmm_pred_margNew", object, eta, W, subject,
+              nrow(X), probs, PACKAGE = "vcrpart")
+        
+      } else {
+        
+        ## population-averaged expectation 
+        probs <- matrix(0, nrow(X), ncol(eta) + 1L)
+        colnames(probs) <- levels(object$y)
+        rownames(probs) <- rownames(X)
+        .Call("olmm_pred_marg", object, eta, W, nrow(X), probs,
+              PACKAGE = "vcrpart")
+
+      }
+
       
     } else {
-      ## or conditional probabilities (or linear predictor)
+      ## or conditional expected probabilities (or linear predictor)
 
       subsW <- c(rep(which(attr(W, "merge") == 1L), dims["nEta"]),
                  which(attr(W, "merge") == 2L))
@@ -679,7 +691,8 @@ predict.olmm <- function(object, newdata = NULL,
       ## extend linear predictor
       if (is.matrix(ranef))
         eta <- eta +
-          (W[, subsW,drop = FALSE] * ranef[as.integer(subject),,drop=FALSE]) %*% tmatW
+          (W[, subsW,drop = FALSE] *
+           ranef[as.character(subject),,drop=FALSE]) %*% tmatW
       rownames(eta) <- rownames(X)
       colnames(eta) <- colnames(object$eta)
         

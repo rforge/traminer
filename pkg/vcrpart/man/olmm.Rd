@@ -216,7 +216,7 @@ olmm(formula, data, family = cumulative(),
 data(schizo)
 
 model.10.3.1 <-
-  olmm(imps79o ~ tx + sqrt(week) + tx * sqrt(week) + re(1|id),
+  olmm(imps79o ~ tx + sqrt(week) + re(1|id),
        data = schizo, family = cumulative())
 
 summary(model.10.3.1)

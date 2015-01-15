@@ -808,9 +808,13 @@ SEXP olmm_update_u(SEXP x) {
  * ---------------------------------------------------------
  * Marginal predicition.
  *    
- * @param  x a olmm object
- * @param  p a matrix
-
+ * @param  x the 'olmm' object
+ * @param  eta the linear predictor of the values to predict
+ * @param  W the random coefficients design matrix of the
+ *    the values to predict
+ * @param  n the number of observations to predict
+ * @param  pred the prediction matrix
+ *
  * @return R_NilValue
  * ---------------------------------------------------------
  */
@@ -920,5 +924,175 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
   }
   Free(etaRanef);
   Free(predCond);
+  return R_NilValue;
+}
+
+
+SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew, 
+		       SEXP nNew, SEXP pred) {
+  
+  double *retaNew = REAL(etaNew), *rWNew = REAL(WNew), 
+    *rpred = REAL(pred);
+  int *rsubjectNew = INTEGER(subjectNew);
+  const int rnNew = INTEGER(nNew)[0];
+  
+  /* get subject slot */  
+  SEXP subject_0 = getListElement(x, "subject"), subject_1;
+  PROTECT(subject_1 = coerceVector(subject_0, INTSXP));
+
+  /* get response variable slot */
+  SEXP y_0 = getListElement(x, "y"), y_1;
+  PROTECT(y_1 = coerceVector(y_0, INTSXP));
+
+  /* integer valued slots and pointer to factor valued slots */
+  int *y = INTEGER(y_1), *subject = INTEGER(subject_1),
+    *dims = DIMS_SLOT(x);
+  R_CheckStack();
+  
+  /* numeric valued objects */
+  double *ranefCholFac = RANEFCHOLFAC_SLOT(x),
+    *ghw = GHW_SLOT(x), *ghx = GHX_SLOT(x), *eta = ETA_SLOT(x),
+    *W = W_SLOT(x), *logLik_sbj = LOGLIKSBJ_SLOT(x);
+  R_CheckStack();
+
+  /* set constants (dimensions of vectors etc.) */
+  const int q = dims[q_POS], qEta = dims[qEta_POS], 
+    qCe = dims[qCe_POS], qGe = dims[qGe_POS],
+    J = dims[J_POS], N = dims[N_POS], n = dims[n_POS], 
+    nEta = dims[nEta_POS], nQP = dims[nQP_POS], 
+    family = dims[fTyp_POS], link = dims[lTyp_POS];
+  
+  /* variables for matrix operations etc. */
+  int i1 = 1;
+  double one = 1.0, zero = 0.0, 
+    gq_weight = 1, sumBL = 0.0,
+    logLikCond_obs, lTmp;
+  
+  /* define internal objects */
+  double *etaRanefNew = Calloc(rnNew * nEta, double),
+    *etaRanef = Calloc(n * nEta, double),
+    *logLikCond_sbj = Calloc(rnNew, double),
+    *gq_nodes = Alloca(q, double),
+    *predCond = Calloc(rnNew * J, double),
+    *ranefVec = Alloca(q, double),
+    *ranef = Alloca(qEta * nEta, double);
+  R_CheckStack();
+  
+  AllocVal(rpred, rnNew * J, zero);
+
+  for (int k = 0; k < nQP; k++) {
+    
+    AllocVal(predCond, rnNew * J, zero);
+    AllocVal(logLikCond_sbj, rnNew, zero);
+
+    /* prepare integration nodes and weights */    
+    for (int i = 0; i < q; i++) {
+      gq_nodes[i] = ghx[nQP * i + k];
+      gq_weight *= ghw[nQP * i + k];
+    }
+    gq_weight = log(gq_weight);
+
+    /* multiply ranefCholFac with actual nodes */
+    F77_CALL(dgemv)("N", &q, &q, &one, ranefCholFac, &q, 
+		    gq_nodes, &i1, &zero, ranefVec, &i1);
+
+    /* ranefVec (vector) to ranef (matrix) */
+    for (int i = 0; i < nEta; i++) {
+      Memcpy(ranef + i * qEta, ranefVec + i * qCe, qCe);
+      Memcpy(ranef + i*qEta + qCe, ranefVec + qCe*nEta, qGe);
+    }
+
+    /* set predictor-invariant random effects of adjacent-category models 
+       to use the Likelihood of the baseline-category model */
+    if (family == 3) {
+      for (int i = 0; i < qGe; i++) {
+	for (int j = 0; j < nEta; j++) {
+	  ranef[(qCe + qGe) * j + qCe + i] *=
+	    J - j - 1; 
+	}
+      }
+    }
+
+    /* compute contribution of random effects to linear predictor */
+
+    /* observation in model */
+    F77_CALL(dgemm)("N", "N", &n, &nEta, &qEta, &one, W, &n, 
+		    ranef, &qEta, &zero, etaRanef, &n);
+    /* new observations */
+    F77_CALL(dgemm)("N", "N", &rnNew, &nEta, &qEta, &one, rWNew, &rnNew, 
+		    ranef, &qEta, &zero, etaRanefNew, &rnNew);
+
+    /* approximate marginal probabilities .................. */
+
+    for (int i = 0; i < rnNew; i++) {
+
+      /* compute conditional probability */
+      
+      for (int i2 = 0; i2 < n; i2++) {
+	
+	logLikCond_obs = 0;	 	  
+	if (subject[i2] == rsubjectNew[i]) {	  
+
+	  switch (family) {
+	  case 1: 
+	    for (int j = 0; j < J; j++) {
+	      if (y[i2] - 1 == j) {
+		logLikCond_obs = log(olmm_GLink(j < (J - 1) ? eta[n * j + i2] + etaRanef[n * j + i2] : DBL_MAX, link) - olmm_GLink(j > 0 ? eta[n * (j - 1) + i2] + etaRanef[n * (j - 1) + i2] : -DBL_MAX, link));
+		logLikCond_sbj[i] += logLikCond_obs;
+	      }
+	    }
+	    break;
+	  case 2: case 3:
+	    sumBL = 0;
+	    for (int j = 0; j < nEta; j++)
+	      sumBL += exp(eta[n * j + i2] + etaRanef[n * j + i2]);
+	    logLikCond_obs = -log(1.0 + sumBL);
+	    if (y[i2] < J)
+	      logLikCond_obs += eta[n * (y[i2] - 1) + i2] + 
+		etaRanef[n * (y[i2] - 1) + i2];
+	    logLikCond_sbj[i] += logLikCond_obs;
+	    break;
+	  }
+	}
+      }
+      
+      for (int j = 0; j < J; j++) {
+	
+	/* compute conditional prediction */
+	switch (family) {
+	case 1:
+	  predCond[rnNew * j + i] = 
+	    log(olmm_GLink(j < (J - 1) ? retaNew[rnNew * j + i] + etaRanefNew[rnNew * j + i] : DBL_MAX, link) - olmm_GLink(j > 0 ? retaNew[rnNew * (j - 1) + i] + etaRanefNew[rnNew * (j - 1) + i] : -DBL_MAX, link));
+	  break;
+	case 2: case 3:
+	  sumBL = 0;
+	  for (int l = 0; l < nEta; l++)
+	    sumBL += exp(retaNew[rnNew * l + i] + etaRanefNew[rnNew * l + i]);
+	  predCond[rnNew * j + i] = -log(1.0 + sumBL);
+	  if (j < (J - 1))
+	    predCond[rnNew * j + i] += 
+	      retaNew[rnNew * j + i] + etaRanefNew[rnNew * j + i];
+	  break;
+	}
+      }
+    }
+    
+    for (int i = 0; i < rnNew; i++) {
+      for (int j = 0; j < J; j++) {
+	lTmp = rsubjectNew[i] < N ? logLik_sbj[rsubjectNew[i] - 1] : 0;
+	rpred[rnNew * j + i] += 
+	  exp(predCond[rnNew * j + i] + gq_weight + logLikCond_sbj[i] - lTmp);
+      }
+    }
+
+    gq_weight = 1; /* reset integration weight */
+    
+  }
+
+  Free(logLikCond_sbj);
+  Free(etaRanef);
+  Free(etaRanefNew);
+  Free(predCond);
+  UNPROTECT(2);
   return R_NilValue;
 }
