@@ -30,6 +30,9 @@ dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
   This method is, in some way, a generalization of \code{\link{dissassoc}} to account for several explanatory variables.
   The function computes the part of discrepancy explained by the list of covariates specified in the \code{formula}.
   It provides for each covariate the Type-II effect, i.e. the effect measured when removing the covariate from the full model with all variables included.
+  As of TraMiner version 1.8.9, the degree of freedom have been corrected. The within sum of squares were previously divided by (n-m-1) (as explained in \cite{Studer et al., 2011}) instead of (n-m), with n 
+	being the sample size and m the number of groups (Reported by Vicente Ponsoda).
+  
   For a single factor \code{dissmfac} is slower than \code{\link{dissassoc}}.
   Moreover, the latter performs also tests for homogeneity in within-group discrepancies (equality of variances) with a generalization of Levene's and Bratlett's statistics.
 
