@@ -13,6 +13,7 @@
 ##'
 ##'
 ##' Modifications:
+##' 2015-01-15: - improved predict.olmm
 ##' 2014-09-25: - removed bug for numeric estimation of covariance of
 ##'               'olmm' objects
 ##'             - define 'score_sbj' and 'score_obs' slot even if
@@ -315,11 +316,6 @@ olmm <- function(formula, data, family = cumulative(),
       if (any(is.na(offset))) stop("'offset' contains NA's.")
       if (nrow(offset) != dims["n"]) stop("'offset' has wrong dimensions.")    
   }
-
-  ## set the transformed random effect matrix
-  u <- matrix(0, dims["N"], dims["q"],
-              dimnames = list(levels(subject),
-                colnames(parNames$ranefCholFac)))
   
   ## weights and nodes for the Gauss-Hermite quadrature integration
   if (hasRanef) {
@@ -386,6 +382,10 @@ olmm <- function(formula, data, family = cumulative(),
   xlevels <- .getXlevels(attr(fullmf, "terms"), fullmf)
   if (is.null(xlevels)) storage.mode(xlevels) <- "list"
 
+  ## set the transformed random effect matrix
+  u <- matrix(0, dims["N"], dims["q"],
+              dimnames = list(levels(subject), rownames(start$ranefCholFac)))                 
+  
   ## get terms and delete environments
   formList <- vcrpart_formula_delEnv(formList)
   terms <- list(feCe = terms(formList$fe$eta$ce, keep.order = TRUE),

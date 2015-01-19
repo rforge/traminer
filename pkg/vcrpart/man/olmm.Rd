@@ -231,7 +231,7 @@ summary(model.10.3.1)
 data(movie)
 
 ## model with category-specific effects for "review"
-model.24.1 <- olmm(critic ~  ce(review) + re(1|movie, intercept = "ce"),
+model.24.1 <- olmm(critic ~ ce(review) + re(1|movie, intercept = "ce"),
                    data = movie, family = adjacent())
 
 summary(model.24.1)

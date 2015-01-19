@@ -12,7 +12,7 @@ Description: Recursive partitioning for varying coefficient generalized linear m
 License: GPL (>= 2)
 Depends: R (>= 3.1.0), parallel, partykit
 Imports: stats, grid, graphics, methods, nlme, rpart, numDeriv, ucminf, zoo, sandwich, strucchange
-URL: http://vcrpart.wordpress.com, https://r-forge.r-project.org/projects/traminer/
+URL: http://vcrpart.wordpress.com
 LazyLoad: yes
 NeedsCompilation: yes
 Packaged: 2015-01-03 00:00:00 UTC; rbuergin

@@ -1,3 +1,10 @@
+Changes in Version 0.3-2
+
+    o    Corrected labels for random effects of 'olmm' objects.
+
+    o    Revision of the 'predict' method for 'olmm'. The new function 
+         implements the three prediction option of Skrondal and Rabe-Hesketh 2009.
+
 Changes in Version 0.3-1
 
     o    Improvements for 'prunepath' method. 

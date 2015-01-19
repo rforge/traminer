@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-12-08
+##' Date:            2014-01-16
 ##'
 ##' Description:
 ##' methods for olmm objects.
@@ -40,6 +40,7 @@
 ##' weights:     Weights
 ##'
 ##' Modifications:
+##' 2014-01-16: - improve 'predict.olmm' function
 ##' 2014-12-07: - add argument 'center' to 'predecor_control'
 ##' 2014-10-24: - improve simulate.olmm
 ##'             - improved 'estfun.olmm' call in 'gefp.olmm'
@@ -572,8 +573,7 @@ predict.olmm <- function(object, newdata = NULL,
     
     ## data preparation
     mfForm <- formList$all
-    if (!object$subjectName %in% colnames(newdata) |
-        (is.logical(ranef) && ranef))
+    if (!object$subjectName %in% colnames(newdata))
       mfForm <- update(mfForm, paste(". ~ . -", object$subjectName))
     mf <- model.frame(object)
     Terms <- delete.response(terms(mfForm))
@@ -584,7 +584,6 @@ predict.olmm <- function(object, newdata = NULL,
     newdata <- as.data.frame(model.frame(Terms, newdata,
                                          na.action = na.action,
                                          xlev = xlevels))
-
     
     if (!is.null(cl <- attr(Terms, "dataClasses")))
       .checkMFClasses(cl, mf)   
@@ -600,12 +599,25 @@ predict.olmm <- function(object, newdata = NULL,
       offset <- matrix(0.0, nrow(X), dims["nEta"])
     
     if (is.logical(ranef) && ranef) {
-      ranef <- matrix(0.0, nrow(X), ncol(object$u),
-                      dimnames = list(paste("New", 1:nrow(X), sep = ""),
-                        colnames(object$u)))
-      message("set random effects to 0.")
-    }
 
+      if (object$subjectName %in% colnames(newdata)) {
+        subjLevs <- unique(newdata[, object$subjectName])
+        ranef <- matrix(0.0, length(subjLevs), ncol(object$u),
+                        dimnames = list(subjLevs, colnames(object$u)))
+        if (!all(subjLevs %in% levels(object$subject)))
+          message(paste("set random effects of new subjects",
+                        paste(setdiff(subjLevs, levels(object$subject)),
+                              collapse = ", "), "to 0."))
+        ranef[intersect(rownames(ranef), rownames(object$u)), ] <-
+          ranef(object)[intersect(rownames(ranef), rownames(object$u)),,drop = FALSE]
+      } else {
+        message("set random effects of new subjects to 0.")
+        ranef <- matrix(0.0, nrow(X), ncol(object$u),
+                        dimnames = list(paste("New", 1:nrow(X), sep = ""),
+                          colnames(object$u)))
+      }
+    }
+    
     if (is.matrix(ranef) && ncol(ranef) != ncol(object$u)) 
       stop("random effects matrix has wrong dimensions")
     
