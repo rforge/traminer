@@ -1,4 +1,10 @@
 Changes in Version 0.3-2
+	
+    o    Changed a default definition for 'formula' of 'olmm'. Terms
+         which are not specified by 'ce' or 'ge' are now always assigned
+         to 'ge' terms. The old revision used a model specific assignement.
+         It is generally best to use the 'ce' and 'ge' terms to get
+         the desired model.
 
     o    Corrected labels for random effects of 'olmm' objects.
 

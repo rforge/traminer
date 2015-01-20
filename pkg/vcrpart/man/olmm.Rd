@@ -44,12 +44,12 @@ olmm(formula, data, family = cumulative(),
 
     where \code{ce(x1)} specifies that the predictor \code{x1} has a 
     category-specific i.e. non-proportional odds effect and
-    \code{ge(x2)} has global i.e. proportional odds fixed effect, see
-    \command{\link{ge}}, resp. \command{\link{ce}}. Random effects are
-    specified within the \command{\link{re}} term, where the variable
-    \code{id} above behind the vertical bar \code{|} defines  the
-    subject i.e. cluster factor. Notice that only one subject factor is 
-    allowed.}   
+    \code{ge(x2)} that the predictor \code{x2} has global
+    i.e. proportional odds fixed effect, see \command{\link{ge}},
+    resp. \command{\link{ce}}. Random effects are specified within the
+    \command{\link{re}} term, where the variable \code{id} above behind
+    the vertical bar \code{|} defines the subject i.e. cluster
+    factor. Notice that only one subject factor is allowed. See details.}   
   \item{data}{an optional data frame with the variables
     in \code{formula}. By default the variables are taken from the 
     environment from which \code{olmm} is called.}
@@ -98,7 +98,21 @@ olmm(formula, data, family = cumulative(),
   The implementation adopts functions of the packages \pkg{statmod}
   (Novomestky, 2012) and \pkg{matrixcalc} (Smyth et al., 2014), which 
   is not visible for the user. The authors are grateful for these
-  codes. 
+  codes.
+
+  The \code{formula} argument specifies the model to be
+  fitted. Categorical regression models distinguish between global
+  effects (or proportional-odds effects), which are defined with
+  \command{\link{ge}} terms, and category-specific effects, which are
+  defined by \command{\link{ce}} terms. For undefined terms, the
+  function will use \command{\link{ge}} terms. Notice that this default
+  does not necessarily yield interpretable outputs. For example, for the
+  \command{\link{baseline}} model you may use only \command{\link{ce}}
+  terms, and you have to specifiy this manually. For
+  \command{\link{cumulative}} models it is at present not possible to
+  specifiy \command{\link{ce}} for the random effects component because
+  the internal, unconstraint integration would yield unusable predictor
+  values. 
 }
 
 \value{\command{\link{olmm}} returns an object of class

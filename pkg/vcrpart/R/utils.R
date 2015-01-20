@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-11-10
+##' Date:            2015-20-01
 ##'
 ##' Description:
 ##' General utility functions for the 'vcrpart' package.
@@ -24,6 +24,7 @@
 ##'                         from vcrpart_formula.
 ##'
 ##' Last modifications:
+##' 2015-01-20: change defaults for random effect specification
 ##' 2014-11-10: exported function 'contr.wsum'
 ##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
 ##' 2014-09-07: added 'vcrpart_fitted' function to avoid replicated
@@ -46,7 +47,7 @@
 ##'             trees
 ##'
 ##' To do:
-##' - max export 'vcrpart_contr.sum' in future versions.
+##' - 
 ##' -------------------------------------------------------- #
 
 
@@ -361,12 +362,17 @@ vcrpart_formula_eta <- function(x, family, env) {
       if (x$type == "vc" && any(sapply(geTerms, checkOperators)))
         stop("the ':', '*' and '%in%' operators are not allowed for the 'by' ",
              "argument in 'vc' terms.")
+      ## This code distinguishes between the models and their random
+      ## effect specification. For the cumulative and the adjacent model,
+      ## use global effects, and for the cumulative model use category
+      ## specific effects
+      ## if (family$family %in% c("cumulative", "adjacent")) {
+      ##   geTerms <- c(geTerms, rval[!subsGe & !subsCe])
+      ## } else {
+      ##   ceTerms <- c(ceTerms, rval[!subsGe & !subsCe])
+      ## }
       
-      if (family$family %in% c("cumulative", "adjacent")) {
-        geTerms <- c(geTerms, rval[!subsGe & !subsCe])
-      } else {
-        ceTerms <- c(ceTerms, rval[!subsGe & !subsCe])
-      }
+      geTerms <- c(geTerms, rval[!subsGe & !subsCe]) # ? better
       rval <- list(paste(ceTerms, collapse = "+"),
                    paste(geTerms, collapse = "+"))
 
