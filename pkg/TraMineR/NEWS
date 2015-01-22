@@ -4,6 +4,12 @@ Version 1.9-9 (Development version)
 Changes in existing functions:
   - seqpm(): New sep argument to allow searching for string patterns when 
     states are not labelled with single characters.
+  - seqpcplot(): 
+    - New argument 'seed' to control the jittering. 
+    - New convenience options for the 'filter' argument. If just
+      a numeric is assigned the function will use the 'minfreq' filter. 
+      Alternatively, the coloring filter options can be handled by the 
+      new 'pcfilter' function. See the help of 'seqpcplot'.
 
 Bug fixes:
   - seqformat(): fixed error occurring when converting from STS to TSE

@@ -1,6 +1,7 @@
 %% -*- RD:ANSI -*-
 \name{seqpcplot}
 \alias{seqpcplot}
+\alias{pcfilter}
 \alias{plot.seqe}
 \alias{plot.seqelist}
 \title{Parallel coordinate plot for sequence data}
@@ -25,7 +26,10 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
           title = NULL, xlab = NULL, ylab = NULL,
           xaxis = TRUE, yaxis = TRUE, axes = "all",
           xtlab = NULL, cex.plot = 1,
-          rows = NA, cols = NA, plot = TRUE, ...)
+          rows = NA, cols = NA, plot = TRUE,
+          seed = NULL, ...)
+
+pcfilter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
 
 }
 \arguments{
@@ -103,6 +107,16 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
   \item{plot}{logical. If \code{FALSE} nothing is plotted and an object
     of class \code{seqpcplot} is returned by default.}
 
+  \item{seed}{an integer specifying which seed should be set at the
+    beginning.}
+
+  \item{method}{character string. Defines the filtering
+     function. Available are \code{"minfreq"}, \code{"cumfreq"} and
+     \code{"linear"}.} 
+
+  \item{level}{numeric scalar between 0 and 1. The frequency threshold
+    for the filtering methods \code{"minfreq"} and \code{"cumfreq"}.} 
+  
   \item{...}{arguments to be passed to other methods, such as graphical
     parameters (see \code{\link{par}}).}
 }
@@ -256,17 +270,30 @@ seqpcplot(seqdata = biofam.seqe,
 ## color sequences over 10% (within group) (function method)
 seqpcplot(seqdata = biofam.seqe,
           filter = list(type = "function",
-                          value = "minfreq",
-                          level = 0.1),
-          alphabet = lab, order.align = "first")
+                        value = "minfreq",
+                        level = 0.1),
+          alphabet = lab, order.align = "first", seed = 1)
+
+## .. same result using the convenience functions
+seqpcplot(seqdata = biofam.seqe,
+          filter = 0.1, 
+          alphabet = lab, order.align = "first", seed = 1)
+
+seqpcplot(seqdata = biofam.seqe,
+          filter = pcfilter("minfreq", 0.1),
+          alphabet = lab, order.align = "first", seed = 1)
 
 ## highlight the 50% most frequent sequences
 seqpcplot(seqdata = biofam.seqe,
           filter = list(type = "function",
                           value = "cumfreq",
                           level = 0.5),
-          alphabet = lab, order.align = "first")
+          alphabet = lab, order.align = "first", seed = 2)
 
+## .. same result using the convenience functions
+seqpcplot(seqdata = biofam.seqe,
+          filter = pcfilter("cumfreq", 0.5),
+          alphabet = lab, order.align = "first", seed = 2)
 }
 
 \author{Reto Bürgin (with Gilbert Ritschard for the help page)}

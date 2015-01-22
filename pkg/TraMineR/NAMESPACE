@@ -45,6 +45,7 @@ export(
 	seqnum,
 	seqplot,
         seqpcplot,
+        pcfilter,
 	seqpm,
 	seqrecode,
 	seqrep,

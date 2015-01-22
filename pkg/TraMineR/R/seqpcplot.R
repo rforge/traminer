@@ -7,7 +7,8 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL,
                       title = NULL, xlab = NULL, ylab = NULL,
                       xaxis = TRUE, yaxis = TRUE, axes = "all",
                       xtlab = NULL, cex.plot = 1,
-                      rows = NA, cols = NA, plot = TRUE, ...) {
+                      rows = NA, cols = NA, plot = TRUE, seed = NULL,
+                      ...) {
 
   seqpcplot_private(seqdata = seqdata, group = group, weights = weights,
                     cex = cex, lwd = lwd, cpal = cpal,
@@ -20,7 +21,8 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL,
                     xaxis = xaxis, yaxis = yaxis,
                     axes = axes, xtlab = xtlab,
                     cex.plot = cex.plot,
-                    rows = rows, cols = cols, plot = plot, ...)
+                    rows = rows, cols = cols, plot = plot, seed = seed,
+                    ...)
 
 }
 
@@ -42,7 +44,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
                               xtlab = xtlab,
                               xaxis = TRUE, yaxis = TRUE, axes = "all",
                               cex.plot = 1, rows = NA, cols = NA,
-                              plot = TRUE, add = FALSE,
+                              plot = TRUE, seed = NULL, add = FALSE,
                               verbose = FALSE, ...) {
 
   if (!"seqpcplot" %in% class(seqdata)) {
@@ -70,19 +72,24 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     if (!(lorder %in% c("background", "foreground"))) {
       stop("[!] invalid lorder input")
     }
-
+    
+    if (!is.null(filter)) {
+      filter <- construct.filter(x = filter)
+    }
+    
     mtext <- NULL
-    if (is.null(title) &&
-        !is.null(filter) && # text below the title
+    if (is.list(filter) && # text below the title
         filter$type == "function" &&
         is.character(filter$value) &&
         filter$value %in% c("minfreq", "cumfreq")) {
       mtext <- "colored: "
     }
 
-    if (!is.null(filter)) {
-      filter <- construct.filter(x = filter)
-    }
+    ## set seed
+    if (!exists(".Random.seed", envir = .GlobalEnv)) runif(1)
+    oldSeed <- get(".Random.seed", mode="numeric", envir=globalenv())
+    if (!is.null(seed)) set.seed(seed)
+    RNGstate <- .Random.seed
 
     ## Step 2: Check and prepare raw data .................. #
 
@@ -777,6 +784,9 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     ## coordinates for background rectangles
     backrect <- expand.grid(xgrid = 1:nx, ygrid = 1:ny)
 
+    ## reset seed
+    assign(".Random.seed", oldSeed, envir=globalenv())
+    
     ## plot data object
 
     x <- list(pts = pts, # pointdata
@@ -989,7 +999,14 @@ optimpanelraster <- function(nx, ny, npanels,c = 1) {
 
 ## convert input for filter argument
 construct.filter <- function(x) {
-  if (is.list(x)) {
+
+  if (is.numeric(x)) {
+    x <- x[1L]
+    stopifnot(x >= 0 & x <= 1)
+    x <- list(type = "function", value = "minfreq", level = x)
+  }
+  
+  if (is.list(x) | inherits(x, "pcfilter")) {
     if (sum(names(x) %in% c("type", "value")) != 2) stop("[!] filter must contain a type and a value object")
     if (!x$type %in% c("sequence", "subsequence", "value", "density", "function")) stop("[!] unknown input for filter$type")
     if ((x$type == "function") & (length(x) > 2)) {
@@ -1042,6 +1059,15 @@ construct.filter <- function(x) {
 colourize <- function(value, col1, col2) { # define colouring function
   mp <- colorRamp(c(col1, col2))
   col <- rgb(mp(value), maxColorValue = 255)
+}
+
+## convenience function
+pcfilter <- function(method = c("minfreq", "cumfreq", "linear"), level = NULL) {
+  value <- match.arg(method)
+  if (is.null(level) && method %in% c("minfreq", "cumfreq"))
+    stop("'pcfilter' requires an inpute for 'level'.")
+  return(structure(list(type = "function", value = value,
+                        level = level), class = "pcfilter"))
 }
 
 ## linear colour gradient function
