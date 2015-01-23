@@ -1,23 +1,27 @@
 ## =========
 Version 1.9-9 (Development version)
 
+New function:
+  - pcfilter(): convenience function to define the coloring 
+    filter options to be passed as 'filter' argument to seqpcplot().
+
 Changes in existing functions:
-  - seqpm(): New sep argument to allow searching for string patterns when 
+  - seqpm(): New sep argument to allow searching for string patterns when
     states are not labelled with single characters.
-  - seqpcplot(): 
-    - New argument 'seed' to control the jittering. 
-    - New convenience options for the 'filter' argument. If just
-      a numeric is assigned the function will use the 'minfreq' filter. 
-      Alternatively, the coloring filter options can be handled by the 
-      new 'pcfilter' function. See the help of 'seqpcplot'.
+  - seqpcplot():
+    - New argument 'seed' to control the jittering.
+    - The 'filter' argument can now simply be a scalar, in which case  
+      the 'minfreq' filter is applied with this numeric value as threshold. 
+      See also the new function pcfilter().
 
 Bug fixes:
   - seqformat(): fixed error occurring when converting from STS to TSE
     with a tevent matrix containing empty strings (i.e. "")
-  - dissmfacw(): Corrected degree of freedom for per covariate F statistic
-    Within sum of squares were divided by (n-m-1) instead of (n-m), with n 
-	being the sample size and m the number of groups (Reported by Vicente 
-	Ponsoda).
+  - dissmfacw(): reported F values now obtained by dividing the within 
+    discrepancy in the denominator by (n-m), where n is the sample size 
+    and m the total number of predictors (contrasts for categorical
+    factors). Up to here (n-m-1) was mistakenly used 
+    (Reported by Vicente Ponsoda.)
 
 Misc:
   - Two additional exported aliases to TraMineR internal functions:

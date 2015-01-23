@@ -107,16 +107,15 @@ pcfilter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
   \item{plot}{logical. If \code{FALSE} nothing is plotted and an object
     of class \code{seqpcplot} is returned by default.}
 
-  \item{seed}{an integer specifying which seed should be set at the
-    beginning.}
+  \item{seed}{integer. Start seed value.}
 
   \item{method}{character string. Defines the filtering
      function. Available are \code{"minfreq"}, \code{"cumfreq"} and
-     \code{"linear"}.} 
+     \code{"linear"}.}
 
   \item{level}{numeric scalar between 0 and 1. The frequency threshold
-    for the filtering methods \code{"minfreq"} and \code{"cumfreq"}.} 
-  
+    for the filtering methods \code{"minfreq"} and \code{"cumfreq"}.}
+
   \item{...}{arguments to be passed to other methods, such as graphical
     parameters (see \code{\link{par}}).}
 }
@@ -276,7 +275,7 @@ seqpcplot(seqdata = biofam.seqe,
 
 ## .. same result using the convenience functions
 seqpcplot(seqdata = biofam.seqe,
-          filter = 0.1, 
+          filter = 0.1,
           alphabet = lab, order.align = "first", seed = 1)
 
 seqpcplot(seqdata = biofam.seqe,
