@@ -3,7 +3,7 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL,
                       ltype = "unique", embedding = "most-frequent",
                       lorder = NULL , lcourse = "upwards",
                       filter = NULL, hide.col = "grey80",
-                      alphabet = NULL, order.align = "first",
+                      alphabet = NULL, missing = "auto", order.align = "first",
                       title = NULL, xlab = NULL, ylab = NULL,
                       xaxis = TRUE, yaxis = TRUE, axes = "all",
                       xtlab = NULL, cex.plot = 1,
@@ -16,7 +16,8 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL,
                     ltype = ltype, embedding = embedding,
                     lorder = lorder, lcourse = lcourse,
                     filter = filter, hide.col = hide.col,
-                    alphabet = alphabet, order.align = order.align,
+                    alphabet = alphabet, missing = missing,
+                    order.align = order.align,
                     title = title, xlab = xlab, ylab = ylab,
                     xaxis = xaxis, yaxis = yaxis,
                     axes = axes, xtlab = xtlab,
@@ -40,6 +41,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
                               title = NULL, xlab = NULL, ylab = NULL,
                               xlim, ylim,
                               alphabet = NULL, alphabet.optim = FALSE,
+                              missing = c("auto", "show", "hide"),
                               R = 1000, order.align = NULL, maxit = 300,
                               xtlab = xtlab,
                               xaxis = TRUE, yaxis = TRUE, axes = "all",
@@ -76,6 +78,8 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     if (!is.null(filter)) {
       filter <- construct.filter(x = filter)
     }
+
+    missing <- match.arg(missing)
     
     mtext <- NULL
     if (is.list(filter) && # text below the title
@@ -138,6 +142,17 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
         id <- TMP$id
         x <- TMP$time
         y <- TMP$state
+
+        if (missing %in% c("auto", "hide")) {
+          SUBS <- y == attr(seqdata, "nr")
+          if (missing == "hide" | missing == "auto" && !any(SUBS)) {
+            id <- id[!SUBS]
+            x <- x[!SUBS]
+            y <- y[!SUBS]
+            y <- factor(y, levels = levels(y)[levels(y) != attr(seqdata, "nr")])
+          }
+        }
+        
         if (is.null(weights)) weights <- attr(seqdata, "weights")
 
         if (is.null(xlab)) {
@@ -1006,10 +1021,10 @@ construct.filter <- function(x) {
     x <- list(type = "function", value = "minfreq", level = x)
   }
   
-  if (is.list(x) | inherits(x, "pcfilter")) {
+  if (is.list(x) | inherits(x, "seqpcfilter")) {
     if (sum(names(x) %in% c("type", "value")) != 2) stop("[!] filter must contain a type and a value object")
     if (!x$type %in% c("sequence", "subsequence", "value", "density", "function")) stop("[!] unknown input for filter$type")
-    if ((x$type == "function") & (length(x) > 2)) {
+    if ((x$type == "function") & (length(x) > 1)) {
       if (is.character(x$value)) {
         if (x$value == "linear") {
           x$value <- linear
@@ -1062,16 +1077,16 @@ colourize <- function(value, col1, col2) { # define colouring function
 }
 
 ## convenience function
-pcfilter <- function(method = c("minfreq", "cumfreq", "linear"), level = NULL) {
+seqpcfilter <- function(method = c("minfreq", "cumfreq", "linear"), level = 0.05) {
   value <- match.arg(method)
   if (is.null(level) && method %in% c("minfreq", "cumfreq"))
-    stop("'pcfilter' requires an inpute for 'level'.")
+    stop("'seqpcfilter' requires an inpute for 'level'.")
   return(structure(list(type = "function", value = value,
-                        level = level), class = "pcfilter"))
+                        level = level), class = "seqpcfilter"))
 }
 
 ## linear colour gradient function
-linear <- function(x) {
+linear <- function(x, level = NULL) {
   return((x - min(x)) / diff(range(x)))
 }
 

@@ -13,6 +13,8 @@ Changes in existing functions:
     - The 'filter' argument can now simply be a scalar, in which case  
       the 'minfreq' filter is applied with this numeric value as threshold. 
       See also the new function pcfilter().
+    - New argument 'missing'. The arguments allows to control whether and
+      how missing values should be displayed in 'seqpcplot'.
 
 Bug fixes:
   - seqformat(): fixed error occurring when converting from STS to TSE

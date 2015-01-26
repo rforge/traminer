@@ -1,7 +1,7 @@
 %% -*- RD:ANSI -*-
 \name{seqpcplot}
 \alias{seqpcplot}
-\alias{pcfilter}
+\alias{seqpcfilter}
 \alias{plot.seqe}
 \alias{plot.seqelist}
 \title{Parallel coordinate plot for sequence data}
@@ -22,14 +22,14 @@ seqpcplot(seqdata, group = NULL, weights = NULL,
           ltype = "unique", embedding = "most-frequent",
           lorder = NULL , lcourse = "upwards",
           filter = NULL, hide.col = "grey80",
-          alphabet = NULL, order.align = "first",
+          alphabet = NULL, missing = "auto", order.align = "first",
           title = NULL, xlab = NULL, ylab = NULL,
           xaxis = TRUE, yaxis = TRUE, axes = "all",
           xtlab = NULL, cex.plot = 1,
           rows = NA, cols = NA, plot = TRUE,
           seed = NULL, ...)
 
-pcfilter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
+seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
 
 }
 \arguments{
@@ -79,6 +79,12 @@ pcfilter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
   \item{alphabet}{a vector of response levels in the order they should
     appear on the y-axis. This argument is solely relevant for
     \code{seqelist} objects.}
+
+  \item{missing}{character. Whether and how missing values should be
+    displayed. Available are \code{"auto"}, \code{"show"} and
+    \code{"hide"}. If \code{"auto"}, the plot will show missings only if
+    present. \code{"hide"} will fade out missings and \code{"show"} will
+    always show missings.} 
 
   \item{order.align}{Aligning method. For aligning on order positions use either \code{"first"} (default) or
   \code{"last"}. Option \code{"first"} numbers the positions from the beginning
@@ -130,35 +136,44 @@ pcfilter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
   at least elements \code{type} and \code{value}. The following types
   are implemented:
 
-  Type \code{sequence}: colors a specific pattern, for example assign\cr
+  Type \code{"sequence"}: colors a specific pattern, for example assign\cr
   \code{filter = list(type = "sequence", value = "(Leaving
   Home,Union)-(Child)")}.
 
-  Type \code{subsequence}: colors patterns which include a specific
+  Type \code{"subsequence"}: colors patterns which include a specific
   subsequence, for example\cr \code{filter = list(type =
   "subsequence", value = "(Child)-(Marriage)")} .
 
-  Type \code{value}: gradually colors the patterns according to the
+  Type \code{"value"}: gradually colors the patterns according to the
   numeric vector (of length equal to the number of sequences) provided as
   \code{"value"} element in the list. You can give something like
   \code{filter = list(type = "value", value = c(0.2, 1, ...))} or
   provide the distances to the medoid as \code{value} vector for
   example.
 
-  Type \code{function}: colors the patterns depending on the values
+  Type \code{"function"}: colors the patterns depending on the values
   returned by a [0,1] valued function of the frequency x of the
-  pattern. Two native functions can be used: \code{"minfreq"} and
-  \code{"cumfreq"}. Use \code{filter = list(type = "function", value =
-  "minfreq", level = 0.05)} to color patterns with a support of at least
-  5\% (within group). Or, use\cr\code{filter = list(type = "function",
-  value = "cumfreq", level = 0.5)} to highlight the 50\% most frequent
-  patterns (within group). Other user-specified functions can be
-  provided by giving something like\cr\code{filter = list(type =
-  "function", value = function(x, arg1, arg2) {return(x / max(x) * arg1
-  / arg2)}, arg1 = 1, arg2 = 1)}. This latter function adjusts
-  gradually the color intensity of patterns according to the frequency
-  of the pattern.
+  pattern. Three native functions can be used: \code{"minfreq"},
+  \code{"cumfreq"} and \code{"linear"}. Use \code{filter = list(type =
+  "function", value = "minfreq", level = 0.05)} to color patterns with a
+  support of at least 5\% (within group). Use\cr\code{filter = list(type
+    = "function", value = "cumfreq", level = 0.5)} to highlight the 50\% most
+  frequent patterns (within group). Or, use \code{filter = list(type =
+    "function", value = "linear")} to use a linear gradient for the
+  color intensity (the most most frequent trajectory obtains 
+  100\% intensity). Other user-specified functions can be provided by
+  giving something like\cr\code{filter = list(type = "function", value =
+  function(x, arg1, arg2) {return(x / max(x) * arg1 / arg2)}, arg1 = 1,
+  arg2 = 1)}. This latter function adjusts gradually the color intensity
+  of patterns according to the frequency of the pattern.
 
+  The function \code{seqpcfilter} is a convenience function for type
+  \code{"function"}. The three examples above can be imitated by
+  \code{seqpcfilter("minfreq", 0.05)}, \code{seqpcfilter("cumfreq",
+    0.5)} and \code{seqpcfilter("linear")}.
+
+  If a numeric scalar is assigned to \code{filter}, the \code{"minfreq"}
+  filter is used.
 }
 
 \value{
@@ -279,7 +294,7 @@ seqpcplot(seqdata = biofam.seqe,
           alphabet = lab, order.align = "first", seed = 1)
 
 seqpcplot(seqdata = biofam.seqe,
-          filter = pcfilter("minfreq", 0.1),
+          filter = seqpcfilter("minfreq", 0.1),
           alphabet = lab, order.align = "first", seed = 1)
 
 ## highlight the 50% most frequent sequences
@@ -291,8 +306,21 @@ seqpcplot(seqdata = biofam.seqe,
 
 ## .. same result using the convenience functions
 seqpcplot(seqdata = biofam.seqe,
-          filter = pcfilter("cumfreq", 0.5),
+          filter = seqpcfilter("cumfreq", 0.5),
           alphabet = lab, order.align = "first", seed = 2)
+
+## linear gradient
+seqpcplot(seqdata = biofam.seqe,
+          filter = list(type = "function",
+                          value = "linear"),
+          alphabet = lab, order.align = "first", seed = 2)
+
+seqpcplot(seqdata = biofam.seqe,
+          filter = seqpcfilter("linear"),
+          alphabet = lab, order.align = "first", seed = 1)
+
+
+
 }
 
 \author{Reto Bürgin (with Gilbert Ritschard for the help page)}
