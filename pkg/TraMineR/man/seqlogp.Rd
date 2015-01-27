@@ -9,14 +9,14 @@ Logarithm of the probabilities of state sequences
 Compute the logarithm of the probability of each state sequence obtained from a state transition model. The probability of a sequence is equal to the product of each state probability of the sequence. There are several methods to compute a state probability.
 }
 \usage{
-seqlogp(seqdata, prob="trate", time.varying=TRUE, 
+seqlogp(seqdata, prob="trate", time.varying=TRUE,
         begin="freq", weighted=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
 	\item{seqdata}{The sequence to compute the probabilities.}
 	
-	\item{prob}{either the name (\code{"trate"} or \code{"freq"$) of the probability model to use to compute the state probabilities, or an \code{\link{array}} specifying the transition probabilities at each position \eqn{t} (see details).}
+	\item{prob}{either the name (\code{"trate"} or \code{"freq"$} of the probability model to use to compute the state probabilities, or an \code{\link{array}} specifying the transition probabilities at each position \eqn{t} (see details).}
 	
 	\item{time.varying}{Logical. If \code{TRUE}, the probabilities (transitions or frequencies) are computed separately for each time \eqn{t} point.}
 	
