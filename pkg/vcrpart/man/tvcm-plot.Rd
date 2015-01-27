@@ -125,8 +125,8 @@ panel_coef(object, parm = NULL,
 }
 
 \references{
-  Hastie, T., R. Tibshirani and J. Friedman (2001), The Elements of 
-  Statistical Learning (2 ed.), Springer-Verlag.
+  Hastie, T., R. Tibshirani and J. Friedman (2001). \emph{The Elements
+    of Statistical Learning} (2 ed.). New York, USA: Springer-Verlag.
 }
 
 \examples{

@@ -126,10 +126,10 @@
 
 \references{
   Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data} (2
-  ed.), Wiley.
+  ed.). New Jersey, USA: John Wiley & Sons.
 
-  Tutz, G. (2012). \emph{Regression for Categorical Data}, Cambridge
-  Series in Statistical and Probabilistic Mathematics.
+  Tutz, G. (2012). \emph{Regression for Categorical Data}. New York,
+  USA: Cambridge Series in Statistical and Probabilistic Mathematics. 
   
   Li, C. and B. E. Sheperd (2012). A New Residual for Ordinal
   Outcomes, \emph{Biometrika}, \bold{99}(2), 437-480.

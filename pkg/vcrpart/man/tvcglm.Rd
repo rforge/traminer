@@ -8,7 +8,7 @@
 
 \description{The \command{\link{tvcglm}} function implements the
   tree-based varying coefficient regression algorithm for generalized
-  linear models introduced by Buergin and Ritschard (2014c). The
+  linear models introduced by Buergin and Ritschard (2015b). The
   algorithm approximates varying coefficients by piecewise constant
   functions using recursive partitioning, i.e., it estimates the
   selected coefficients individually by strata of the value space of
@@ -130,15 +130,14 @@ tvcglm_control(minsize = 30, mindev = 2.0,
 }
 
 \references{
-  Breiman, L., J. H. Friedman, R. A. Olshen and C.J. Stone (1984)  
-  \emph{Classification and Regression Trees}. Volume 19. The Wadsworth
-  Statistics / Probability Series.
+  Breiman, L., J. H. Friedman, R. A. Olshen and C.J. Stone (1984).  
+  \emph{Classification and Regression Trees}. New York, USA: Wadsworth. 
   
   Wang, J. C., Hastie, T. (2014), Boosted Varying-Coefficient
   Regression Models for Product Demand Prediction, \emph{Journal of
-    Computational and Graphical Statistics}, \bold{23}(2), 361--382. 
+    Computational and Graphical Statistics}, \bold{23}(2), 361-382. 
   
-  Buergin R. and G. Ritschard (2014c). Coefficient-Wise Tree-Based
+  Buergin R. and G. Ritschard (2015b). Coefficient-Wise Tree-Based
   Varying Coefficient Regression with vcrpart. Article in progress.
 }
 

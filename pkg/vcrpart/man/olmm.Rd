@@ -191,7 +191,7 @@ olmm(formula, data, family = cumulative(),
 
 \references{
   Agresti, A. (2010). \emph{Analysis of Ordinal Categorical Data} (2
-  ed.), Wiley.
+  ed.). New Jersey, USA: John Wiley & Sons.
   
   Hartzel, J., A. Agresti and B. Caffo (2001). Multinomial Logit Random
   Effect Models, \emph{Statistical Modelling} \bold{1}(2), 81--102.
@@ -204,8 +204,8 @@ olmm(formula, data, family = cumulative(),
   Models, \emph{Computational Statistics & Data Analysis} \bold{22}(5),
   537--557. 
 
-  Tutz, G. (2012). \emph{Regression for Categorical Data}, Cambridge
-  Series in Statistical and Probabilistic Mathematics.
+  Tutz, G. (2012). \emph{Regression for Categorical Data}. New York,
+  USA: Cambridge Series in Statistical and Probabilistic Mathematics.
 
   Novomestky, F. (2012). matrixcalc: Collection of Functions for 
   Matrix Calculations. R package version 1.0-3. URL 

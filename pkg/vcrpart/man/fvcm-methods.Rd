@@ -77,9 +77,9 @@
   
   Breiman, L. (2001). Random Forests. \emph{Machine Learning},
   \bold{45}(1), 5--32.
-  
-  Hastie, T., R. Tibshirani and J. Friedman (2001), The Elements of 
-  Statistical Learning (2 ed.), Springer-Verlag.
+
+  Hastie, T., R. Tibshirani and J. Friedman (2001). \emph{The Elements
+    of Statistical Learning} (2 ed.). New York, USA: Springer-Verlag.
 }
 
 \seealso{\command{\link{fvcm}}, \command{\link{tvcm-methods}}}

@@ -8,7 +8,7 @@
 
 \description{The \command{\link{tvcolmm}} function implements the
   tree-based longitudinal varying coefficient regression algorithm
-  proposed in Buergin and Ritschard (2014b). The algorithm approximates
+  proposed in Buergin and Ritschard (2015a). The algorithm approximates
   varying fixed coefficients in the cumulative logit mixed model by a
   (multivariate) piecewise constant function using recursive
   partitioning, i.e., it estimates the fixed effect component of the
@@ -160,8 +160,9 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
   Parameter Instability, \emph{Statistica Neerlandica}, \bold{61}(4),
   488--508.
   
-  Buergin R. and Ritschard G. (2014b), Tree-Based Varying Coefficient 
-  Regression for Longitudinal Ordinal Responses. Article in progress.
+  Buergin R. and Ritschard G. (2015a), Tree-Based Varying Coefficient 
+  Regression for Longitudinal Ordinal Responses. \emph{Computational
+  Statistics & Data Analysis}. Forthcoming. 
       
   Sela R. and J. S. Simonoff (2012). RE-EM trees: A Data Mining
   Approach for Longitudinal and Clustered data, \emph{Machine Learning}

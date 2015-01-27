@@ -116,8 +116,9 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   Parameter Instability, \emph{Statistica Neerlandica}, \bold{61}(4),
   488--508. 
   
-  Buergin R. and Ritschard G. (2014b), Tree-Based Varying Coefficient 
-  Regression for Longitudinal Ordinal Responses. Article in progress.
+  Buergin R. and Ritschard G. (2015a), Tree-Based Varying Coefficient 
+  Regression for Longitudinal Ordinal Responses. \emph{Computational
+  Statistics & Data Analysis}. Forthcoming.
 }
 
 \author{Reto Buergin}

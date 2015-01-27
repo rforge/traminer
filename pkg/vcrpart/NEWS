@@ -9,7 +9,11 @@ Changes in Version 0.3-2
     o    Corrected labels for random effects of 'olmm' objects.
 
     o    Revision of the 'predict' method for 'olmm'. The new function 
-         implements the three prediction option of Skrondal and Rabe-Hesketh 2009.
+         implements the three prediction option of Skrondal and 
+         Rabe-Hesketh (2009).
+
+    o    Revised references.
+
 
 Changes in Version 0.3-1
 
@@ -31,6 +35,7 @@ Changes in Version 0.3-1
     o    Improved help manual for 'tvcglm' and 'tvcolmm'.
 
     o    Revised references.
+
 
 Changes in Version 0.2-3
 

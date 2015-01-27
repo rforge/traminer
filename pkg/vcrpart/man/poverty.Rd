@@ -78,7 +78,7 @@
   Switzerland. \emph{Archives of Gerontology and Geriatrics}.  
   
   Gabriel, R., M. Oris, M. Studer and M. Baeriswyl (2014). The
-  Persistance of Social Stratification? Submitted.
+  Persistance of Social Stratification? Article in progress.
 } 
 
 \keyword{datasets}

@@ -94,10 +94,11 @@ tvcm(formula, data, fit, family,
   and Statistics, Research Platform Empirical and Experimental
   Economics}, Number 2014-10. Universitaet Innsbruck.
   
-  Buergin R. and G. Ritschard (2014b), Tree-Based Varying Coefficient
-  Regression for Longitudinal Ordinal Responses. Article in progress. 
+  Buergin R. and G. Ritschard (2015a), Tree-Based Varying Coefficient
+  Regression for Longitudinal Ordinal Responses. \emph{Computational
+  Statistics & Data Analysis}. Forthcoming. 
   
-  Buergin R. and G. Ritschard (2014c), Coefficient-Wise Tree-Based
+  Buergin R. and G. Ritschard (2015b), Coefficient-Wise Tree-Based
   Varying Coefficient Regression with vcrpart. Article in progress.
 }
 
