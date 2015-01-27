@@ -16,9 +16,9 @@ Changes in existing functions:
     - New argument 'seed' to control the jittering.
     - The 'filter' argument can now simply be a scalar, in which case
       the 'minfreq' filter is applied with this numeric value as threshold.
-      See also the new function pcfilter().
-    - New argument 'missing' to allow controlling  whether and
-      how to display missing values in 'seqpcplot'.
+      See also the new function seqpcfilter().
+    - New argument 'missing' to control  whether and how to display missing 
+      values.
 
 Bug fixes:
   - seqformat(): fixed error occurring when converting from STS to TSE
