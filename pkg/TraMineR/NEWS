@@ -2,7 +2,7 @@
 Version 1.9-9 (Development version)
 
 New function:
-  - pcfilter(): convenience function to define the coloring 
+  - pcfilter(): convenience function to define the coloring
     filter options to be passed as 'filter' argument to seqpcplot().
 
 Changes in existing functions:
@@ -10,19 +10,19 @@ Changes in existing functions:
     states are not labelled with single characters.
   - seqpcplot():
     - New argument 'seed' to control the jittering.
-    - The 'filter' argument can now simply be a scalar, in which case  
-      the 'minfreq' filter is applied with this numeric value as threshold. 
+    - The 'filter' argument can now simply be a scalar, in which case
+      the 'minfreq' filter is applied with this numeric value as threshold.
       See also the new function pcfilter().
-    - New argument 'missing'. The arguments allows to control whether and
-      how missing values should be displayed in 'seqpcplot'.
+    - New argument 'missing' to allow controlling  whether and
+      how to display missing values in 'seqpcplot'.
 
 Bug fixes:
   - seqformat(): fixed error occurring when converting from STS to TSE
     with a tevent matrix containing empty strings (i.e. "")
-  - dissmfacw(): reported F values now obtained by dividing the within 
-    discrepancy in the denominator by (n-m), where n is the sample size 
+  - dissmfacw(): reported F values now obtained by dividing the within
+    discrepancy in the denominator by (n-m), where n is the sample size
     and m the total number of predictors (contrasts for categorical
-    factors). Up to here (n-m-1) was mistakenly used 
+    factors). Up to here (n-m-1) was mistakenly used
     (Reported by Vicente Ponsoda.)
 
 Misc:

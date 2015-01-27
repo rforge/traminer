@@ -13,14 +13,14 @@ The \code{seqformat} function is used to convert data from one format to another
 
 \usage{
 seqformat(data, var=NULL, id=NULL,
-     from, to, compressed=FALSE,
-     nrep=NULL, tevent, stsep=NULL, covar=NULL,
-     SPS.in=list(xfix="()", sdsep=","),
-     SPS.out=list(xfix="()", sdsep=","),
-     begin=NULL, end=NULL, status=NULL,
-     process=TRUE, pdata=NULL, pvar=NULL,
-     limit=100, overwrite=TRUE,
-     fillblanks=NULL, tmin=NULL, tmax=NULL, nr="*")
+         from, to, compressed=FALSE,
+         nrep=NULL, tevent, stsep=NULL, covar=NULL,
+         SPS.in=list(xfix="()", sdsep=","),
+         SPS.out=list(xfix="()", sdsep=","),
+         begin=NULL, end=NULL, status=NULL,
+         process=TRUE, pdata=NULL, pvar=NULL,
+         limit=100, overwrite=TRUE,
+         fillblanks=NULL, tmin=NULL, tmax=NULL, nr="*")
  }
 
 \arguments{
@@ -81,16 +81,14 @@ previous one.}
 
 	\item{fillblanks}{When converting from \code{SPELL}, if
 \code{fillblanks} is not \code{NULL}, gaps between episodes are
-filled with any character given as argument.}
+filled with the \code{fillblanks} character value.}
 
-	\item{tmin}{When converting from \code{SPELL}, if sequences are
-to be defined on a calendar time axis, it defines the starting time
-of the axis. If set to \code{NULL}, the minimum time is taken from
-the 'begin' column in the data.}
+	\item{tmin}{Integer. When converting from \code{SPELL} with \code{process=FALSE}, defines the starting time
+of the axis. If set as \code{NULL}, the minimum time is taken from
+the \sQuote{begin} column in the data.}
 
-	\item{tmax}{When converting from \code{SPELL}, if year sequences
-are wanted, defines the ending year. If set to
-\code{NULL}, it is guessed from the data (not so accurately!).} }
+	\item{tmax}{Integer. When converting from \code{SPELL} with \code{process=FALSE}, defines the ending time. If set as
+\code{NULL}, the value is guessed from the data (not so accurately!).} }
 
 \value{A data frame}
 
@@ -103,7 +101,7 @@ Demography, University of Geneva.
 Ritschard, G., A. Gabadinho, M. Studer and N. S. Müller. Converting
 between various sequence representations. in Ras, Z. & Dardzinska, A.
 (ed.) \emph{Advances in Data Management}, Springer, 2009, 223,
-155-175 }
+155-175. }
 
 \seealso{
  \code{\link{seqdef}}

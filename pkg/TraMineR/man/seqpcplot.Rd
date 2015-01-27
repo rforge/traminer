@@ -84,7 +84,7 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
     displayed. Available are \code{"auto"}, \code{"show"} and
     \code{"hide"}. If \code{"auto"}, the plot will show missings only if
     present. \code{"hide"} will fade out missings and \code{"show"} will
-    always show missings.} 
+    always show missings.}
 
   \item{order.align}{Aligning method. For aligning on order positions use either \code{"first"} (default) or
   \code{"last"}. Option \code{"first"} numbers the positions from the beginning
@@ -160,7 +160,7 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
     = "function", value = "cumfreq", level = 0.5)} to highlight the 50\% most
   frequent patterns (within group). Or, use \code{filter = list(type =
     "function", value = "linear")} to use a linear gradient for the
-  color intensity (the most most frequent trajectory obtains 
+  color intensity (the most most frequent trajectory obtains
   100\% intensity). Other user-specified functions can be provided by
   giving something like\cr\code{filter = list(type = "function", value =
   function(x, arg1, arg2) {return(x / max(x) * arg1 / arg2)}, arg1 = 1,
