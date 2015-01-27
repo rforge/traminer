@@ -1,15 +1,18 @@
-﻿                CHANGES IN TraMineRextras VERSION 0.3.3 [2015-01-12]
+﻿                CHANGES IN TraMineRextras VERSION 0.3.4 [2015-01-27]
+
+
+                CHANGES IN TraMineRextras VERSION 0.2.3 [2015-01-27]
 
 New function
 
-    o   seqtabstocc(): frequencies of state co-occurrence patterns 
+    o   seqtabstocc(): frequencies of state co-occurrence patterns
 
 Changes in existing functions
 
     o   seqgranularity(): new method "mostfreq"
 
     o   seqedplot(): replaced calls of TraMineR internal functions seqeage
-        and TraMineR.legend functions with respectively
+        and TraMineR.legend with respectively
         TraMineRInternalSeqeage and TraMineRInternalLegend
         (should be transparent to the end user).
 

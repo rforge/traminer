@@ -1,6 +1,8 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
-\section{Changes in version 0.3.3 [2014-09-15]}{
+\section{Changes in version 0.3.4 [2015-01-27]}{
+}
+\section{Changes in version 0.2.3 [2015-01-27]}{
 \subsection{New functions}{
   \itemize{
     \item{\code{seqtabstocc()}: frequencies of state co-occurrence patterns}
@@ -9,7 +11,7 @@
   \itemize{
     \item{\code{seqgranularity()}: new method \code{"mostfreq"}}
     \item{\code{seqedplot()}: replaced calls of TraMineR internal functions \code{seqeage}
-        and \code{TraMineR.legend} functions with respectively
+        and \code{TraMineR.legend} with respectively
         \code{TraMineRInternalSeqeage} and \code{TraMineRInternalLegend}
         (should be transparent to the end user).}
 }}}
