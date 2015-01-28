@@ -1,6 +1,6 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
-\section{Changes in version 0.3.4 [2015-01-27]}{
+\section{Changes in version 0.3.4 [2015-01-27]}{  
 }
 \section{Changes in version 0.2.3 [2015-01-27]}{
 \subsection{New functions}{
