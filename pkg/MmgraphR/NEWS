@@ -1,7 +1,12 @@
+29.01.2015
+° trmatplot.march.Dcmm.Rd updated to improve 'description'
+° trmatplot.Rd updated to improve 'usage'
+
 09.12.2014
 ° MmgraphR failed to build.
-° NAMESPACE changed to include full import of "colorspace" and "TraMineR"
+° NAMESPACE changed to include full import of "colorspace" and "TraMineR" 
 ° DESCRIPTION changed to include "colorspace" and "TraMineR" in 'Depends'
+° MmgraphR build status: Current
 
 08.12.2014
 ° Mmgraph deleted from and MmgraphR uploaded onto R-forge. Status: building.
