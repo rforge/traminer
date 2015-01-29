@@ -3,6 +3,8 @@
 \alias{trmatplot.default}
 \alias{trmatplot.depmix.fitted}
 \title{Transition Matrix Plot}
+\description{
+A coordinate plot which maps each row in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to empasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}'}
 \usage{
 
 trmatplot(d, ...)
@@ -13,7 +15,6 @@ trmatplot(d, seed = NULL, cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
   ylab = NULL, ylim = NULL, xtlab = NULL, pfilter = NULL,
   shade.col = "grey80", num = 1, hide.col = NULL, lorder = NULL,
   verbose = FALSE, ...)
-}
 
 ## S3 method for class 'depmix.fitted'
 
@@ -80,9 +81,7 @@ The four options for \code{pfilter} are described below, and are illustrated in 
  % for example assign \preformatted{filter = list(type = "sequence", value = "(1)-(4)")}
  See Examples.
 }
-\description{
-A coordinate plot which maps each row in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to empasize the most (or least) probable state sequences overall, or by initial state.
-}
+
 
 \examples{
 ##########################################
