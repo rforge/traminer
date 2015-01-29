@@ -5,15 +5,15 @@
 Poulcheria Adamopoulou
 }
 \description{
-A coordinate plot which maps each row in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to empasize the most (or least) probable state sequences overall, or by initial state. Input is an object of class \code{march.Dcmm} which is the output of \code{march.dcmm.construct}.
+A coordinate plot which maps each row in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to empasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is an object of class \code{march.Dcmm} which is the output of \code{march.dcmm.construct}.
 }
 
 \usage{
-trmatplot.march.Dcmm(d, seed = NULL, type = "hidden", hstate = 1,
-	cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
-  ylab = NULL, ylim = NULL, xtlab = NULL, pfilter = NULL,
-  shade.col = "grey80", num = 1, hide.col = NULL, lorder = NULL,
-  verbose = FALSE, ...)
+trmatplot.march.Dcmm (d, seed = NULL, type = "hidden", hstate = 1,
+											cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
+  										ylab = NULL, ylim = NULL, xtlab = NULL, pfilter = NULL,
+  										shade.col = "grey80", num = 1, hide.col = NULL, lorder = NULL,
+  										verbose = FALSE, ...)
 }
 \arguments{
 \item{d}{Object to be plotted. A \code{march.Dcmm} object.}
@@ -24,7 +24,7 @@ trmatplot.march.Dcmm(d, seed = NULL, type = "hidden", hstate = 1,
 
 \item{hstate}{Numeric. Valid when \code{type = "visible"}. Specifies from which hidden state the (visible) probability transition matrix should be plotted. Default \code{hstate = 1}.}
 
-\item{cspal}{A color palette that can be specified as one of: \code{"dynamic", "harmonic", "cold", "warm", "heat", "terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes.
+\item{cspal}{A color palette that can be specified as one of: \code{"dynamic", "harmonic", "cold", "warm", "heat", "terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes. See Examples in \command{\link{trmatplot}}.
 }
 
 \item{cpal}{Color palette vector when coloring probability sequences. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
@@ -61,7 +61,7 @@ trmatplot.march.Dcmm(d, seed = NULL, type = "hidden", hstate = 1,
 Setting a \code{seed} allows the graphic to be replicated.
 
 The \code{pfilter} argument serves to highlight probability sequences that are either most probable while shading out those that are less probable in \code{shade.col} and vice-versa.
-The four options for \code{pfilter} are described below, and are illustrated in Examples.
+The four options for \code{pfilter} are described below, and are illustrated in Examples in \command{\link{trmatplot}}.
 \describe{
 \item{\code{"smax"}}{For each initial state the most probable next state is highlighed.}
 \item{\code{"smin"}}{For each initial state the least probable next state is highlighed.}
@@ -75,7 +75,7 @@ The four options for \code{pfilter} are described below, and are illustrated in 
  The filter argument expects a list with at least elements \code{type} and \code{value}.
  Most relevant within the context of probabilities is \code{type = "sequence"}, which highlights the specific pattern. 
  % for example assign \preformatted{filter = list(type = "sequence", value = "(1)-(4)")}
- See Examples.
+ See Examples in \command{\link{trmatplot}}.
 }
 
 \references{
