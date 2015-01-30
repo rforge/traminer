@@ -9,19 +9,13 @@ A coordinate plot which maps each row in the probability transition matrix as a 
 
 trmatplot(d, ...)
 
-## S3 method for class 'matrix'
+## S3 method for classes 'matrix' and 'depmix.fitted'
 
 trmatplot(d, seed = NULL, cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
   ylab = NULL, ylim = NULL, xtlab = NULL, pfilter = NULL,
   shade.col = "grey80", num = 1, hide.col = NULL, lorder = NULL,
   verbose = FALSE, ...)
 
-## S3 method for class 'depmix.fitted'
-
-trmatplot(d, seed = NULL, cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
-  ylab = NULL, ylim = NULL, xtlab = NULL, pfilter = NULL,
-  shade.col = "grey80", num = 1, hide.col = NULL, lorder = NULL,
-  verbose = FALSE, ...)
 }
 \arguments{
 \item{d}{Object to be plotted of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}}. A transition matrix of probabilities.}
