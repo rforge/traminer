@@ -4,7 +4,8 @@
 \alias{trmatplot.depmix.fitted}
 \title{Transition Matrix Plot}
 \description{
-A coordinate plot which maps each row in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to empasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}'}
+A coordinate plot which maps each row in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to empasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}}.
+}
 \usage{
 
 trmatplot(d, ...)
