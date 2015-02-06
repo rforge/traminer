@@ -335,17 +335,30 @@ trmatplot.default <- function (d, seed = NULL, cspal = NULL, cpal = NULL, title 
       lordr<-"background"
       
     }
+	}
     
-  }
-  
   else if ( is.null ( pfilter ) ) {
     
-    lordr <- lorder
+    lordr <- NULL
     
   }
-  
-  
-  seqpcplot(seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
-            order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, ...) #
-  
+
+	## PLOT
+	# list arguments inherent in seqpcplot
+  a <- structure (list ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col,
+												 lorder = lordr, order.align = "time", ylim = ylm, cpal = dat$ch, xtlab = xt), 
+									class = "seqpcplot")
+
+	# list arguments inhert in trmatplot
+	b <- structure ( list ( cspal = cspal, pfilter = pfilter, shade.col = shade.col, num = num),
+									class = "trmatplot")
+
+	# agregate list of arguments
+	rval <- structure ( list ( plot = a, trmatplot = b, seed = seed, verbose = verbose), class = "trmatplot")
+	
+ 	# seqpcplot ( a, ...)
+  seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
+         order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, ...) 
+	## DATA
+  invisible ( rval )
 }
