@@ -19,7 +19,7 @@ trmatplot(d, seed = NULL, cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
 
 }
 \arguments{
-\item{d}{Object to be plotted of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}}. A transition matrix of probabilities.}
+\item{d}{Object to be plotted of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}}. A transition matrix of probabilities. See Details.}
 
 \item{seed}{A single value, interpreted as an integer, or \code{NULL} (default). See Details.}
 
@@ -57,6 +57,10 @@ trmatplot(d, seed = NULL, cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
 }
 
 \details{
+
+The object \code{d} to be plotted, is a probability matrix that when of class \command{\link[base]{matrix}} can be user defined, or an output of packages such as \pkg{msm}, \pkg{HiddenMarkov}, \pkg{HMM}, to name a few. A probability matrix obtained using the package \pkg{depmixS4} is of class \command{\link[depmixS4]{depmix.fitted}} and this is also accepted.
+
+
 Setting a \code{seed} allows the graphic to be replicated.
 
 The \code{pfilter} argument serves to highlight probability sequences that are either most probable while shading out those that are less probable in \code{shade.col} and vice-versa.
@@ -153,11 +157,12 @@ trmatplot(trmat, seed = 2, filter = list(type = "sequence", value = "(1)-(4)"))
 Poulcheria Adamopoulou
 }
 \references{
-Buergin, R. and G. Ritschard (2014), "A decorated parallel coordinate plot for categorical longitudinal data", \emph{The American Statistician}. Vol. 68(2), pp. 98-103.
-Zeileis, A.; Hornik, K. and P. Murrell (2009), "Escaping RGBland: Selecting Colors for Statistical Graphics", \emph{Computational Statistics & Data Analysis}. Vol. 53, pp. 3259-3270.
+	\item{Buergin, R. and G. Ritschard (2014), "A decorated parallel coordinate plot for categorical longitudinal data", \emph{The American Statistician}. Vol. 68(2), pp. 98-103.}
+
+	\item{Zeileis, A.; Hornik, K. and P. Murrell (2009), "Escaping RGBland: Selecting Colors for Statistical Graphics", \emph{Computational Statistics & Data Analysis}. Vol. 53, pp. 3259-3270.}
 }
 \seealso{
-\command{\link{trmatplot.march.Dcmm}}
-\command{\link[TraMineR]{seqpcplot}}
+	\command{\link{trmatplot.march.Dcmm}}
+	\command{\link[TraMineR]{seqpcplot}}
 }
 
