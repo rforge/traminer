@@ -13,6 +13,6 @@ S3method(trmatplot, default)
 S3method(trmatplot, depmix.fitted)
 
 #Export method "trmatplot" for class "march.Dcmm"
-s3method(trmatplot, march.Dcmm)
+#s3method(trmatplot, march.Dcmm)
 
 
