@@ -1,5 +1,6 @@
 #'@keywords internal
-trmatplot.default <- function (d, seed = NULL, cspal = NULL, cpal = NULL, title = NULL,
+trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
+											 cspal = NULL, cpal = NULL, title = NULL,
                        xlab =  NULL, ylab = NULL, ylim = NULL, xtlab = NULL,
                        pfilter = NULL,
                        shade.col = "grey80",
@@ -36,9 +37,9 @@ trmatplot.default <- function (d, seed = NULL, cspal = NULL, cpal = NULL, title 
       
     }
     
-    if ( sum1 ( d ) == FALSE ){
+    if ( rowconstraint == TRUE & sum1 ( d ) == FALSE ){
       
-      stop ( "[!] rows of transtion probability matrix must sum up to one" )
+      stop ( "[!] rows of transtion probability matrix must sum up to one, otherwise set argument rowconstraint to FALSE" )
       
     }
     
@@ -350,10 +351,14 @@ trmatplot.default <- function (d, seed = NULL, cspal = NULL, cpal = NULL, title 
 									class = "seqpcplot")
 
 	# list arguments inhert in trmatplot
-	b <- structure ( list ( cspal = cspal, pfilter = pfilter, shade.col = shade.col, num = num),
+	b <- structure ( list ( rowconstraint = rowconstraint, 
+													cspal = cspal, 
+													pfilter = pfilter, 
+													shade.col = shade.col, 
+													num = num ),
 									class = "trmatplot")
 
-	# agregate list of arguments
+	# aggregate list of arguments
 	rval <- structure ( list ( plot = a, trmatplot = b, seed = seed, verbose = verbose), class = "trmatplot")
 	
  	# seqpcplot ( a, ...)

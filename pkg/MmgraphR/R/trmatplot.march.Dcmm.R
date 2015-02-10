@@ -1,4 +1,5 @@
-trmatplot.march.Dcmm <- function (d, seed = NULL, type = "hidden", hstate = 1, 
+# renamed from trmatplot.march.Dcmm b/c implies S3 method (impossible since march isn't on CRAN)
+march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1, 
                        	cspal = NULL, cpal = NULL, title = NULL,
                       	xlab =  NULL, ylab = NULL, ylim = NULL, xtlab = NULL,
 												pfilter = NULL,                       	
@@ -419,9 +420,28 @@ trmatplot.march.Dcmm <- function (d, seed = NULL, type = "hidden", hstate = 1,
     lordr <- lorder
     
   }
-  
-  
-  seqpcplot(seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
-            order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, ...) #
+  	## PLOT
+	# list arguments inherent in seqpcplot
+  a <- structure (list ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col,
+												 lorder = lordr, order.align = "time", ylim = ylm, cpal = dat$ch, xtlab = xt), 
+									class = "seqpcplot")
+
+	# list arguments inhert in trmatplot
+	b <- structure ( list ( type = type,
+													hstate = hstate, 
+													cspal = cspal, 
+													pfilter = pfilter, 
+													shade.col = shade.col, 
+													num = num ),
+									class = "trmatplot")
+
+	# aggregate list of arguments
+	rval <- structure ( list ( plot = a, trmatplot = b, seed = seed, verbose = verbose), class = "trmatplot")
+	
+ 	# seqpcplot ( a, ...)
+  seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
+         order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, ...) 
+	## DATA
+  invisible ( rval )
   
 }
