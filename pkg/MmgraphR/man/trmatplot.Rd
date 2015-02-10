@@ -1,75 +1,75 @@
 \name{trmatplot}
 \alias{trmatplot}
 \alias{trmatplot.default}
+\alias{trmatplot.array}
 \alias{trmatplot.depmix.fitted}
 \title{Transition Matrix Plot}
 \description{
-A coordinate plot which maps each row in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to empasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}}.
+A coordinate plot which maps each element in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to emphasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, or \command{\link[depmixS4]{depmix.fitted}}.
 }
 \usage{
+## S3 method for classes 'matrix', 'array' and 'depmix.fitted'
 
-trmatplot(d, ...)
-
-## S3 method for classes 'matrix' and 'depmix.fitted'
-
-trmatplot(d, seed = NULL, cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
-  ylab = NULL, ylim = NULL, xtlab = NULL, pfilter = NULL,
-  shade.col = "grey80", num = 1, hide.col = NULL, lorder = NULL,
-  verbose = FALSE, ...)
-
+trmatplot(d, rowconstraint = TRUE, seed = NULL,
+cspal = NULL, cpal = NULL, title = NULL, 
+xlab = NULL, ylab = NULL, ylim = NULL, xtlab = NULL,
+pfilter = NULL, shade.col = "grey80", num = 1, 
+hide.col = NULL, lorder = NULL, verbose = FALSE, 
+...)
 }
 \arguments{
-\item{d}{Object to be plotted of class \command{\link[base]{matrix}} or \command{\link[depmixS4]{depmix.fitted}}. A transition matrix of probabilities. See Details.}
 
-\item{seed}{A single value, interpreted as an integer, or \code{NULL} (default). See Details.}
+	\item{d}{Object to be plotted of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, or \command{\link[depmixS4]{depmix.fitted}}. A transition matrix of probabilities. See Details.}
 
-\item{cspal}{A color palette that can be specified as one of: \code{"dynamic", "harmonic", "cold", "warm", "heat", "terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes.
-}
+	\item{rowconstraint}{Logical. Checks if the row constraint is satisfied, i.e. the sum of each row of the transition probability matrix equals one. Default is \code{TRUE}.}
 
-\item{cpal}{Color palette vector when coloring probability sequences. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
+	\item{seed}{A single value, interpreted as an integer, or \code{NULL} (default). See Details.}
 
-\item{title}{Title for the graphic. Default is \emph{Probability Transition Matrix}.}
+	\item{cspal}{A color palette that can be specified as one of: \code{"dynamic", "harmonic", "cold", "warm", "heat", "terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes.}
 
-\item{xlab}{Label for the x axis. Default is \emph{Time}.}
+	\item{cpal}{Color palette vector when coloring probability sequences. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
 
-\item{ylab}{Label for the y axis. Default is \emph{States}.}
+	\item{title}{Title for the graphic. Default is \emph{Probability Transition Matrix}.}
 
-\item{ylim}{Numeric vector of length 2 giving the y coordinates range.}
+	\item{xlab}{Label for the x axis. Default is \emph{Time}.}
 
-\item{xtlab}{Label for the x axis ticks. Default is time (t, t+1,...).}
+	\item{ylab}{Label for the y axis. Default is \emph{States}.}
 
-\item{pfilter}{Probability filter. Can be specified as one of \code{"tmax", "tmin", "smax", "smin"}. See Details.}
+	\item{ylim}{Numeric vector of length 2 giving the y coordinates range.}
 
-\item{shade.col}{The color for sequences shaded out using the \code{pfilter} argument. Default is \code{"grey80"}. See Details.}
+	\item{xtlab}{Label for the x axis ticks. Default is time (t, t+1,...).}
 
-\item{num}{Numeric. The number of sequences to be highlighted. Only applicable when using \code{pfilter="tmax"} or \code{pfilter="tmin"}. Default is 1.}
+	\item{pfilter}{Probability filter. Can be specified as one of \code{"tmax", "tmin", "smax", "smin"}. See Details.}
 
-\item{hide.col}{The color for sequences shaded out using the \code{filter} argument. Default is \code{"grey80"}. See Details.}
+	\item{shade.col}{The color for sequences shaded out using the \code{pfilter} argument. Default is \code{"grey80"}. See Details.}
 
-\item{lorder}{Line order. Either \code{"background"} or \code{"foreground"}. When \code{pfilter} is used \code{lorder} is set by default.}
+	\item{num}{Numeric. The number of sequences to be highlighted. Only applicable when using \code{pfilter="tmax"} or \code{pfilter="tmin"}. Default is 1.}
 
-\item{verbose}{Logical. Reports extra information on progress. Default is \code{FALSE}.}
+	\item{hide.col}{The color for sequences shaded out using the \code{filter} argument. Default is \code{"grey80"}. See Details.}
 
-\item{...}{Additional arguments, such as graphical parameters, to be passed on. See \command{\link[graphics]{par}} and \command{\link[TraMineR]{seqpcplot}}.}
+	\item{lorder}{Line order. Either \code{"background"} or \code{"foreground"}. When \code{pfilter} is used \code{lorder} is set by default.}
+
+	\item{verbose}{Logical. Reports extra information on progress. Default is \code{FALSE}.}
+
+	\item{...}{Additional arguments, such as graphical parameters, to be passed on. See \command{\link[graphics]{par}} and \command{\link[TraMineR]{seqpcplot}}.}
 }
 \value{
-\code{trmatplot} returns an object of class \command{\link[TraMineR]{seqpcplot}}
+	\code{trmatplot} returns an object of class \command{\link{trmatplot}}. Some of the arguments are inherent in \command{\link[graphics]{par}} and \command{\link[TraMineR]{seqpcplot}}.
 }
 
 \details{
 
-The object \code{d} to be plotted, is a probability matrix that when of class \command{\link[base]{matrix}} can be user defined, or an output of packages such as \pkg{msm}, \pkg{HiddenMarkov}, \pkg{HMM}, to name a few. A probability matrix obtained using the package \pkg{depmixS4} is of class \command{\link[depmixS4]{depmix.fitted}} and this is also accepted.
-
+The object \code{d} to be plotted, is a probability matrix which, when of class \command{\link[base]{matrix}} or \command{\link[base]{array}}, can be user defined. Alternatively, if the probability transition matrix is the output packages \pkg{msm}, \pkg{HiddenMarkov} and \pkg{HMM}, it is of class \command{\link[base]{matrix}}. A probability matrix obtained using the package \pkg{depmixS4} is of class \command{\link[depmixS4]{depmix.fitted}} and this is also accepted.
 
 Setting a \code{seed} allows the graphic to be replicated.
 
 The \code{pfilter} argument serves to highlight probability sequences that are either most probable while shading out those that are less probable in \code{shade.col} and vice-versa.
 The four options for \code{pfilter} are described below, and are illustrated in Examples.
 \describe{
-\item{\code{"smax"}}{For each initial state the most probable next state is highlighed.}
-\item{\code{"smin"}}{For each initial state the least probable next state is highlighed.}
-\item{\code{"tmax"}}{The sequence of states with the highest probability overall is highlighed. To highlight the \emph{n} most probable sequences of states, set \code{num = n}.}
-\item{\code{"tmin"}}{The sequence of states with the lowest probability overall is highlighed. To highlight the \emph{n} least probable sequences of states, set \code{num = n}.}
+	\item{\code{"smax"}}{For each initial state the most probable next state is highlighed.}
+	\item{\code{"smin"}}{For each initial state the least probable next state is highlighed.}
+	\item{\code{"tmax"}}{The sequence of states with the highest probability overall is highlighed. To highlight the \emph{n} most probable sequences of states, set \code{num = n}.}
+	\item{\code{"tmin"}}{The sequence of states with the lowest probability overall is highlighed. To highlight the \emph{n} least probable sequences of states, set \code{num = n}.}
 }
 
  The \code{filter} and \code{hide.col} arguments are inherent in and may be passed on to \command{\link[TraMineR]{seqpcplot}}.
@@ -162,7 +162,8 @@ Poulcheria Adamopoulou
 	Zeileis, A.; Hornik, K. and P. Murrell (2009), "Escaping RGBland: Selecting Colors for Statistical Graphics", \emph{Computational Statistics & Data Analysis}. Vol. 53, pp. 3259-3270.
 }
 \seealso{
-	\command{\link{trmatplot.march.Dcmm}}
-	\command{\link[TraMineR]{seqpcplot}}
+	\command{\link{march.Dcmm.trmatplot}}, 
+	\command{\link[TraMineR]{seqpcplot}}, 
+	\command{\link[graphics]{par}}.
 }
 
