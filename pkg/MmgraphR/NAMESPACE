@@ -1,4 +1,4 @@
-export(trmatplot)
+export(trmatplot, march.Dcmm.trmatplot)
 import("TraMineR", "colorspace")
 #importFrom(TraMineR,seqdef)
 #importFrom(TraMineR,seqpcplot)
@@ -12,8 +12,8 @@ S3method(trmatplot, default)
 #Export method "trmatplot" for class "depmix.fitted"
 S3method(trmatplot, depmix.fitted)
 
+#Export method "trmatplot" for class "array"
+S3method(trmatplot, array)
+
 #Export method "trmatplot" for class "march.Dcmm"
 #s3method(trmatplot, march.Dcmm)
-export(trmatplot.march.Dcmm)
-
-

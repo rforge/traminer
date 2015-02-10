@@ -1,3 +1,8 @@
+10.02.2015
+° trmatplot.array function added for arrays
+° rowconstraint argument added ; files changed trmatplot.Rd, trmatplot.default.R, trmatplot.array.R, trmatplot.depmix.fitted.R 
+° trmatplot.march.Dcmm renamed to march.Dcmm.trmatplot so as not to cause confusion until march is released on CRAN
+
 06.02.2015
 ° trmatplot.march.Dcmm.Rd updated for 'usage' and 'references'
 ° trmatplot.Rd updated for 'details' and 'references 
