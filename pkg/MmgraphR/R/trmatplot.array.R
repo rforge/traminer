@@ -17,7 +17,7 @@ trmatplot.array <- function (d, rowconstraint = TRUE, seed = NULL,
 #	if ( as.integer ( log ( dim(array, base= 2))==(log(8,base=2))
 
 
-  d <- matrix ( d, nrow = ( dim ( d )[1]), ncol= (dim(d)[2]), byrow = TRUE)
+  d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
  
   trmatplot.default ( d = d, rowconstraint = rowconstraint, seed = seed,
 											cspal = cspal, cpal = cpal, title = title, 
