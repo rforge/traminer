@@ -129,7 +129,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
   
   w <- as.vector ( w )
   
-  s <- seqdef ( p , weights = w)
+  s <- suppressMessages ( seqdef ( p , weights = w) )
   
   st <- apply ( p , 1 , function ( x ) paste ( x , collapse = "-" ) )
   
