@@ -166,23 +166,19 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
 		  
 		if ( is.null ( cspal ) ) {
 			
-			if ( type == "hidden" ) {
+	#		if ( type == "hidden" ) {
       
     	  cpl <- rainbow_hcl ( M , c = 80 , l = 65 , start = 0 , end = 360 * ( M - 1 ) / M ) # cite: colorspace:::rainbow_hcl
 			
-    	}
+  #  	}
     
-			if ( type == "visible" ) {
+		# else	if ( type == "visible" ) {
       
-      	cpl <- heat_hcl ( M , h = c ( 100 , -100 ) , l = c ( 75 , 40), c = c ( 40 , 80 ) , power = 8 ) # ccolorspace:::heat_hcl
+   #   	cpl <- heat_hcl ( M , h = c ( 100 , -100 ) , l = c ( 75 , 40), c = c ( 40 , 80 ) , power = 8 ) # ccolorspace:::heat_hcl
       
-    	}
+    #	}
     
-			else {
-  			
-				cpl <- rainbow_hcl ( M , c = 80 , l = 65 , start = 0 , end = 360 * ( M - 1 ) / M ) # cite: colorspace:::rainbow_hcl
-			
-			}
+
 		}		
     
     else if ( ! is.null ( cspal ) & cspal == "dynamic"){
