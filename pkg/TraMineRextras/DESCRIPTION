@@ -16,3 +16,10 @@ Description: Collection of ancillary functions and utilities to be used in conju
 License: GPL (>= 2)
 URL: http://mephisto.unige.ch/traminer
 Encoding: UTF-8
+Author: Gilbert Ritschard [aut, cre, ths, cph],
+  Matthias Studer [aut],
+  Reto Buergin [aut],
+  Alexis Gabadinho [ctb],
+  Nicolas Muller [ctb],
+  Patrick Rousset [ctb]
+Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
