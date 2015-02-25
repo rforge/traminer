@@ -345,11 +345,11 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
   }
 
 	## PLOT
-	# list arguments inherent in seqpcplot
-  a <- structure (list ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col,
-												 lorder = lordr, order.align = "time", ylim = ylm, cpal = dat$ch, xtlab = xt), 
-									class = "seqpcplot")
+	
+	a <- seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
+         order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, plot = FALSE, ...) 
 
+ 
 	# list arguments inhert in trmatplot
 	b <- structure ( list ( rowconstraint = rowconstraint, 
 													cspal = cspal, 
@@ -361,9 +361,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
 	# aggregate list of arguments
 	rval <- structure ( list ( plot = a, trmatplot = b, seed = seed, verbose = verbose), class = "trmatplot")
 	
- 	# seqpcplot ( a, ...)
-  seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
-         order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, ...) 
+	plot ( a )
 	## DATA
   invisible ( rval )
 }
