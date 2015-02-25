@@ -379,9 +379,6 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
     
   }
   
-  # alphabet: labeling the y-axis ticks with the visible states (or why not even the hidden states?)
-  # yt <-d @ y @ dictionary
-  
   # hide.col
   
   if ( ! is.null ( filter ) & ! is.null ( hide.col ) ){
@@ -426,7 +423,8 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
          order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, plot = FALSE, ...) 
 
 	# ytlab
-
+  # alphabet: labeling the y-axis ticks with the visible states (or why not even the hidden states?)
+  # yt <-d @ y @ dictionary
 	if ( ! is.null ( ytlab ) ){
 		a$ylevs <- ytlab
 	}
@@ -449,7 +447,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
 
 	#	plot
 
-	if ( plot = TRUE ) {
+	if ( plot == TRUE ) {
 
 		plot ( a )
 

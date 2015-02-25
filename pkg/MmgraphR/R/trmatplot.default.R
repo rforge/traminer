@@ -373,7 +373,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
 
 	#	plot
 
-	if ( plot = TRUE ) {
+	if ( plot == TRUE ) {
 
 		plot ( a )
 
