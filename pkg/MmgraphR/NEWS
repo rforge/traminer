@@ -1,3 +1,7 @@
+25.02.2015
+° S3 method plot exported for objects of class trmatplot
+° ytlab argument added so that users can add y tick labels to the plot
+
 10.02.2015
 ° trmatplot.array function added for arrays
 ° rowconstraint argument added ; files changed trmatplot.Rd, trmatplot.default.R, trmatplot.array.R, trmatplot.depmix.fitted.R 
