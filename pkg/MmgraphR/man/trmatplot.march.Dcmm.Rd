@@ -11,11 +11,11 @@ A coordinate plot which maps each element in the probability transition matrix a
 \usage{
 ## For class 'march.Dcmm'
 
-march.Dcmm.trmatplot (d, seed = NULL, type = "hidden", hstate = 1,
+march.Dcmm.trmatplot ( d, seed = NULL, type = "hidden", hstate = 1,
 cspal = NULL, cpal = NULL, title = NULL, xlab = NULL,
-ylab = NULL, ylim = NULL, xtlab = NULL, pfilter = NULL,
-shade.col = "grey80", num = 1, hide.col = NULL, lorder = NULL,
-verbose = FALSE, ...)
+ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL, 
+pfilter = NULL, shade.col = "grey80", num = 1, hide.col = NULL, 
+lorder = NULL, plot = TRUE, verbose = FALSE, ...)
 }
 \arguments{
 	\item{d}{Object to be plotted. A \code{march.Dcmm} object.}
@@ -41,6 +41,8 @@ verbose = FALSE, ...)
 
 	\item{xtlab}{Label for the x axis ticks. Default is time (t, t+1,...).}
 
+	\item{ytlab}{Labels for the y axis ticks.}
+
 	\item{pfilter}{Probability filter. Can be specified as one of \code{"tmax", "tmin", "smax", "smin"}. See Details.}
 
 	\item{shade.col}{The color for sequences shaded out using the \code{pfilter} argument. Default is \code{"grey80"}. See Details.}
@@ -51,6 +53,8 @@ verbose = FALSE, ...)
 
 	\item{lorder}{Line order. Either \code{"background"} or \code{"foreground"}. When \code{pfilter} is used \code{lorder} is set by default.}
 
+	\item{plot}{Logical. Should the object be plotted. Default is \code{TRUE}.}
+	
 	\item{verbose}{Logical. Reports extra information on progress. Default is \code{FALSE}.}
 
 	\item{...}{Additional arguments, such as graphical parameters, to be passed on. See \command{\link[graphics]{par}} and \command{\link[TraMineR]{seqpcplot}}.}
