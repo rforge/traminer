@@ -6,6 +6,9 @@ import("TraMineR", "colorspace")
 #importFrom(colorspace,heat_hcl)
 #importFrom(colorspace,terrain_hcl)
 
+#Export method "plot" for class "trmatplot"
+S3method(plot, trmatplot)
+
 #Export method "trmatplot" for class "default"
 S3method(trmatplot, default)
 
