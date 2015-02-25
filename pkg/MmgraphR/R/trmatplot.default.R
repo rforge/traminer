@@ -8,6 +8,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
                       num = 1,
                       hide.col = NULL,
                       lorder = NULL,
+											plot = TRUE,
                       verbose = FALSE, ...){
   
   if ( verbose )
@@ -241,7 +242,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
   }
   
   
-  # XLAB
+  # title
   
   if ( is.null ( xlab ) ) {
     
@@ -255,7 +256,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
     
   }
   
-  # YLAB
+  # ylab
   
   if ( is.null(ylab) ){
     
@@ -269,7 +270,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
     
   }
   
-  #YLIM    
+  # ylim    
   
   if ( is.null ( ylim ) ){
     
@@ -284,7 +285,7 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
   }
   
   
-  # XtLAB
+  # xtlab
   
   if ( is.null ( xtlab ) ) {
     #xt <- c(0:(M-l))
@@ -345,24 +346,45 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
     
   }
 
-	## PLOT
-	
+	#	seqpcplot	
 	a <- seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
          order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, plot = FALSE, ...) 
 
- 
-	# list arguments inhert in trmatplot
+	# ytlab
+
+	if ( ! is.null ( ytlab ) ){
+		a$ylevs <- ytlab
+	}
+	else {
+		a$ylevs
+	}
+
+	#	list arguments inhert in trmatplot
 	b <- structure ( list ( rowconstraint = rowconstraint, 
 													cspal = cspal, 
+													ytlab = ytlab,
 													pfilter = pfilter, 
 													shade.col = shade.col, 
 													num = num ),
 									class = "trmatplot")
 
-	# aggregate list of arguments
+	#	aggregate list of arguments
 	rval <- structure ( list ( plot = a, trmatplot = b, seed = seed, verbose = verbose), class = "trmatplot")
+
+	#	plot
+
+	if ( plot = TRUE ) {
+
+		plot ( a )
+
+	}
 	
-	plot ( a )
+	else {
+
+		return ( rval )
+
+	}
+	
 	## DATA
   invisible ( rval )
 }

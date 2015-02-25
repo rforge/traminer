@@ -1,12 +1,14 @@
 # renamed from trmatplot.march.Dcmm b/c implies S3 method (impossible since march isn't on CRAN)
 march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1, 
                        	cspal = NULL, cpal = NULL, title = NULL,
-                      	xlab =  NULL, ylab = NULL, ylim = NULL, xtlab = NULL,
+                      	xlab =  NULL, ylab = NULL, ylim = NULL, 
+												xtlab = NULL, ytlab = NULL,
 												pfilter = NULL,                       	
 												shade.col = "grey80",
                        	num = 1,
                        	hide.col = NULL,
                        	lorder = NULL,
+												plot = TRUE,
                        	verbose = FALSE, ...){
 
 	###
@@ -418,28 +420,48 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
     lordr <- lorder
     
   }
-  	## PLOT
-	# list arguments inherent in seqpcplot
-  a <- structure (list ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col,
-												 lorder = lordr, order.align = "time", ylim = ylm, cpal = dat$ch, xtlab = xt), 
-									class = "seqpcplot")
 
-	# list arguments inhert in trmatplot
-	b <- structure ( list ( type = type,
+	#	seqpcplot	
+	a <- seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
+         order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, plot = FALSE, ...) 
+
+	# ytlab
+
+	if ( ! is.null ( ytlab ) ){
+		a$ylevs <- ytlab
+	}
+	else {
+		a$ylevs
+	}
+
+	#	list arguments inhert in trmatplot
+	b <- structure ( list ( type = type, 
 													hstate = hstate, 
 													cspal = cspal, 
+													ytlab = ytlab,
 													pfilter = pfilter, 
 													shade.col = shade.col, 
 													num = num ),
 									class = "trmatplot")
 
-	# aggregate list of arguments
+	#	aggregate list of arguments
 	rval <- structure ( list ( plot = a, trmatplot = b, seed = seed, verbose = verbose), class = "trmatplot")
+
+	#	plot
+
+	if ( plot = TRUE ) {
+
+		plot ( a )
+
+	}
 	
- 	# seqpcplot ( a, ...)
-  seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
-         order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, ...) 
+	else {
+
+		return ( rval )
+
+	}
+	
 	## DATA
   invisible ( rval )
-  
 }
+
