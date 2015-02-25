@@ -98,6 +98,10 @@ trmatplot(trmat)
 
 trmatplot(trmat, seed = 2)
 
+#--- Adjusting line width
+
+trmatplot(trmat, seed = 2, lwd = 0.8)
+
 
 ###########################################################
 # cspal: ready-to-use color palettes using colorspace
