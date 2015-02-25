@@ -1,5 +1,5 @@
-plot.trmatplot <- function ( x ) {
+plot.trmatplot <- function ( x, ... ) {
 
-	plot ( x $ plot )
+	plot ( x $ plot, ... )
 
 }
