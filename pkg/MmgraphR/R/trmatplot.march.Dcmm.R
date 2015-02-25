@@ -22,9 +22,10 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
 
 	##
 	## seed
-	if ( ! is.numeric ( seed ) ) {
+	if ( ! is.null ( seed ) & ! is.numeric ( seed ) ) {
 			stop ("[!] seed must be numeric")
 	}
+
   ##
   ## type
   if ( ! ( type %in% c ( "hidden", "visible" ) ) ) {
@@ -33,6 +34,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
 	if ( type == "visible" & d @ orderVC == 0 ) {
       stop ( "[!] visible matrix cannot be plotted when the visible order is zero" )
   }
+
  	##
   ## hstate
   if ( ! is.element ( hstate, c (1 : ( d @ M ) ) ) ) {
