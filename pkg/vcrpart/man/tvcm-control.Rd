@@ -13,7 +13,7 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
              sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
              trim = 0.1, estfun.args = list(), nimpute = 5, 
              maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
-             maxstep = 1e3, maxwidth = 1e9, maxdepth = 1e9,
+             maxstep = 1e3, maxwidth = Inf, maxdepth = Inf,
              lossfun = neglogLik2, ooblossfun = NULL, fast = TRUE,
              cp = 0.0, dfpar = 0.0, dfsplit = 1.0,
              cv = !sctest, folds = folds_control("kfold", 5),
@@ -23,7 +23,7 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
 
 \arguments{
   \item{alpha, bonferroni, trim, estfun.args, nimpute}{See
-    \command{\link{tvcglm_control}}} 
+    \command{\link{tvcolmm_control}}} 
   \item{mindev, cv, folds, prune, center}{See
     \command{\link{tvcglm_control}}}
   \item{minsize}{numeric (vector). The minimum sum of weights in

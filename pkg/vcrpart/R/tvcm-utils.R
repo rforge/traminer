@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-10-14
+##' Date:            2015-02-25
 ##'
 ##' Description:
 ##' Workhorse functions for the 'tvcm' function
@@ -49,6 +49,8 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
+##' 2015-02-25: add check for fixed effects model matrix in 'tvcm_grow_update'.
+##' 2015-02-24: - improved 'tvcm_getNumSplits' (bugs for the upper limits)
 ##' 2014-12-10: - added 'drop = FALSE' commands in 'tvcm_exsearch_nomToOrd'
 ##'               which produced errors
 ##'             - 'tvcm_getNumSplits' yielded sometimes more than 'maxnumsplit'
@@ -274,8 +276,8 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
     }
 
     ## random selection (used by 'fvcm')
-    if (any(c(control$ptry, control$vtry, control$ntry) < Inf))
-        splits <- tvcm_setsplits_rselect(splits, partid, nodeid, varid, control)
+    if (control$mtry < Inf)
+        splits <- tvcm_setsplits_rselect(splits, control)
     
     if (run > 0L && control$sctest) {
       
@@ -618,7 +620,8 @@ tvcm_grow_update <- function(object, control) {
     object$X <-
       olmm_merge_mm(x = model.matrix(termsFeCe, object$frame, conCe),
                     y = model.matrix(termsFeGe, object$frame, conGe), TRUE)
-
+    object$X <- olmm_check_mm(object$X)
+    
     if (control$center) {
       
       ## extract interaction predictors to be centered
@@ -727,36 +730,48 @@ tvcm_grow_gefp <- gefp.olmm # see 'olmm-methods.R'
 ##'-------------------------------------------------------- #
 
 tvcm_getNumSplits <- function(z, w, minsize, maxnumsplit) {
-
+  
   ## order the partitioning variable
   ord <- order(z)
   z <- z[ord]; w <- w[ord];
-
-  ## get first and last valid indices
   cw <- cumsum(w)
-  subsL <- max(c(1, which(cw < minsize)))
-  subsR <- min(c(length(z), which(cw > (cw[length(cw)] - minsize))))
+
+  ## result if there is no split
+  rval0 <- matrix(numeric(), ncol = 1L)
+  colnames(rval0) <- "cut"
+  attr(rval0, "type") <- "dev"
   
+  ## get the first index
+  subsL <- which(cw >= minsize)
+  if (length(subsL) < 1L) return(rval0)
+  subsL <- min(subsL)
+
+  ## get the last index
+  subsR <- cw < (cw[length(cw)] - minsize + 1)
+  if (!any(subsR)) return(rval0)
+  if (any(!subsR)) subsR <- subsR & z < min(z[!subsR])
+  if (!any(subsR)) return(rval0)
+  subsR <- max(which(subsR))
+
   if (subsL <= subsR && z[subsL] <= z[subsR]) {
 
     ## valid splits available
-    rval <- unique(z[z >= z[subsL] & z < z[subsR]])
-    maxz <- z[length(z)]
-
+    z <- z[subsL:subsR]
+    cw <- cw[subsL:subsR] - cw[subsL] + w[subsL]
+    
     ## apply a cutpoint reduction if necessary
-    if ((length(rval) - 1)  > maxnumsplit) {
-      nq <- maxnumsplit - 1L
+    if (length(unique(z)) > maxnumsplit) {
+      nq <- maxnumsplit - 1
       rval <- c()
       cw <- cw / cw[length(cw)]
-      while (length(rval) < (maxnumsplit + 1L)) {
+      while (length(unique(rval)) < maxnumsplit) {
         nq <- nq + 1L
         q <- (1:nq) / (nq + 1L)
-        rval <- unique(c(sapply(q, function(p) z[max(which(cw <= p))]), maxz))        
+        rval <- unique(sapply(q, function(p) z[max(which(cw <= p))]))
       }
+    } else {
+      rval <- unique(z)
     }
-
-    ## delete largest value
-    rval <- rval[rval < maxz]
 
     ## sometimes the while loop yields too many values ...
     if (length(rval) > maxnumsplit)
@@ -1069,47 +1084,27 @@ tvcm_setsplits_splitnode <- function(splits, spart, snode, nodeid) {
 ##' @details Used in 'tvcm'.
 ##'------------------------------------------------------ #
 
-tvcm_setsplits_rselect <- function(splits, partid, nodeid, varid, control) {
+tvcm_setsplits_rselect <- function(splits, control) {
 
-  ## get the candidate node
-  nodeidC <- nodeid
-  for (pid in seq_along(partid))
-    for (nid in seq_along(nodeid[[pid]]))
-      if (all(sapply(splits[[pid]][[nid]], function(x) length(x) == 0L)))
-        nodeidC[[pid]] <- setdiff(nodeidC[[pid]], nid)
-
-  ## get the candidate partitions
-  partidC <- partid
-  for (pid in seq_along(partid))
-    if (length(nodeidC[[pid]]) == 0L)
-      partidC <- setdiff(partidC, pid)
-
-  ## get candidates variables for each partition
-  varidC <- varid
-  for (pid in seq_along(partid))
-    for (vid in seq_along(varid[[pid]]))
-      if (all(sapply(splits[[pid]], length) == 0L))
-        varidC[[pid]] <- setdiff(varidC[[pid]], vid)
-
-  ## random selections
-  spart <- sort(sample(partidC, min(length(partidC), control$ptry)))
-  svar <- lapply(seq_along(varidC), function(pid) {
-    s <- sample(length(varidC[[pid]]), min(length(varidC[[pid]]), control$vtry[pid]))
-    return(varidC[[pid]][sort(s)])
-  })
-  snode <- lapply(seq_along(nodeidC), function(pid) {
-    s <- sample(length(nodeidC[[pid]]), min(length(nodeidC[[pid]]),control$vtry[pid]))
-    return(nodeidC[[pid]][sort(s)])
-  })  
-
+  ## extract valid partition/node/variable combinations
+  idmat <- matrix(, 0, 3)
+  for (pid in seq_along(splits))
+    for (nid in seq_along(splits[[pid]]))
+      for (vid in seq_along(splits[[pid]][[nid]]))
+        if (nrow(splits[[pid]][[nid]][[vid]][[1L]]) > 0L)
+          idmat <- rbind(idmat, c(pid, nid, vid))
+  
+  ## randomly select partition/node/variable combinations
+  if (nrow(idmat) > control$mtry)
+    idmat <- idmat[sort(sample(1:nrow(idmat), control$mtry)),,drop = FALSE]
+  
   ## delete unselected nodes
-  for (pid in seq_along(partid)) 
-    for (nid in seq_along(nodeid[[pid]])) 
-      for (vid in seq_along(varid[[pid]])) 
-        if (nrow(splits[[pid]][[nid]][[vid]]) > 0 &&
-            !(pid %in% spart & vid %in% svar[[pid]] & nid %in% snode[[pid]]))
+  for (pid in seq_along(splits))
+    for (nid in seq_along(splits[[pid]]))
+      for (vid in seq_along(splits[[pid]][[nid]]))
+        if (!any(apply(idmat, 1, function(x) all(x == c(pid, nid, vid)))))        
           splits[[pid]][[nid]][[vid]][[2L]][] <- -Inf
-
+  
   ## return updated 'splits'
   return(splits)
 }
@@ -1190,7 +1185,8 @@ tvcm_grow_sctest <- function(model, nodes, where, partid, nodeid, varid,
       for (nid in seq_along(nodeid[[pid]])) { # loop over nodes
         
         ## check if there is a permitted split
-        if (nrow(splits[[pid]][[nid]][[vid]][[1L]]) > 0L) {
+        if (nrow(splits[[pid]][[nid]][[vid]][[1L]]) > 0L &&
+            all(is.na(splits[[pid]][[nid]][[vid]][[2L]]))) {
           
           ## observations of the current partition
           rows <- where[[pid]] == levels(where[[pid]])[nid] 
@@ -1917,16 +1913,6 @@ tvcm_grow_setcontrol <- function(control, model, formList, root, parm.only = TRU
     if (!length(control$maxdepth) %in% c(1L, npart))
       stop("'maxdepth' must be either of length ", 1L, " or ", npart, ".")
     control$maxdepth <- rep_len(control$maxdepth, npart)
-    
-    ## update 'fvcm' parameters
-    
-    if (!length(control$ntry) %in% c(1L, npart))
-      stop("'ntry' must be either of length ", 1L, " or ", npart, ".")
-      control$ntry <- rep_len(control$ntry, npart)
-    
-    if (!length(control$vtry) %in% c(1L, npart))
-      stop("'vtry' must be either of length ", 1L, " or ", npart, ".")
-    control$vtry <- rep_len(control$vtry, npart)
   }
   
   ## update the 'parm' and the 'nuisance' slots

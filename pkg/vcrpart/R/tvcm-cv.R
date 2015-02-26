@@ -301,14 +301,14 @@ cvloss.tvcm <- function(object, folds = folds_control(), ...) {
       }
 
     } else {
-      cv <- NULL
+      cv <- ibTree
 
     }
     if (control$verbose) {
       if (control$papply != "lapply") {
-        if (is.null(cv)) cat("failed")
+        if (inherits(cv, "try-error")) cat("failed")
       } else {
-        if (is.null(cv)) cat("failed") else cat(" OK")
+        if (inherits(cv, "try-error")) cat("failed") else cat(" OK")
       }
     }
     ## return output
@@ -414,8 +414,7 @@ cvloss.tvcm <- function(object, folds = folds_control(), ...) {
     cv[rval$error$which] <- NULL
     rval$node <- lapply(cv, function(x) x[[1L]])
     rval$coefficients <- lapply(cv, function(x) x[[2L]])
-    rval$contrasts <- lapply(cv, function(x) x[[3L]])
-    
+    rval$contrasts <- lapply(cv, function(x) x[[3L]])   
     rval$folds <- foldsMat
   }
   

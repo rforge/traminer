@@ -1,5 +1,21 @@
 Changes in Version 0.3-3
 
+    o    Replaced 'ptry', 'ntry' and 'vtry' parameters for random
+         selections of 'fvcm' by 'mtry', see 'fvcm_control'. 'mtry' 
+         specifies the number of random selections of combinations of
+         partition, node and variable.
+
+    o    Removed internal bugs of 'tvcolmm' and 'tvglm' calls The 
+         changes have no consequences for the users. 
+
+    o    Removed internal bugs in 'fvcm'.
+
+    o    Improved help file of 'fvcm'.
+
+    o    Changed the defaults for 'maxwidth' and 'maxdepth' in 'tvcm_control'
+         from '1e9' to 'Inf'.
+
+
 Changes in Version 0.3-2
 	
     o    Changed a default definition for 'formula' of 'olmm'. Terms

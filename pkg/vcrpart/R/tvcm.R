@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2015-01-04
+##' Date:        2015-23-02
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -81,10 +81,17 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE, minsize = 50,
 
   mc <- match.call()
   mc[[1L]] <- as.name("tvcm_control")
-  if (!"minsize" %in% names(mc))
-    mc$minsize <- formals(tvcolmm_control)$minsize
-  if (!"sctest" %in% names(mc))
-    mc$sctest <- TRUE
+  mc$alpha <- alpha
+  mc$bonferroni <- bonferroni
+  mc$minsize <- minsize
+  mc$maxnomsplit <- maxnomsplit
+  mc$maxordsplit <- maxordsplit
+  mc$fast <- fast
+  mc$trim <- trim
+  mc$estfun.args <- estfun.args
+  mc$nimpute <- nimpute
+  mc$seed <- seed
+  mc$sctest <- TRUE
   return(eval.parent(mc))
 }
 
@@ -107,6 +114,15 @@ tvcglm_control <- function(minsize = 30, mindev = 2.0,
                            prune = cv, center = TRUE, ...) {
   mc <- match.call()
   mc[[1L]] <- as.name("tvcm_control")
+  mc$minsize <- minsize
+  mc$mindev <- mindev
+  mc$maxnomsplit <- maxnomsplit
+  mc$maxordsplit <- maxordsplit
+  mc$maxnumsplit <- maxnumsplit
+  mc$cv <- cv
+  mc$folds <- folds
+  mc$prune <- prune
+  mc$center <- center
   return(eval.parent(mc))
 }
 
@@ -126,7 +142,7 @@ tvcm <- function(formula, data, fit, family,
 
   ## set seed
   if (!exists(".Random.seed", envir = .GlobalEnv)) runif(1)
-  oldSeed <- get(".Random.seed", mode="numeric", envir=globalenv())
+  oldSeed <- get(".Random.seed", mode = "numeric", envir = globalenv())
   if (!is.null(control$seed)) set.seed(control$seed)
   RNGstate <- .Random.seed
   
@@ -340,7 +356,7 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                          sctest = FALSE, alpha = 0.05, bonferroni = TRUE,
                          trim = 0.1, estfun.args = list(), nimpute = 5, 
                          maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
-                         maxstep = 1e3, maxwidth = 1e9, maxdepth = 1e9,
+                         maxstep = 1e3, maxwidth = Inf, maxdepth = Inf,
                          lossfun = neglogLik2, ooblossfun = NULL, fast = TRUE,
                          cp = 0.0, dfpar = 0.0, dfsplit = 1.0, 
                          cv = !sctest, folds = folds_control("kfold", 5),
@@ -361,14 +377,17 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
   stopifnot(is.numeric(nimpute) && length(nimpute) == 1L && nimpute > 0)
   nimpute <- max(1.0, round(nimpute))
 
-  stopifnot(is.numeric(maxnomsplit) && length(maxnomsplit) == 1L && maxnomsplit > 1L)
-  stopifnot(is.numeric(maxordsplit) && length(maxordsplit) == 1L && maxordsplit > 1L)
-  stopifnot(is.numeric(maxnumsplit) && length(maxnumsplit) == 1L && maxnumsplit > 1L)
+  stopifnot(is.numeric(maxnomsplit) && length(maxnomsplit) == 1L && maxnomsplit > 0L)
+  stopifnot(is.numeric(maxordsplit) && length(maxordsplit) == 1L && maxordsplit > 0L)
+  stopifnot(is.numeric(maxnumsplit) && length(maxnumsplit) == 1L && maxnumsplit > 0L)
 
   stopifnot(is.numeric(maxstep) && length(maxstep) == 1L && maxstep >= 0L)
+  maxstep <- min(maxstep, .Machine$integer.max)
   stopifnot(is.numeric(maxwidth) && all(maxwidth > 0L))
+  maxwidth <- min(maxwidth, .Machine$integer.max)
   stopifnot(is.numeric(maxdepth) &&  all(maxdepth >= 0))
-
+  maxdepth <- min(maxdepth, .Machine$integer.max)
+  
   stopifnot(is.function(lossfun))
   stopifnot(is.null(ooblossfun) | is.function(ooblossfun))
 
@@ -407,12 +426,8 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
   stopifnot(is.list(papply.args))
   
   ## check hidden arguments
-  ptry <- ifelse(is.null(list(...)$ptry), Inf,  list(...)$ptry)
-  stopifnot(is.numeric(ptry) && length(ptry) == 1L && ptry > 0)
-  ntry <- if (is.null(list(...)$ntry)) Inf else list(...)$ntry
-  stopifnot(is.numeric(ntry) && all(ntry > 0))
-  vtry <- if (is.null(list(...)$vtry)) Inf else list(...)$vtry
-  stopifnot(is.numeric(vtry) && all(vtry > 0))
+  mtry <- ifelse(is.null(list(...)$mtry), .Machine$integer.max,  list(...)$mtry)
+  stopifnot(is.numeric(mtry) && length(mtry) == 1L && mtry > 0L)
   
   ## ensure backward compability
   if ("maxevalsplit" %in% names(list(...))) maxnumsplit <- list(...)$maxevalsplit
@@ -454,9 +469,7 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                 papply.args = papply.args,
                 center = center,
                 verbose = verbose,
-                ptry = ptry,
-                ntry = ntry,
-                vtry = vtry,                 
+                mtry = as.integer(mtry),     
                 parm = NULL, intercept = NULL,
                 seed = seed,
                 functional.factor = "LMuo",

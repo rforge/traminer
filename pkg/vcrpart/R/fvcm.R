@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-10-14
+##' Date:            2015-02-24
 ##'
 ##' Description:
 ##' Random forests and bagging for the 'tvcm' algorithm.
@@ -19,10 +19,13 @@
 ##' ranef.fvcm:   extracts random effects
 ##'
 ##' To do:
-##' - set 'ptry', 'vtry' and 'ntry' automatically (see Hastie)
+##' - 
 ##'
 ##' Last modifications:
-##' 2014-10-14: found bug in predict.tvcm: now the 'coefi'
+##' 2015-02-24: - replace 'ptry', 'ntry' and 'vtry' by 'mtry'.
+##' 2015-02-23: - resolved errors for 'fvcolmm' and 'fvcglm' calls
+##'             - disable 'nimpute' in the defaults
+##' 2014-10-14: found bug in predict.fvcm: now the 'coefi'
 ##'             matrices are ordered by the column names of
 ##'             'coef'.
 ##' 2014-09-07: - improvment of predict.tvcm function
@@ -39,6 +42,10 @@
 fvcolmm <- function(..., family = cumulative(), control = fvcolmm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
+  if (!"family" %in% names(mc))
+    mc$family <- formals(fvcolmm)$family
+  if (!"control" %in% names(mc))
+    mc$control <- formals(fvcolmm)$control
   mc$fit <- "olmm"
   if ("weights" %in% names(mc)) mc$weights <- list(...)$weights
   if ("offset" %in% names(mc)) mc$offset <- list(...)$offset
@@ -47,11 +54,17 @@ fvcolmm <- function(..., family = cumulative(), control = fvcolmm_control()) {
 
 
 fvcolmm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
-                            ptry = 1, ntry = 1, vtry = 5, alpha = 1.0, ...) {
+                            mtry = 5, alpha = 1.0, minsize = 50, nimpute = 1, ...) {
 
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm_control")
   mc$sctest <- TRUE
+  mc$maxstep <- maxstep
+  mc$folds <- folds
+  mc$mtry <- mtry
+  mc$alpha <- 1
+  mc$minsize <- minsize
+  mc$nimpute <- nimpute
   return(eval.parent(mc))
 }
 
@@ -59,6 +72,8 @@ fvcolmm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5
 fvcglm <- function(..., family, control = fvcglm_control()) {
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm")
+  if (!"control" %in% names(mc))
+    mc$control <- formals(fvcglm)$control
   mc$fit <- "glm"
   if ("weights" %in% names(mc)) mc$weights <- list(...)$weights
   if ("offset" %in% names(mc)) mc$offset <- list(...)$offset
@@ -67,10 +82,14 @@ fvcglm <- function(..., family, control = fvcglm_control()) {
 
 
 fvcglm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
-                           ptry = 1, ntry = 1, vtry = 5, mindev = 0, ...) {
+                           mtry = 5, mindev = 0, ...) {
 
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm_control")
+  mc$maxstep <- maxstep
+  mc$folds <- folds
+  mc$mtry <- mtry
+  mc$mindev <- mindev
   return(eval.parent(mc))
 }
 
@@ -90,6 +109,12 @@ fvcm <- function(..., control = fvcm_control()) {
   initCall <- mc
   initCall[[1L]] <- as.name("tvcm")
   initCall$control <- control
+
+  ## set seed
+  if (!exists(".Random.seed", envir = .GlobalEnv)) runif(1)
+  oldSeed <- get(".Random.seed", mode = "numeric", envir = globalenv())
+  if (!is.null(control$seed)) set.seed(control$seed)
+  RNGstate <- .Random.seed
   
   object <- eval(initCall)
   
@@ -97,25 +122,17 @@ fvcm <- function(..., control = fvcm_control()) {
   
   ## reset the depth parameter and set the verbose parameter
   object$info$control$maxstep <- maxstep
+  object$info$control$verbose <- verbose
   
   ## compute trees for subsamples
   cvCall <- list(name = as.name("cvloss"),
                  object = quote(object),
                  folds = quote(control$folds),
-                 type = "forest",
-                 verbose = quote(verbose),
-                 papply = quote(control$papply))
-  papplyArgs <- intersect(names(formals(control$papply)), names(control))
-  cvCall[papplyArgs] <- control[papplyArgs]
+                 type = "forest")
   mode(cvCall) <- "call"
   cv <- eval(cvCall)
-  
-  fails <- cv$error$which  
-  
+    
   ## add new information to info slot
-  if (length(fails) > 0)
-    foldsMat <- foldsMat[, -fails, drop = FALSE]
- 
   object$info$forest <- cv$node
   object$info$coefficients <- cv$coefficients
   object$info$contrasts <- cv$contrasts
@@ -123,6 +140,13 @@ fvcm <- function(..., control = fvcm_control()) {
   object$info$error <- cv$error
   object$info$control$verbose <- verbose
   object$info$call <- mc
+
+  ## drop folds with errors
+  if (length(object$info$error$which) > 0)
+    object$info$folds <- object$info$folds[, -object$info$error$which, drop = FALSE]
+
+  ## reset seed
+  assign(".Random.seed", oldSeed, envir=globalenv())
   
   ## modifiy class attribute to allow methods
   class(object) <- append("fvcm", class(object))
@@ -131,8 +155,7 @@ fvcm <- function(..., control = fvcm_control()) {
 
 
 fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
-                         ptry = 1, ntry = 1, vtry = 5,
-                         alpha = 1.0, mindev = 0.0, ...) {
+                         mtry = 5,alpha = 1.0, mindev = 0.0, ...) {
 
   ## modify the 'papply' argument
   mc <- match.call()
@@ -144,8 +167,7 @@ fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
   
   ## combine the parameter to a list and disble cross validation and pruning 
   call <- list(maxstep = maxstep, folds = folds,
-               ptry = ptry, ntry = ntry, vtry = vtry,
-               alpha = alpha, mindev = mindev,
+               mtry = mtry, alpha = alpha, mindev = mindev,
                papply = papply, cv = FALSE, prune = FALSE)
   call <- appendDefArgs(call, list(...))
   
@@ -551,8 +573,7 @@ print.fvcm <- function(x, ...) {
     cat(" Subset: ", str, "\n", sep = "")
   if (length(x$info$control) > 0L)
     cat(paste("Control: ", 
-              "maxstep = ", x$info$control$maxstep,
-              ", minsize = ", paste(x$info$control$minsize, collapse = ", "),
+              "minsize = ", paste(x$info$control$minsize, collapse = ", "),
               ", ntrees = ", length(x$info$forest),
               "\n", sep = ""))
   if (nzchar(mess <- naprint(attr(x$data, "na.action")))) 

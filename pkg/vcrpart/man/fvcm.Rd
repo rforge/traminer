@@ -19,18 +19,18 @@
 fvcm(..., control = fvcm_control())
 
 fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
-             ptry = 1, ntry = 1, vtry = 5, 
-             alpha = 1.0, mindev = 0.0, ...)
+             mtry = 5, alpha = 1.0, mindev = 0.0, ...)
 
 fvcolmm(..., family = cumulative(), control = fvcolmm_control())
 
 fvcolmm_control(maxstep = 10, folds = folds_control("subsampling", 5),
-                ptry = 1, ntry = 1, vtry = 5, alpha = 1.0, ...)
+                mtry = 5, alpha = 1.0,
+                minsize = 50, nimpute = 1, ...)
 
 fvcglm(..., family, control = fvcglm_control())
 
 fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
-               ptry = 1, ntry = 1, vtry = 5, mindev = 0, ...)
+               mtry = 5, mindev = 0, ...)
 }
 
 \arguments{
@@ -48,25 +48,16 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
     individual trees.}
   \item{folds}{a list of parameters to control the extraction of subsets, 
     as created by \command{\link{folds_control}}.}
-  \item{ptry}{positive numeric scalar. The number of \command{\link{vc}}
-    terms to be randomly sampled as candidates in each iteration. If
-    \code{0 < ptry < 1}, \code{ptry} is interpreted as the relative number
-    of terms to select regarding the total number of terms.} 
-  \item{ntry}{positive numeric, either a scalar or a vector of length
-    equal the number of \command{\link{vc}} terms. The number(s) of
-    nodes of each term to be randomly sampled as candidates in each
-    iteration. If \code{0 < ntry < 1}, \code{ntry} is interpreted as the
-    relative number of nodes to select regarding the current total number 
-    of nodes in the term.} 
-  \item{vtry}{positive numeric, either a scalar or a vector of length
-    equal the number of \command{\link{vc}} terms. The number(s) of input
-    variables of each term to be randomly sampled as candidates in each
-    iteration. If \code{0 < vtry < 1}, \code{ntry} is interpreted as the
-    relative number of variables to select regarding the total number of
-    variables of the corresponding term.} 
-  \item{mindev, alpha}{These two parameters are merely specified to
+  \item{mtry}{positive integer scalar. The number of combinations of
+    partitions, nodes and variables to be randomly sampled as candidates
+    in each iteration.} 
+  \item{mindev, alpha}{these parameters are merely specified to
     disable the default stopping rules for \command{\link{tvcm}}. See
-    also \command{\link{tvcm_control}} for details.} 
+    also \command{\link{tvcm_control}} for details.}
+  \item{minsize, nimpute}{special parameter settings for
+    \command{\link{fvcolmm}}. The minimum node size is set to the
+    default of \command{\link{tvcolmm}}. The default \code{nimpute}
+    deactivates the imputation procedure in cases of unbalanced data.}
 }
 
 \details{
@@ -75,8 +66,7 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
   \command{\link{tvcm}}. The method consist in growing multiple trees by
   using \command{\link{tvcm}} and aggregating the fitted coefficient
   functions in the scale of the predictor function. To enable bagging,
-  use \code{ptry = Inf}, \code{ntry = Inf} and \code{vtry = Inf} in
-  \command{\link{fvcm_control}}.    
+  use \code{mtry = Inf} in \command{\link{fvcm_control}}.    
 
   \command{\link{fvcolmm}} and \command{\link{fvcglm}} are the
   extensions for \command{\link{tvcolmm}} and
@@ -90,12 +80,10 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
   default arguments for \code{alpha} and \code{maxoverstep} essentially
   disable the stopping rules of \command{\link{tvcm}}, where the
   argument \code{maxstep} (the number of iterations i.e. the maximum
-  number of splits) fully controls the stopping. The three parameters
-  \code{ptry}, \code{ntry} and \code{vtry} control the randomization for
-  selecting the \command{\link{vc}} term, the node and the variable for
-  splitting. The default of \code{vtry = 5} is arbitrary. It should be
-  adjusted in applications, e.g., to the number of partitioning
-  variables (for each term) divided by 3, see Hastie et al. (2001). 
+  number of splits) fully controls the stopping. The parameter
+  \code{mtry} controls the randomization for selecting combinations of
+  partitions, nodes and variables for splitting. The default of
+  \code{mtry = 5} is arbitrary.
 }
 
 \value{An object of class \code{fvcm}.}
