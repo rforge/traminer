@@ -24,7 +24,7 @@
 ##
 # depmix.fitted.trmat
 ##
-depmix.fitted.trmat <- function ( d ) {
+trmat.depmix.fitted <- function ( d ) {
 	
   M <- attributes ( d ) $ nstates
 

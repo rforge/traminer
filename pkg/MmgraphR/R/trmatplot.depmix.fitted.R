@@ -11,7 +11,7 @@ trmatplot.depmix.fitted <- function (d, rowconstraint = TRUE, seed = NULL,
 													plot = TRUE,
                        		verbose = FALSE, ...){
 
-  d <- depmix.fitted.trmat ( d )
+  d <- trmat.depmix.fitted ( d )
  
    trmatplot.default ( d = d, rowconstraint = rowconstraint, seed = seed,
 											cspal = cspal, cpal = cpal, title = title, 
@@ -26,3 +26,4 @@ trmatplot.depmix.fitted <- function (d, rowconstraint = TRUE, seed = NULL,
                       verbose = verbose, ... )
   
 }
+
