@@ -161,6 +161,7 @@ deviance.olmm <- function(object, ...) return(-as.numeric(2.0 * logLik(object)))
 predecor_control <- function(impute = TRUE, seed = NULL,
                              symmetric = TRUE, center = FALSE,
                              reltol = 1e-6, maxit = 250L, minsize = 1L, 
+                             include = c("observed", "all"),
                              verbose = FALSE, silent = FALSE) {
   stopifnot(is.logical(impute) && length(impute) == 1L)
   stopifnot(is.null(seed) | is.numeric(seed) && length(seed) == 1L)
@@ -169,12 +170,13 @@ predecor_control <- function(impute = TRUE, seed = NULL,
   stopifnot(is.numeric(reltol) && reltol > 0 && length(reltol) == 1L)
   stopifnot(is.numeric(maxit) && maxit > 0 && length(maxit) == 1L)
   stopifnot(is.numeric(minsize) && minsize > 0 && length(minsize) == 1L)
+  include <- match.arg(include)
   stopifnot(is.logical(verbose) && length(verbose) == 1L)
   stopifnot(is.logical(silent) && length(silent) == 1L)
   return(structure(list(impute = impute, seed = seed, 
                         symmetric = symmetric, center = center,
                         reltol = reltol, maxit = maxit, minsize = minsize, 
-                        verbose = verbose, silent = silent),
+                        include = include, verbose = verbose, silent = silent),
                    class = "predecor_control"))
 }
 
@@ -300,8 +302,10 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
     
     ## compute transformation matrix
     if (control$verbose) cat("\n* compute transformation matrix ...")
-    T <- olmm_decormat(scores = scores[!subsImp,,drop = FALSE],
-                       subject = x$subject[!subsImp],
+
+    subsT <- if (control$include == "observed") !subsImp else rep(TRUE, nrow(scores))
+    T <- olmm_decormat(scores = scores[subsT,,drop = FALSE],
+                       subject = x$subject[subsT],
                        control = control)
     
     ## if transformation failed, return raw scores

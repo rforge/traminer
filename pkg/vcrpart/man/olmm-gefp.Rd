@@ -21,6 +21,7 @@ predecor_control(impute = TRUE, seed = NULL,
                  symmetric = TRUE, center = FALSE,
                  reltol = 1e-6,
                  maxit = 250L, minsize = 1L,
+                 include = c("observed", "all"),
                  verbose = FALSE, silent = FALSE)
 
 gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
@@ -52,7 +53,11 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   \item{maxit}{the maximum number of iterations used to compute the
     transformation matrix.}
   \item{silent}{logical scalar. Should the report of warnings be
-    suppressed?} 
+    suppressed?}
+  \item{include}{logical scalar. Whether the transformation matrix
+    should be computed based on the scores corresponding to observations
+    (option \code{"observed"}) or on all scores (option \code{"all"}),
+    including the imputed values.}
   \item{verbose}{logical scalar. Produces messages.}
   \item{scores}{a function or a matrix. Function to extract the
     estimating equations from \code{object} or a matrix representing the
