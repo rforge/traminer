@@ -29,7 +29,7 @@
 \method{cvloss}{tvcm}(object, folds = folds_control(), ...)
 
 folds_control(type = c("kfold", "subsampling", "bootstrap"),
-      K = ifelse(type == "kfold", 5, 30),
+      K = ifelse(type == "kfold", 5, 100),
       prob = 0.5, weights = c("case", "freq"),
       seed = NULL)
 

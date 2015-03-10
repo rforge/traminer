@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2015-02-24
+##' Date:            2015-03-08
 ##'
 ##' Description:
 ##' Random forests and bagging for the 'tvcm' algorithm.
@@ -22,6 +22,7 @@
 ##' - 
 ##'
 ##' Last modifications:
+##' 2015-03-08: - change default parameters of control functions.
 ##' 2015-02-24: - replace 'ptry', 'ntry' and 'vtry' by 'mtry'.
 ##' 2015-02-23: - resolved errors for 'fvcolmm' and 'fvcglm' calls
 ##'             - disable 'nimpute' in the defaults
@@ -53,8 +54,9 @@ fvcolmm <- function(..., family = cumulative(), control = fvcolmm_control()) {
 }
 
 
-fvcolmm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
-                            mtry = 5, alpha = 1.0, minsize = 50, nimpute = 1, ...) {
+fvcolmm_control <- function(maxstep = 10, folds = folds_control("subsampling", K = 100),
+                            mtry = 5, alpha = 1.0, minsize = 50, nimpute = 1, verbose = TRUE,
+                            ...) {
 
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm_control")
@@ -81,8 +83,8 @@ fvcglm <- function(..., family, control = fvcglm_control()) {
 }
 
 
-fvcglm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
-                           mtry = 5, mindev = 0, ...) {
+fvcglm_control <- function(maxstep = 10, folds = folds_control("subsampling", K = 100),
+                           mtry = 5, mindev = 0, verbose = TRUE, ...) {
 
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm_control")
@@ -154,8 +156,8 @@ fvcm <- function(..., control = fvcm_control()) {
 }
 
 
-fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
-                         mtry = 5,alpha = 1.0, mindev = 0.0, ...) {
+fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", K = 100),
+                         mtry = 5,alpha = 1.0, mindev = 0.0, verbose = TRUE, ...) {
 
   ## modify the 'papply' argument
   mc <- match.call()
@@ -168,7 +170,8 @@ fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", 5),
   ## combine the parameter to a list and disble cross validation and pruning 
   call <- list(maxstep = maxstep, folds = folds,
                mtry = mtry, alpha = alpha, mindev = mindev,
-               papply = papply, cv = FALSE, prune = FALSE)
+               papply = papply, verbose = verbose,
+               cv = FALSE, prune = FALSE)
   call <- appendDefArgs(call, list(...))
   
   ## call 'tvcm_control'

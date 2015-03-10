@@ -69,7 +69,7 @@ oobloss.tvcm <- function(object, newdata = NULL, weights = NULL,
 
 
 folds_control <- function(type = c("kfold", "subsampling", "bootstrap"),
-                          K = ifelse(type == "kfold", 5, 30),
+                          K = ifelse(type == "kfold", 5, 100),
                           prob = 0.5, weights = c("case", "freq"),
                           seed = NULL) {
   if ("bootstrapping" %in% type) type <- "bootstrap"

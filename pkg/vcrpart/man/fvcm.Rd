@@ -18,19 +18,19 @@
 
 fvcm(..., control = fvcm_control())
 
-fvcm_control(maxstep = 10, folds = folds_control("subsampling", 5),
-             mtry = 5, alpha = 1.0, mindev = 0.0, ...)
+fvcm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
+             mtry = 5, alpha = 1.0, mindev = 0.0, verbose = TRUE, ...)
 
 fvcolmm(..., family = cumulative(), control = fvcolmm_control())
 
-fvcolmm_control(maxstep = 10, folds = folds_control("subsampling", 5),
-                mtry = 5, alpha = 1.0,
-                minsize = 50, nimpute = 1, ...)
+fvcolmm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
+                mtry = 5, alpha = 1.0, minsize = 50, 
+                nimpute = 1, verbose = TRUE, ...)
 
 fvcglm(..., family, control = fvcglm_control())
 
-fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
-               mtry = 5, mindev = 0, ...)
+fvcglm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
+               mtry = 5, mindev = 0, verbose = TRUE, ...)
 }
 
 \arguments{
@@ -58,6 +58,8 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", 5),
     \command{\link{fvcolmm}}. The minimum node size is set to the
     default of \command{\link{tvcolmm}}. The default \code{nimpute}
     deactivates the imputation procedure in cases of unbalanced data.}
+  \item{verbose}{logical. Should information about the fitting process
+    be printed to the screen?}
 }
 
 \details{

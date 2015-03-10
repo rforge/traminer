@@ -15,6 +15,9 @@ Changes in Version 0.3-3
     o    Changed the defaults for 'maxwidth' and 'maxdepth' in 'tvcm_control'
          from '1e9' to 'Inf'.
 
+    o    Changed default parameters for the number of folds and verbose in 
+         'fvcm_control', 'fvcolmm_control' and 'fvcglm_control'. 
+
 
 Changes in Version 0.3-2
 	
