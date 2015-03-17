@@ -4,8 +4,8 @@
 \title{Distances (dissimilarities) between sequences}
 
 \description{
- Computes pairwise dissimilarities between sequences or
-dissimilarities with a reference sequence. Several dissimilarities measures or metrics are available: optimal matching (OM), distance based on the longest common prefix (LCP), on the longest common suffix (RLCP), on the longest common subsequence (LCS), the Hamming distance (HAM) and the Dynamic Hamming Distance (DHD).
+Computes pairwise dissimilarities between sequences or
+dissimilarities with a reference sequence. Several dissimilarities measures can be chosen including optimal matching (OM) and many of its variants, distance based on the count of common attributes, and distances between within sequence state distributions.
  }
 
 \usage{
@@ -20,24 +20,24 @@ seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
 }
 
 \arguments{
-  \item{seqdata}{a state sequence object defined with the \code{\link{seqdef}} function.}
+  \item{seqdata}{State sequence object defined with the \code{\link{seqdef}} function.}
 
-  \item{method}{a character string indicating the metric to be used. One of
+  \item{method}{Character string indicating the metric to be used. One of
   \code{"OM", "OMloc", "OMslen", "OMspell", "OMstran", "LCS", "HAM", "DHD", "TWED", "SVRspell", "NMS", "NMSMST", "LCP", "RLCP", "CHI2", "EUCLID"} (see details)
-
-  \code{"OM"} (Optimal Matching), \code{"LCP"} (Longest Common Prefix), \code{"RLCP"} (reversed LCP, i.e. Longest Common Suffix), \code{"LCS"} (Longest Common Subsequence), \code{"HAM"} (Hamming distance), \code{"DHD"} (Dynamic Hamming distance), \code{"NMS"} (Number of matching subsequences), \code{"NMSMST"} (Number of matching subsequences weighted by minimum shared time), \code{"NMSDUR"} (Number of matching subsequences weighted by duration), \code{"OMloc"} (localized optimal matching), \code{"OMspell"} (spell optimal matching ), \code{"OMslen"} (duration sensititive optimal matching).}
+}
 
   \item{refseq}{Optional baseline sequence to compute the distances from. Can be the index of a sequence in the state sequence object, 0 for the most frequent sequence, or an external sequence passed as a sequence object with 1 row.}
 
-  \item{norm}{if \code{TRUE}, the computed OM, LCP, RLCP or LCS distances are normalized to account for differences in sequence lengths, and the normalization method is automatically selected.  Default is \code{FALSE}. Can also be one of \code{"none", "maxlength", "gmean", "maxdist", "YujianBo"}. See details.}
+  \item{norm}{String or logical. One of \code{"none", "maxlength", "gmean", "maxdist", "YujianBo"}. If \code{TRUE} the normalization method is automatically selected (see details).  Default is \code{FALSE}.}
 
-  \item{indel}{the insertion/deletion cost (for all OM variants including TWED). Default is 1. Ignored with non OM metrics. If it is a vector, the indel costs are state dependant (the vector length should equals the number of states).}
+  \item{indel}{Scalar or numeric vector. The insertion/deletion cost (for all OM variants including TWED). Default is 1. Ignored with non OM metrics. If it is a vector, the indel costs are state dependant (the vector length should be equal to the number of states).}
 
   \item{sm}{substitution-cost matrix (for OM variants, TWED, SVRspell, HAM and DHD method). Can also be one of the \code{\link{seqcost}} build methods \code{"TRATE"} or \code{"CONSTANT"}. Default is \code{NA}.}
 
   \item{with.missing}{Logical. Must be \code{TRUE} when sequences contain non deleted gaps (missing values). See details.}
 
-  \item{full.matrix}{Logical. If \code{TRUE} (default), the full distance matrix is returned. This is for compatibility with  earlier versions of the \code{seqdist} function. If \code{FALSE}, an object of class \code{\link{dist}} is returned, that is, a vector containing only values from the upper triangle of the distance matrix. Since the distance matrix is symmetrical, no information is lost with this representation while size is divided by 2. Objects of class \code{dist} can be passed directly as arguments to most clustering functions. Ignored when \code{refseq} is set.}
+  \item{full.matrix}{Logical. If \code{TRUE} (default), the full distance matrix is returned. This is for compatibility with  earlier versions of the \code{seqdist} function. If \code{FALSE}, an object of class \code{\link{dist}} is returned, that is, a vector containing only values from the upper triangle of the distance matrix. Objects of class \code{dist} are smaller and can be passed directly as arguments to most clustering functions. Ignored when \code{refseq} is set.}
+  
   \item{kweights}{Numerical vector with at position \eqn{k} the weight applied to subsequences of length \eqn{k} (for all NMS distances).}
 
   \item{expcost}{Scalar. Cost of spell length transformation (the exact interpretation is distance dependant). For \code{OMspell} and \code{OMloc}.}
@@ -47,7 +47,7 @@ seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
   \item{link}{Function name. Function used to compute some internal costs.\cr
   For \code{OMloc}, the function used in the dynamic computation of insertion/deletion costs; one of \code{"mean"} (default), \code{"min"} (minimum) or \code{"previous"} (previous state only). \cr
    For \code{"OMslen"}, the function used to compute substitution costs; one of \code{"mean"} (arithmetic average) or \code{"gmean"} (geometric mean as in the original proposition of Halpin 2010).\cr
-  For \code{NMS, NMSMST, SVRspell}, if \code{link=="log"}, the logarithm of common attributes is computed before computing the final distance.
+  %For \code{NMS, NMSMST, SVRspell}, if \code{link=="log"}, the logarithm of common attributes is computed before computing the final distance.
 }
   \item{h}{Scalar. Exponential weight of spell length (for \code{OMslen}).}
 
@@ -78,7 +78,9 @@ The \code{seqdistOO} function returns a matrix of distances between sequences or
 
  \item{\emph{Metrics based on counts of common attributes}: distance based on longest common subsequence (\code{LCS}), on longest common prefix (\code{LCP}), on longest common suffix (\code{RLCP}), number of matching subsequence (\code{NMS}), and the subsequence vectorial representation metric (\code{SVRspell}).}
 
- \item{\emph{Distances between state distributions}: Euclidean (\code{EUCLID}), Chi-squared (\code{CHI2}), and the Chi-squared distance between vectors of transition rates to the future states (\code{CHI2fut}).}
+ \item{\emph{Distances between state distributions}: Euclidean (\code{EUCLID}), Chi-squared (\code{CHI2}).
+ %, and the Chi-squared distance between vectors of transition rates to the future states (\code{CHI2fut}).
+ }
 }
 
 See \cite{Studer and Ritschard (2014)} for a description and the comparison of the above dissimilarity measures except \code{TWED} for which we refer to \cite{Marteau (2009)} and \cite{Halpin (2014)}.
@@ -117,15 +119,15 @@ When sequences contain gaps and the \code{gaps=NA} option was passed to \code{\l
 }
 
 \value{
- When \code{refseq} is \code{NULL} (default), the whole matrix of pairwise distances between sequences is returned. Otherwise a vector with distances from the sequences in the data sequence object to the reference sequence specified with \code{refseq} is returned.
+ When \code{refseq} is \code{NULL} (default), the whole matrix (or a \code{dist} object when \code{full.matrix=FALSE}) of pairwise distances between sequences is returned. Otherwise a vector with distances from the sequences in the data sequence object to the reference sequence specified with \code{refseq} is returned.
  }
 
 \seealso{
- \code{\link{seqsubm}}, \code{\link{seqdef}}, and for multichannel distances \code{\link{seqdistmc}}.
+ \code{\link{seqsubm}}, \code{\link{seqdef}}, and for multichannel distances \code{\link{seqdistmc}}, \code{\link{seqcost}}.
 }
 
 \references{
-Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES, Switzerland, 2014. DOI: \url{http://dx.doi.org/10.12682/lives.2296-1658.2014.33}
+Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES, Switzerland. DOI: \url{http://dx.doi.org/10.12682/lives.2296-1658.2014.33}
 
 %Elzinga, C. H. (2008). Sequence analysis: Metric representations of categorical time
 %series. \emph{Technical Report}, Department of Social Science Research Methods, Vrije Universiteit, Amsterdam.
@@ -146,7 +148,6 @@ Marteau, P.-F. (2009). Time Warp Edit Distances with Stiffness Adjustment for Ti
 %Rousset, P., Giret, J.-F., and Grelet, Y. (2012). Typologies de parcours et dynamique longitudinale.
 %\emph{Bulletin of Sociological Methodology/Bulletin de Méthodologie Sociologique},
 %114(1):5–34.
-
 
 See also all references in \cite{Studer and Ritschard (2014)}
 }
