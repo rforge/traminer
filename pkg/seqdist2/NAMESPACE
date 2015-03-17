@@ -1,0 +1,19 @@
+import("TraMineR")
+
+export(
+    seqdistOO,
+    seqcost
+  )
+
+useDynLib(seqdist2,
+    ##Debug
+    SD_getSDDebugLevel = getSDDebugLevel,
+    SD_setSDDebugLevel = setSDDebugLevel,
+    ## distances interface
+    TMR_cstringdistanceOO = cstringdistanceOO,
+    TMR_cstringdistanceOOomp = cstringdistanceOOomp,
+    TMR_tmrChisq = tmrChisq,
+    TMR_cstringrefseqdistanceOO = cstringrefseqdistanceOO
+
+)
+
