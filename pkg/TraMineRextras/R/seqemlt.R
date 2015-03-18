@@ -245,7 +245,7 @@ print.emlt <- function(x, ...) {
     cat("Periods of observation: ", x$period, "\n")
     cat("State alphabet: ")
     cat(x$state,"\n\n")
-cat("Frequencies of situations (time-stamped states):  \n")
+    cat("Frequencies of situations (time-stamped states):  \n")
     print(x$sit.freq)
     cat("\n")
     cat("sit.cor: Correlations between situations\n         (proximities/links between situations) \n\n")
