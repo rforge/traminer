@@ -1,11 +1,11 @@
 Changes in Version 0.3-3
 
     o    Replaced 'ptry', 'ntry' and 'vtry' parameters for random
-         selections of 'fvcm' by 'mtry', see 'fvcm_control'. 'mtry' 
-         specifies the number of random selections of combinations of
-         partition, node and variable.
+         selections of the 'fvcm' function by 'mtry', see the 'fvcm_control' 
+ 	 function. 'mtry' specifies the number of random selections of 
+	 combinations of partition, node and variable.
 
-    o    Removed internal bugs of 'tvcolmm' and 'tvglm' calls The 
+    o    Removed internal bugs of the 'tvcolmm' and 'tvglm' functions. The 
          changes have no consequences for the users. 
 
     o    Removed internal bugs in 'fvcm'.
