@@ -1,5 +1,5 @@
 #'@keywords internal
-trmatplot.array <- function (d, rowconstraint = TRUE, seed = NULL,
+trmatplot.array <- function (d, seed = NULL, rowconstraint = TRUE, order= NULL,
 													cspal = NULL, cpal = NULL, title = NULL,
                 	       	xlab =  NULL, ylab = NULL, ylim = NULL, 
 													xtlab = NULL, ytlab = NULL,

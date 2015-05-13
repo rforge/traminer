@@ -1,5 +1,5 @@
 #'@keywords internal
-trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
+trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
 											cspal = NULL, cpal = NULL, title = NULL,
                       xlab =  NULL, ylab = NULL, ylim = NULL, 
 											xtlab = NULL, ytlab = NULL,
@@ -27,9 +27,9 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
 	## matrix
   if ( is.matrix ( d ) ) {
     
-    if ( ! identical ( nrow ( d ) , ncol ( d ) ) ) {
+    if ( order == 1 & ! identical ( nrow ( d ) , ncol ( d ) ) ) {
       
-      stop ( "[!] the transition probability matrix must be square, nrow = ncol" ) 
+      stop ( "[!] if of order one, the transition probability matrix must be square, nrow = ncol" ) 
       
     }
     
@@ -51,6 +51,18 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
 	## seed
 	if ( ! is.null ( seed ) & ! is.numeric ( seed ) ) {
 			stop ("[!] seed must be numeric")
+	}
+	
+ 	##
+	## rowconstraint
+	if ( ! is.null ( rowconstraint ) & ! is.logical ( rowconstraint ) ) {
+			stop ("[!] rowconstraint must be logical")
+	}
+	
+ 	##
+	## order
+	if ( ! is.null ( order ) & ! is.numeric ( order ) ) {
+			stop ("[!] order must be numeric")
 	}
   
 	##
@@ -117,9 +129,9 @@ trmatplot.default <- function (d, rowconstraint = TRUE, seed = NULL,
   
  	set.seed(seed)
   
- 	M <- dim ( d ) [ 1 ]
+ 	M <- dim ( d ) [ 2 ]
     
- 	l <- 1 
+ 	l <- order 
     
 	w <- d
  
