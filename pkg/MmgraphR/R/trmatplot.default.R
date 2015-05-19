@@ -365,7 +365,7 @@ trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
 	# ytlab
 
 	if ( ! is.null ( ytlab ) ){
-		a$ylevs <- ytlab
+		a$ylevs <- c( ytlab, "")
 	}
 	else {
 		a$ylevs
