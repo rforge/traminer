@@ -14,9 +14,10 @@ Additional functionalities of MmgraphR include probability filters that can easi
 \tabular{ll}{
 Package: \tab MmgraphR\cr
 Version: \tab 0.1\cr
-Date: \tab 2015-05-20\cr
+Date: \tab 2014-10-24\cr
 Depends: \tab R (>= 3.1.1), TraMineR, colorspace\cr
 License: \tab GPL (>= 2)\cr
+LazyData: \tab true\cr
 URL: \tab https://r-forge.r-project.org/R/?group_id=743\cr
 Encoding: \tab latin1\cr
 }
