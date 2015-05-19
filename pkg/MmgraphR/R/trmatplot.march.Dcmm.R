@@ -426,7 +426,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
   # alphabet: labeling the y-axis ticks with the visible states (or why not even the hidden states?)
   # yt <-d @ y @ dictionary
 	if ( ! is.null ( ytlab ) ){
-		a$ylevs <- ytlab
+		a$ylevs <- c (ytlab, "")
 	}
 	else {
 		a$ylevs
