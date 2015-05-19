@@ -15,11 +15,6 @@ Additional functionalities of MmgraphR include probability filters that can easi
 Package: \tab MmgraphR\cr
 Version: \tab 0.1\cr
 Date: \tab 2015-05-20\cr
-Authors@R: \tab c(
-  person("Pauline (Poulcheria)", "Adamopoulou", role = c("aut", "cre", "cph"), email = "padamopo@gmail.com"),
-  person("Gilbert", "Ritschard", role = c("ths"), email = "gilbert.ritschard@unige.ch"),
-  person("Andre", "Berchtold", role = c("ths"), email = "andre.berchtold@unil.ch" ),
-  person("Reto", "Buergin", role = c("cbt"), email = "rbuergin@gmx.ch"))\cr
 Depends: \tab R (>= 2.8.1), TraMineR, colorspace\cr
 License: \tab GPL (>= 2)\cr
 URL: \tab https://r-forge.r-project.org/R/?group_id=743\cr
@@ -83,6 +78,13 @@ trmatplot(trmat, seed = 2, pfilter = "smax")
 #--- The ten least probable sequences
 
 trmatplot(trmat, seed = 2, pfilter = "tmin", num = 10 )
+}
+\seealso{
+	\command{\link{trmatplot}},  
+	\command{\link{trmatplot.default}},  
+	\command{\link{trmatplot.depmix.fitted}}, 
+	\command{\link{trmatplot.array}},
+	\command{\link{march.Dcmm.trmatplot}}
 }
 
 \keyword{ package }
