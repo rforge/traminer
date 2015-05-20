@@ -195,7 +195,7 @@ trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
   
   predat <- data.frame ( w = w , ch = ch , s = st )
   
-  predat <- predat [ order ( predat $ s ) , ] # order by seq name
+  predat <- predat [ order ( predat $ s ) , ] # order by seq name, i.e. state
   
   if ( is.null ( pfilter ) ) {
     
@@ -365,7 +365,7 @@ trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
 	# ytlab
 
 	if ( ! is.null ( ytlab ) ){
-		a$ylevs <- c( ytlab, "")
+		a$ylevs <- ytlab
 	}
 	else {
 		a$ylevs
