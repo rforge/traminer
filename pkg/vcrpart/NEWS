@@ -1,5 +1,15 @@
 Changes in Version 0.3-3
 
+    o    Corrected issues with moderators with name 'x' in 'vc' terms. Thanks
+    	 Jonathan Williams for the hint.
+
+    o    Corrected issues in cases no 'vc' terms are specified in 'tvcm' or 
+         'fvcm'. In these cases there will be a warning message and a linear
+         model as specified in 'fit' will be returned. Correction carries over
+         to 'tvcglm', 'tvcolmm', 'fvcolmm' and 'fvcglm'.
+
+Changes in Version 0.3-3
+
     o    Replaced 'ptry', 'ntry' and 'vtry' parameters for random
          selections of the 'fvcm' function by 'mtry', see the 'fvcm_control' 
  	 function. 'mtry' specifies the number of random selections of 
