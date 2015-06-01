@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2015-03-08
+##' Date:            2015-06-01
 ##'
 ##' Description:
 ##' Random forests and bagging for the 'tvcm' algorithm.
@@ -22,6 +22,9 @@
 ##' - 
 ##'
 ##' Last modifications:
+##' 2015-06-01: - 'fvcm' gave an error when a linear model is specified
+##'               new version returns the linear model with a warning from
+##'               'tvcm'
 ##' 2015-03-08: - change default parameters of control functions.
 ##' 2015-02-24: - replace 'ptry', 'ntry' and 'vtry' by 'mtry'.
 ##' 2015-02-23: - resolved errors for 'fvcolmm' and 'fvcglm' calls
@@ -121,6 +124,8 @@ fvcm <- function(..., control = fvcm_control()) {
   object <- eval(initCall)
   
   if (verbose) cat("OK\n")
+
+  if (!inherits(object, "tvcm")) return(object)
   
   ## reset the depth parameter and set the verbose parameter
   object$info$control$maxstep <- maxstep

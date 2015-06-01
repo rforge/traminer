@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2015-23-02
+##' Date:        2015-06-01
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -14,6 +14,7 @@
 ##' tvcm_control    control function for 'tvcm'
 ##'
 ##' Last modifications:
+##' 2015-06-01: - give a warning when no 'vc' terms are specified.
 ##' 2014-12-08: - enable 'sctest = FALSE' in 'tvcolmm_control'
 ##'             - remove checks on length of argument list, which is
 ##'               not necessary because R assigns the argument names
@@ -171,15 +172,18 @@ tvcm <- function(formula, data, fit, family,
   ## set formulas
   if (control$verbose) cat("OK\n* setting formulas ... ")
   if (any(grepl("Right", all.vars(formula)) | grepl("Left", all.vars(formula)) |
-          grepl("Node", all.vars(formula))))
+          grepl("Node", all.vars(formula)) | grepl("fTerm", all.vars(formula))))
   if (any(substr(all.vars(formula), 1, 4) == "Node"))
-    stop("'Node', 'Left' and 'Right' are reserved labeles and cannot be used as",
-         "substrings of variable names.")
+    stop("'Node', 'Left', 'Right' and 'fTerm' are reserved labels and cannot",
+         "be used as variable names (or substrings of).")
   env <- environment(eval.parent(mc$formula))
   formList <- vcrpart_formula(formula, family, env)
   nPart <- length(formList$vc)  
-  if (nPart < 1L) control$cv <- FALSE
-    
+  if (nPart < 1L) {
+      control$cv <- FALSE
+      warning("no 'vc' terms. Return a linear model")
+  }
+  
   direct <- any(sapply(formList$vc, function(x) x$direct))
   if (length(direct) == 0L) direct <- FALSE
   control$direct <- direct
@@ -336,7 +340,7 @@ tvcm <- function(formula, data, fit, family,
     if (control$verbose) cat("\n* pruning ... ")
     tree <- prune(tree, cp = tree$info$cv$cp.hat, papply = control$papply)
     if (control$verbose) cat("OK")
-  }  
+  }
   
   if (control$verbose) {
     cat("\n\nFitted model:\n")

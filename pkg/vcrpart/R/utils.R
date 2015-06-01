@@ -24,6 +24,9 @@
 ##'                         from vcrpart_formula.
 ##'
 ##' Last modifications:
+##' 2015-06-01: corrected bug of 'vcrpart_formula' in cases where a
+##'             effect modifier has the variable name 'x'. Now I call
+##'             it 'fTerm'.
 ##' 2015-01-20: change defaults for random effect specification
 ##' 2014-11-10: exported function 'contr.wsum'
 ##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
@@ -350,14 +353,16 @@ vcrpart_formula_eta <- function(x, family, env) {
       }
       
       subsCe <- rval %in% termFact[attr(terms, "specials")$ce]
-      ceTerms <- unlist(lapply(rval[subsCe], function(x) eval(parse(text = x))))
+      ceTerms <-
+          unlist(lapply(rval[subsCe], function(fTerm) eval(parse(text = fTerm))))
       
       if (x$type == "vc" && any(sapply(ceTerms, checkOperators)))
         stop("the ':', '*' and '%in%' operators are not allowed for the 'by' ",
              "argument in 'vc' terms.")
       
       subsGe <- rval %in% termFact[attr(terms, "specials")$ge]
-      geTerms <- unlist(lapply(rval[subsGe], function(x) eval(parse(text = x)))) 
+      geTerms <-
+          unlist(lapply(rval[subsGe], function(fTerm) eval(parse(text = fTerm)))) 
       
       if (x$type == "vc" && any(sapply(geTerms, checkOperators)))
         stop("the ':', '*' and '%in%' operators are not allowed for the 'by' ",
@@ -548,8 +553,8 @@ vcrpart_formula <- function(formula, family = cumulative(),
     if (feTerms$intercept == "none") {
       direct <- vcInt == "ce"
       direct <- direct &
-        unlist(lapply(vcTerms, function(x) !"(Intercept)" %in%
-                      eval(parse(text = x))$nuisance))
+        unlist(lapply(vcTerms, function(fTerm) !"(Intercept)" %in%
+                      eval(parse(text = fTerm))$nuisance))
       subs <- which(direct)[1L]
     } else {
       subs <- c()
@@ -561,7 +566,7 @@ vcrpart_formula <- function(formula, family = cumulative(),
       direct <- direct[ord]
       vcTerms <- vcTerms[ord]
     }
-    vcTerms <- lapply(vcTerms, function(x) eval(parse(text = x)))
+    vcTerms <- lapply(vcTerms, function(fTerm) eval(parse(text = fTerm)))
     names(vcTerms) <- LETTERS[1:length(vcTerms)]
     for (pid in seq_along(vcTerms)) {
       vcTerms[[pid]]$name <- names(vcTerms)[pid]
