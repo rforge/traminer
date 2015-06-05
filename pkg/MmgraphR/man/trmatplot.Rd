@@ -159,7 +159,7 @@ trmatplot(trmat, seed = 2, pfilter = "tmin", num = 10 )
 # filter: Highlighting a specific sequence of interest
 ######################################################
 
-#--- Highlight the sequence that is initially in state 1 and then in state 4
+#--- Highlight the probability that a sequence is initially in state 1 and then in state 4
 
 trmatplot(trmat, seed = 2, filter = list(type = "sequence", value = "(1)-(4)"))
 }
