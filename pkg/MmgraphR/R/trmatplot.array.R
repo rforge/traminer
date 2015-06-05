@@ -19,8 +19,9 @@ trmatplot.array <- function (d, seed = NULL, rowconstraint = TRUE, order= NULL,
 #	if ( as.integer ( log ( dim(array, base= 2))==(log(8,base=2))
 
 
-  d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
- 
+ # d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
+	d <- as.matrix (d) 
+
   trmatplot.default ( d = d, rowconstraint = rowconstraint, seed = seed,
 											cspal = cspal, cpal = cpal, title = title, 
 											xlab = xlab, ylab = ylab, ylim = ylim, 
