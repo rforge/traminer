@@ -1,6 +1,9 @@
 import(TraMineR, cluster)
 importFrom(utils, packageDescription, packageVersion)
 importFrom(RColorBrewer, brewer.pal)
+importFrom("graphics", "par", "plot", "legend", "lines", "polygon", "layout")
+importFrom("grDevices", "adjustcolor")
+importFrom("stats", "var", "cutree", "median", "qnorm", "quantile", "xtabs", "aggregate", "as.dist", "hclust")
 
 export(
 as.clustrange,
