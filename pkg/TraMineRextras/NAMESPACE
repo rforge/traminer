@@ -36,7 +36,8 @@ export(
     seqauto,
     seqentrans,
     seqemlt,
-    seqtabstocc
+    seqtabstocc,
+    seqplot.rf
 )
 
 ## emlt methods

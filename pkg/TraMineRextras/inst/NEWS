@@ -1,5 +1,14 @@
-﻿                CHANGES IN TraMineRextras VERSION 0.3.4 [2015-01-27]
+﻿                CHANGES IN TraMineRextras VERSION 0.3.4 [2015-07-09]
 
+New function
+
+    o   seqplot.rf(): Implements the Relative Frequency Sequence Plots
+        introduced in Fasang and Liao (2014). 
+
+Help pages
+
+    o   revised help page for seqemlt() (distance of Rousset et al. 2012)
+            
 
                 CHANGES IN TraMineRextras VERSION 0.2.3 [2015-01-27]
 
