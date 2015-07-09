@@ -47,17 +47,23 @@ See Also \code{\link{seqplot}}.
 data(biofam)
 biofam.lab <- c("Parent", "Left", "Married", "Left+Marr",
 "Child", "Left+Child", "Left+Marr+Child", "Divorced")
-biofam.seq <- seqdef(biofam[1:600, ], 10:25, labels=biofam.lab)
+
+## Here, we use only 100 cases selected such that all elements 
+## of the alphabet be present. 
+## (More cases would be necessary to get a meaningful example.)
+biofam.seq <- seqdef(biofam[501:600, ], 10:25, labels=biofam.lab)
 diss <- seqdist(biofam.seq, method="LCS")
 
-## Use 60 groups, default MDS grouping
-seqplot.rf(biofam.seq, diss=diss, k=60)
+## Use 12 groups and default MDS grouping
+seqplot.rf(biofam.seq, diss=diss, k=12, 
+   title="Non meaningful example (n=100)")
 
 
 ## Using a user specified sorting variable
 ## Here time spent in parental home
 parentTime <- seqistatd(biofam.seq)[, 1]
-seqplot.rf(biofam.seq, diss=diss, k=60, sortv=parentTime)
+seqplot.rf(biofam.seq, diss=diss, k=12, sortv=parentTime, 
+   title="Sorted by parent time")
 
 }
 
