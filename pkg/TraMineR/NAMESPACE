@@ -1,5 +1,5 @@
-import(boot, RColorBrewer)
-importFrom(utils, packageDescription)
+import(boot, RColorBrewer, graphics, grDevices, stats)
+importFrom(utils, packageDescription, combn, download.file, read.table)
 
 export(
 	alphabet,
@@ -66,7 +66,7 @@ export(
 	TraMineRInternalNodeInit,
 	TraMineRInternalSplitInit,
 	TraMineRInternalLayout,
-	TraMineRInternalLegend, 
+	TraMineRInternalLegend,
 	TraMineRInternalSeqeage
   )
 

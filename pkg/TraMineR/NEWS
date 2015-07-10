@@ -1,9 +1,13 @@
 ## =========
 Version 1.9-10 (Development version)
 
+Misc:
+  - Updated help pages: seqeconstraint, seqtree, distree2dot
+  - Added required basic packages to the import statements to
+    comply with R v3.3 requirements
 
 ## =========
-Version 1.8-9 
+Version 1.8-9
 
 New function:
   - pcfilter(): convenience function to define the coloring
@@ -17,7 +21,7 @@ Changes in existing functions:
     - The 'filter' argument can now simply be a scalar, in which case
       the 'minfreq' filter is applied with this numeric value as threshold.
       See also the new function seqpcfilter().
-    - New argument 'missing' to control  whether and how to display missing 
+    - New argument 'missing' to control  whether and how to display missing
       values.
 
 Bug fixes:
