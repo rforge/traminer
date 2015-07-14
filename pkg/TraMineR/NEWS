@@ -5,6 +5,9 @@ Misc:
   - Updated help pages: seqeconstraint, seqtree, distree2dot
   - Added required basic packages to the import statements to
     comply with R v3.3 requirements
+  - One additional exported alias to a TraMineR internal function:
+    TraMineRInternalSeqgbar.
+
 
 ## =========
 Version 1.8-9
