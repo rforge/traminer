@@ -39,7 +39,7 @@ seqplot.rf_internal <- function(seqdata, k=floor(nrow(seqdata)/10), diss, sortv=
 		mdsk <- factor(cutree(hh, k))
 		medoids <- disscenter(diss, group=mdsk, medoids.index="first")
 		medoids <- medoids[levels(mdsk)]
-		ww <- xtabs(~mdsk)
+		#ww <- xtabs(~mdsk)
 		mds <- cmdscale(diss[medoids, medoids], k=1)
 		mdsk <- as.integer(factor(mdsk, levels=levels(mdsk)[order(mds)]))
 	}
