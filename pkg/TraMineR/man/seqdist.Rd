@@ -49,7 +49,7 @@ When sequences contain gaps and the \code{gaps=NA} option was passed to \code{\l
 
 \seealso{
  \code{\link{seqsubm}}, \code{\link{seqdef}}, and for multichannel distances \code{\link{seqdistmc}}.
- 
+
  For more dissimilarity measures, consider the package \emph{seqdist2} (available from R-Forge \url{https://r-forge.r-project.org/R/?group_id=743}) that proposes all the measures addressed in \cite{Studer and Ritschard (2015)}.
 
 }
@@ -64,7 +64,7 @@ Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009). Mining Sequence 
 
 Lesnard, L. (2006). Optimal Matching and Social Sciences. \emph{Série des Documents de Travail du CREST},  Institut National de la Statistique et des Etudes Economiques, Paris.
 
-Studer, M. and G. Ritschard (2015). What matters in differences between life trajectories: A comparative review of sequence dissimilarity. \emph{Journal of the Royal Statistical Society A},  (in press).
+Studer, M. and G. Ritschard (2015). What matters in differences between life trajectories: A comparative review of sequence dissimilarity. \emph{Journal of the Royal Statistical Society A},  (Early view), DOI: 10.1111/rssa.12125.
 
 }
 
