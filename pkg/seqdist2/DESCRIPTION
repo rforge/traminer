@@ -4,8 +4,7 @@ Date: 2015-03-17
 Title: Distance between state sequences
 Author: Matthias Studer <matthias.studer@unige.ch>, Gilbert Ritschard <gilbert.ritschard@unige.ch>
 Maintainer: Matthias Studer <matthias.studer@unige.ch>
-Depends: TraMineR
-Suggests: cluster
+Depends: TraMineR, cluster
 Description: This package provides a function to compute different distances between states sequences. The main function is seqdistOO.
 License: GPL (>= 2)
 URL: http://mephisto.unige.ch/traminer

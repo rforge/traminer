@@ -9,7 +9,7 @@ dissimilarities with a reference sequence. Several dissimilarities measures can 
  }
 
 \usage{
-seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
+seqdistOO(seqdata, method, refseq=NULL, norm=FALSE,
         indel=1, sm=NA, with.missing=FALSE, full.matrix=TRUE,
         kweights=rep(1.0, ncol(seqdata)), tpow=1,
         expcost=0.5, context=1-2*expcost,
@@ -159,15 +159,6 @@ data(biofam)
 biofam.seq <- seqdef(biofam, 10:25)
 costs <- seqsubm(biofam.seq, method="TRATE")
 biofam.om <- seqdistOO(biofam.seq, method="OM", indel=3, sm=costs)
-
-## normalized LCP distances
-biofam.lcp <- seqdistOO(biofam.seq, method="LCP", norm=TRUE)
-
-## normalized LCS distances to the most frequent sequence in the data set
-biofam.lcs <- seqdistOO(biofam.seq, method="LCS", refseq=0, norm=TRUE)
-
-## histogram of the normalized LCS distances
-hist(biofam.lcs)
 
 ## =====================
 ## Example with missings
