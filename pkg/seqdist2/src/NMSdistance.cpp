@@ -7,7 +7,9 @@ void SUBSEQdistance::setParameters(SEXP params){
 	distTransform = INTEGER(getListElement(params, "distTransform"))[0];
 	for (int is=0;is<nseq;is++) {
 		this->resetKvect();
-		this->computeattr(is,is);
+		if(slen[is]>0){
+			this->computeattr(is,is);
+		}
 		for(int i =0; i<maxlen; i++){
 			selfmatvect[MINDICE(is,i,nseq)]=kvect[i];
 		}
@@ -23,7 +25,9 @@ double SUBSEQdistance::distance(const int&is, const int& js){
 	}*/
 	int minimum = maxlen;
 	this->resetKvect();
-	this->computeattr(is, js);
+	if(slen[is]>0&&slen[js]>0){
+		this->computeattr(is, js);
+	}
 	if(this->distMethod==1){
 		double s=0, kval=0, ktot=0;
 		for(int i =0; i<minimum; i++){

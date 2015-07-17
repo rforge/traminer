@@ -365,53 +365,53 @@ seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	
 	## Function and arguments
 	if (!missing(refseq) && !is.null(refseq)) {
-			
-		## Getting refseq
-		##User specified
-		if (inherits(refseq,"stslist") && nrow(refseq)==1) {
-			compseq <- refseq
-			message(" [>] using (external) sequence ",
-				suppressMessages(seqformat(compseq, from="STS", to="SPS", compressed=TRUE)), " as reference")
-		}
-		## Most frequent sequence as reference
-		else if (refseq==0) {
-			mfseq <- seqtab(seqdata, tlim=1)
-			message(" [>] using most frequent sequence as reference: ",
-				suppressMessages(seqformat(mfseq, from="STS", to="SPS", compressed=TRUE)))
-			idxmfseq <- suppressMessages(seqfind(mfseq, seqdata))
-			message(" [>] most frequent sequence appears ", length(idxmfseq), " times")
-			compseq <- seqdata[idxmfseq[1],]
-		}
-		## Indice of sequence given as reference
-		else if (is.numeric(refseq) & refseq>0) {
-			compseq <- seqdata[refseq,]
+				if (is.numeric(refseq) && refseq>0 && refseq <= nrow(seqdata)) {
 			message(" [>] using sequence ", refseq,": ",
-				suppressMessages(seqformat(compseq, from="STS", to="SPS", compressed=TRUE)), " as reference")
+				suppressMessages(seqformat(seqdata[refseq,], from="STS", to="SPS", compressed=TRUE)), " as reference")
+			refseqid <- mcorr[refseq]
 		} else {
 			stop("[!] invalid reference sequence", call.=FALSE)
 		}
-		## Length of compseq
-		lcompseq <- seqlength(compseq)
+		## Getting refseq
+		##User specified
+		# if (inherits(refseq,"stslist") && nrow(refseq)==1) {
+			# compseq <- refseq
+			# message(" [>] using (external) sequence ",
+				# suppressMessages(seqformat(compseq, from="STS", to="SPS", compressed=TRUE)), " as reference")
+		# } 
+		# ## Most frequent sequence as reference
+		# else if (refseq==0) {
+			# mfseq <- seqtab(seqdata, tlim=1)
+			# message(" [>] using most frequent sequence as reference: ", 
+				# suppressMessages(seqformat(mfseq, from="STS", to="SPS", compressed=TRUE)))
+			# idxmfseq <- suppressMessages(seqfind(mfseq, seqdata))
+			# message(" [>] most frequent sequence appears ", length(idxmfseq), " times")
+			# compseq <- seqdata[idxmfseq[1],]
+		# } 
+		# ## Indice of sequence given as reference
+		# else 
+		# ## Length of compseq
+		## lcompseq <- seqlength(compseq)
 		## Vector of distance
-		m <- vector(mode="numeric", length=nd)
-		compseq <- TraMineR:::seqasnum(seqnum(compseq), with.missing=with.missing)
-		ddseq <- rbind(dseq[1,], dseq)
-		ddseq[1,1:lcompseq] <- compseq[1:lcompseq]
-		slength <- c(lcompseq, slength)
+		## m <- vector(mode="numeric", length=nd)
+		## compseq <- TraMineR:::seqasnum(seqnum(compseq), with.missing=with.missing)
+		## ddseq <- rbind(dseq[1,], dseq)
+		## ddseq[1,1:lcompseq] <- compseq[1:lcompseq]
+		## slength <- c(lcompseq, slength)
 		## SEXP cstringrefseqdistanceOO(SEXP Ssequences, SEXP seqdim, SEXP lenS, SEXP paramS, SEXP normS, SEXP disttypeS, SEXP refseqS) {
 		distances <- .Call(TMR_cstringrefseqdistanceOO,
-			as.integer(ddseq),
-			as.integer(dim(ddseq)),
+			as.integer(dseq),
+			as.integer(dim(dseq)),
 			as.integer(slength),
 			params,
 			as.integer(norm),
 			disttype,
-			as.integer(1))
-		distances <- distances[2:length(distances)]
+			as.integer(refseqid))
+		## distances <- distances[2:length(distances)]
 		## Constructing the final distance vector
 		#mcorr <- match(seqconc(seqdata),seqconc(dseq))
 		distances <- distances[mcorr]
-		names(distances) <- NULL	
+		names(distances) <- NULL
 	}
 	else { ## !Refseq
 		magicSeq <- order(mcorr)
