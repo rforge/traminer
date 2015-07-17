@@ -1,6 +1,7 @@
               CHANGES IN seqdist2 VERSION 0.9-1
 BUG FIXES
-  o seqdistOO: Restriction of the way to specify reference sequence. It can now only 
+  o seqdistOO: Restriction on the way to specify reference sequence as this was 
+			   causing problem with some distance measures. Currently, it can only 
 			   be the index of one of the sequence in the data. 
   o SVRspell: Now SVRspell can compute distances to the NULL sequence 
 			 (ie. a sequence of length 0)
