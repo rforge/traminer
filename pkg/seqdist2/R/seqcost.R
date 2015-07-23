@@ -20,6 +20,8 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 		stop(" [!] transition must be one of: ", paste(transitionlist,collapse=" "))
 	}
 
+    ret <- list()
+    ret$indel <- 1
 	alphabet <- attr(seqdata,"alphabet")
 	
 	cval4cond <- time.varying && method=="TRATE" && transition=="both"
@@ -83,7 +85,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 					}
 				}
 			}
-			return(dist)
+            return(dist)
 		}
 		if(time.varying){
 			stop(" [!] time.varying substitution cost are not (yet) implemented for FUTURE method.")
@@ -92,6 +94,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 		tr <- seqtrate(seqdata, time.varying=FALSE, weighted=weighted, lag=lag, with.missing = missing.trate)
 		costs <- chisqdist(tr)
 		diag(costs) <- 0
+        ret$indel <- .5*max(costs)
 	}
 	if (method=="FEATURES") {
 		if(time.varying){
@@ -100,7 +103,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 		if(is.null(state.prop) || nrow(state.prop)!=length(alphabet)){
 			stop(" [!] state.prop should be a data.frame containing one row per state (possibly one for missing values).")
 		}
-		if(!require(cluster)){
+		if(!requireNamespace(cluster)){
 			stop(" [!] cluster library is required to use FEATURES method.")
 		}
 		if(is.null(prop.weights)){
@@ -108,8 +111,12 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 		}
 		costs <- as.matrix(daisy(state.prop, metric="gower", weights=prop.weights, type=prop.type))
 		diag(costs) <- 0
+        ret$indel <- .5*max(costs)
 	}
 	if(method=="INDELS"||method=="INDELSLOG"){
+		if(time.varying){
+			stop(" [!] time.varying substitution cost are not (yet) implemented for INDELS and INDELSLOG methods.")
+		}
 		ww <- attr(seqdata, "weights")
 		if(is.null(ww) ||!weighted){
 			ww <- rep(1, nrow(seqdata))
@@ -122,18 +129,21 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 			indels <- 1/indels
 			indels[is.infinite(indels)] <- .Machine$double.xmax
 		}
-		ret <- list()
+		##ret <- list()
 		ret$indel <- indels
-		ret$sm <- matrix(0, nrow=length(alphabet), ncol=length(alphabet))
+		##ret$sm <- matrix(0, nrow=length(alphabet), ncol=length(alphabet))
+		costs <- matrix(0, nrow=length(alphabet), ncol=length(alphabet))
 		for(i in seq_along(alphabet)){
 			for(j in seq_along(alphabet)){
 				if(i!=j){
-					ret$sm[i, j] <- indels[i]+indels[j]
+					##ret$sm[i, j] <- indels[i]+indels[j]
+					costs[i, j] <- indels[i]+indels[j]
 				}
 			}
 		}
-		ret$sm[is.infinite(ret$sm)] <- .Machine$double.xmax
-		return(ret)
+		costs[is.infinite(ret$sm)] <- .Machine$double.xmax
+		##ret$sm[is.infinite(ret$sm)] <- .Machine$double.xmax
+		##return(ret)
 	}
 	if (method=="TRATE") {
 		if (time.varying) {
@@ -156,7 +166,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 				}
 				else{
 					return(cval + 2*cost)
-				}
+                }
 			}
 			tratecostPrevious <- function(trate, time, state1, state2, debut, fin){
 				cost <- 0
@@ -205,7 +215,8 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 					costs[j,i] <- cost
 				}
 			}
-		}
+            ret$indel <- .5*max(costs)
+        }
 	}
 
 	##
@@ -231,5 +242,12 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	if(proximities){
 		costs <- 1-costs/max(costs)
 	}
-	return(costs)
+	#return(costs)
+    ret$sm <- costs
+    return(ret)
+}
+
+## alias for backward compatibility with seqsubm
+seqsubm <- function(...){
+    return(seqcost(...)$sm)
 }

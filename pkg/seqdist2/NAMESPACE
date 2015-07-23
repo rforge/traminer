@@ -3,7 +3,8 @@ importFrom(cluster, daisy)
 
 export(
     seqdistOO,
-    seqcost
+    seqcost,
+    seqsubm
   )
 
 useDynLib(seqdist2,

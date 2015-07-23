@@ -3,18 +3,19 @@
 \name{seqcost}
 
 \alias{seqcost}
+\alias{seqsubm}
 
 \title{Define substitution and indel costs}
 
 \description{
- The function proposes different ways to generate substitution costs
+The function \code{seqcost} proposes different ways to generate substitution costs
 (supposed to reflect state dissimilarities) and possibly indel costs. Proposed methods are:
 \code{"CONSTANT"} (same cost for all substitutions), \code{"TRATE"} (derived from the observed transition rates), \code{"FUTURE"} (Chi-squared distance between conditional state distributions \code{lag} positions ahead), \code{"FEATURES"} (Gower distance between state features), \code{"INDELS"}, \code{"INDELSLOG"} (based on estimated indel costs)
-The substitution-cost matrix is intended to serve as \code{sm} argument in the \code{\link{seqdist}} function that computes distances between sequences.
+The substitution-cost matrix is intended to serve as \code{sm} argument in the \code{\link{seqdist}} function that computes distances between sequences. \code{seqsubm} is an alias that return only the substitution cost matrix, i.e., no indel. 
  }
 
 \details{
- The substitution-cost matrix has dimension \eqn{ns*ns}, where
+The substitution-cost matrix has dimension \eqn{ns*ns}, where
 \eqn{ns} is the number of states in the \link{alphabet} of the
 sequence object. The element \eqn{(i,j)} of the matrix is the cost of
 substituting state \eqn{i} with state \eqn{j}. It defines the dissimilarity between
@@ -42,6 +43,8 @@ With method \code{FEATURES}, each state is characterized by the variables \code{
 
 With methods \code{INDELS} and \code{INDELSLOG}, values of indels are first derived from the state relative frequencies \eqn{f_i}. For \code{INDELS}, \eqn{indel_i = 1/f_i}, and for \code{INDELSLOG}, \eqn{indel_i = \log[2/(1 + f_i)]}{indel_i = log[2/(1 + f_i)]}.
 Substitution costs are then set as \eqn{SC(i,j) = indel_i + indel_j}.
+
+For all methods but \code{INDELS} and \code{INDELSLOG}, the indel is set as \eqn{\max(sm)/2}{max(sm)/2} when \code{time.varying=FALSE} and as \eqn{1} otherwise.
 }
 
 
@@ -50,6 +53,9 @@ seqcost(seqdata, method, cval=NULL, with.missing=FALSE,
     miss.cost=NULL, time.varying=FALSE, weighted=TRUE, transition="both", lag=1,
     missing.trate=FALSE, state.prop=NULL, prop.weights=NULL, prop.type=list(),
     proximities=FALSE)
+
+seqsubm(...)
+
 }
 
  \arguments{
@@ -77,13 +83,25 @@ seqcost(seqdata, method, cval=NULL, with.missing=FALSE,
     \item{lag}{Integer. For methods \code{TRATE} and \code{FUTURE} only. Time ahead to which transition rates are computed
     (default is \code{lag=1}).}
 
-  \item{missing.trate}{Logical. For methods \code{TRATE} and \code{FUTURE} only.
+    \item{missing.trate}{Logical. For methods \code{TRATE} and \code{FUTURE} only.
     If \code{TRUE}, substitution costs with missing state are also based on transition rates. If \code{FALSE} (default value), the substitution cost for the missing state are set as \code{miss.cost}.}
+
+    \item{state.prop}{???}
+    \item{prop.weights}{???}
+    \item{prop.type}{A list, ???},
+    \item{proximities}{Logical: should state proximities be returned instead of substitution costs?}      
+    \item{...}{Arguments passed to \code{seqcost}}
 }
 
 \value{
- A matrix of size \eqn{ns*ns}, where
-\eqn{ns} is the number of states in the alphabet of the sequence object.
+A list of two elements \code{indel} and \code{sm} with
+
+    \item{sm}{The substitution cost matrix of size \eqn{ns*ns}, where 
+    \eqn{ns} is the number of states in the alphabet of the sequence object.}
+    
+    \item{indel}{The indel cost. Either a scalar or a vector of size \eqn{ns}.}
+    
+For \code{seqsubm}, the matrix \code{sm}.  
 }
 
 \seealso{
@@ -109,12 +127,16 @@ biofam.seq <- seqdef(biofam,10:25)
 ## Optimal matching using transition rates based substitution-cost matrix
 ## and insertion/deletion costs of 3
 trcost <- seqcost(biofam.seq, method="TRATE")
-biofam.om <- seqdist(biofam.seq,method="OM",indel=3,sm=trcost)
+biofam.om <- seqdist(biofam.seq, method="OM", indel=3, sm=trcost$sm)
+
+## Using the insertion/deletion cost returned by seqcost
+biofam.om <- seqdist(biofam.seq, method="OM", indel=trcost$indel, sm=trcost$sm)
+
 
 ## Optimal matching using constant value (2) substitution-cost matrix
 ## and insertion/deletion costs of 3
-ccost <- seqcost(biofam.seq, method="CONSTANT", cval=2)
-biofam.om.c2 <- seqdist(biofam.seq, method="OM",indel=3,sm=ccost)
+ccost <- seqsubm(biofam.seq, method="CONSTANT", cval=2)
+biofam.om.c2 <- seqdist(biofam.seq, method="OM",indel=3, sm=ccost)
 
 ## Displaying the distance matrix for the first 10 sequences
 biofam.om.c2[1:10,1:10]
@@ -127,11 +149,11 @@ ex1.seq <- seqdef(ex1,1:13, weights=ex1$weights)
 
 ## Unweighted
 subm <- seqcost(ex1.seq, method="TRATE", with.missing=TRUE, weighted=FALSE)
-ex1.om <- seqdist(ex1.seq, method="OM", sm=subm, with.missing=TRUE)
+ex1.om <- seqdist(ex1.seq, method="OM", sm=subm$sm, with.missing=TRUE)
 
 ## Weighted
 subm.w <- seqcost(ex1.seq, method="TRATE", with.missing=TRUE, weighted=TRUE)
-ex1.omw <- seqdist(ex1.seq, method="OM", sm=subm.w, with.missing=TRUE)
+ex1.omw <- seqdist(ex1.seq, method="OM", sm=subm.w$sm, with.missing=TRUE)
 
 ex1.om == ex1.omw
 }

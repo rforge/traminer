@@ -37,7 +37,7 @@ seqdistOO(seqdata, method, refseq=NULL, norm=FALSE,
   \item{with.missing}{Logical. Must be \code{TRUE} when sequences contain non deleted gaps (missing values). See details.}
 
   \item{full.matrix}{Logical. If \code{TRUE} (default), the full distance matrix is returned. This is for compatibility with  earlier versions of the \code{seqdist} function. If \code{FALSE}, an object of class \code{\link{dist}} is returned, that is, a vector containing only values from the upper triangle of the distance matrix. Objects of class \code{dist} are smaller and can be passed directly as arguments to most clustering functions. Ignored when \code{refseq} is set.}
-  
+
   \item{kweights}{Numerical vector with at position \eqn{k} the weight applied to subsequences of length \eqn{k} (for all NMS distances).}
 
   \item{expcost}{Scalar. Cost of spell length transformation (the exact interpretation is distance dependant). For \code{OMspell} and \code{OMloc}.}
@@ -68,6 +68,11 @@ seqdistOO(seqdata, method, refseq=NULL, norm=FALSE,
   \item{weighted}{Logical. Should distributions account for the sequence weights in the state sequence object? (see \code{\link{seqdef}}.) Set as \code{FALSE} if you want to ignore the weights (for \code{CHISQ, EUCLID}).}
 
   \item{overlap}{Logical. Are overlapping spells allowed (for \code{CHISQ, EUCLID}).}
+  
+  \item{nu}{Scalar. ???}  
+
+  \item{numcpu}{Scalar. ???}
+
 }
 
 \details{
