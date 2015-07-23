@@ -1,6 +1,6 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
-\section{Changes in version 0.3.4 [2015-01-27]}{
+\section{Changes in version 0.2.4 [2015-07-23]}{
 \subsection{Misc}{
   \itemize{
     \item{\code{seqplot.rf()}: Implements the Relative Frequency Sequence Plots

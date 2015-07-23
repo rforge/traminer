@@ -15,6 +15,7 @@ export(
     pamward,
     rowmode,
     seqplot.tentrop,
+    seqplot.rf,
     sorti,
     sortv,
     toPersonPeriod,
@@ -36,8 +37,7 @@ export(
     seqauto,
     seqentrans,
     seqemlt,
-    seqtabstocc,
-    seqplot.rf
+    seqtabstocc
 )
 
 ## emlt methods

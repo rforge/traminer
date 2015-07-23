@@ -54,7 +54,7 @@ biofam.lab <- c("Parent", "Left", "Married", "Left+Marr",
 biofam.seq <- seqdef(biofam[501:600, ], 10:25, labels=biofam.lab)
 diss <- seqdist(biofam.seq, method="LCS")
 
-## Use 12 groups and default MDS grouping
+## Using 12 groups and default MDS sorting
 seqplot.rf(biofam.seq, diss=diss, k=12,
    title="Non meaningful example (n=100)")
 
