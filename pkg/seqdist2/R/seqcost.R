@@ -10,7 +10,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	if (!inherits(seqdata,"stslist")){
 		stop(" [!] data is NOT a sequence object, see seqdef function to create one")
 	}
-	metlist <- c("CONSTANT","TRATE", "FEATURES", "FUTURE")
+	metlist <- c("CONSTANT","TRATE", "FEATURES", "FUTURE", "INDELS", "INDELSLOG")
 	if (missing(method) || !method %in% metlist){
 		stop(" [!] method must be one of: ", paste(metlist,collapse=" "))
 	}
@@ -32,9 +32,9 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	## Adding an entry for for missing state
 	if (with.missing) {
 		if(missing.trate && method == "TRATE") {
-			message(" [>] using transition rate to compute substitution cost for missing values")
+			message(" [>] Substitution costs for missing values derived from transition rates")
 		} else {
-			message(" [>] setting ",miss.cost," as substitution cost for missing values")
+			message(" [>] Substitution costs for missing values set as ",miss.cost)
 		}
 		
 		alphabet <- c(alphabet, attr(seqdata,"nr"))
