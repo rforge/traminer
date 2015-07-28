@@ -365,7 +365,7 @@ seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	
 	## Function and arguments
 	if (!missing(refseq) && !is.null(refseq)) {
-				if (is.numeric(refseq) && refseq>0 && refseq <= nrow(seqdata)) {
+		if (is.numeric(refseq) && refseq>0 && refseq <= nrow(seqdata)) {
 			message(" [>] using sequence ", refseq,": ",
 				suppressMessages(seqformat(seqdata[refseq,], from="STS", to="SPS", compressed=TRUE)), " as reference")
 			refseqid <- mcorr[refseq]
@@ -378,18 +378,18 @@ seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
 			# compseq <- refseq
 			# message(" [>] using (external) sequence ",
 				# suppressMessages(seqformat(compseq, from="STS", to="SPS", compressed=TRUE)), " as reference")
-		# } 
+		# }
 		# ## Most frequent sequence as reference
 		# else if (refseq==0) {
 			# mfseq <- seqtab(seqdata, tlim=1)
-			# message(" [>] using most frequent sequence as reference: ", 
+			# message(" [>] using most frequent sequence as reference: ",
 				# suppressMessages(seqformat(mfseq, from="STS", to="SPS", compressed=TRUE)))
 			# idxmfseq <- suppressMessages(seqfind(mfseq, seqdata))
 			# message(" [>] most frequent sequence appears ", length(idxmfseq), " times")
 			# compseq <- seqdata[idxmfseq[1],]
-		# } 
+		# }
 		# ## Indice of sequence given as reference
-		# else 
+		# else
 		# ## Length of compseq
 		## lcompseq <- seqlength(compseq)
 		## Vector of distance
