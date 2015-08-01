@@ -1,6 +1,13 @@
 ## =========
 Version 1.9-11 (Development version)
 
+Changes in existing functions:
+  - seqmeant(): New serr argument. When serr=TRUE, seqmeant computes 
+    the variance and standard deviation of the total times spent in the 
+    different states, and the standard error of the mean total times.
+  - seqmtplot(): When serr=TRUE, error bars are displayed in the
+    mean time plot. 
+
 
 ## =========
 Version 1.8-10
