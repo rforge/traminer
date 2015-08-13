@@ -1,14 +1,18 @@
               CHANGES IN seqdist2 VERSION 0.9-1
-              
+
 New Functions
-    o seqcost: proposes different ways of computing substitution (sm) and indel costs; 
+    o seqcost: proposes different ways of computing substitution 
+        (sm) and indel costs;
         returns a list with the two elements sm and indel.
-    o seqsubm: alias of seqcost that returns only the substitution costs. 
-                       
+    o seqsubm: alias of seqcost that returns only the substitution costs.
+
 BUG FIXES
-  o seqdistOO: Restriction on the way to specify reference sequence as this was
-               causing problem with some distance measures. Currently, it can only
-               be the index of one of the sequence in the data.
+  o seqdistOO: Now tests that a non NA value is provided 
+        for sm when method="OM".
+  o seqdistOO: Restriction on the way to specify reference sequence 
+        as this was causing problem with some distance measures. 
+        Currently, it can only be the index of one of the 
+        sequence in the data.
   o SVRspell: Now SVRspell can compute distances to the NULL sequence
               (ie. a sequence of length 0)
 

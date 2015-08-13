@@ -26,14 +26,14 @@ seqdistOO(seqdata, method, refseq=NULL, norm=FALSE,
   \code{"OM", "OMloc", "OMslen", "OMspell", "OMstran", "LCS", "HAM", "DHD", "TWED", "SVRspell", "NMS", "NMSMST", "LCP", "RLCP", "CHI2", "EUCLID"} (see details)
 }
 
-  \item{refseq}{Optional baseline sequence to compute the distances from. Can be the index of a sequence in the state sequence object, 0 for the most frequent sequence, or an external sequence passed as a sequence object with a single row. %The latter works only with a subset of methods (see details). 
+  \item{refseq}{Optional baseline sequence to compute the distances from. Can be the index of a sequence in the state sequence object, 0 for the most frequent sequence, or an external sequence passed as a sequence object with a single row. %The latter works only with a subset of methods (see details).
   }
 
   \item{norm}{String or logical. One of \code{"none", "maxlength", "gmean", "maxdist", "YujianBo"}. If \code{TRUE} the normalization method is automatically selected (see details).  Default is \code{FALSE}.}
 
   \item{indel}{Scalar or numeric vector. The insertion/deletion cost (for all OM variants including TWED). Default is 1. Ignored with non OM metrics. If it is a vector, the indel costs are state dependant (the vector length should be equal to the number of states).}
 
-  \item{sm}{substitution-cost matrix (for OM variants, TWED, SVRspell, HAM and DHD method). Can also be one of the \code{\link{seqcost}} methods \code{"TRATE"} or \code{"CONSTANT"} for building a \code{sm} matrix. Default is \code{NA}.}
+  \item{sm}{substitution-cost matrix (for OM variants, TWED, SVRspell, HAM and DHD method). Can also be one of the \code{\link{seqcost}} methods \code{"TRATE"} or \code{"CONSTANT"} for building a \code{sm} matrix. Default is \code{NA}. A valid value MUST be given for \code{method="OM"}.}
 
   \item{with.missing}{Logical. Must be \code{TRUE} when sequences contain non deleted gaps (missing values). See details.}
 

@@ -98,6 +98,10 @@ seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
 			stop(" [!] Unknown method ", sm, " to compute substitution costs")
 		}
 	}
+	if (method == "OM" && is.na(sm)) {
+		stop(" [!] sm=NA not allowed with method='OM'. Specify a valid sm value!")
+    }
+
 	
 	## =====================
 	## Base information
