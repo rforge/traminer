@@ -24,7 +24,7 @@ seqdist(seqdata, method, refseq=NULL, norm=FALSE,
 
   \item{indel}{the insertion/deletion cost (OM method). Default is 1. Ignored with non OM metrics.}
 
-  \item{sm}{substitution-cost matrix (OM, HAM and DHD method). Can also be one of the \code{\link{seqsubm}} build methods \code{"TRATE"} or \code{"CONSTANT"}. Default is \code{NA}. Ignored with LCP, RLCP and LCS metrics.}
+  \item{sm}{substitution-cost matrix (OM, HAM and DHD method). Can also be one of the \code{\link{seqsubm}} build methods \code{"TRATE"} or \code{"CONSTANT"}. Default is \code{NA}. Ignored with LCP, RLCP and LCS metrics. A valid non NA value must be given for OM.}
 
   \item{with.missing}{must be set to \code{TRUE} when sequences contain non deleted gaps (missing values). See details.}
 

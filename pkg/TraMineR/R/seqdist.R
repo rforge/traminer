@@ -6,7 +6,7 @@
 ## LCS = Longest Common Subsequence (Elzinga)
 ## ====================================================
 
-seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE, 
+seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	indel=1, sm=NA,	with.missing=FALSE, full.matrix=TRUE) {
 	gc(FALSE)
 	debut <- proc.time()
@@ -18,11 +18,11 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	if (method=="OMopt") {
 		method <- "OM"
 		optimized <- TRUE
-	} 
+	}
 	else if (method=="LCSopt") {
 		method <- "LCS"
 		optimized <- TRUE
-	} 
+	}
 	else {
 		optimized <- FALSE
 	}
@@ -69,6 +69,10 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 			stop(" [!] Unknown method ", sm, " to compute substitution costs")
 		}
 	}
+	if (method == "OM" && is.na(sm)) {
+		stop(" [!] sm=NA not allowed with method='OM'. Specify a valid sm value!")
+    }
+
 	
 	## =====================
 	## Base information
@@ -175,7 +179,7 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 			norm, indel, sm, alphsize, nd, dseq, slength, mcorr, with.missing)	
 	}
 	else {
-		distances <- TraMineR.seqdist.all(seqdata, method, 
+		distances <- TraMineR.seqdist.all(seqdata, method,
 			norm, indel, sm, alphsize, nd, dseq, slength, mcorr, optimized)
 	}
 
