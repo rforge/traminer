@@ -85,7 +85,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 					}
 				}
 			}
-            return(dist)
+            return(sqrt(dist))
 		}
 		if(time.varying){
 			stop(" [!] time.varying substitution cost are not (yet) implemented for FUTURE method.")

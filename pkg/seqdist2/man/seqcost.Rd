@@ -11,7 +11,7 @@
 The function \code{seqcost} proposes different ways to generate substitution costs
 (supposed to reflect state dissimilarities) and possibly indel costs. Proposed methods are:
 \code{"CONSTANT"} (same cost for all substitutions), \code{"TRATE"} (derived from the observed transition rates), \code{"FUTURE"} (Chi-squared distance between conditional state distributions \code{lag} positions ahead), \code{"FEATURES"} (Gower distance between state features), \code{"INDELS"}, \code{"INDELSLOG"} (based on estimated indel costs)
-The substitution-cost matrix is intended to serve as \code{sm} argument in the \code{\link{seqdist}} function that computes distances between sequences. \code{seqsubm} is an alias that return only the substitution cost matrix, i.e., no indel. 
+The substitution-cost matrix is intended to serve as \code{sm} argument in the \code{\link{seqdist}} function that computes distances between sequences. \code{seqsubm} is an alias that return only the substitution cost matrix, i.e., no indel.
  }
 
 \details{
@@ -89,19 +89,19 @@ seqsubm(...)
     \item{state.prop}{???}
     \item{prop.weights}{???}
     \item{prop.type}{A list, ???},
-    \item{proximities}{Logical: should state proximities be returned instead of substitution costs?}      
+    \item{proximities}{Logical: should state proximities be returned instead of substitution costs?}
     \item{...}{Arguments passed to \code{seqcost}}
 }
 
 \value{
 A list of two elements \code{indel} and \code{sm} with
 
-    \item{sm}{The substitution cost matrix of size \eqn{ns*ns}, where 
+    \item{sm}{The substitution cost matrix of size \eqn{ns*ns}, where
     \eqn{ns} is the number of states in the alphabet of the sequence object.}
-    
+
     \item{indel}{The indel cost. Either a scalar or a vector of size \eqn{ns}.}
-    
-For \code{seqsubm}, the matrix \code{sm}.  
+
+For \code{seqsubm}, the matrix \code{sm}.
 }
 
 \seealso{
@@ -131,6 +131,10 @@ biofam.om <- seqdist(biofam.seq, method="OM", indel=3, sm=trcost$sm)
 
 ## Using the insertion/deletion cost returned by seqcost
 biofam.om <- seqdist(biofam.seq, method="OM", indel=trcost$indel, sm=trcost$sm)
+
+## Using costs based on FUTURE with a forward lag of 4
+fucost <- seqcost(biofam.seq, method="FUTURE", lag=4)
+biofam.om <- seqdist(biofam.seq, method="OM", indel=fucost$indel, sm=fucost$sm)
 
 
 ## Optimal matching using constant value (2) substitution-cost matrix
