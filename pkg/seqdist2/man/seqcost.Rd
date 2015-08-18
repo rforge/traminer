@@ -10,7 +10,7 @@
 \description{
 The function \code{seqcost} proposes different ways to generate substitution costs
 (supposed to reflect state dissimilarities) and possibly indel costs. Proposed methods are:
-\code{"CONSTANT"} (same cost for all substitutions), \code{"TRATE"} (derived from the observed transition rates), \code{"FUTURE"} (Chi-squared distance between conditional state distributions \code{lag} positions ahead), \code{"FEATURES"} (Gower distance between state features), \code{"INDELS"}, \code{"INDELSLOG"} (based on estimated indel costs)
+\code{"CONSTANT"} (same cost for all substitutions), \code{"TRATE"} (derived from the observed transition rates), \code{"FUTURE"} (Chi-squared distance between conditional state distributions \code{lag} positions ahead), \code{"FEATURES"} (Gower distance between state features), \code{"INDELS"}, \code{"INDELSLOG"} (based on estimated indel costs).
 The substitution-cost matrix is intended to serve as \code{sm} argument in the \code{\link{seqdist}} function that computes distances between sequences. \code{seqsubm} is an alias that return only the substitution cost matrix, i.e., no indel.
  }
 
@@ -136,9 +136,8 @@ biofam.om <- seqdist(biofam.seq, method="OM", indel=trcost$indel, sm=trcost$sm)
 fucost <- seqcost(biofam.seq, method="FUTURE", lag=4)
 biofam.om <- seqdist(biofam.seq, method="OM", indel=fucost$indel, sm=fucost$sm)
 
-
-## Optimal matching using constant value (2) substitution-cost matrix
-## and insertion/deletion costs of 3
+## Optimal matching using a unique substitution cost of 2
+## and an insertion/deletion cost of 3
 ccost <- seqsubm(biofam.seq, method="CONSTANT", cval=2)
 biofam.om.c2 <- seqdist(biofam.seq, method="OM",indel=3, sm=ccost)
 
