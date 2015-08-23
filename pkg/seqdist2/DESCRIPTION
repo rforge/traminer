@@ -1,12 +1,12 @@
 Package: seqdist2
 Version: 0.9-1
-Date: 2015-08-17
+Date: 2015-08-23
 Title: Distance Between State Sequences
 Author: Matthias Studer <matthias.studer@unige.ch>, Gilbert Ritschard <gilbert.ritschard@unige.ch>
 Maintainer: Matthias Studer <matthias.studer@unige.ch>
 Depends: TraMineR
 Imports: cluster
-Description: This package provides a function to compute different distances between states sequences. The main function is seqdistOO.
+Description: Collection of dissimilarity measures between state sequences and methods of determining substitution and indel costs for optimal-matching-based dissimilarities. The main function is seqdistOO.
 License: GPL (>= 2)
 URL: http://mephisto.unige.ch/traminer
 Encoding: latin1
