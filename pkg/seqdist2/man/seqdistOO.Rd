@@ -137,6 +137,8 @@ When sequences contain gaps and the \code{gaps=NA} option was passed to \code{\l
 }
 
 \references{
+Studer, M. & Ritschard, G. (2015), "What matters in differences between life trajectories: A comparative review of sequence dissimilarity", \emph{Journal of the Royal Statistical Society, Series A}. (Early view). DOI: \url{http://dx.doi.org/10.1111/rssa.12125}
+
 Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES, Switzerland. DOI: \url{http://dx.doi.org/10.12682/lives.2296-1658.2014.33}
 
 %Elzinga, C. H. (2008). Sequence analysis: Metric representations of categorical time
@@ -163,7 +165,7 @@ On Pattern Analysis And Machine Intelligence}, \bold{29}(6), 1091--1095. DOI: \u
 %\emph{Bulletin of Sociological Methodology/Bulletin de Méthodologie Sociologique},
 %114(1):5–34.
 
-See also all references in \cite{Studer and Ritschard (2014)}
+See also all references in \cite{Studer and Ritschard (2014, 2015)}
 }
 
 \examples{
