@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2015-06-01
+##' E-Mail:          rbuergin@gmx.ch
+##' Date:            2015-08-21
 ##'
 ##' Description:
 ##' Random forests and bagging for the 'tvcm' algorithm.
@@ -22,6 +22,7 @@
 ##' - 
 ##'
 ##' Last modifications:
+##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
 ##' 2015-06-01: - 'fvcm' gave an error when a linear model is specified
 ##'               new version returns the linear model with a warning from
 ##'               'tvcm'

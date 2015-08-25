@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' E-Mail:          rbuergin@gmx.ch
 ##' Date:            2015-20-01
 ##'
 ##' Description:
@@ -321,7 +321,7 @@ vcrpart_fitted <- function(object, ...) {
 ##' Constructs a formula for the linear predictor.
 ##'
 ##' @param x       a formula.
-##' @param family  the model family, e.g., cumulative()
+##' @param fit     the fitting function, e.g., olmm() or glm()
 ##' @param env     environment for evaluating the formula.
 ##'
 ##' @return A formula.

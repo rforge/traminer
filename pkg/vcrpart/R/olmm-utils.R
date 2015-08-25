@@ -1,6 +1,7 @@
 ##' -------------------------------------------------------- #
-##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-09-08
+##' Author:          Reto Buergin
+##' Date:            2015-08-21
+##' E-Mail:          rbuergin@gmx.ch
 ##'
 ##' Description:
 ##' Utility functions for the olmm function (see olmm.R). Some

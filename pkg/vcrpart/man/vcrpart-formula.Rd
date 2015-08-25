@@ -26,19 +26,21 @@ ce(formula)
     of the formula component. See examples.}
   \item{intercept}{logical or character vector. \code{intercept = TRUE}
     (default) indicates that an intercept is incorporated.
-    \code{intercept = FALSE} replaces the otherwise allowed \code{"-1"}
-    term, that is ignored by \command{\link{fvcm}},
-    \command{\link{olmm}} and \command{\link{tvcm}}. Character strings
-    may be used in connection with \command{\link{olmm}}. Intercepts have
-    specific interpretations, see details.}
-  \item{\ldots}{the names of moderators i.e. partitioning variables,
-    separated by commas. It is also possibly to assign a character
-    vector that includes all the variable names.} 
-  \item{by}{a symbolic description for predictors the effect of which is
-    moderated by the variables in \code{\ldots}. See
-    \command{\link{tvcm}}and the examples below. Note that the by variable
-    must be numeric and factor variables must be recoded to dummy
-    variables byhand.}
+    \code{intercept = FALSE} removes the random intercept from the
+    formula. Note that the sometimes allowed \code{-1}
+    term is ignored. The character strings \code{"ce"}
+    (category-specific random intercepts) and \code{"ge"}
+    (category-global random intercepts) may be used in connection with
+    \command{\link{olmm}}. Intercepts have specific interpretations for
+    \code{fe}, \code{re} and \code{vc}, see the details.}  
+  \item{\ldots}{the names of variables that moderate (i.e. modify) the
+    effects of the variables specified in \code{by}, separated by
+    commas. It is also possibly to assign a vector that contains the
+    variable names as characters.}  
+  \item{by}{a formula of predictors the effects of which are moderated
+    by the variables in \code{\ldots}. See \command{\link{tvcm}}and the
+    examples below. Note that the \code{by} variable must be numeric and
+    factor variables must be recoded to dummy variables by hand.}
   \item{nuisance}{character vector of variables in \code{by} which have
     to be estimated separately for each partition but the algorithm should
     not focus on this variable when searching for splits.} 
@@ -46,23 +48,24 @@ ce(formula)
 
 \value{
   a list used by \command{\link{tvcm}}, \command{\link{fvcm}} and
-  \command{\link{olmm}} for constructing the model formulas.
+  \command{\link{olmm}} for constructing the model matrices.
 }
 
 \details{
   Special formula terms to define fixed effects \command{\link{fe}},
   varying coefficients \command{\link{vc}} and random effects
   \command{\link{re}}. The use of these formula terms ensures that
-  \command{\link{fvcm}}, \command{\link{tvcm}} and \command{\link{olmm}}
-  fit the intended model. Some examples are given below and in the
-  corresponding documentation pages.  
-
-  Variables which are not defined within one of these three special
-  terms will be assigned to the fixed effect predictor equation. The
-  deletion of the intercept can be indicated by a \code{-1} or
-  \code{vc(intercept = FALSE)}. The terms \command{\link{ce}}
+  the functions \command{\link{fvcm}}, \command{\link{tvcm}} and
+  \command{\link{olmm}} fit the intended model. Some examples are given
+  below and on the documentation pages of the fitting functions.
+  
+  For all of \command{\link{fvcm}}, \command{\link{tvcm}} and
+  \command{\link{olmm}}, Variables which are not defined with one of
+  \command{\link{fe}}, \command{\link{vc}} and \command{\link{re}} are
+  treated as fixed effects. Intercepts can be dropped from the model by
+  the \code{intercept} argument. The terms \command{\link{ce}}
   (category-specific effects) and \command{\link{ge}} (global effect or
-  proportional odds effect) are mainly designed for
+  proportional odds effect) are designed for the function
   \command{\link{olmm}}. Notice that \command{\link{tvcm}} may changes,
   for internal reasons, the order of the terms in the specified
   formula. At present, the term \code{"."}, which is generally use to
@@ -77,22 +80,23 @@ ce(formula)
 
 \examples{
 ## Formula for a model with 2 fixed effects (x1 and x2) and a random
-## intercept.
+## intercept. The 're' terms indicates that an intercept is fitted for
+## each level of 'id'.
 
 formula <- y ~ fe(x1 + x2) + re(1|id)
 
-## Formula for a model with 1 fixed effect and a varying coefficient term
-## with 2 moderators and 2 varying coefficient predictors. 'tvcm' will
-## fit one common partition for the two moderated predictors 'x2' and
-## 'x3'.
+## Formula for a model with one fixed effect and one varying coefficient
+## term with 2 moderators and 2 varying coefficient predictors. 'tvcm'
+## will fit one partition to model the effects of 'x2' and 'x3' as
+## functions of 'z1' and 'z2'.
 
-formula <- y ~ x1 + vc(z1, z1, by = x2 + x3, intercept = TRUE)
+formula <- y ~ x1 + vc(z1, z2, by = x2 + x3, intercept = TRUE)
 
 ## Similar formula as above, but the predictors 'x2' and 'x3' have
-## separate 'vc' terms. 'tvcm' will fit a separate partition for each 
-## 'vc' term
+## separate 'vc' terms. 'tvcm' will fit a separate partition for each of
+## 'x2' and 'x3' to model their effects as functions of 'z1' and 'z2'.
 
-formula <- y ~ x1 + vc(z1, z1, by = x2 + x3, intercept = TRUE)
+formula <- y ~ x1 + vc(z1, z2, by = x2) + vc(z1, z2, by = x3)
 }
 
 \author{Reto Buergin}

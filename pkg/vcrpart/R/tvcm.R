@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
-##' E-Mail:      reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:        2015-06-01
+##' E-Mail:      rbuergin@gmx.ch
+##' Date:        2015-08-25
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -210,16 +210,19 @@ tvcm <- function(formula, data, fit, family,
   if (!is.null(offset) & !is.null(model.offset(mf)))
       stop("duplicated specification of 'offset'.")
   if (!is.null(model.offset(mf))) offset <- model.offset(mf)
-  
+
   mcall <- list(name = as.name(fit),
-               formula = quote(ff$full),
-               family = quote(family),
-               data = quote(mf))
+                formula = quote(ff$full),
+                family = quote(family),
+                data = quote(mf))
+ 
   mce <- match.call(expand.dots = TRUE)
   dotargs <- setdiff(names(mce), names(mc))
   fitargs <-
-    switch(fit,olmm = union(names(formals(olmm)), names(formals(olmm_control))),
-           glm = union(names(formals(glm)), names(formals(glm.control))), "")
+    switch(fit,
+           olmm = union(names(formals(olmm)), names(formals(olmm_control))),
+           glm = union(names(formals(glm)), names(formals(glm.control))),
+           "")
   dotargs <- intersect(fitargs, dotargs)
   dotargs <- setdiff(dotargs, names(mcall))
   dotargs <- list(...)[dotargs]
@@ -236,12 +239,13 @@ tvcm <- function(formula, data, fit, family,
   etaVars <- unlist(lapply(formList$vc, function(x) {
     lapply(x$eta, function(x) all.vars(x))
   }))
+
   etaVars <- intersect(etaVars, colnames(model.frame(model))) 
   if (any(sapply(model.frame(model)[, etaVars, drop = FALSE], is.factor)))
-    stop("variables in 'by' of 'vc' terms must be numeric. ",
-         "Use 'model.matrix' to convert the categorical variables to ",
-         "numeric predictors.")
-
+      stop("variables in 'by' of 'vc' terms must be numeric. ",
+           "Use 'model.matrix' to manually convert the categorical variables to ",
+           "numeric predictors.")
+  
   ## set whether coefficient constancy tests are used    
   if (control$sctest) {
     if (nPart > 1L)

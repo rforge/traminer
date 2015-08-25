@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' Date:            2014-10-18
-##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' Date:            2015-08-21
+##' E-Mail:          rbuergin@gmx.ch
 ##'
 ##' Description:
 ##' S3 methods for tvcm objects
@@ -31,6 +31,7 @@
 ##' width:               width of trees
 ##' 
 ##' Modifications:
+##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
 ##' 2014-10-18: added 'depth' and 'width' methods
 ##' 2014-10-14: adapt print.splitpath to new dev-grid structure
 ##' 2014-10-03: add option 'cv' to 'extract.tvcm'

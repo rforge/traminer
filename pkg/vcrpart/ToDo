@@ -2,3 +2,5 @@
 - Check if 'ucminf' works again
 - Check nloptr package
 - Illustration for tvcm and fvcm on wordpress page
+- replace functions of the 'parallel' package with those of 'foreach'?
+- variable importance measures

@@ -1,6 +1,7 @@
 ##' -------------------------------------------------------- #
-##' Author:          Reto Buergin, rbuergin@gmx.ch
+##' Author:          Reto Buergin
 ##' Date:            2014-11-10
+##' E-Mail:          rbuergin@gmx.ch
 ##'
 ##' Description:
 ##' Ordinal time series plot and utility functions.

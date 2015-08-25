@@ -1,6 +1,6 @@
 ## --------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
+##' E-Mail:          rbuergin@gmx.ch
 ##' Date:            2014-09-09
 ##'
 ##' Description:

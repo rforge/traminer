@@ -1,10 +1,10 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2015-02-25
+##' E-Mail:          rbuergin@gmx.ch
+##' Date:            2015-08-25
 ##'
 ##' Description:
-##' Workhorse functions for the 'tvcm' function
+##' Workhorse functions for the 'tvcm' function.
 ##'
 ##' Overview:
 ##'
@@ -22,7 +22,7 @@
 ##' tvcm_setsplits_splitnode: 
 ##' tvcm_setsplits_rselect:   randomly select partitions, variables and nodes
 ##' tvcm_grow_sctest:         run coefficient constancy tests
-##' tvcm_grow_exsearch:     compute the dev statistics
+##' tvcm_grow_exsearch:       compute the 'dev' statistics
 ##' tvcm_grow_splitnode:      split in variable x.
 ##' tvcm_formula:             extract separate formulas for
 ##'                           model and partitioning from
@@ -49,6 +49,9 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
+##' 2015-08-25: - replace 'fit' argument in 'tvcm_formula' by 'family'.
+##' 2015-08-21: - small changes in 'tvcm_grow_fit'.
+##'             - replace 'family' argument in 'tvcm_formula' by 'fit'.
 ##' 2015-02-25: add check for fixed effects model matrix in 'tvcm_grow_update'.
 ##' 2015-02-24: - improved 'tvcm_getNumSplits' (bugs for the upper limits)
 ##' 2014-12-10: - added 'drop = FALSE' commands in 'tvcm_exsearch_nomToOrd'
@@ -239,7 +242,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
     ## --------------------------------------------------- #
 
     vcRoot <- sapply(nodeid, length) == 1L
-    ff <- tvcm_formula(formList, vcRoot, model$family,
+    ff <- tvcm_formula(formList, vcRoot, family,
                        environment(formList$original))
     model <- try(tvcm_grow_fit(mcall))
     
@@ -550,14 +553,15 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
     
   ## extract information from 'mcall'
   env <- environment(mcall)
-
+  
   ## set mcall if coefficients are not to optimized
   if (!doFit) {
-    if (inherits(eval(mcall$family, env), "family.olmm")) {
-      mcall$doFit <- FALSE
-    } else {        
-      mcall$method <- glm.doNotFit # skips glm.fit
-    }
+      fit <- deparse(mcall$name)
+      if (fit == "olmm") {
+          mcall$doFit <- FALSE
+      } else if (fit == "glm") {        
+          mcall$method <- glm.doNotFit # skips glm.fit
+      } 
   }
   
   ## fit model
@@ -1424,7 +1428,7 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
     root <- sapply(nodes, width) == 1
   }
   
-  ff <- tvcm_formula(formList, root, 
+  ff <- tvcm_formula(formList, root,
                      eval(mcall$family, environment(mcall)),
                      environment(mcall), full = FALSE,
                      update = TRUE, fast = control$fast)
@@ -1693,9 +1697,10 @@ tvcm_grow_splitnode <- function(nodes, where, dev, partData, step, weights) {
 ##'    \code{\link{tvcm}}.
 ##'-------------------------------------------------------- #
 
-tvcm_formula <- function(formList, root, family = cumulative(),
+tvcm_formula <- function(formList, root, family,
                          env = parent.frame(),
-                         full = TRUE, update = FALSE, fast = TRUE) {
+                         full = TRUE, update = FALSE,
+                         fast = TRUE) {
 
     
   yName <- rownames(attr(terms(formList$original), "factors"))[1L]
@@ -1768,11 +1773,9 @@ tvcm_formula <- function(formList, root, family = cumulative(),
     if (inherits(family, "family.olmm")) {        
       reForm <- paste("re(", reForm, "|", subjectName,
                       ",intercept='", formList$re$intercept, "')", sep = "")
-    } else {        
-      if (formList$re$intercept == "none")
-        reForm <- paste(reForm, "-1", sep = "")
-      reForm <- paste("(", reForm, "|", subjectName, ")", sep = "")
-    }        
+    } else {
+        reForm <- NULL
+    }
   } else {
     reForm <- NULL
   }
@@ -1786,7 +1789,7 @@ tvcm_formula <- function(formList, root, family = cumulative(),
       feCeForm <- paste("ce(", feCeForm, ")", sep = "")
 
     feGeForm <- if (length(feGeTerms) == 0L) "" else paste(feGeTerms, collapse = "+")
-    if (feGeForm != "" &  inherits(family, "family.olmm"))
+    if (feGeForm != "" & inherits(family, "family.olmm"))
       feGeForm <- paste("ge(", feGeForm, ")", sep = "")
 
     if (feCeForm != "") fTree <- paste(fTree, feCeForm, sep = "")
