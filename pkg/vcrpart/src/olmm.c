@@ -181,17 +181,10 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   SEXP newPar = PROTECT(duplicate(par));
 
   /* get subject slot */  
-  SEXP subject_0 = getListElement(x, "subject"), subject_1;
-  PROTECT(subject_1 = coerceVector(subject_0, INTSXP));
+  int *subject = INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
 
-  /* get response variable slot */
-  SEXP y_0 = getListElement(x, "y"), y_1;
-  PROTECT(y_1 = coerceVector(y_0, INTSXP));
-
-  /* integer valued slots and pointer to factor valued slots */
-  int *y = INTEGER(y_1), *subject = INTEGER(subject_1),
-    *dims = DIMS_SLOT(x);
-  R_CheckStack();
+  /* integer valued slots */
+  int *dims = DIMS_SLOT(x);
 
   /* numeric valued objects */
   double *X = X_SLOT(x),
@@ -225,6 +218,11 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     numGrad = dims[numGrad_POS],
     numHess = dims[numHess_POS],
     lenVecRanefCholFac = q * q, lenVRanefCholFac = q * (q + 1) / 2;
+
+  /* get response variable */
+  int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
+  double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); 
+  R_CheckStack();
 
   /* variables for matrix operations etc. */
   int i1 = 1, tmpJ, subsTmp; 
@@ -274,9 +272,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     etaRanefCLM = Calloc(n * 2 , double);
     for (int i = 0; i < n; i++) {
       etaCLM[i] /* lower */
-	= y[i] > 1 ? eta[n * (y[i] - 2) + i] : -DBL_MAX; 
+	= yI[i] > 1 ? eta[n * (yI[i] - 2) + i] : -DBL_MAX; 
       etaCLM[i + n] = /* upper */
-	y[i] < J ? eta[n * (y[i] - 1) + i] : DBL_MAX;
+	yI[i] < J ? eta[n * (yI[i] - 1) + i] : DBL_MAX;
     }
     break;
   case 2: case 3:
@@ -348,9 +346,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     if (family == 1) {
       for (int i = 0; i < n; i++) {
 	etaRanefCLM[i] /* lower */
-	  = y[i] > 1 ? etaRanef[n * (y[i] - 2) + i] : -DBL_MAX; 
+	  = yI[i] > 1 ? etaRanef[n * (yI[i] - 2) + i] : -DBL_MAX; 
 	etaRanefCLM[n + i] = /* upper */
-	  y[i] < J ? etaRanef[n * (y[i] - 1) + i] : DBL_MAX;
+	  yI[i] < J ? etaRanef[n * (yI[i] - 1) + i] : DBL_MAX;
       }
     }
 
@@ -369,9 +367,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	for (int j = 0; j < nEta; j++)
 	  sumBL[i] += exp(eta[n * j + i] + etaRanef[n * j + i]);
 	logLikCond_obs[i] = -log(1.0 + sumBL[i]);
-	if (y[i] < J)
-	  logLikCond_obs[i] += eta[n * (y[i] - 1) + i] + 
-	    etaRanef[n * (y[i] - 1) + i];
+	if (yI[i] < J)
+	  logLikCond_obs[i] += eta[n * (yI[i] - 1) + i] + 
+	    etaRanef[n * (yI[i] - 1) + i];
 	logLikCond_sbj[subject[i]-1] += logLikCond_obs[i];
 	break;
       }
@@ -421,22 +419,22 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
       
 	switch (family) {
 	case 1: 
-	  if (y[i] < J) { /* score on upper concerned effects */
+	  if (yI[i] < J) { /* score on upper concerned effects */
 	    scoreCondVar[2] = 
 	      olmm_gLink(etaCLM[n + i] + etaRanefCLM[n + i], link) / 
 	      exp(logLikCond_modified);
 
 	    for (int j = 0; j < pCe; j++)
-	      scoreCond_obs[n * (pCe*(y[i]-1) + j) + i] +=
+	      scoreCond_obs[n * (pCe*(yI[i]-1) + j) + i] +=
 		scoreCondVar[2] * X[n * j + i];
 	  }	    
-	  if (y[i] > 1) { /* score on lower effects */
+	  if (yI[i] > 1) { /* score on lower effects */
 	    scoreCondVar[1] = 
 	      -olmm_gLink(etaCLM[i] + etaRanefCLM[i], link) / 
 	      exp(logLikCond_modified);
 
 	    for (int j = 0; j < pCe; j++) {
-	      scoreCond_obs[n * (pCe * (y[i]-2) + j) + i] +=
+	      scoreCond_obs[n * (pCe * (yI[i]-2) + j) + i] +=
 		scoreCondVar[1] * X[n * j + i];
 	    }
 	  }
@@ -445,7 +443,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	  
 	  for (int j = 0; j < nEta; j++) {
 	    scoreCondVar[j] = 
-	      (y[i]-1 == j ? 1.0 : 0.0) -
+	      (yI[i]-1 == j ? 1.0 : 0.0) -
 	      exp(etaTmp[j]) / (1.0 + sumBL[i]);
 
 	    for (int l = 0; l < pCe; l++) {
@@ -472,7 +470,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	  break;
 	case 2: /* baseline-category model */
 	  scoreCondInv = 
-	    (y[i] < J ? 1.0 : 0.0) -
+	    (yI[i] < J ? 1.0 : 0.0) -
 	    sumBL[i] / (1.0 + sumBL[i]);
 
 	  for (int j = 0; j < pGe; j++) {
@@ -482,7 +480,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	  break;
 	case 3: /* adjacent-categories model */
 	  scoreCondInv = 
-	    (y[i] < J ? 1.0 : 0.0) -
+	    (yI[i] < J ? 1.0 : 0.0) -
 	      sumBL[i] / (1.0 + sumBL[i]);
 
 	  for (int j = 0; j < pGe; j++) {
@@ -510,11 +508,11 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	      
 	      switch (family) {
 	      case 1: 
-		if ((y[i] < J) & (y[i] == tmpJ)) {
+		if ((yI[i] < J) & (yI[i] == tmpJ)) {
 		  scoreCond_obs[n * (p + subsTmp) + i] +=
 		    scoreCondVar[2] * vRanefTerm[subsTmp];
 		}
-		if ((y[i] > 1) & (y[i] == tmpJ)) {
+		if ((yI[i] > 1) & (yI[i] == tmpJ)) {
 		  scoreCond_obs[n * (p + subsTmp) + i] += 
 		    scoreCondVar[1] * vRanefTerm[subsTmp];
 		}
@@ -618,7 +616,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     logLik[0] += logLik_sbj[i];
   }
 
-  UNPROTECT(3);
+  UNPROTECT(1);
   return R_NilValue;
 }
 
@@ -634,18 +632,11 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 
 SEXP olmm_update_u(SEXP x) {
 
-  /* get grouping factor slot */  
-  SEXP subject_0 = getListElement(x, "subject"), subject_1;
-  PROTECT(subject_1 = coerceVector(subject_0, INTSXP));
+  /* get subject slot */  
+  int *subject = INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
 
-  /* get targed variable slot */
-  SEXP y_0 = getListElement(x, "y"), y_1;
-  PROTECT(y_1 = coerceVector(y_0, INTSXP));
-
-  /* integer valued slots and pointer to factor valued slots */
-  int *y = INTEGER(y_1), *subject = INTEGER(subject_1),
-    *dims = DIMS_SLOT(x);
-  R_CheckStack();
+  /* integer valued slots */
+  int *dims = DIMS_SLOT(x);
 
   /* numeric valued objects */
   double *W = W_SLOT(x), *u = U_SLOT(x),
@@ -662,6 +653,11 @@ SEXP olmm_update_u(SEXP x) {
     J = dims[J_POS], nEta = dims[nEta_POS],
     nQP = dims[nQP_POS], 
     family = dims[fTyp_POS], link = dims[lTyp_POS];
+
+  /* get response variable */
+  int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
+  double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); 
+  R_CheckStack();
 
   /* variables for matrix operations */
   int i1 = 1; 
@@ -683,9 +679,9 @@ SEXP olmm_update_u(SEXP x) {
     etaRanefCLM = Calloc(n * 2 , double);
     for (int i = 0; i < n; i++) {
       etaCLM[i] /* lower */
-	= y[i] > 1 ? eta[n * (y[i] - 2) + i] : -DBL_MAX; 
+	= yI[i] > 1 ? eta[n * (yI[i] - 2) + i] : -DBL_MAX; 
       etaCLM[i + n] = /* upper */
-	y[i] < J ? eta[n * (y[i] - 1) + i] : DBL_MAX;
+	yI[i] < J ? eta[n * (yI[i] - 1) + i] : DBL_MAX;
     }
     break;
   case 2: case 3:
@@ -746,9 +742,9 @@ SEXP olmm_update_u(SEXP x) {
     if (family == 1) {
       for (int i = 0; i < n; i++) {
 	etaRanefCLM[i] /* lower */
-	  = y[i] > 1 ? etaRanef[n * (y[i] - 2) + i] : -DBL_MAX; 
+	  = yI[i] > 1 ? etaRanef[n * (yI[i] - 2) + i] : -DBL_MAX; 
 	etaRanefCLM[i + n] = /* upper */
-	  y[i] < J ? etaRanef[n * (y[i] - 1) + i] : DBL_MAX;
+	  yI[i] < J ? etaRanef[n * (yI[i] - 1) + i] : DBL_MAX;
       }
     }
         
@@ -767,9 +763,9 @@ SEXP olmm_update_u(SEXP x) {
 	for (int j = 0; j < nEta; j++)
 	  sumBL[i] += exp(eta[i + j * n] + etaRanef[i + j * n]);
 	logLikCond_obs[i] = -log(1.0 + sumBL[i]);
-	if (y[i] < J)
-	  logLikCond_obs[i] += eta[i + n * (y[i] - 1)] + 
-	    etaRanef[i + n * (y[i] - 1)];
+	if (yI[i] < J)
+	  logLikCond_obs[i] += eta[i + n * (yI[i] - 1)] + 
+	    etaRanef[i + n * (yI[i] - 1)];
 	logLikCond_sbj[subject[i]-1] += logLikCond_obs[i];
 	break;
       }
@@ -799,7 +795,6 @@ SEXP olmm_update_u(SEXP x) {
   if (family == 1) Free(etaRanefCLM);
   if ((family == 2) | (family == 3)) Free(sumBL);
 
-  UNPROTECT(2);
   return R_NilValue;
 }
 
@@ -827,7 +822,6 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
 
   /* integer valued slots and pointer to factor valued slots */
   int *dims = DIMS_SLOT(x);
-  R_CheckStack();
 
   /* numeric valued objects */
   double *ranefCholFac = RANEFCHOLFAC_SLOT(x),
@@ -936,19 +930,12 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   int *rsubjectNew = INTEGER(subjectNew);
   const int rnNew = INTEGER(nNew)[0];
   
-  /* get subject slot */  
-  SEXP subject_0 = getListElement(x, "subject"), subject_1;
-  PROTECT(subject_1 = coerceVector(subject_0, INTSXP));
+  /* get subject slot */
+  int *subject = INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
+    
+  /* integer valued slots */
+  int *dims = DIMS_SLOT(x);
 
-  /* get response variable slot */
-  SEXP y_0 = getListElement(x, "y"), y_1;
-  PROTECT(y_1 = coerceVector(y_0, INTSXP));
-
-  /* integer valued slots and pointer to factor valued slots */
-  int *y = INTEGER(y_1), *subject = INTEGER(subject_1),
-    *dims = DIMS_SLOT(x);
-  R_CheckStack();
-  
   /* numeric valued objects */
   double *ranefCholFac = RANEFCHOLFAC_SLOT(x),
     *ghw = GHW_SLOT(x), *ghx = GHX_SLOT(x), *eta = ETA_SLOT(x),
@@ -962,6 +949,11 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
     nEta = dims[nEta_POS], nQP = dims[nQP_POS], 
     family = dims[fTyp_POS], link = dims[lTyp_POS];
   
+  /* get response variable */
+  int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
+  double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); 
+  R_CheckStack();
+
   /* variables for matrix operations etc. */
   int i1 = 1;
   double one = 1.0, zero = 0.0, 
@@ -1036,7 +1028,7 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
 	  switch (family) {
 	  case 1: 
 	    for (int j = 0; j < J; j++) {
-	      if (y[i2] - 1 == j) {
+	      if (yI[i2] - 1 == j) {
 		logLikCond_obs = log(olmm_GLink(j < (J - 1) ? eta[n * j + i2] + etaRanef[n * j + i2] : DBL_MAX, link) - olmm_GLink(j > 0 ? eta[n * (j - 1) + i2] + etaRanef[n * (j - 1) + i2] : -DBL_MAX, link));
 		logLikCond_sbj[i] += logLikCond_obs;
 	      }
@@ -1047,9 +1039,9 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
 	    for (int j = 0; j < nEta; j++)
 	      sumBL += exp(eta[n * j + i2] + etaRanef[n * j + i2]);
 	    logLikCond_obs = -log(1.0 + sumBL);
-	    if (y[i2] < J)
-	      logLikCond_obs += eta[n * (y[i2] - 1) + i2] + 
-		etaRanef[n * (y[i2] - 1) + i2];
+	    if (yI[i2] < J)
+	      logLikCond_obs += eta[n * (yI[i2] - 1) + i2] + 
+		etaRanef[n * (yI[i2] - 1) + i2];
 	    logLikCond_sbj[i] += logLikCond_obs;
 	    break;
 	  }
@@ -1093,6 +1085,5 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   Free(etaRanef);
   Free(etaRanefNew);
   Free(predCond);
-  UNPROTECT(2);
   return R_NilValue;
 }
