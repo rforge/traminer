@@ -15,4 +15,4 @@ Imports: stats, grid, graphics, methods, nlme, rpart, numDeriv, ucminf, zoo, san
 URL: http://vcrpart.wordpress.com
 LazyLoad: yes
 NeedsCompilation: yes
-Packaged: 2015-06-01 00:00:00 UTC; rbuergin
+Packaged: 2015-08-25 00:00:00 UTC; rbuergin
