@@ -9,6 +9,8 @@ Changes in existing functions:
     mean time plot.
   - seqdist(): New error message when sm=NA with method "OM".
 
+Misc:
+  - updated disstreedisplay help page (tree argument).
 
 ## =========
 Version 1.8-10
