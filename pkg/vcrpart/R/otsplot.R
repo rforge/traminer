@@ -34,7 +34,7 @@ otsplot_control <- function(cex = 1, lwd = 1/4, col = NULL,
                             lorder = c("background", "foreground") ,
                             lcourse = c("upwards", "downwards"),
                             grid.scale = 1/5, grid.lwd = 1/2,
-                            grid.fill =  grey(0.95), grid.col = grey(0.6),          
+                            grid.fill =  grey(0.95), grid.col = grey(0.6),
                             layout = NULL, margins = c(5.1, 4.1, 4.1, 3.1),
                             strip.fontsize = 12, strip.fill =  grey(0.9),
                             pop = TRUE, newpage = TRUE, maxit = 500L) {
@@ -78,7 +78,8 @@ otsplot_control <- function(cex = 1, lwd = 1/4, col = NULL,
 }
 
 
-otsplot_filter <- function(method = c("minfreq", "cumfreq", "linear"), level = NULL) {
+otsplot_filter <- function(method = c("minfreq", "cumfreq", "linear"),
+                           level = NULL) {
     method <- match.arg(method)
     if (is.null(level) && method %in% c("minfreq", "cumfreq"))
         stop("'otsplot_filter' requires an inpute for 'level'.")
@@ -86,7 +87,8 @@ otsplot_filter <- function(method = c("minfreq", "cumfreq", "linear"), level = N
                      linear = linear,
                      minfreq = minfreq,
                      cumfreq = cumfreq)
-    return(structure(list(method = method, level = level), class = "otsplot_filter"))
+    return(structure(list(method = method, level = level),
+                     class = "otsplot_filter"))
 }
 
 

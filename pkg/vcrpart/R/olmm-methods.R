@@ -545,6 +545,7 @@ predict.olmm <- function(object, newdata = NULL,
   
   if (type == "prob") type <- "response"
   formList <- vcrpart_formula(formula(object), object$family) # extract formulas
+  
   offset <- list(...)$offset
   subset <- list(...)$subset
   dims <- object$dims
@@ -555,7 +556,11 @@ predict.olmm <- function(object, newdata = NULL,
   if (!class(ranef) %in% c("logical", "matrix"))
     stop("'ranef' must be a 'logical' or a 'matrix'.")
   
-  if (dims["hasRanef"] < 1L) ranef <- FALSE
+  if (dims["hasRanef"] < 1L) {
+      ranef <- FALSE
+      formList$re$eta$ge <- as.formula(~ 1)
+      formList$re$eta$ce <- as.formula(~ -1)
+  }
   
   if (is.null(newdata)) {
     
@@ -769,13 +774,14 @@ print.olmm <- function(x, etalab = c("int", "char", "eta"), ...) {
 
   if (length(so$feMatGe) > 0 && nrow(so$feMatGe) > 0) {
     cat("\nGlobal fixed effects:\n")
-    text <- so$feMatGe[, 1]; names(text) <- rownames(so$feMatGe)
+    text <- so$feMatGe[, 1]; names(text) <- rownames(so$feMatGe);
     print(text, ...)
   }
   
   if (length(so$feMatCe) > 0 && nrow(so$feMatCe) > 0) {
-    cat("\nCategory-specific fixed effects:\n")    
-    print(olmm_rename(so$feMatCe[, 1], so$yLevs, so$family, etalab), ...)
+    cat("\nCategory-specific fixed effects:\n")
+    text <- so$feMatCe[, 1]; names(text) <- rownames(so$feMatCe);
+    print(olmm_rename(text, so$yLevs, so$family, etalab), ...)
   }
 }
 
@@ -950,7 +956,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
   }
 
   ## title
-  methTitle <- "Ordinal Linear"
+  methTitle <- "Linear"
   if (dims["hasRanef"] > 0L) methTitle <- paste(methTitle, "Mixed")
   methTitle <- paste(methTitle, "Model")
   if (dims["hasRanef"] > 0L)
@@ -960,6 +966,8 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
   na.action <- naprint(attr(model.frame(object), "na.action"))
   na.action <- if (na.action == "") character() else paste("(", na.action, ")", sep = "")
   call <- getCall(object)
+
+  yLevs <- if (is.factor(object$y)) levels(object$y) else 1L
   
   ## return a 'summary.olmm' object
   return(structure(

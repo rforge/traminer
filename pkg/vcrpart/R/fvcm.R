@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-08-21
+##' Date:            2015-10-30
 ##'
 ##' Description:
 ##' Random forests and bagging for the 'tvcm' algorithm.
@@ -22,6 +22,8 @@
 ##' - 
 ##'
 ##' Last modifications:
+##' 2015-10-30: corrected bug in 'predict.fvcm'. When building a dummy
+##'             model the family was not specified.
 ##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
 ##' 2015-06-01: - 'fvcm' gave an error when a linear model is specified
 ##'               new version returns the linear model with a warning from
@@ -58,9 +60,10 @@ fvcolmm <- function(..., family = cumulative(), control = fvcolmm_control()) {
 }
 
 
-fvcolmm_control <- function(maxstep = 10, folds = folds_control("subsampling", K = 100),
-                            mtry = 5, alpha = 1.0, minsize = 50, nimpute = 1, verbose = TRUE,
-                            ...) {
+fvcolmm_control <- function(maxstep = 10,
+                            folds = folds_control("subsampling", K = 100),
+                            mtry = 5, alpha = 1.0, minsize = 50, nimpute = 1,
+                            verbose = TRUE, ...) {
 
   mc <- match.call()
   mc[[1L]] <- as.name("fvcm_control")
@@ -280,7 +283,8 @@ predict.fvcm <- function(object, newdata = NULL,
                          verbose = FALSE, ...) {
   
   type <- match.arg(type)
-
+  if (type == "prob") type = "response"
+  
   ## check newdata
   if (!is.null(newdata) && !class(newdata) == "data.frame")
     stop("'newdata' must be a 'data.frame'.")
@@ -461,20 +465,24 @@ predict.fvcm <- function(object, newdata = NULL,
     fixefMat <- function(fixef) {
       return(rbind(matrix(fixef[1:(dims["pCe"] * dims["nEta"])], dims["pCe"], dims["nEta"], byrow = FALSE), if (dims["pGe"] > 0) matrix(rep(fixef[(dims["pCe"] * dims["nEta"] + 1):dims["p"]], each = dims["nEta"]), dims["pGe"], dims["nEta"], byrow = TRUE) else NULL))
     }
-    eta <- t(sapply(1:nrow(newdata), function(i) {
-      X[i,,drop = FALSE] %*% fixefMat(coef[i,])
-    }))
+    eta <- sapply(1:nrow(newdata), function(i) {
+        X[i,,drop = FALSE] %*% fixefMat(coef[i,])
+    })
+    if (dims["nEta"] == 1) eta <- matrix(eta, ncol = 1) else eta <- t(eta)
+    colnames(eta) <- etaLabs
+    rownames(eta) <- rownames(newdata)
   } else {     
     eta <- t(sapply(1:nrow(newdata), function(i) {
       X[i,,drop = FALSE] %*% coef[i, ]
     }))
     eta <- matrix(eta, ncol = 1L)
   }
-  colnames(eta) <- etaLabs
-  rownames(eta) <- rownames(newdata)
 
-  if (type == "link") return(na.action(eta))
-
+  if (type == "link") {
+      if (object$info$fit != "olmm") eta <- c(eta)
+      return(na.action(eta))
+  }
+  
   ## ------------------------------------------------------- #
   ## Step 3: create a new 'empty' model and predict the outcomes
   ## ------------------------------------------------------- #
@@ -528,6 +536,7 @@ predict.fvcm <- function(object, newdata = NULL,
                   form = quote(form),
                   data = quote(newdata),
                   offset = quote(offset),
+                  family = quote(object$info$family),
                   start = quote(start),
                   na.action = na.pass)
   for (arg in names(object$info$dotargs))
@@ -564,13 +573,15 @@ predict.fvcm <- function(object, newdata = NULL,
   ## set the observations which appear in all trees to NA
   if (oob) pred[apply(folds, 1L, function(x) all(x == 0L)),] <- NA
 
+  if (object$info$fit != "olmm") pred <- c(pred)
+
   ## return predictions
   return(na.action(pred))
 }
 
 
 print.fvcm <- function(x, ...) {
-  cat(if (any(x$info$control$vtry < Inf)) "Random forest" else "Bagging",
+  cat(if (any(x$info$control$mtry < Inf)) "Random forest" else "Bagging",
       "based varying-coefficients model\n\n")
   if (length(x$info$family$family) > 0L)
     cat(" Family:", x$info$family$family, x$info$family$link, "\n")

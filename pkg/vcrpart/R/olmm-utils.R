@@ -303,9 +303,8 @@ olmm_start <- function(start, dims, parNames, X, W, eta, ranefElMat) {
   ## set fixed effects
   
   ## default values
-  intDef <- switch(dims["family"],
-                   qlogis(ppoints(dims["nEta"])),
-                   rep.int(0.0, dims["nEta"]),
+  intDef <- switch(as.character(dims["family"]),
+                   "1" = qlogis(ppoints(dims["nEta"])),
                    rep.int(0.0, dims["nEta"]))
   fixef <- c(matrix(c(rep.int(intDef, dims["pInt"]), rep.int(0.0, dims["nEta"] * (dims["pCe"] - dims["pInt"]))), dims["pCe"], dims["nEta"], byrow = TRUE), rep.int(0.0, dims["pGe"]))
   names(fixef) <- parNames$fixef
@@ -491,7 +490,7 @@ olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
 
   if(etalab != "eta") {
 
-    if (etalab == "int") levels <- seq_along(levels)
+    if (etalab == "int") seq_along(levels)
     rename <- function(names) {
       names <- strsplit(names, ":") 
       names <- lapply(names, function(name) {

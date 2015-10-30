@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2014-09-08
+##' Date:            2015-10-05
 ##'
 ##' Description:
 ##' Plot functions for 'tvcm' objects.
@@ -35,127 +35,145 @@ plot.tvcm <- function(x, type = c("default", "coef",
                            "simple", "partdep", "cv"),
                       main, part = NULL,
                       drop_terminal = TRUE,
-                      tnex = 1, newpage = TRUE, ask = NULL, 
+                      tnex, newpage = TRUE, ask = NULL, 
                       pop = TRUE, gp = gpar(), ...) {
 
-  ## checks
-  type <- match.arg(type)
-  stopifnot(is.logical(drop_terminal) && length(drop_terminal) == 1L)
-  stopifnot(is.numeric(tnex) && length(tnex) == 1L)
-  stopifnot(is.logical(newpage) && length(newpage) == 1L)
-  stopifnot(is.logical(pop) && length(pop) == 1L)
-  stopifnot(class(gp) %in% c("gpar", "list"))
-  
-  if (type == "partdep") {
-
-    if (missing(main)) main <- NULL
-    call <- list(as.name("panel_partdep"), object = quote(x), ask = ask, main = main)
-    call <- append(call, list(...))
-    mode(call) <- "call"
-    eval(call)
-
-  } else if (type == "cv") {
-
-    if (missing(main)) main <- NULL
+    ## checks
+    type <- match.arg(type)
+    stopifnot(is.logical(drop_terminal) && length(drop_terminal) == 1L)
+    if (!missing(tnex)) stopifnot(is.numeric(tnex) && length(tnex) == 1L)
+    stopifnot(is.logical(newpage) && length(newpage) == 1L)
+    stopifnot(is.logical(pop) && length(pop) == 1L)
+    stopifnot(class(gp) %in% c("gpar", "list"))
+    
+    if (type == "partdep") {
+        
+        if (missing(main)) main <- NULL
+        call <- list(as.name("panel_partdep"),
+                     object = quote(x), ask = ask, main = main)
+        call <- append(call, list(...))
+        mode(call) <- "call"
+        eval(call)
+        
+    } else if (type == "cv") {
+        
+        if (missing(main)) main <- NULL
     if (is.null(x$info$cv)) {
-      warning("no information on cross validation.")
+        warning("no information on cross validation.")
     } else {
-      plot(x$info$cv, main = main, ...)
+        plot(x$info$cv, main = main, ...)
     }
-    
-  } else {
-    
-    ## tree plots
-    if (is.null(part)) part <- seq_along(x$info$node)
-    if (is.character(part)) {
-      part <- which(LETTERS[seq_along(x$info$node)] %in% part)
-    } else if (is.numeric(part)) {
-      part <- as.integer(part)
+        
     } else {
-      stop("'part' must be a 'character' or a 'integer'.")
+        
+        ## tree plots
+        if (is.null(part)) part <- seq_along(x$info$node)
+        if (is.character(part)) {
+            part <- which(LETTERS[seq_along(x$info$node)] %in% part)
+        } else if (is.numeric(part)) {
+            part <- as.integer(part)
+        } else {
+            stop("'part' must be a 'character' or a 'integer'.")
+        }
+        if (length(part) < 1L) stop("no valid 'part' specified.")
+        
+        ## whether an input is expected before plotting the next tree
+        if (is.null(ask))
+            ask <- ifelse(length(part) == 1L, FALSE, TRUE)
+        
+        ## repeat the title
+        if (missing(main)) {
+            main <- tvcm_print_vclabs(x$info$formula)[part]
+        } else if (is.character(main)){
+            main <- rep(main, length.out = length(part))
+        } else {
+            main <- NULL
+        }
+        
+        ## terminal panel
+        tp_fun <-
+            switch(type,
+                   "default" =
+                       if (max(sapply(x$info$node[part], width))> 4L) {
+                           panel_empty
+                       } else {
+                           panel_coef
+                       },
+                   "coef" = panel_coef,
+                   "simple" = panel_empty)
+        tp_args <- if ("tp_args" %in% names(list(...))) {
+            list(...)$tp_args
+        } else {
+            list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
+        }
+        tp_args$part <- part
+        tp_args$gp <- gp
+        
+        ## inner panel
+        inner_panel <- if ("inner_panel" %in% names(list(...))) {
+            list(...)$inner_panel
+        } else {
+            switch(type,
+                   "default" = node_inner,
+                   "coef" = node_inner,
+                   "simple" = node_inner)
+        }
+        ip_args <- if ("ip_args" %in% names(list(...))) {
+            list(...)$ip_args
+        } else {
+            list(...)[names(list(...)) %in% names(formals(inner_panel))[-1]]
+        }
+        
+        ## edge panel
+        edge_panel <- if ("edge_panel" %in% names(list(...))) {
+            list(...)$edge_panel
+        } else {
+            edge_default
+        }
+        ep_args <- if ("ep_args" %in% names(list(...))) {
+            list(...)$ep_args
+        } else {
+            list(...)[names(list(...)) %in% names(formals(edge_panel))[-1]]
+        }
+        if ("justmin" %in% names(formals(edge_panel)) &&
+            !"justmin" %in% names(ep_args)) ep_args$justmin <- 5
+        
+        ## other arguments
+        dotargs <- list(...)[names(list(...)) %in%
+                             names(formals(plot.party))[-1]]
+        dotargs <- dotargs[setdiff(names(dotargs),
+                                   c("tp_args", "ip_args", "ep_args"))]
+        
+        ## prepare call
+        call <- list(name = as.name("plot.party"),
+                     x = quote(x),
+                     terminal_panel = quote(tp_fun),
+                     tp_args = quote(tp_args),
+                     inner_panel = quote(inner_panel),
+                     ip_args = quote(ip_args),
+                     edge_panel = quote(edge_panel),
+                     ep_args = quote(ep_args),
+                     drop_terminal = quote(drop_terminal),
+                     tnex = quote(tnexCall),
+                     newpage = quote(newpage),
+                     main = quote(main[pid]),
+                     pop = pop, gp = gp)
+        call <- append(call, dotargs)    
+        mode(call) <- "call"
+        
+        if (ask) {
+            oask <- devAskNewPage(TRUE)
+            on.exit(devAskNewPage(oask))
+        }
+        
+        ## call
+        for (pid in seq_along(part)) {
+            tp_args$part <- part[pid]
+            x$node <- x$info$node[[part[pid]]]
+            tnexCall <- if (missing(tnex)) max(1, depth(x$node)) else tnex
+            eval(call)
+        }
     }
-    if (length(part) < 1L) stop("no valid 'part' specified.")
-
-    ## whether an input is expected before plotting the next tree
-    if (is.null(ask))
-      ask <- ifelse(length(part) == 1L, FALSE, TRUE)
-    
-    ## repeat the title
-    if (missing(main)) {
-      main <- tvcm_print_vclabs(x$info$formula)[part]
-    } else if (is.character(main)){
-      main <- rep(main, length.out = length(part))
-    } else {
-      main <- NULL
-    }
-    
-    ## terminal panel
-    tp_fun <-
-      switch(type,
-             "default" =
-             if (max(sapply(x$info$node[part], width))> 4L) {
-               panel_empty
-             } else {
-               panel_coef
-             },
-             "coef" = panel_coef,
-             "simple" = panel_empty)
-    tp_args <- if ("tp_args" %in% names(list(...))) {
-      list(...)$tp_args
-    } else {
-      list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
-    }
-    tp_args$part <- part
-    tp_args$gp <- gp
-      
-    ## inner panel
-    ip_fun <-
-      switch(type,
-             "default" = node_inner,
-             "coef" = node_inner,
-             "simple" = node_inner)
-    ip_args <- if ("ip_args" %in% names(list(...))) {
-      list(...)$ip_args
-    } else {
-      list(...)[names(list(...)) %in% names(formals(ip_fun))[-1]]
-    }
-    
-    ## edge panel
-    ep_fun <- edge_default    
-    ep_args <- if ("ep_args" %in% names(list(...))) {
-      list(...)$ep_args
-    } else {
-      list(...)[names(list(...)) %in% names(formals(ep_fun))[-1]]
-    }
-    
-    ## other arguments
-    dotargs <- list(...)[names(list(...)) %in% names(formals(plot.party))[-1]]
-    dotargs <- dotargs[setdiff(names(dotargs), c("tp_args", "ip_args", "ep_args"))]
-    
-    ## prepare call
-    call <- list(name = as.name("plot.party"),
-                 x = quote(x),
-                 terminal_panel = quote(tp_fun), tp_args = quote(tp_args),
-                 inner_panel = quote(ip_fun), ip_args = quote(ip_args),
-                 edge_panel = quote(ep_fun), ep_args = quote(ep_args),
-                 drop_terminal = quote(drop_terminal), tnex = quote(tnex),
-                 newpage = quote(newpage), main = quote(main[pid]),
-                 pop = pop, gp = gp)
-    call <- append(call, dotargs)    
-    mode(call) <- "call"
-    
-    if (ask) {
-      oask <- devAskNewPage(TRUE)
-      on.exit(devAskNewPage(oask))
-    }
-    
-    ## call
-    for (pid in seq_along(part)) {
-      tp_args$part <- part[pid]
-      x$node <- x$info$node[[part[pid]]]
-      eval(call)
-    }
-  }
 }
                     
 
@@ -286,30 +304,32 @@ panel_partdep <- function(object, parm = NULL,
 panel_get_main <- function(object, node, id, nobs) {
   rval <- ""
   if (id) rval <-
-    paste(rval, paste(names(object)[id_node(node)], sep = ""))
-  if (id && nobs) rval <- paste(rval, ": ", sep = "")
-  if (nobs) rval <- paste(rval, "n = ", node$info$dims["n"], sep = "")
+    paste(rval, paste0(names(object)[id_node(node)]))
+  if (id && nobs) rval <- paste0(rval, ":")
+  if (nobs) rval <- paste0(rval, "n=", node$info$dims["n"])
   return(rval)
 }
 
 
 panel_coef <- function(object, parm = NULL, 
                        id = TRUE, nobs = TRUE,
-                       exp = FALSE, plot_gp = list(),
-                       margins = c(3, 2, 0, 0), yadj = 0.1,
+                       exp = FALSE,
+                       plot_gp = list(),
+                       margins, yadj = 0.1,
                        mean = FALSE, mean_gp = list(),
-                       conf.int = TRUE, conf.int_gp = list(),
-                       abbreviate = TRUE, etalab = c("int", "char", "eta"),
+                       conf.int = FALSE, conf.int_gp = list(),
+                       abbreviate = TRUE,
+                       etalab = c("int", "char", "eta"),
                        ...) {
 
   ## checks
   stopifnot(is.logical(id) && length(id) == 1L)
   stopifnot(is.logical(nobs) && length(nobs) == 1L)
   stopifnot(is.list(plot_gp))
-  stopifnot(is.numeric(margins) && length(margins) == 4L)
+  if (!missing(margins)) stopifnot(is.numeric(margins) && length(margins) == 4L)
   stopifnot(is.list(mean_gp))
   stopifnot(is.list(conf.int_gp))
-
+  
   ## get partition
   part <- which(sapply(object$info$node, identical, object$node))
   
@@ -366,6 +386,12 @@ panel_coef <- function(object, parm = NULL,
     return(x)
   }
 
+  ## determine 'margins' if required
+  if (missing(margins)) {
+      margins <- c(0.5, 0.5, 0, 0)
+      if (length(parm) > 1) margins[1L] <- 1.5
+  }
+  
   ## whether y labels should be the exponential of their actual values
   exp <- rep(exp, length.out = length(parm))
   
@@ -397,7 +423,8 @@ panel_coef <- function(object, parm = NULL,
                           ylab = if (exp[i]) "exp(coef)" else "coef",
                           type = "b",
                           xlabel = xlabel, 
-                          height = 1, width = 0.6, 
+                          height = 1,
+                          width = min(0.6, 0.15 * width(object$node)), 
                           gp = gpar(cex = 1L, fontsize = 8))
              if (length(plot_gp) > 0L)
                rval <- appendDefArgs(plot_gp[[i]], rval)
@@ -438,12 +465,12 @@ panel_coef <- function(object, parm = NULL,
   qN <- qnorm(0.975)
   
   rval <- function(node) {
-    
+
     strUnit <- if (any(c(id, nobs))) unit(2, "strheight", "A") else unit(0, "npc")
     pushViewport(viewport(layout = grid.layout(3, 1,
-                            heights = unit.c(unit(yadj, "npc"),
-                              strUnit,
-                              unit(1, "npc") - unit(yadj, "npc") - strUnit)))) # 1
+                              heights = unit.c(unit(yadj, "npc"),
+                                  strUnit,
+                                  unit(1, "npc") - unit(yadj, "npc") - strUnit)))) # 1
     
     pushViewport(viewport(layout.pos.row = 2L)) # 2
     grid.rect(gp = gpar(fill = "white", col = 0))
@@ -461,14 +488,16 @@ panel_coef <- function(object, parm = NULL,
       pushViewport(viewport(height = unit(plot_gp[[i]]$height, "npc"),
                             width = unit(plot_gp[[i]]$width, "npc"))) # 5
       pushViewport(plotViewport(margins = margins,
-                                xscale = plot_gp[[i]]$xlim, yscale = plot_gp[[i]]$ylim,
+                                xscale = plot_gp[[i]]$xlim,
+                                yscale = plot_gp[[i]]$ylim,
                                 default.units = "native")) # 6
-      
+
+      ## vertical lines
       grid.segments(unit(1:ncol(coefList[[i]]), "native"),
                     unit(rep(plot_gp[[i]]$ylim[1], ncol(coefList[[i]])), "native"),
                     unit(1:ncol(coefList[[i]]), "native"),
                     unit(rep(plot_gp[[i]]$ylim[2], ncol(coefList[[i]])), "native"),
-                    gp = gpar(col = "lightgrey"))
+                    gp = gpar(col = "lightgrey", lty = 3))
 
       if (plot_gp[[i]]$ylim[1] < 0.0 & plot_gp[[i]]$ylim[2] > 0)
       grid.segments(unit(plot_gp[[i]]$xlim[1], "native"), unit(0, "native"),
@@ -553,14 +582,15 @@ panel_coef <- function(object, parm = NULL,
       if (id_node(node) == min(nodeids(object, terminal = TRUE))) {
         grid.yaxis(at = plot_gp[[i]]$yat,
                    label = plot_gp[[i]]$ylabel,
-                   gp = gpar(lineheight = 0.5))
+                   gp = gpar(lineheight = 0.2))
         grid.text(plot_gp[[i]]$ylab,
                   unit(-0.75 - 0.6 * max(nchar(plot_gp[[i]]$ylabel)), "char"),
                   unit(0.5, "npc"), rot = 90)
       }
       
-      grid.xaxis(at = 1:ncol(coefList[[i]]), label = plot_gp[[i]]$xlabel,
-                 gp = gpar(lineheight = 0.5))
+      grid.xaxis(at = 1:ncol(coefList[[i]]),
+                 label = plot_gp[[i]]$xlabel,
+                 gp = gpar(lineheight = 0.4))
       grid.rect()
       upViewport(3L)
 
@@ -572,7 +602,6 @@ panel_coef <- function(object, parm = NULL,
   }
 }
 class(panel_coef) <- "grapcon_generator"
-
 
 panel_empty <- function(object, part = 1L, id = TRUE, nobs = TRUE, ...) {
   

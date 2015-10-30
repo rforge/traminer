@@ -1,3 +1,18 @@
+Changes in Version 0.4-1
+
+    o    Because of an internal bug the print method for 'fvcm' object
+         indicated always that the model would be a 'Bagging based varying
+         coefficient model'. Bug fixed. Thanks Michel Ballings for the 
+         hint.
+
+    o    Improved the 'coef' method for models fitted with 'tvcm', 'tvcglm'
+         or 'tvcolmm'. 'by' variables of 'vc' terms without splits are not
+         anymore assigned to fixed i.e. main effects. 
+
+    o    Corrected internal bug of 'predict.fvcm'. Except for 'type = "coef"',
+         and models with 'family = gaussian()' or 'family = cumulative()',
+         predictions gave wrong results. Sorry.
+
 Changes in Version 0.3-3
 
     o    Corrected issues with moderators with name 'x' in 'vc' terms. Thanks

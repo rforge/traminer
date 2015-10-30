@@ -444,7 +444,7 @@ plot.cvloss.tvcm <- function(x, legend = TRUE, details = TRUE, ...) {
   type <- "s"
   lpos <- "topleft"
   lsubs <- if (details) 1L:2L else 1L
-  if (x$cp.hat < Inf) lsubs <- c(lsubs, 4L)
+  if (x$cp.hat < Inf) lsubs <- c(lsubs, 3L)
   lcol <- c("black", "grey80", "black")
   llty <- c(1, 1, 2)
 

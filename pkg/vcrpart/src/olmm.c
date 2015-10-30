@@ -221,7 +221,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); 
+  /* double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP));xs */ 
   R_CheckStack();
 
   /* variables for matrix operations etc. */
@@ -656,7 +656,7 @@ SEXP olmm_update_u(SEXP x) {
 
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); 
+  /* double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); */ 
   R_CheckStack();
 
   /* variables for matrix operations */
@@ -951,7 +951,7 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); 
+  /* double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); */ 
   R_CheckStack();
 
   /* variables for matrix operations etc. */

@@ -66,7 +66,8 @@
     with which to predict, if omitted, the fitted values are used.} 
   \item{type}{character string. Denotes for \command{\link{predict}} the
     type of predicted value. See \command{\link{predict.glm}} or
-    \command{\link{predict.olmm}}.}
+    \command{\link{predict.olmm}}. \code{"response"} and \code{"prob"}
+    are identical.}
   \item{na.action}{function determining what should be done with missing
     values for fixed effects in \code{newdata}. The default is to
     predict \code{NA}: see \command{\link{na.pass}}.}

@@ -36,7 +36,8 @@
     with which to predict. If omitted, the training data are used.} 
   \item{type}{character string indicating the type of plot or
     prediction. See \command{\link{plot.tvcm}} or
-    \command{\link{predict.tvcm}}.} 
+    \command{\link{predict.tvcm}}. \code{"response"} and \code{"prob"}
+    are identical.} 
   \item{tree}{integer vector. Which trees should be plotted.}
   \item{ask}{logical. Whether an input should be asked before printing
     the next panel.} 

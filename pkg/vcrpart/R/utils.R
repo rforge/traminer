@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-20-01
+##' Date:            2015-09-02
 ##'
 ##' Description:
 ##' General utility functions for the 'vcrpart' package.
@@ -24,6 +24,10 @@
 ##'                         from vcrpart_formula.
 ##'
 ##' Last modifications:
+##' 2015-09-02: - modified 'vcrpart_formula_eta' for implementation of
+##'               gaussian mixed model.
+##'             - set for baseline model as default category-specific
+##'               effects. 
 ##' 2015-06-01: corrected bug of 'vcrpart_formula' in cases where a
 ##'             effect modifier has the variable name 'x'. Now I call
 ##'             it 'fTerm'.
@@ -363,21 +367,32 @@ vcrpart_formula_eta <- function(x, family, env) {
       subsGe <- rval %in% termFact[attr(terms, "specials")$ge]
       geTerms <-
           unlist(lapply(rval[subsGe], function(fTerm) eval(parse(text = fTerm)))) 
-      
+          
       if (x$type == "vc" && any(sapply(geTerms, checkOperators)))
         stop("the ':', '*' and '%in%' operators are not allowed for the 'by' ",
              "argument in 'vc' terms.")
+
       ## This code distinguishes between the models and their random
       ## effect specification. For the cumulative and the adjacent model,
       ## use global effects, and for the cumulative model use category
       ## specific effects
-      ## if (family$family %in% c("cumulative", "adjacent")) {
-      ##   geTerms <- c(geTerms, rval[!subsGe & !subsCe])
-      ## } else {
-      ##   ceTerms <- c(ceTerms, rval[!subsGe & !subsCe])
-      ## }
+      if (family$family %in% c("cumulative", "adjacent")) {
+          geTerms <- c(geTerms, rval[!subsGe & !subsCe])
+      } else if (family$family %in% c("gaussian")) {
+          if (any(subsCe) | any(subsGe))
+              warning("'ce()' and 'ge()' terms ",
+                      "are ignored if family = '",
+                      family$family, "'")
+          ceTerms <- c(ceTerms, geTerms, rval[!subsGe & !subsCe])
+          subsCe <- rep(TRUE, length(ceTerms))
+          subsGe <- rep(FALSE, length(rval))
+          geTerms <- NULL          
+      } else {
+          ceTerms <- c(ceTerms, rval[!subsGe & !subsCe])
+      }
+      ## old
+      ## geTerms <- c(geTerms, rval[!subsGe & !subsCe]) # ? better
       
-      geTerms <- c(geTerms, rval[!subsGe & !subsCe]) # ? better
       rval <- list(paste(ceTerms, collapse = "+"),
                    paste(geTerms, collapse = "+"))
 
@@ -388,6 +403,8 @@ vcrpart_formula_eta <- function(x, family, env) {
     }
     
     ## set intercepts
+    if (family$family %in% c("baseline", "gaussian"))
+        x$intercept <- "ce"    
     if (x$intercept == "none") {
       int <- list(switch(x$type, fe = "-1", re = "-1", vc = "1"),
                   switch(x$type, fe = "1", re = "-1", vc = "1"))
