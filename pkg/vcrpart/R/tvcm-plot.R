@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-10-05
+##' Date:            2015-10-30
 ##'
 ##' Description:
 ##' Plot functions for 'tvcm' objects.

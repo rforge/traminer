@@ -1,9 +1,14 @@
 Changes in Version 0.4-1
 
-    o    Because of an internal bug the print method for 'fvcm' object
-         indicated always that the model would be a 'Bagging based varying
-         coefficient model'. Bug fixed. Thanks Michel Ballings for the 
-         hint.
+    o    Because of an internal bug the print method for 'fvcm' objects
+         printed always 'Bagging based varying coefficient model', even if
+	 'mtry < Inf'. Bug fixed. Thanks Michel Ballings for the hint.
+
+    o    In cases of 'mtry = Inf' the algorithm returned an error. Now
+         'mtry = Inf' is allowed.
+
+    o    In cases of 'mtry < Inf' the 'print.fvcm' shows now the set 'mtry'
+         parameter.
 
     o    Improved the 'coef' method for models fitted with 'tvcm', 'tvcglm'
          or 'tvcolmm'. 'by' variables of 'vc' terms without splits are not
@@ -12,6 +17,10 @@ Changes in Version 0.4-1
     o    Corrected internal bug of 'predict.fvcm'. Except for 'type = "coef"',
          and models with 'family = gaussian()' or 'family = cumulative()',
          predictions gave wrong results. Sorry.
+
+    o    The default setting for 'na.action' on 'tvcolmm', 'tvcglm', 'tvcm'
+         and 'olmm' is set to 'na.action = na.omit'. Thanks to the anonymous
+         referee of JSS.
 
 Changes in Version 0.3-3
 

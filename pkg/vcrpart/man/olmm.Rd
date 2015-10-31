@@ -32,7 +32,7 @@ adjacent(link = "logit")
 baseline(link = "logit")
 
 olmm(formula, data, family = cumulative(), 
-     weights, subset, na.action,
+     weights, subset, na.action = na.omit,
      offset, contrasts, control = olmm_control(), ...)
 }
 

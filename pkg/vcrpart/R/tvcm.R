@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      rbuergin@gmx.ch
-##' Date:        2015-08-25
+##' Date:        2015-10-31
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -14,6 +14,8 @@
 ##' tvcm_control    control function for 'tvcm'
 ##'
 ##' Last modifications:
+##' 2015-11-31: enable the setting 'mtry <- Inf'
+##' 2015-10-30: set default 'na.action = na.omit' on 'tvcm'
 ##' 2015-06-01: - give a warning when no 'vc' terms are specified.
 ##' 2014-12-08: - enable 'sctest = FALSE' in 'tvcolmm_control'
 ##'             - remove checks on length of argument list, which is
@@ -57,7 +59,7 @@
 ##' -------------------------------------------------------- #
 
 tvcolmm <- function(formula, data, family = cumulative(),
-                    weights, subset, offset, na.action,
+                    weights, subset, offset, na.action = na.omit,
                     control = tvcolmm_control(), ...) {
     mc <- match.call()
     mc[[1L]] <- as.name("tvcm")
@@ -98,7 +100,7 @@ tvcolmm_control <- function(alpha = 0.05, bonferroni = TRUE, minsize = 50,
 
 
 tvcglm <- function(formula, data, family,
-                   weights, subset, offset, na.action,
+                   weights, subset, offset, na.action = na.omit,
                    control = tvcglm_control(), ...) { 
     mc <- match.call()
     mc[[1L]] <- as.name("tvcm")
@@ -130,7 +132,7 @@ tvcglm_control <- function(minsize = 30, mindev = 2.0,
 
 
 tvcm <- function(formula, data, fit, family, 
-                 weights, subset, offset, na.action,
+                 weights, subset, offset, na.action = na.omit,
                  control = tvcm_control(), ...) {
   
   ## get specified arguments
@@ -436,6 +438,10 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
   ## check hidden arguments
   mtry <- ifelse(is.null(list(...)$mtry), .Machine$integer.max,  list(...)$mtry)
   stopifnot(is.numeric(mtry) && length(mtry) == 1L && mtry > 0L)
+  if (mtry != round(mtry) && mtry < Inf) {
+      mtry <- as.integer(mtry)
+      warning("'mtry' was set to ", mtry)
+  }
   
   ## ensure backward compability
   if ("maxevalsplit" %in% names(list(...))) maxnumsplit <- list(...)$maxevalsplit
@@ -477,7 +483,7 @@ tvcm_control <- function(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
                 papply.args = papply.args,
                 center = center,
                 verbose = verbose,
-                mtry = as.integer(mtry),     
+                mtry = mtry,     
                 parm = NULL, intercept = NULL,
                 seed = seed,
                 functional.factor = "LMuo",

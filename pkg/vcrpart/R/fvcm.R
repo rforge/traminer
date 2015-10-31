@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-10-30
+##' Date:            2015-10-31
 ##'
 ##' Description:
 ##' Random forests and bagging for the 'tvcm' algorithm.
@@ -19,9 +19,11 @@
 ##' ranef.fvcm:   extracts random effects
 ##'
 ##' To do:
-##' - 
+##' - implement variable importance measures
 ##'
 ##' Last modifications:
+##' 2015-11-31: - enable the setting 'mtry <- Inf'
+##'             - indicate the 'mtry' parameter in cases of random forests
 ##' 2015-10-30: corrected bug in 'predict.fvcm'. When building a dummy
 ##'             model the family was not specified.
 ##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
@@ -592,10 +594,11 @@ print.fvcm <- function(x, ...) {
   if (length(str <- deparseCall(x$info$call$subset)) > 0L)
     cat(" Subset: ", str, "\n", sep = "")
   if (length(x$info$control) > 0L)
-    cat(paste("Control: ", 
-              "minsize = ", paste(x$info$control$minsize, collapse = ", "),
-              ", ntrees = ", length(x$info$forest),
-              "\n", sep = ""))
+      cat(paste0("Control: ", 
+                 "minsize = ", paste(x$info$control$minsize, collapse = ", "),
+                 ", ntrees = ", length(x$info$forest),
+                 if (x$info$control$mtry < Inf) paste0(", mtry = ", x$info$control$mtry), 
+                 "\n"))
   if (nzchar(mess <- naprint(attr(x$data, "na.action")))) 
     cat("\n(", mess, ")\n", sep = "")
   return(invisible(x))

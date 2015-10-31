@@ -50,8 +50,9 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
-##' 2015-10-15: - add function 'tvcm_grow_setparm'
-##' 2015-08-25: - replace 'fit' argument in 'tvcm_formula' by 'family'.
+##' 2015-11-31: enable the setting 'mtry <- Inf'
+##' 2015-10-15: add function 'tvcm_grow_setparm'
+##' 2015-08-25: replace 'fit' argument in 'tvcm_formula' by 'family'.
 ##' 2015-08-21: - small changes in 'tvcm_grow_fit'.
 ##'             - replace 'family' argument in 'tvcm_formula' by 'fit'.
 ##' 2015-02-25: add check for fixed effects model matrix in 'tvcm_grow_update'.

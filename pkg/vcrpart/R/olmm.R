@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:       Reto Buergin
-##' Date:         2015-09-02
+##' Date:         2015-10-30
 ##' E-Mail:       rbuergin@gmx.ch
 ##'
 ##' References:
@@ -14,6 +14,7 @@
 ##'
 ##'
 ##' Modifications:
+##' 2015-10-30: set default 'na.action = na.omit' on 'olmm'
 ##' 2015-09-02: started with integration auf gaussian mixed model
 ##' 2015-01-15: improved predict.olmm
 ##' 2014-09-25: - removed bug for numeric estimation of covariance of
@@ -139,7 +140,7 @@ olmm_control <- function(fit = c("nlminb", "ucminf", "optim"), doFit = TRUE,
 }
 
 olmm <- function(formula, data, family = cumulative(),
-                 weights, subset, na.action,
+                 weights, subset, na.action = na.omit,
                  offset, contrasts, control = olmm_control(), ...) {
 
   ## check arguments

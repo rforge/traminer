@@ -13,7 +13,7 @@
 
 \usage{
 tvcm(formula, data, fit, family,
-     weights, subset, offset, na.action,
+     weights, subset, offset, na.action = na.omit,
      control = tvcm_control(), ...)
 }
 
@@ -36,7 +36,9 @@ tvcm(formula, data, fit, family,
   \item{offset}{this can be used to specify an a priori known component 
     to be included in the linear predictor during fitting.} 	
   \item{na.action}{a function that indicates what should happen if data 
-    contain \code{NA}s. See \command{\link{na.action}}.}
+    contain \code{NA}s. The default \code{na.action = na.omit} is
+    listwise deletion, i.e., observations with missings on any variable
+    are dropped. See \command{\link{na.action}}.} 
   \item{control}{a list with control parameters as returned by
     \command{\link{tvcm_control}}.}
   \item{\ldots}{additional arguments passed to the fitting function

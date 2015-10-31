@@ -20,7 +20,7 @@
 
 \usage{
 tvcglm(formula, data, family, 
-       weights, subset, offset, na.action, 
+       weights, subset, offset, na.action = na.omit, 
        control = tvcglm_control(), ...)
 
 tvcglm_control(minsize = 30, mindev = 2.0,
@@ -55,7 +55,9 @@ tvcglm_control(minsize = 30, mindev = 2.0,
   \item{offset}{this can be used to specify an a priori known component 
     to be included in the linear predictor during fitting.} 	
   \item{na.action}{a function that indicates what should happen if data 
-    contain \code{NA}s. See \command{\link{na.action}}.}
+    contain \code{NA}s. The default \code{na.action = na.omit} is
+    listwise deletion, i.e., observations with missings on any variable
+    are dropped. See \command{\link{na.action}}.}
   \item{control}{a list with control parameters as returned by
     \command{\link{tvcolmm_control}}.}
   \item{minsize}{numeric (vector). The minimum sum of weights in
