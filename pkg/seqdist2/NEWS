@@ -1,13 +1,15 @@
-              CHANGES IN seqdist2 VERSION 0.9-1 [2015-08-18]
+              CHANGES IN seqdist2 VERSION 0.9-1 [2015-11-16]
 
 New Functions
   o seqcost: proposes different ways of computing substitution
         (sm) and indel costs;
         returns a list with the two elements sm and indel.
   o seqsubm: alias of seqcost that returns only the substitution costs.
+  o seqdist: new error message when 'refseq' is a state sequence object
+      with an alphabet assigned different from that of 'seqdata' to it.
 
 BUG FIXES
-  o seqsubm, seqcost: option FUTURE wrongly returned a squared 
+  o seqsubm, seqcost: option FUTURE wrongly returned a squared
         Chi-squared distance. This is now fixed.
   o seqdistOO: Now tests that a non NA value is provided
         for sm when method="OM".

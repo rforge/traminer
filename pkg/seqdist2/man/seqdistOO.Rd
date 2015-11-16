@@ -26,7 +26,7 @@ seqdistOO(seqdata, method, refseq=NULL, norm=FALSE,
   \code{"OM", "OMloc", "OMslen", "OMspell", "OMstran", "LCS", "HAM", "DHD", "TWED", "SVRspell", "NMS", "NMSMST", "LCP", "RLCP", "CHI2", "EUCLID"} (see details)
 }
 
-  \item{refseq}{Optional baseline sequence to compute the distances from. Can be the index of a sequence in the state sequence object, 0 for the most frequent sequence, or an external sequence passed as a sequence object with a single row. %The latter works only with a subset of methods (see details).
+  \item{refseq}{Optional baseline sequence to compute the distances from. Can be the index of a sequence in the state sequence object, 0 for the most frequent sequence, or an external sequence passed as a sequence object with a single row  and same alphabet as seqdata assigned to it. %The latter works only with a subset of methods (see details).
   }
 
   \item{norm}{String or logical. One of \code{"none", "maxlength", "gmean", "maxdist", "YujianBo"}. If \code{TRUE} the normalization method is automatically selected (see details).  Default is \code{FALSE}.}
@@ -153,7 +153,7 @@ Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009). Mining Sequence 
 
 Halpin, B. (2014). Three Narratives of Sequence Analysis, in Blanchard, P., Bühlmann, F. and Gauthier, J.-A. (Eds.) \emph{Advances in Sequence Analysis: Theory, Method, Applications}, Vol 2 of Series \emph{Life Course Research and Social Policies}, pages 75--103, Heidelberg: Springer. DOI: \url{http://dx.doi.org/10.1007/978-3-319-04969-4_5}
 
-%Lesnard, L. (2006). Optimal Matching and Social Sciences. \emph{Série des Documents de Travail du CREST},  Institut National de la Statistique et des Etudes Economiques, Paris.
+%Lesnard, L. (2006). Optimal Matching and Social Sciences. \emph{Série des Documents de Travail du CREST},  Institut National de la Statistique et des Etudes Economiques, \bold{2006-01}, Paris.
 
 Marteau, P.-F. (2009). Time Warp Edit Distances with Stiffness Adjustment for Time Series Matching. \emph{IEEE Transactions on Pattern Analysis and Machine Learning Intelligence}, \bold{31}(2), 306--318. DOI: \url{http://dx.doi.org/10.1109/TPAMI.2008.76}
 
@@ -173,8 +173,13 @@ See also all references in \cite{Studer and Ritschard (2014, 2015)}
 ## derived from transition rates
 data(biofam)
 biofam.seq <- seqdef(biofam, 10:25)
-costs <- seqsubm(biofam.seq, method="TRATE")
-biofam.om <- seqdistOO(biofam.seq, method="OM", indel=3, sm=costs)
+biofam.om <- seqdistOO(biofam.seq, method="OM", indel=3, sm="TRATE")
+
+## LCS distances to an external sequence
+refs <- seqdef("(0,5)-(3,5)-(4,6)", informat="SPS",
+            alphabet=alphabet(biofam.seq))
+biofam.ref <- seqdist(biofam.seq, method="LCS", refseq=refs)
+hist(biofam.ref)
 
 ## =====================
 ## Example with missings
