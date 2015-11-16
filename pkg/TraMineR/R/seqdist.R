@@ -15,6 +15,16 @@ seqdist <- function(seqdata, method, refseq=NULL, norm=FALSE,
 	if (!inherits(seqdata,"stslist")) {
 		stop(" [!] data is not a state sequence object, use 'seqdef' function to create one", call.=FALSE)
 	}
+
+    ## checking refseq
+    if (inherits(refseq, "stslist")) {
+        a.ref <- alphabet(refseq)
+        a.seq <- alphabet(seqdata)
+        if ((length(a.ref)!=length(a.seq)) | (!suppressWarnings(all(a.ref==a.seq)))) {
+            stop(" [!] same alphabet must be assigned to 'refseq' and 'seqdata'!", call.=FALSE)
+        }
+    }
+
 	if (method=="OMopt") {
 		method <- "OM"
 		optimized <- TRUE

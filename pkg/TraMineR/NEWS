@@ -7,10 +7,15 @@ Changes in existing functions:
     different states, and the standard error of the mean total times.
   - seqmtplot(): When serr=TRUE, error bars are displayed in the
     mean time plot.
-  - seqdist(): New error message when sm=NA with method "OM".
+  - seqdist(): 
+    - New error message when sm=NA with method "OM".
+    - New error message when 'refseq' is a state sequence object with
+      an alphabet assigned to it different from that of 'seqdata'.
 
 Misc:
   - updated disstreedisplay help page (tree argument).
+  - updated seqdist help page (refseq argument and example).
+  - updated CITATION file (new ref and fixed a doi argument). 
 
 ## =========
 Version 1.8-10
