@@ -64,7 +64,7 @@ Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009). Mining Sequence 
 
 Lesnard, L. (2006). Optimal Matching and Social Sciences. \emph{Série des Documents de Travail du CREST},  Institut National de la Statistique et des Etudes Economiques, \bold{2006-01}, Paris.
 
-Studer, M. and G. Ritschard (2015). What matters in differences between life trajectories: A comparative review of sequence dissimilarity. \emph{Journal of the Royal Statistical Society A},  (Early view), DOI: 10.1111/rssa.12125.
+Studer, M. and G. Ritschard (2015). What matters in differences between life trajectories: A comparative review of sequence dissimilarity measures. \emph{Journal of the Royal Statistical Society A},  (Early view), DOI: 10.1111/rssa.12125.
 
 }
 
@@ -86,7 +86,7 @@ biofam.lcs <- seqdist(biofam.seq, method="LCS", refseq=0, norm=TRUE)
 hist(biofam.lcs)
 
 ## distance to an external sequence
-refs <- seqdef("(0,5)-(3,5)-(4,6)", informat="SPS", 
+refs <- seqdef("(0,5)-(3,5)-(4,6)", informat="SPS",
             alphabet=alphabet(biofam.seq))
 biofam.ref <- seqdist(biofam.seq, method="LCS", refseq=refs)
 hist(biofam.ref)
