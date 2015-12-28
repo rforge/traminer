@@ -22,6 +22,8 @@ Changes in Version 0.4-1
          and 'olmm' is set to 'na.action = na.omit'. Thanks to the anonymous
          referee of JSS.
 
+    o    Added the argument 'fast' to 'tvcglm_control'
+
 Changes in Version 0.3-3
 
     o    Corrected issues with moderators with name 'x' in 'vc' terms. Thanks

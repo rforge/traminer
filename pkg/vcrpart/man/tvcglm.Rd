@@ -26,7 +26,7 @@ tvcglm(formula, data, family,
 tvcglm_control(minsize = 30, mindev = 2.0,
                maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
                cv = TRUE, folds = folds_control("kfold", 5),
-               prune = cv, center = TRUE, ...)
+               prune = cv, fast = TRUE, center = fast, ...)
 }
 
 \arguments{
@@ -76,7 +76,12 @@ tvcglm_control(minsize = 30, mindev = 2.0,
     \command{\link{folds_control}}. Is used for cross-validation.}
   \item{prune}{logical scalar. Whether or not the initial tree should be
     pruned by the estimated \code{cp} parameter from
-    cross-validation. Cannot be \code{TRUE} if \code{cv = FALSE}.} 
+    cross-validation. Cannot be \code{TRUE} if \code{cv = FALSE}.}
+  \item{fast}{logical integer. Whether the approximative model should be
+    used to search for the next split. The approximative search model
+    uses the fitted values of the current model as offsets and estimates
+    only the coefficients of the added split. If \code{FALSE}, the
+    accurate search model is used.}
   \item{center}{logical integer. Whether the predictor variables of
     update models during the grid search should be centered. Note that
     \code{TRUE} will not modify the predictors of the fitted model.} 

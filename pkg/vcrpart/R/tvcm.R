@@ -114,7 +114,7 @@ tvcglm <- function(formula, data, family,
 tvcglm_control <- function(minsize = 30, mindev = 2.0,
                            maxnomsplit = 5, maxordsplit = 9, maxnumsplit = 9,
                            cv = TRUE, folds = folds_control("kfold", 5),
-                           prune = cv, center = TRUE, ...) {
+                           prune = cv, fast = TRUE, center = fast, ...) {
   mc <- match.call()
   mc[[1L]] <- as.name("tvcm_control")
   mc$minsize <- minsize
@@ -125,6 +125,7 @@ tvcglm_control <- function(minsize = 30, mindev = 2.0,
   mc$cv <- cv
   mc$folds <- folds
   mc$prune <- prune
+  mc$fast <- fast
   mc$center <- center
   return(eval.parent(mc))
 }
