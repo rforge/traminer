@@ -38,7 +38,7 @@ ce(formula)
     commas. It is also possibly to assign a vector that contains the
     variable names as characters.}  
   \item{by}{a formula of predictors the effects of which are moderated
-    by the variables in \code{\ldots}. See \command{\link{tvcm}}and the
+    by the variables in \code{\ldots}. See \command{\link{tvcm}} and the
     examples below. Note that the \code{by} variable must be numeric and
     factor variables must be recoded to dummy variables by hand.}
   \item{nuisance}{character vector of variables in \code{by} which have
