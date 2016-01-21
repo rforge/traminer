@@ -14,7 +14,7 @@ BIOSPELL_to_STS <- function(seqdata, id=1, begin=2, end=3, status=4,
     is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
 
 	if (any(!is.wholenumber(c(endcolumn,begincolumn)), na.rm=TRUE)) {
-		stop(" [!] Found non-integer values as begin and/or end argument!", call.=FALSE)
+		stop(" [!] Found non-integer values in colunms refer to by begin and/or end argument!", call.=FALSE)
 	}
 	if (any(begincolumn<1, na.rm=TRUE)) {
 		stop(" [!] Found one or more spell with starting time < 1", call.=FALSE)
