@@ -390,7 +390,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 
 	/* hack to avoid numeric problems with DBL_MIN, DBL_MAX */
 	logLikCond_modified = 
-	  fabs(exp(logLikCond_obs[i])) < 1E-6 & gq_weight < 1E-6 ?
+	  (fabs(exp(logLikCond_obs[i])) < 1E-6) & (gq_weight < 1E-6) ?
 	  DBL_MAX : logLikCond_obs[i];
 	
 	/* calculate the Kronecker product of u_i and w_it */

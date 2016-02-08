@@ -83,7 +83,7 @@ plot.tvcm <- function(x, type = c("default", "coef",
         
         ## repeat the title
         if (missing(main)) {
-            main <- tvcm_print_vclabs(x$info$formula)[part]
+            main <- tvcm_print_vclabs(x$info$formula, TRUE)[part]
         } else if (is.character(main)){
             main <- rep(main, length.out = length(part))
         } else {

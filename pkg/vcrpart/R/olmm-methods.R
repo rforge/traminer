@@ -525,7 +525,7 @@ model.matrix.olmm <- function(object, which = c("fe", "fe-ce", "fe-ge",
   return(rval)
 }
 
-neglogLik2.olmm <- function(object, ...) return(-as.numeric(logLik(object)))
+neglogLik2.olmm <- function(object, ...)  return(-2 * as.numeric(logLik(object, ...)))
 
 
 nobs.olmm <- function(object, ...) object$dims[["n"]]
@@ -1061,7 +1061,7 @@ update.olmm <- function(object, formula., evaluate = TRUE, ...) {
 }
 
 
-VarCorr.olmm <- function(x, sigma = 1., rdig = 3) {
+VarCorr.olmm <- function(x, sigma = 1., rdig = 3, ...) {
             
   ## create formatted output according to VarCorr
   RECovMat <- ranefCov(x)

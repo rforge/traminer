@@ -11,7 +11,7 @@ Maintainer: Reto Buergin <rbuergin@gmx.ch>
 Description: Recursive partitioning for varying coefficient generalized linear models and ordinal linear mixed models. Special features are coefficient-wise partitioning, non-varying coefficients and partitioning of time-varying variables in longitudinal regression.
 License: GPL (>= 2)
 Depends: R (>= 3.1.0), parallel, partykit
-Imports: stats, grid, graphics, methods, nlme, rpart, numDeriv, ucminf, zoo, sandwich, strucchange
+Imports: stats, grid, graphics, methods, nlme (>= 3.1-123), rpart, numDeriv, ucminf, zoo, sandwich, strucchange
 URL: http://vcrpart.wordpress.com
 LazyLoad: yes
 NeedsCompilation: yes

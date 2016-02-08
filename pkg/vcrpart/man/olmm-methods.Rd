@@ -56,7 +56,7 @@
 
 \method{terms}{olmm}(x, which = c("fe-ce", "fe-ge", "re-ce", "re-ge"), ...)
 
-\method{VarCorr}{olmm}(x, sigma = 1., rdig = 3)
+\method{VarCorr}{olmm}(x, sigma = 1., rdig = 3, ...)
 
 \method{weights}{olmm}(object, level = c("observation", "subject"), ...)
 }

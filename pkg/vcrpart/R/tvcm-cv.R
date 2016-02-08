@@ -49,12 +49,10 @@
 
 oobloss.tvcm <- function(object, newdata = NULL, weights = NULL, 
                          fun = NULL, ...) {
-  
   if (is.null(fun)) {
     fun <- function(y, mu, wt)
       sum(object$info$family$dev.resids(y, mu, wt))
   }
-  
   if (missing(newdata)) stop("require 'newdata'.")
   if (is.null(weights)) weights <- rep(1.0, nrow(newdata))
   yName <- all.vars(object$info$formula$original)[1]
@@ -63,7 +61,6 @@ oobloss.tvcm <- function(object, newdata = NULL, weights = NULL,
     yMat <- yMat[,2L,drop = FALSE]
   mu <- suppressWarnings(predict(object, newdata, type = "response", ...))
   rval <- fun(yMat, mu, weights)
-  
   return(rval)
 }
 

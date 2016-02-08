@@ -1,13 +1,15 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-09-02
+##' Date:            2016-01-10
 ##'
 ##' Description:
 ##' General utility functions for the 'vcrpart' package.
 ##' most of the functions are not exported and documented inline.
 ##'
 ##' Functions:
+##' neglogLik2.glm:        compute the -2 times likelihood error of
+##'                        a 'glm' object.
 ##' addEmptyChar:          add empty spaces to a character
 ##' appendDefArgs:         over-write default arguments
 ##' deparseCall:           convert a 'call' into a 'character'
@@ -56,7 +58,6 @@
 ##' To do:
 ##' - 
 ##' -------------------------------------------------------- #
-
 
 ## --------------------------------------------------------- #
 ##' Add empty spaces to characters to have the same length.

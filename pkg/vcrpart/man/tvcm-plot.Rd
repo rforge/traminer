@@ -94,8 +94,8 @@ panel_coef(object, parm = NULL,
     coefficients. Includes a component \code{gp = gpar(...)} and a
     component \code{pch}. See examples.}
   \item{conf.int}{logical. Whether confidence intervals should be
-    visualized. Note that these intervals do not account for the error
-    of the algorithm,}
+    visualized. These are indicative values only. They do not account
+    for the uncertainty of model selection procedure.} 
   \item{conf.int_gp}{a list of graphical parameters for the confidence
     intervals applied to \command{\link{arrow}}. Includes \code{angle},
     \code{length}, \code{ends} and \code{type}. See examples.}

@@ -1,5 +1,8 @@
 Changes in Version 0.4-1
 
+    o    Add '...' to the 'VarCorr' method for 'olmm' objects to resolve
+         the warning since 'nlme' version 3.1-123.
+
     o    Because of an internal bug the print method for 'fvcm' objects
          printed always 'Bagging based varying coefficient model', even if
 	 'mtry < Inf'. Bug fixed. Thanks Michel Ballings for the hint.

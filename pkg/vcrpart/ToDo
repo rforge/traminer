@@ -4,3 +4,6 @@
 - Illustration for tvcm and fvcm on wordpress page
 - replace functions of the 'parallel' package with those of 'foreach'?
 - variable importance measures
+- there seems to be a problem with vcrpart_formula with 'terms' call: for example
+  terms(diabetes ~ vc(z1,z2,x) + vc(z1,z2,by=x), specials = types, keep.order = TRUE)
+  drops the second term!!!

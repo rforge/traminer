@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:      Reto Buergin
 ##' E-Mail:      rbuergin@gmx.ch
-##' Date:        2015-10-31
+##' Date:        2015-12-28
 ##'
 ##' Description:
 ##' The 'tvcm' function
@@ -14,6 +14,7 @@
 ##' tvcm_control    control function for 'tvcm'
 ##'
 ##' Last modifications:
+##' 2015-12-28: added the argument 'fast' to 'tvcglm_control'.
 ##' 2015-11-31: enable the setting 'mtry <- Inf'
 ##' 2015-10-30: set default 'na.action = na.omit' on 'tvcm'
 ##' 2015-06-01: - give a warning when no 'vc' terms are specified.
@@ -127,6 +128,8 @@ tvcglm_control <- function(minsize = 30, mindev = 2.0,
   mc$prune <- prune
   mc$fast <- fast
   mc$center <- center
+  if (fast && (!is.null(list(...)$lossfun)))
+      warning("the 'lossfun' argument will be ignored for the exhaustive search.")
   return(eval.parent(mc))
 }
 

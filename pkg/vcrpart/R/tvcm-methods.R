@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' Date:            2015-08-21
+##' Date:            2016-01-10
 ##' E-Mail:          rbuergin@gmx.ch
 ##'
 ##' Description:
@@ -31,6 +31,7 @@
 ##' width:               width of trees
 ##' 
 ##' Modifications:
+##' 2016-01-10: changed 'neglokLik2.tvcm' to allow for subsets
 ##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
 ##' 2014-10-18: added 'depth' and 'width' methods
 ##' 2014-10-14: adapt print.splitpath to new dev-grid structure
@@ -169,7 +170,7 @@ model.frame.tvcm <- function(formula, ...) {
 
 
 neglogLik2.tvcm <- function(object, ...)
-  return(-2 * as.numeric(logLik(extract(object, "model"))))
+    return(neglogLik2(extract(object, "model"), ...))
 
 
 nobs.tvcm <- function(object, ...) nobs(extract(object, "model"), ...)

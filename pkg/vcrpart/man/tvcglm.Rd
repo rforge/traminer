@@ -46,7 +46,7 @@ tvcglm_control(minsize = 30, mindev = 2.0,
     be removed by a \code{-1} term, according to the desired
     interpretation of the model.} 
   \item{family}{the model family. An object of class
-    \command{\link{family.olmm}}.}   
+    \command{\link{family}}.}   
   \item{data}{a data frame containing the variables in the model.}
   \item{weights}{an optional numeric vector of weights to be used in the 
     fitting process.}
@@ -59,7 +59,7 @@ tvcglm_control(minsize = 30, mindev = 2.0,
     listwise deletion, i.e., observations with missings on any variable
     are dropped. See \command{\link{na.action}}.}
   \item{control}{a list with control parameters as returned by
-    \command{\link{tvcolmm_control}}.}
+    \command{\link{tvcglm_control}}.}
   \item{minsize}{numeric (vector). The minimum sum of weights in
     terminal nodes.}
   \item{mindev}{numeric scalar. The minimum permitted training error 

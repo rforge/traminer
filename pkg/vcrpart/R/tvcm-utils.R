@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-10-11
+##' Date:            2016-01-10
 ##'
 ##' Description:
 ##' Workhorse functions for the 'tvcm' function.
@@ -50,6 +50,8 @@
 ##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##'
 ##' Last modifications:
+##' 2016-01-08: change in 'tvcm_grow_fit' to allow fitting the approximate
+##'             search modell locally. For now only for 'glm' fits!
 ##' 2015-11-31: enable the setting 'mtry <- Inf'
 ##' 2015-10-15: add function 'tvcm_grow_setparm'
 ##' 2015-08-25: replace 'fit' argument in 'tvcm_formula' by 'family'.
@@ -138,6 +140,10 @@
 ##' - tvcm_grow_sctest
 ##' - tvcm_grow_setsplits
 ##' - tvcm_grow_exsearch
+##'
+##' To do:
+##' - fitting local models when 'fast = TRUE' for 'olmm'
+##'   objects
 ##' -------------------------------------------------------- #
 
 ##' -------------------------------------------------------- #
@@ -156,7 +162,7 @@ tvcm_complexity <- function(npar, dfpar, nsplit, dfsplit)
 
 
 ##' -------------------------------------------------------- #
-##' \code{\link{tvcm_grow_fit}} fits the current node model.
+##' Growing a 'tvcm' tree.
 ##'
 ##' @param object  a 'tvcm' object
 ##' @param subset  a vector indicating the subset on which
@@ -282,7 +288,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
     }
 
     ## random selection (used by 'fvcm')
-    if (control$mtry < Inf)
+    if (control$mtry < .Machine$integer.max)
         splits <- tvcm_setsplits_rselect(splits, control)
     
     if (run > 0L && control$sctest) {
@@ -512,7 +518,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
 
 
 ##' -------------------------------------------------------- #
-##' \code{\link{tvcm_grow_fit}} fits the current node model.
+##' Avoid calling glm.fit if 'fit == FALSE'
 ##'
 ##' @param call    an object of class call
 ##' @param doFit   a logical indicating whether the parameters
@@ -603,7 +609,7 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
 ##' Improve performance for non 'olmm' objects
 ##' -------------------------------------------------------- #
 
-tvcm_grow_update <- function(object, control) {
+tvcm_grow_update <- function(object, control, subs = NULL) {
   
   if (inherits(object, "olmm")) {
   
@@ -652,7 +658,7 @@ tvcm_grow_update <- function(object, control) {
       
       ## center the predictors
       object$X[,  c(cColsCe, cColsGe)] <-
-        scale(object$X[,  c(cColsCe, cColsGe)], center = TRUE, scale = TRUE)
+        scale(object$X[,  c(cColsCe, cColsGe)], center = TRUE, scale = FALSE)
     }
     
     ## prepare optimization
@@ -700,13 +706,24 @@ tvcm_grow_update <- function(object, control) {
         ## centering
         X[, cCols] <- scale(X[, cCols], center = TRUE, scale = TRUE)
     }
+
+    ## if ‘fast = TRUE’ model is fitted locally (thereby nuisance parameter is 
+    ## left as a free parameter)
+    if (!control$fast | is.null(subs)) subs <- rep(TRUE, nrow(X))
+    start <- if (control$fast) object$coefficients else NULL
     
+    ##subs <- rep(TRUE, nrow(X))
     
     object <- try(suppressWarnings(
-                    glm.fit(x = X, y = object$y, weights = object$prior.weights,
-                            start = object$coefficients, offset = object$offset,
-                            family = object$family, control = object$control,
+                    glm.fit(x = X[subs,,drop=FALSE], 
+                            y = object$y[subs], 
+                            weights = object$prior.weights[subs],
+                            start = start, 
+                            offset = object$offset[subs],
+                            family = object$family, 
+                            control = object$control,
                             intercept = TRUE)), TRUE)
+    
     if (!inherits(object, "try-error")) {
       class(object) <- c("glm", "lm")
       if (!object$conv) object <- try(stop("not converged"), TRUE)
@@ -1359,7 +1376,8 @@ tvcm_exsearch_dev <- function(cutpoint,
                               modelNuis, startNuis, 
                               nuisance,
                               where, partData, 
-                              control, loss0, mfName) {
+                              control, loss0,
+                              mfName) {
       
   ## set node indicator
   subs <- where[[pid]] == levels(where[[pid]])[nid]
@@ -1380,20 +1398,39 @@ tvcm_exsearch_dev <- function(cutpoint,
       as.integer(droplevels(where[[pid]][!subs]))
   }
   model$coefficients <- vcrpart_copy(start)
-  model <- tvcm_grow_update(model, control)
+  eta0 <- model$offset
+  model <- tvcm_grow_update(model, control, subs)
   rval <- rep(NA, 2L)
   
-  if (!inherits(model, "try-error")) {
-    rval[1L] <- loss0 - control$lossfun(model)
-    rval[2L] <- length(coef(model)[grep("Right", names(coef(model)))])
+  if (!inherits(model, "try-error")) { # new from the 2016-01-10
+
+      dev.fast <- function(object, eta0) {
+          return(
+              sum(object$family$dev.resids(
+                  y = object$y,
+                  mu = object$family$linkinv(eta0),
+                  wt = object$prior.weights)) -
+                      sum(object$family$dev.resids(
+                          y = object$y,
+                          mu = object$family$linkinv(object$linear.predictors),
+                          wt = object$prior.weights)))
+      }
+      
+      rval[1] <- ifelse(inherits(model, "glm") & control$fast, 
+                        dev.fast(model, eta0[subs]),
+                        loss0 - control$lossfun(model))
+      rval[2L] <- length(coef(model)[grep("Right", names(coef(model)))])
     if (is.null(modelNuis)) {
       return(rval)
     } else {
       modelNuis[[mfName]]$Left <- 1 * (subs & zs)
       modelNuis[[mfName]]$Right <- 1 * (subs & !zs)
       modelNuis$coefficients <- vcrpart_copy(startNuis)
-      modelNuis <- tvcm_grow_update(modelNuis, control)
-      rval[1L] <- rval[1L] - (loss0 - control$lossfun(modelNuis))
+      modelNuis <- tvcm_grow_update(modelNuis, control, subs)
+      rval[1] <- rval[1L] -
+          ifelse(inherits(model, "glm") & control$fast,
+                 dev.fast(modelNuis, eta0[subs]),
+                 loss0 - control$lossfun(modelNuis))
       rval[2L] <- rval[2L] -
         length(coef(modelNuis)[grep("Right", names(coef(modelNuis)))])
       return(rval)
@@ -1403,18 +1440,21 @@ tvcm_exsearch_dev <- function(cutpoint,
   }
 }
 
+
 tvcm_grow_exsearch <- function(splits, partid, nodeid, varid, 
                                model, nodes, where, partData, 
                                control, mcall, formList, step) {
 
   verbose <- control$verbose; control$verbose <- FALSE;
-
   loss0 <- control$lossfun(model)
+  
   mfName <- switch(deparse(mcall[[1]]), glm = "model", olmm = "frame")
   
   if (verbose) cat("\n* computing splits ")
 
   mcall$data <- eval(mcall$data, environment(mcall))
+  nodeData <- mcall$data[paste0("Node", names(nodes))]
+  
   w <- weights(model)
 
   if (control$fast)
@@ -1443,7 +1483,7 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
                      update = TRUE, fast = control$fast)
 
   Left <- sample(c(0, 1), nobs(model), replace = TRUE)
-  Right <- Left - 1
+  Right <- -(Left - 1)
   Node <- lapply(where, function(x) {
     levs <- c("Left", "Right", seq(1, nlevels(x) - 1, length.out = nlevels(x) - 1))
     return(factor(rep(levs, length.out = length(x)), levels = levs))
@@ -1454,8 +1494,10 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
      
       mcall$formula <- ff$update[[pid]][[1L]]
 
+      ## for 'control$fast = TRUE'
       mcall$data$Left <- Left
-      mcall$data$Right <- Right      
+      mcall$data$Right <- Right
+      ## for 'control$fast = FALSE'
       mcall$data[, paste0("Node", LETTERS[pid])] <- Node[[pid]]
 
       sModel <- tvcm_grow_fit(mcall, doFit = FALSE)
@@ -1522,8 +1564,10 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
           }
         }
       }
-    }
   }
+    mcall$data[, paste0("Node", LETTERS[pid])] <-
+        nodeData[, paste0("Node", names(nodes)[pid])]  
+}
   
   ## extracts the penalized loss reduction
   pendev <- lapply(splits, function(part) {
@@ -2348,14 +2392,15 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
 ##' Create short labes for 'vc' terms
 ##'
 ##' @param object a \code{\link{tvcm}} object
-##' 
+##' @param intercept logical scalar. Whether '(Intercept)'
+##'    should be added to the label.
 ##' @return A character vector with a label for each 'vc'
 ##'    term.
 ##'
 ##' @details Used in 'tvcm_print' and 'plot.tvcm'.
 ##'-------------------------------------------------------- #
 
-tvcm_print_vclabs <- function(formList) {
+tvcm_print_vclabs <- function(formList, intercept = FALSE) {
   
   if (length(formList$vc) == 0) return(NULL)
   
@@ -2377,7 +2422,12 @@ tvcm_print_vclabs <- function(formList) {
     if (rval == "NULL") return("") else return(rval)
   }
   by <- sapply(vcLabs, function(x) eval(parse(text = x)))
-
+  if (intercept) {
+      hasInt <- sapply(formList$vc, function(x) x$intercept) != "none"
+      for (i in which(hasInt)) 
+          by[i] <- paste0("(Intercept)", ifelse(by[i] ==  "", "", " + "), by[i])
+  }
+  
   ## collapse the short labels
   rval <- rep.int("vc(", length(formList$vc))
   for (pid in seq_along(rval)) {

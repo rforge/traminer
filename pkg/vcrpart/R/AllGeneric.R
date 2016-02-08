@@ -1,7 +1,7 @@
 ##'--------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          reto.buergin@unige.ch, rbuergin@gmx.ch
-##' Date:            2014-09-07
+##' Date:            2016-01-10
 ##'
 ##' Description:
 ##' New generics for exported methods
@@ -40,7 +40,7 @@ fixef.glm <- function(object, ...) coef(object)
 neglogLik2 <- function(object, ...) UseMethod("neglogLik2")
 
 neglogLik2.default <- function(object, ...)
-  return(-as.numeric(2 * logLik(object)))
+    return(-as.numeric(2 * logLik(object)))
 
 oobloss <- function(object, ...) UseMethod("oobloss")
 
