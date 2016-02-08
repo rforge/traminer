@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2016-01-10
+##' Date:            2016-02-08
 ##'
 ##' Description:
 ##' Workhorse functions for the 'tvcm' function.
@@ -707,7 +707,7 @@ tvcm_grow_update <- function(object, control, subs = NULL) {
         X[, cCols] <- scale(X[, cCols], center = TRUE, scale = TRUE)
     }
 
-    ## if ‘fast = TRUE’ model is fitted locally (thereby nuisance parameter is 
+    ## if 'fast = TRUE' model is fitted locally (thereby nuisance parameter is 
     ## left as a free parameter)
     if (!control$fast | is.null(subs)) subs <- rep(TRUE, nrow(X))
     start <- if (control$fast) object$coefficients else NULL

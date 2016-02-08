@@ -51,9 +51,10 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
     assigned to the \code{fun} argument of \command{\link{oobloss}}.}
   \item{fast}{logical scalar. Whether the approximative model should be
     used to search for the next split. The approximative search model
-    uses the fitted values of the current model as offsets and estimates
-    only the coefficients of the added split. If \code{FALSE}, the
-    accurate search model is used.}
+    uses only the observations of the node to split and incorporates the
+    fitted values of the current model as offsets. Therewith the
+    estimation is reduces to the coefficients of the added split. If
+    \code{FALSE}, the accurate search model is used.}
   \item{cp}{numeric scalar. The penalty to be multiplied with the
     complexity of the model during partitioning. The complexity of the
     model is defined as the number of coefficients times \code{dfpar}

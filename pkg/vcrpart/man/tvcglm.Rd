@@ -77,11 +77,12 @@ tvcglm_control(minsize = 30, mindev = 2.0,
   \item{prune}{logical scalar. Whether or not the initial tree should be
     pruned by the estimated \code{cp} parameter from
     cross-validation. Cannot be \code{TRUE} if \code{cv = FALSE}.}
-  \item{fast}{logical integer. Whether the approximative model should be
+  \item{fast}{logical scalar. Whether the approximative model should be
     used to search for the next split. The approximative search model
-    uses the fitted values of the current model as offsets and estimates
-    only the coefficients of the added split. If \code{FALSE}, the
-    accurate search model is used.}
+    uses only the observations of the node to split and incorporates the
+    fitted values of the current model as offsets. Therewith the
+    estimation is reduces to the coefficients of the added split. If
+    \code{FALSE}, the accurate search model is used.}
   \item{center}{logical integer. Whether the predictor variables of
     update models during the grid search should be centered. Note that
     \code{TRUE} will not modify the predictors of the fitted model.} 
