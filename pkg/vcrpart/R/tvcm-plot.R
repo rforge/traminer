@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-10-30
+##' Date:            2016-02-08
 ##'
 ##' Description:
 ##' Plot functions for 'tvcm' objects.
@@ -18,6 +18,7 @@
 ##' panel_empty:     grapcon generator for empty terminal node plots
 ##'
 ##' Last modifications:
+##' 2016-02-08: add warning in cases 'conf.int = TRUE' in 'panel_coef'.
 ##' 2014-09-08: replace 'do.call' by 'eval'
 ##' 2014-09-06: solve bugs in 'panel_partdep'
 ##' 2014-09-06: - add 'type = "cv"' option for the cases where
@@ -329,6 +330,9 @@ panel_coef <- function(object, parm = NULL,
   if (!missing(margins)) stopifnot(is.numeric(margins) && length(margins) == 4L)
   stopifnot(is.list(mean_gp))
   stopifnot(is.list(conf.int_gp))
+  if (conf.int) warning("The shown confidence intervals do not ",
+                        "account for the model selection procedure. ",
+                        "Therefore interpret them carefully.") 
   
   ## get partition
   part <- which(sapply(object$info$node, identical, object$node))
