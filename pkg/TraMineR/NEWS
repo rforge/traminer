@@ -5,15 +5,16 @@ Changes in existing functions:
   - seqformat(): The transformation now stops with an error message
     when the columns referenced with the begin and end
     argument contain a non integer value.
-    
+
 New data examples:
   - bfspell: a small data set with 20 sequences in SPELL format.
-    
+
 Misc:
-  - updated seqformat help page: now includes an example of a 
+  - updated seqformat help page: now includes an example of a
     transformation from SPELL to STS.
-    
-    
+  - fixed bad use of extern "C" {} in TraMineR.h (done by B. Ripley)
+
+
 ## =========
 Version 1.8-11
 
