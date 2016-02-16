@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2016-02-08
+##' Date:            2016-02-16
 ##'
 ##' Description:
 ##' Plot functions for 'tvcm' objects.
@@ -18,6 +18,7 @@
 ##' panel_empty:     grapcon generator for empty terminal node plots
 ##'
 ##' Last modifications:
+##' 2016-02-16: modified titles for 'panel_coef'.
 ##' 2016-02-08: add warning in cases 'conf.int = TRUE' in 'panel_coef'.
 ##' 2014-09-08: replace 'do.call' by 'eval'
 ##' 2014-09-06: solve bugs in 'panel_partdep'

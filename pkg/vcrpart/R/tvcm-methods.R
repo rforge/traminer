@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' Date:            2016-01-10
+##' Date:            2016-02-16
 ##' E-Mail:          rbuergin@gmx.ch
 ##'
 ##' Description:
@@ -31,6 +31,7 @@
 ##' width:               width of trees
 ##' 
 ##' Modifications:
+##' 2016-02-16: changed titles for varying coefficients in 'tvcm_print'.
 ##' 2016-01-10: changed 'neglokLik2.tvcm' to allow for subsets
 ##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
 ##' 2014-10-18: added 'depth' and 'width' methods
@@ -343,7 +344,7 @@ tvcm_print <- function(x, type = c("print", "summary"),
     
   class(terminal_panel) <- "grapcon_generator"
 
-  vcLabs <- tvcm_print_vclabs(x$info$formula)
+  vcLabs <- tvcm_print_vclabs(x$info$formula, TRUE)
 
   for (pid in seq_along(coef$vc)) {
     cat(paste("\nVarying Coefficient ", LETTERS[pid],

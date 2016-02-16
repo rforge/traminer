@@ -1,5 +1,7 @@
 Changes in Version 0.4-1
 
+    o    Changed titles in 'panel_coef', 'tvcm.print' and 'tvcm.summary'
+
     o    Add '...' to the 'VarCorr' method for 'olmm' objects to resolve
          the warning since 'nlme' version 3.1-123.
 
