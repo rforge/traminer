@@ -56,7 +56,7 @@
 
 \method{terms}{olmm}(x, which = c("fe-ce", "fe-ge", "re-ce", "re-ge"), ...)
 
-\method{VarCorr}{olmm}(x, sigma = 1., rdig = 3, ...)
+\method{VarCorr}{olmm}(x, sigma = 1., ...)
 
 \method{weights}{olmm}(object, level = c("observation", "subject"), ...)
 }
@@ -90,7 +90,6 @@
     \code{newdata} is not in \code{object} the random effects are
     simulated.}
   \item{sigma}{ignored but obligatory argument from original generic.} 
-  \item{rdig}{ignored but obligatory argument from original generic.}
   \item{...}{potential further arguments passed to methods.}
 }
 

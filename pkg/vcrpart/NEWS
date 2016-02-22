@@ -3,7 +3,7 @@ Changes in Version 0.4-1
     o    Changed titles in 'panel_coef', 'tvcm.print' and 'tvcm.summary'
 
     o    Add '...' to the 'VarCorr' method for 'olmm' objects to resolve
-         the warning since 'nlme' version 3.1-123.
+         the warning since 'nlme' version 3.1-123. Removed 'rdig' argument.
 
     o    Because of an internal bug the print method for 'fvcm' objects
          printed always 'Bagging based varying coefficient model', even if

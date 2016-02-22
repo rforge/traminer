@@ -3,24 +3,34 @@ useDynLib(vcrpart, .registration = TRUE)
 import("methods", "partykit")
 
 ## Exported methods for which generics exist
-importFrom("graphics", plot)
-importFrom("parallel", mclapply)
-importFrom("grid", gpar, unit, unit.c, convertHeight, convertWidth, convertUnit,
-           viewport, pushViewport, upViewport, popViewport, plotViewport,
-           grid.layout, grid.rect, grid.points, grid.lines, grid.segments, grid.text,
-           depth, grid.xaxis, grid.yaxis, grid.newpage, arrow)
+importFrom("graphics", "plot", "axis", "box", "matplot", "par", "segments")
+importFrom("grDevices", "axisTicks", "col2rgb", "colorRamp",
+           "devAskNewPage", "grey", "rgb")
+importFrom("parallel", "mclapply")
+importFrom("grid", "gpar", "unit", "unit.c", "convertHeight", "convertWidth",
+           "convertUnit", "viewport", "pushViewport", "upViewport", "popViewport",
+           "plotViewport", "grid.layout", "grid.rect", "grid.points",
+           "grid.lines", "grid.segments", "grid.text",
+           "depth", "grid.xaxis", "grid.yaxis", "grid.newpage", "arrow")
 importFrom("stats",
-           AIC, BIC, anova, coef, coefficients, deviance,
-           extractAIC, fitted, formula, getCall, logLik,
-           model.frame, model.matrix, nobs, predict, resid,
-           residuals, simulate, terms, update, vcov, weights)
-importFrom("nlme", fixef, ranef, VarCorr)
-importFrom("rpart", prune)
-importFrom("numDeriv", hessian)
-importFrom("ucminf", ucminf)
-importFrom("zoo", zoo)
-importFrom("sandwich", estfun)
-importFrom("strucchange", gefp, sctest, supLM, catL2BB, root.matrix)
+           "AIC", "BIC", "anova", "coef", "coefficients", "deviance",
+           "extractAIC", "fitted", "formula", "getCall", "logLik",
+           "model.frame", "model.matrix", "nobs", "predict", "resid",
+           "residuals", "simulate", "terms", "update", "vcov", "weights",
+           ".checkMFClasses", ".getXlevels", "as.formula",
+           "contr.sum", "contrasts<-", "cov2cor", "delete.response",
+           "gaussian", "glm", "glm.control", "glm.fit", "model.offset",
+           "model.response", "model.weights", "na.omit", "na.pass",
+           "naprint", "nlminb", "pchisq", "plogis", "ppoints",
+           "prcomp", "qlogis", "qnorm", "quantile", "reshape", "rnorm",
+           "runif", "update.formula")
+importFrom("nlme", "fixef", "ranef", "VarCorr")
+importFrom("rpart", "prune")
+importFrom("numDeriv", "hessian")
+importFrom("ucminf", "ucminf")
+importFrom("zoo", "zoo")
+importFrom("sandwich", "estfun")
+importFrom("strucchange", "gefp", "sctest", "supLM", "catL2BB", "root.matrix")
 
 ## Exports
 export(

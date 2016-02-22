@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ##' Author:          Reto Buergin
 ##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2014-09-09
+##' Date:            2016-02-22
 ##'
 ##' Description:
 ##' Function for model selection and assessment for 'tvcm' objects.
@@ -15,6 +15,8 @@
 ##' plot.cvloss.tvcm:    plot fot 'cv.tvcm' objects
 ##'
 ##' Last modifications:
+##' 2016-02-22: adapt code of 'tvcm_folds' to allow creating folds
+##'             for olmm objects (not officially!!!)
 ##' 2014-09-09: tvcm_folds: the 'seed' attribute is now the number
 ##'             of the seed and not the RNG state anymore.
 ##' 2014-09-07: modifications for direct call from 'tvcm'
@@ -115,20 +117,22 @@ tvcm_folds <- function(object, control) {
   weights <- control$weights
   seed <- control$seed
 
-  subject <- object$info$model$subject
+  if (inherits(object, "tvcm")) object <- extract(object, "model")
+  
+  subject <- object$subject
   if (inherits(object, "olmm")) {
     if (max(table(subject)) > 0L) {
       if (weights == "freq")
         stop("option 'weights = 'freq'' is not available for 'olmm' objects")
-      if (type == "bootstrapt")
+      if (type == "bootstrap")
         stop("option 'type = 'bootstrap'' is not available for 'olmm' object",
              "with 2-stage structures.")
     }
   }
   
   freq <- switch(weights,
-                 case = rep(1, nobs(extract(object, "model"))),
-                 freq = weights(extract(object, "model")))
+                 case = rep(1, nobs(object)),
+                 freq = weights(object))
   if (weights == "freq" && any(!freq == round(freq)))
     stop("some of the weights are not integers.")
   
@@ -177,7 +181,7 @@ tvcm_folds <- function(object, control) {
   }
 
   colnames(folds) <- 1:K
-  rownames(folds) <- rownames(model.frame(extract(object, "model")))
+  rownames(folds) <- rownames(model.frame(object))
 
   assign(".Random.seed", oldSeed, envir=globalenv())
   attr(folds, "type") <- type

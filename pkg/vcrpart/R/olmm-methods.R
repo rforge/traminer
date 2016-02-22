@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:       Reto Buergin
 ##' E-Mail:       rbuergin@gmx.ch
-##' Date:         2014-01-16
+##' Date:         2016-02-22
 ##'
 ##' Description:
 ##' methods for olmm objects.
@@ -41,6 +41,7 @@
 ##' weights:     Weights
 ##'
 ##' Modifications:
+##' 2016-02-22: removed 'rdig' argument from 'VarCorr' method
 ##' 2014-01-16: - improve 'predict.olmm' function
 ##' 2014-12-07: - add argument 'center' to 'predecor_control'
 ##' 2014-10-24: - improve simulate.olmm
@@ -1062,7 +1063,7 @@ update.olmm <- function(object, formula., evaluate = TRUE, ...) {
 }
 
 
-VarCorr.olmm <- function(x, sigma = 1., rdig = 3, ...) {
+VarCorr.olmm <- function(x, sigma = 1., ...) {
             
   ## create formatted output according to VarCorr
   RECovMat <- ranefCov(x)
