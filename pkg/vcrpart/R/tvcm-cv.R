@@ -47,6 +47,7 @@
 ##'             - cvloss: add 'direction' as new parameter 
 ## --------------------------------------------------------- #
 
+
 oobloss.tvcm <- function(object, newdata = NULL, weights = NULL, 
                          fun = NULL, ...) {
   if (is.null(fun)) {

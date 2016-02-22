@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:       Reto Buergin
-##' Date:         2015-10-30
 ##' E-Mail:       rbuergin@gmx.ch
+##' Date:         2015-10-30
 ##'
 ##' References:
 ##' ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html

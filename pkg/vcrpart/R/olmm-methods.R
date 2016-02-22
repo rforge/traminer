@@ -1,6 +1,7 @@
 ##' -------------------------------------------------------- #
-##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-01-16
+##' Author:       Reto Buergin
+##' E-Mail:       rbuergin@gmx.ch
+##' Date:         2014-01-16
 ##'
 ##' Description:
 ##' methods for olmm objects.

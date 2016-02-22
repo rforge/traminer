@@ -1,7 +1,7 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Reto Buergin
-##' Date:            2016-02-16
 ##' E-Mail:          rbuergin@gmx.ch
+##' Date:            2016-02-16
 ##'
 ##' Description:
 ##' S3 methods for tvcm objects

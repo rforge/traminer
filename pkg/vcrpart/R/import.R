@@ -1,6 +1,7 @@
 ##' -------------------------------------------------------- #
-##' Author:          Reto Buergin, rbuergin@gmx.ch
-##' Date:            2014-09-08
+##' Author:       Reto Buergin
+##' E-Mail:       rbuergin@gmx.ch
+##' Date:         2014-09-08
 ##'
 ##' Description:
 ##' Unexported functions imported from other packages
