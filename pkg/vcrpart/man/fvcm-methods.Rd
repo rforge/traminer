@@ -102,8 +102,8 @@ data(vcrpart_1)
 ## fit and analyse the model
 
 control <-
-  fvcm_control(sctest = TRUE, mtry = 2, maxstep = 1, 
-               folds = folds_control(type = "subsampling", K = 2, prob = 0.75))
+  fvcolmm_control(mtry = 2, maxstep = 1, 
+                  folds = folds_control(type = "subsampling", K = 2, prob = 0.75))
 
 model.1 <-
   fvcolmm(y ~ -1 + wave + vc(z3, z4, by = treat, intercept = TRUE) + re(1|id),
@@ -151,8 +151,8 @@ data(vcrpart_2)
 
 ## fit and analyse the model
 
-control <- fvcm_control(mtry = 1L, minsize = 5, maxstep = 3,
-                        folds_control("subsampling", K = 3, 0.75))
+control <- fvcglm_control(mtry = 1L, minsize = 5, maxstep = 3,
+                          folds_control("subsampling", K = 3, 0.75))
 
 model.2 <- fvcglm(y ~ -1  + vc(z1, z2, by = x1, intercept = TRUE) + x2,
                   data = vcrpart_2,

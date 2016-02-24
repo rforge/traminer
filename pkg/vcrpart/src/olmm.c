@@ -249,8 +249,8 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   R_CheckStack();
 
   if (numGrad == 0) {
-    scoreCond_obs = Calloc((1 - numGrad) * n * nPar + numGrad, double);
-    scoreCond_sbj = Calloc((1 - numGrad) * N * nPar + numGrad, double);
+    scoreCond_obs = Calloc(n * nPar, double);
+    scoreCond_sbj = Calloc(N * nPar, double);
   }
 
   AllocVal(etaRanef, n * nEta, zero);
@@ -303,9 +303,8 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     AllocVal(logLikCond_sbj, N, zero);
 
     if (numGrad == 0) {
-
-      AllocVal(scoreCond_obs, (1 - numGrad) * n * nPar + numGrad, zero);
-      AllocVal(scoreCond_sbj, (1 - numGrad) * N * nPar + numGrad, zero);
+      AllocVal(scoreCond_obs, n * nPar, zero);
+      AllocVal(scoreCond_sbj, N * nPar, zero);
     }
 
     if ((family == 2) | (family == 3)) AllocVal(sumBL, n, zero);
