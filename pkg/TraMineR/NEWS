@@ -2,6 +2,9 @@
 Version 1.9-12 (Development version)
 
 Changes in existing functions:
+  - seqdef(): now accepts to create state sequence object when 
+    with an alphabet that has only one element. Fixed an error  
+    that occurred when there was only one state
   - seqformat(): The transformation now stops with an error message
     when the columns referenced with the begin and end
     argument contain a non integer value.
