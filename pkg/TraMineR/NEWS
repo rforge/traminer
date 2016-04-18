@@ -2,8 +2,8 @@
 Version 1.9-12 (Development version)
 
 Changes in existing functions:
-  - seqdef(): now accepts to create state sequence object when 
-    with an alphabet that has only one element. Fixed an error  
+  - seqdef(): now accepts to create a state sequence object
+    with an alphabet that has only one element. Fixed an error
     that occurred when there was only one state
   - seqformat(): The transformation now stops with an error message
     when the columns referenced with the begin and end
@@ -15,7 +15,8 @@ New data examples:
 Misc:
   - updated seqformat help page: now includes an example of a
     transformation from SPELL to STS.
-  - fixed bad use of extern "C" {} in TraMineR.h (done by B. Ripley)
+  - fixed bad use of extern "C" {} in TraMineR.h 
+    (done by B. Ripley, CRAN version 1.8-11.1)
 
 
 ## =========

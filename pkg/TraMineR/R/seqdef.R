@@ -124,11 +124,13 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	attr(seqdata,"alphabet") <- A
 	nbstates <- length(A)
 
-	if (nbstates==1)
+	##if (nbstates==1)
 		## stop("\n [!] alphabet contains only one state", call.=FALSE)
-		warning("\n [!] alphabet contains only one state", call.=FALSE)
-	else if (nbstates>12 && missing(cpal))
-		warning(" [!] no automatic color palete attributed, number of states>12. \n     Use 'cpal' argument to define one.", call.=FALSE)
+		## warning("\n [!] alphabet contains only one state", call.=FALSE)
+	##else
+    if (nbstates>12 && missing(cpal))
+		warning(" [!] No color palette automatically assigned because number of states > 12.
+               \n     Use 'cpal' argument to assign one.", call.=FALSE)
 
 	## Converting each column to a factor
 	for (i in 1:ncol(seqdata)) {
