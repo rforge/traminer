@@ -9,13 +9,19 @@ Changes in existing functions:
     when the columns referenced with the begin and end
     argument contain a non integer value.
 
+Bug fixes:
+  - plot.stslist(): an unnecessary warning occurred when a
+    vector of labels was passed as ytlab argument.
+    
+
+
 New data examples:
   - bfspell: a small data set with 20 sequences in SPELL format.
 
 Misc:
   - updated seqformat help page: now includes an example of a
     transformation from SPELL to STS.
-  - fixed bad use of extern "C" {} in TraMineR.h 
+  - fixed bad use of extern "C" {} in TraMineR.h
     (done by B. Ripley, CRAN version 1.8-11.1)
 
 
