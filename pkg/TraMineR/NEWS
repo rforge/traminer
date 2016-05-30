@@ -2,6 +2,8 @@
 Version 1.9-12 (Development version)
 
 Changes in existing functions:
+  - seqST(): new argument 'norm' to ask for a normalized
+    turbulence index.
   - seqdef(): now accepts to create a state sequence object
     with an alphabet that has only one element. Fixed an error
     that occurred when there was only one state
@@ -12,8 +14,6 @@ Changes in existing functions:
 Bug fixes:
   - plot.stslist(): an unnecessary warning occurred when a
     vector of labels was passed as ytlab argument.
-    
-
 
 New data examples:
   - bfspell: a small data set with 20 sequences in SPELL format.
