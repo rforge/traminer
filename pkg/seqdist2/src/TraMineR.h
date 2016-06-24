@@ -13,7 +13,7 @@
 	#include <cstdio>
 	#include <cstdarg>
 	using std::sprintf;
-	extern "C" {
+//	extern "C" {
 #endif	//#ifdef __cplusplus
 
 #include <R.h>
@@ -21,7 +21,7 @@
 #include <R_ext/Rdynload.h>
 #include <Rmath.h>
 #ifdef __cplusplus
-	} //end extern "C" {
+//	} //end extern "C" {
 #endif	//#ifdef __cplusplus
 
 
