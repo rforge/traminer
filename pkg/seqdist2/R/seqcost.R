@@ -103,7 +103,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 		if(is.null(state.prop) || nrow(state.prop)!=length(alphabet)){
 			stop(" [!] state.prop should be a data.frame containing one row per state (possibly one for missing values).")
 		}
-		if(!requireNamespace(cluster)){
+		if(!requireNamespace("cluster")){
 			stop(" [!] cluster library is required to use FEATURES method.")
 		}
 		if(is.null(prop.weights)){

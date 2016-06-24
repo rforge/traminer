@@ -1,6 +1,6 @@
 import("TraMineR")
 importFrom(cluster, daisy)
-
+importFrom("stats", "xtabs")
 export(
     seqdistOO,
     seqcost,
