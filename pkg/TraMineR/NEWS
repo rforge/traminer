@@ -1,6 +1,10 @@
 ## =========
 Version 1.9-13 (Development version)
 
+Changes in existing functions:
+  - Changes in C-code for the seqefsub function (replaced the
+    function round by fround, as proposed by Brian D. Ripley
+
 
 ## =========
 Version 1.8-12 
