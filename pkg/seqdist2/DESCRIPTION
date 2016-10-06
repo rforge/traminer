@@ -1,6 +1,6 @@
 Package: seqdist2
 Version: 0.9-1
-Date: 2016-06-23
+Date: 2016-10-06
 Title: Distance Between State Sequences
 Author: Matthias Studer <matthias.studer@unige.ch>, Gilbert Ritschard <gilbert.ritschard@unige.ch>
 Maintainer: Matthias Studer <matthias.studer@unige.ch>
