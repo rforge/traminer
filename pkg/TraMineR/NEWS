@@ -1,9 +1,13 @@
 ## =========
-Version 1.9-13 (Development version)
+Version 1.9-14 (Development version)
+
+
+## =========
+Version 1.8-13 
 
 Misc:
   - Changes in C-code for the seqefsub function: replaced call
-    to function round by a call to fround to comply with 
+    to function round by a call to fround to comply with
     forthcoming changes in R 3.4.0 (request of Brian D. Ripley).
     The change is transparent for the user.
 
