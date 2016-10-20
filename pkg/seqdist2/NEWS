@@ -1,3 +1,7 @@
+              CHANGES IN seqdist2 VERSION 0.9-1 [2016-10-20]
+
+  o Fixed typos in and updated references help pages. 
+
               CHANGES IN seqdist2 VERSION 0.9-1 [2015-11-16]
 
 New Functions
@@ -6,7 +10,7 @@ New Functions
         returns a list with the two elements sm and indel.
   o seqsubm: alias of seqcost that returns only the substitution costs.
   o seqdist: new error message when 'refseq' is a state sequence object
-      with an alphabet assigned different from that of 'seqdata' to it.
+      with an alphabet assigned to it different from that of 'seqdata'.
 
 BUG FIXES
   o seqsubm, seqcost: option FUTURE wrongly returned a squared
