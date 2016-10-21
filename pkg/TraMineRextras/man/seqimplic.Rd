@@ -49,8 +49,6 @@ Logical. If \code{TRUE} (default), observations with missing values on the \code
 \item{axes}{if set to \code{"all"} (default value) x axes are drawn for each plot in the graphic. If set to \code{"bottom"}, axes are drawn only under the plots located at the bottom of the graphic area. If \code{FALSE}, no x-axis is drawn.}  
 
 \item{xtlab}{optional labels for the x axis ticks labels. If unspecified, the column names of the \code{seqdata} sequence object are used (see \code{\link{seqdef}}).}
-\item{cex.plot}{expansion factor for setting the size of the font for the axis labels and names of the axes. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase it.}
-
 \item{cex.plot}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
 
   \item{withlegend}{defines if and where the legend of the state colors is plotted. The default value \code{"auto"} sets the position of the legend automatically. Other possible value is \code{"right"}. Obsolete value \code{TRUE} is equivalent to \code{"auto"}.}

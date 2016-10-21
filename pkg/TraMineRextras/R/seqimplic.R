@@ -102,14 +102,14 @@ seqimplic <- function(seqdata, group, with.missing=FALSE, weighted=TRUE, na.rm=T
 		} else {
 			cond <- seqi != attr(seqdata, "void")
 		}
-		if(seqg){
-			group <- groupseq[, i]
-			if(!na.rm) {
-				group <- recodef(group, list(Missing=c(c(attr(groupseq, "nr"), attr(groupseq, "void")))))
-			}else{
-				cond <- cond &(!group %in% c(attr(groupseq, "nr"), attr(groupseq, "void")))
-			}
-		}
+		# if(seqg){
+			# group <- groupseq[, i]
+			# if(!na.rm) {
+				# group <- recodef(group, list(Missing=c(c(attr(groupseq, "nr"), attr(groupseq, "void")))))
+			# }else{
+				# cond <- cond &(!group %in% c(attr(groupseq, "nr"), attr(groupseq, "void")))
+			# }
+		# }
 		i_indice  <- implicativestat(x=group[cond], y=seqi[cond], type=type, resid=resid, weights=weights[cond], continuity=continuity)
 		ret$indices[ rownames(i_indice) , colnames(i_indice), i] <- i_indice
 	}
