@@ -37,12 +37,18 @@ export(
     seqauto,
     seqentrans,
     seqemlt,
+	seqimplic,
     seqtabstocc
 )
 
 ## emlt methods
 S3method(plot, emlt)
 S3method(print, emlt)
+
+## seqimplic methods
+S3method(plot, seqimplic)
+S3method(print, seqimplic)
+
 
 
 useDynLib(TraMineRextras,
