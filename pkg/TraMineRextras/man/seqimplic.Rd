@@ -51,9 +51,9 @@ Logical. If \code{TRUE} (default), observations with missing values on the \code
 \item{axes}{If set as \code{"all"} (default value) x-axes are drawn for each plot in the graphic. If set as \code{"bottom"}, axes are drawn only under the plots located at the bottom of the graphic area. If \code{FALSE}, no x-axis is drawn.}
 
 \item{xtlab}{optional labels for the x-axis ticks labels. If unspecified, the column names of the \code{seqdata} sequence object are used (see \code{\link{seqdef}}).}
-\item{cex.plot}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
+\item{cex.axis}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
 
-  \item{withlegend}{One of \code{"auto"} (default), \code{"right"} or \code{FALSE}. Defines if and where the legend of the state colors is plotted. With \code{"auto"} sets the position of the legend is set automatically. The obsolete value \code{TRUE} is equivalent to \code{"auto"}.}
+  \item{with.legend}{One of \code{"auto"} (default), \code{"right"} or \code{FALSE}. Defines if and where the legend of the state colors is plotted. With \code{"auto"} sets the position of the legend is set automatically. The obsolete value \code{TRUE} is equivalent to \code{"auto"}.}
 
   \item{ltext}{optional description of the states to appear in the legend. Must be a vector of character strings with number of elements equal to the size of the alphabet. If unspecified, the \code{label} attribute of the \code{seqdata} sequence object is used (see \code{\link{seqdef}}).}
 
@@ -66,7 +66,7 @@ Logical. If \code{TRUE} (default), observations with missing values on the \code
   \item{only.levels}{Optional list of levels of the \code{group} variable to be plotted. By default all levels are plotted.}
 
   \item{round}{Optional number of decimals when printing a \code{seqimplic} object.}
-  \item{siglevel}{Confidence levels thresholds (default is 0.95).}
+  \item{conf.level}{Confidence levels thresholds (default is 0.95).}
   \item{na.print}{Character string (or \code{NULL}) used for \code{NA} values in printed output, see \code{\link{print.default}}.}
   \item{\dots}{further arguments passed to \code{\link{print.default}} (for \code{print} method) or \code{\link{lines}} (for \code{plot} method).}
 
@@ -80,8 +80,8 @@ The implicative statistic assesses the statistical relevance of a rule of the fo
 It does so by measuring the gap between the expected and observed numbers of counter examples.
 The rule is considered to be strongly implicative if we observe much less counter examples than expected under the independence assumption.
 This gap and its significance are computed using adjusted residuals of a contingency table with continuity correction.
-In order to improve the readability of the graphs, we use here the opposite of the implicative index, which is highly negative for significant rules.
-The index  \eqn{I(A\rightarrow B)}{I(A->B)} measuring the relevance of the rule  "A implies B" reads as follows:
+In order to improve the readability of the graphs, we use here the opposite of the implicative statistic, which is highly negative for significant rules.
+The statistic  \eqn{I(A\rightarrow B)}{I(A->B)} measuring the relevance of the rule  "A implies B" reads as follows:
 
 \deqn{I(A\rightarrow B)=-\frac{n_{\bar{B}A}+0.5-n^e_{\bar{B}A}}{\sqrt{n^{e}_{\bar{B}A}(n_{B.}/n)(1-n_{.A}/n)}}}{I(A->B) = -(n_\{Bbar,A\}+0.5-n^e_\{Bbar,A\}) / (sqrt\{n^e_\{Bbar,A\}(n_{B.}/n)(1-n_\{.A\}/n)\})}
 Where \eqn{n_{\bar{B}A}}{n_\{Bbar,A\}} is the observed number of counter-examples, \eqn{n^{e}_{\bar{B}A}}{e_\{Bbar,A\}} the expected number of counter-examples under the independence assumption,
@@ -91,7 +91,7 @@ The plot function can be used to visualize the results. It produces a separate p
 In each plot, it presents at each time point \eqn{t}, the relevance of the rule "Being in this group implies to be in this state at this time point".
 The higher the plotted value, the higher the relevance of the rule.
 The horizontal dashed lines indicate the confidence thresholds. A rule is considered as statistically significant at the 5\% level if it exceeds the 95\% confidence horizontal line.
-The strength of rules with negative implicative index are not displayed because they have no meaningful interpretation.
+The strength of rules with negative implicative statistic are not displayed because they have no meaningful interpretation.
 
 }
 \value{
@@ -112,7 +112,7 @@ mvad.seq <- seqdef(mvad, 17:86)
 mvad.si.gcse5eq <- seqimplic(mvad.seq, group=mvad$gcse5eq)
 
 ##Plotting the typical states
-plot(mvad.si.gcse5eq, lwd=3, siglevel=c(0.95, 0.99))
+plot(mvad.si.gcse5eq, lwd=3, conf.level=c(0.95, 0.99))
 
 ## Printing the results
 print(mvad.si.gcse5eq, xtstep=12)

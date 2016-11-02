@@ -121,17 +121,17 @@ seqimplic <- function(seqdata, group, with.missing=FALSE, weighted=TRUE, na.rm=T
 
 
 
-print.seqimplic <- function(x, xtstep=x$xtstep, round=NULL, siglevel=NULL, na.print="", ...){
+print.seqimplic <- function(x, xtstep=x$xtstep, round=NULL, conf.level=NULL, na.print="", ...){
 	indices <- x$indices
 	if(!is.null(round)){
 		indices <- round(indices, round)
 	}
-	if(!is.null(siglevel)){
+	if(!is.null(conf.level)){
 		if(x$type == "indice"){
-			siglevel <- -qnorm(siglevel)
-			cond <- indices>siglevel
+			conf.level <- -qnorm(conf.level)
+			cond <- indices > conf.level
 		} else {
-			cond <- indices<siglevel
+			cond <- indices < conf.level
 		}
 		indices[cond] <- ""
 		indices[!cond] <- "*"
@@ -145,9 +145,9 @@ print.seqimplic <- function(x, xtstep=x$xtstep, round=NULL, siglevel=NULL, na.pr
 
 
 plot.seqimplic <- function(x, title=NULL, ylim=NULL, xaxis=TRUE, 
-	ylab="Implication", yaxis=TRUE, axes="all", xtlab=NULL, cex.plot=1,
-	withlegend="auto", ltext=NULL, cex.legend=1, 
-	legend.prop=NA, rows=NA, cols=NA, siglevel=0.95, lwd=1, only.levels=NULL, ...){
+	ylab="Implication", yaxis=TRUE, axes="all", xtlab=NULL, cex.axis=1,
+	with.legend="auto", ltext=NULL, cex.legend=1, 
+	legend.prop=NA, rows=NA, cols=NA, conf.level=0.95, lwd=1, only.levels=NULL, ...){
 	
 	savepar <- par(no.readonly = TRUE)
 	on.exit(par(savepar))
@@ -156,8 +156,8 @@ plot.seqimplic <- function(x, title=NULL, ylim=NULL, xaxis=TRUE,
 	}
 	plotindex <- (1:length(x$levels))[x$levels %in% only.levels]
 	nplot <- length(plotindex)
-	if(nplot>1||withlegend!=FALSE){
-		lout <- TraMineR:::TraMineR.setlayout(nplot, rows, cols, withlegend, axes, legend.prop)
+	if(nplot>1||with.legend!=FALSE){
+		lout <- TraMineR:::TraMineR.setlayout(nplot, rows, cols, with.legend, axes, legend.prop)
 		layout(lout$laymat, heights=lout$heights, widths=lout$widths)
 		legpos <- lout$legpos
 	}
@@ -192,27 +192,27 @@ plot.seqimplic <- function(x, title=NULL, ylim=NULL, xaxis=TRUE,
 				xtlab <- dimnames(x$indices)[[3]]
 			}
 			tpos <- seq(1, length(xtlab), x$xtstep)
-			axis(1, at=tpos-0.5, labels=xtlab[tpos], cex.axis=cex.plot)
+			axis(1, at=tpos-0.5, labels=xtlab[tpos], cex.axis=cex.axis)
 		}
 		if (is.null(yaxis) || yaxis) {
-			axis(2, cex.axis=cex.plot)
+			axis(2, cex.axis=cex.axis)
 		}
-		if(!is.null(siglevel)) {
-			for(sig in siglevel){
-				label <- paste("Conf. ", format(sig))
+		if(!is.null(conf.level)) {
+			for(conf in conf.level){
+				label <- paste("Conf. ", format(conf))
 				if(x$type=="intensity"){
-					h <- sig
+					h <- conf
 				} else {
-					h <- qnorm(sig)				
+					h <- qnorm(conf)				
 				}
 				abline(h=h, lty=3, col="grey", lwd=lwd)
-				cex.textlab <- 0.8*cex.plot
+				cex.textlab <- 0.8*cex.axis
 				text(x=dim(x$indices)[3] - strwidth(label, cex=cex.textlab)/2, y=h + strheight(label, cex=cex.textlab), labels=label, cex=cex.textlab)
 			}
 		}
 	}
 	
-	if (withlegend!=FALSE) {
+	if (with.legend!=FALSE) {
 		## Extracting some sequence characteristics
 		TraMineR:::TraMineR.legend(legpos, x$labels, x$cpal, cex=cex.legend)
 	}
