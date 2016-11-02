@@ -11,12 +11,12 @@ Visualization and identification of the differences between two or more groups o
 }
 \usage{
 seqimplic(seqdata, group, with.missing = FALSE, weighted = TRUE, na.rm = TRUE)
-\method{plot}{seqimplic}(x, title = NULL, ylim = NULL, xaxis = TRUE, 
-    ylab = "Implication", yaxis = TRUE, axes = "all", xtlab = NULL, 
-	cex.plot = 1, withlegend = "auto", ltext = NULL, cex.legend = 1, 
-	legend.prop = NA, rows = NA, cols = NA, siglevel = 0.95, lwd = 1, 
+\method{plot}{seqimplic}(x, title = NULL, ylim = NULL, xaxis = TRUE,
+    ylab = "Implication", yaxis = TRUE, axes = "all", xtlab = NULL,
+	cex.plot = 1, withlegend = "auto", ltext = NULL, cex.legend = 1,
+	legend.prop = NA, rows = NA, cols = NA, siglevel = 0.95, lwd = 1,
 	only.levels = NULL, ...)
-\method{print}{seqimplic}(x, xtstep = x$xtstep, round = NULL, 
+\method{print}{seqimplic}(x, xtstep = x$xtstep, round = NULL,
     siglevel = NULL, na.print = "", ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -46,7 +46,7 @@ Logical. If \code{TRUE} (default), observations with missing values on the \code
 \item{ylab}{An optional label for the y axis. If set to \code{NA}, no label is drawn.}
 \item{yaxis}{Controls whether the y axis is plotted or not. When set to \code{TRUE}, sequence indexes are displayed. }
 
-\item{axes}{if set to \code{"all"} (default value) x axes are drawn for each plot in the graphic. If set to \code{"bottom"}, axes are drawn only under the plots located at the bottom of the graphic area. If \code{FALSE}, no x-axis is drawn.}  
+\item{axes}{if set to \code{"all"} (default value) x axes are drawn for each plot in the graphic. If set to \code{"bottom"}, axes are drawn only under the plots located at the bottom of the graphic area. If \code{FALSE}, no x-axis is drawn.}
 
 \item{xtlab}{optional labels for the x axis ticks labels. If unspecified, the column names of the \code{seqdata} sequence object are used (see \code{\link{seqdef}}).}
 \item{cex.plot}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
@@ -70,30 +70,30 @@ Logical. If \code{TRUE} (default), observations with missing values on the \code
 
 }
 \details{
-The \code{seqimplic} function build a sequence of typical states object. It can be used to visualize or identify the differences between two or more groups of trajectories. 
-It presents at each time points the typical states of a subpopulation (for instance women, as opposed to men). 
+The \code{seqimplic} function builds a sequence of typical states object. It can be used to visualize or identify the differences between two or more groups of trajectories.
+It presents at each time point the typical states of a subpopulation (for instance women, as opposed to men).
 A state at a given time point is considered to be typical of a group if the rule "Being in this group implies being in this state at this time point" is relevant according to implicative statistic.
 
-Implicative statistic assesses the statistical relevance of a rule of the form "A implies B".  
-It does so by measuring the gap between the expected and the observed number of counter examples. 
-If we observe much less counter example than expected under the independence assumption, the rule is considered to be strongly implicative. 
-This gap and its significance are computed using adjusted residuals of a contingency table with continuity correction. 
-In order to improve the readability of the graphs, we use here the opposite of the implicative index which is highly negative for significant rules. 
-The index  \eqn{I(A\rightarrow B)} measuring the relevance of the rule that "A implies B" reads as follows:
+Implicative statistic assesses the statistical relevance of a rule of the form "A implies B".
+It does so by measuring the gap between the expected and observed number of counter examples.
+If we observe much less counter examples than expected under the independence assumption, the rule is considered to be strongly implicative.
+This gap and its significance are computed using adjusted residuals of a contingency table with continuity correction.
+In order to improve the readability of the graphs, we use here the opposite of the implicative index which is highly negative for significant rules.
+The index  \eqn{I(A\rightarrow B)}{I(A->B)} measuring the relevance of the rule that "A implies B" reads as follows:
 
-\deqn{I(A\rightarrow B)=-\frac{n_{\bar{B}A}+0.5-n^e_{\bar{B}A}}{\sqrt{n^{e}_{\bar{B}A}(n_{B.}/n)(1-n_{.A}/n)}}}
-Where \eqn{n_{\bar{B}A}} is the observed number of counter-examples, \eqn{n^{e}_{\bar{B}A}} the expected number of counter-examples in the independence assumption case, 
+\deqn{I(A\rightarrow B)=-\frac{n_{\bar{B}A}+0.5-n^e_{\bar{B}A}}{\sqrt{n^{e}_{\bar{B}A}(n_{B.}/n)(1-n_{.A}/n)}}}{I(A->B) = -(n_\{Bbar,A\}+0.5-n^e_\{Bbar,A\}) / (sqrt\{n^e_\{Bbar,A\}(n_{B.}/n)(1-n_\{.A\}/n)\})}
+Where \eqn{n_{\bar{B}A}}{n_\{Bbar,A\}} is the observed number of counter-examples, \eqn{n^{e}_{\bar{B}A}}{e_\{Bbar,A\}} the expected number of counter-examples under the independence assumption,
 \eqn{n_{B.}} the number of times that B is observed, \eqn{n_{.A}} the number of times that A is observed and \eqn{n} the total number of cases.
 
-The plot function can be used to visualize the results. It produce a separate plot for each level of the \code{group} variable. 
-In each plot, it presents at each time point \eqn{t}, the relevance of the rule "Being in this group implies being in this state at this time point". 
-A higher value indicate a higher relevance of the rule.
-The horizontal dashed lines present the confidence thresholds. A rule is considered statistically significant at the 5\% if it exceeds the 95\% confidence horizontal line. 
-Rules with negative implicative index are not represented because they have no meaningful interpretation. 
+The plot function can be used to visualize the results. It produce a separate plot for each level of the \code{group} variable.
+In each plot, it presents at each time point \eqn{t}, the relevance of the rule "Being in this group implies being in this state at this time point".
+The higher the value, the higher the relevance of the rule.
+The horizontal dashed lines indicate the confidence thresholds. A rule is considered as statistically significant at the 5\% level if it exceeds the 95\% confidence horizontal line.
+Rules with negative implicative index are not shown because they have no meaningful interpretation.
 
 }
 \value{
-\code{seqimplic} return a \code{"seqimplic"} object that can be plotted and printed. It stores the values of the implicative statistics at each time point.}
+\code{seqimplic} returns a \code{"seqimplic"} object that can be plotted and printed. It stores the values of the implicative statistics at each time point.}
 \references{
 Matthias Studer (2015), Comment: On the Use of Globally Interdependent Multiple Sequence Analysis, Sociological Methodology 45, DOI: 10.1177/0081175015588095.
 }
@@ -110,8 +110,8 @@ mvad.seq <- seqdef(mvad, 17:86)
 mvad.si.gcse5eq <- seqimplic(mvad.seq, group=mvad$gcse5eq)
 
 ##Plotting the typical states
-plot(mvad.si.gcse5eq, lwd=3, siglevel=c(0.95, 0.99)) 
+plot(mvad.si.gcse5eq, lwd=3, siglevel=c(0.95, 0.99))
 
 ## Printing the results
-print(mvad.si.gcse5eq, xtstep=12) 
+print(mvad.si.gcse5eq, xtstep=12)
 }
