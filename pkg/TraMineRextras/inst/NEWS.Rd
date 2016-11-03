@@ -1,9 +1,11 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
-\section{Changes in version 0.3.5 [2015-07-23]}{
-\subsection{Misc}{
+\section{Changes in version 0.3.5 [2016-11-02]}{
+\subsection{New functions}{
   \itemize{
-    \item{no changes}
+    \item{\code{seqimplic()}: Identifies position wise typical states 
+    of groups of sequences when compared with all the others. There 
+    are also plot and print methods for the outcome of the function.}
 }}
 }
 

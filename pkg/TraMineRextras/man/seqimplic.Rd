@@ -95,9 +95,11 @@ The strength of rules with negative implicative statistic are not displayed beca
 
 }
 \value{
-\code{seqimplic} returns a \code{"seqimplic"} object that can be plotted and printed. It stores the values of the implicative statistics at each time point.}
+\code{seqimplic} returns a \code{"seqimplic"} object that can be plotted and printed. The values of the implicative statistics at each time point are in the element \code{indices} of the object.}
 \references{
-Matthias Studer (2015), Comment: On the Use of Globally Interdependent Multiple Sequence Analysis, Sociological Methodology 45, DOI: 10.1177/0081175015588095.
+Studer, Matthias (2015), Comment: On the Use of Globally Interdependent Multiple Sequence Analysis, Sociological Methodology 45, DOI: 10.1177/0081175015588095.
+
+Gras, Régis and Kuntz, Pascale. (2008), An overview of the Statistical Implicative Analysis (SIA) development, in Gras, R., Suzuki, E., Guillet, F. and Spagnolo, F. (eds), Statistical Implicative Analysis: Theory and application, Series Studies in Computational Intelligence, Vol 127, Berlin: Springer-Verlag, pp 11-40.
 }
 \author{
 Matthias Studer.
