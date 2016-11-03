@@ -143,7 +143,7 @@
 
 \examples{
 ## --------------------------------------------------------- #
-## Example 1: Schizophrenia (see also example of 'olmm')
+## Example: Schizophrenia (see also example of 'olmm')
 ## --------------------------------------------------------- #
 
 data(schizo)

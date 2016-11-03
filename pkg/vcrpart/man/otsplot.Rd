@@ -127,7 +127,7 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
 
 \examples{
 ## ------------------------------------------------------------------- #
-## Dummy example 1: 
+## Dummy example: 
 ##
 ## Plotting artificially generated ordinal longitudinal data
 ## ------------------------------------------------------------------- #

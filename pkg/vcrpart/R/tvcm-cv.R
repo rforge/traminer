@@ -1,52 +1,52 @@
 ## --------------------------------------------------------- #
-##' Author:          Reto Buergin
-##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2016-02-22
-##'
-##' Description:
-##' Function for model selection and assessment for 'tvcm' objects.
-##'
-##' Contents:
-##' oobloss.tvcm:        computes the out.of-bag loss
-##' folds:               parameters for cross-validation folds
-##' tvcm_folds:          create cross-validation folds
-##' cvloss.tvcm:         cross-validation for 'tvcm' objects
-##' print.cvloss.tvcm:   print for 'cv.tvcm' objects
-##' plot.cvloss.tvcm:    plot fot 'cv.tvcm' objects
-##'
-##' Last modifications:
-##' 2016-02-22: adapt code of 'tvcm_folds' to allow creating folds
-##'             for olmm objects (not officially!!!)
-##' 2014-09-09: tvcm_folds: the 'seed' attribute is now the number
-##'             of the seed and not the RNG state anymore.
-##' 2014-09-07: modifications for direct call from 'tvcm'
-##' 2014-09-02: - modifications on 'tvcm_get_node'. The former
-##'               implementation was a time-killer an therefore
-##'               there is a new argument 'formList' and a
-##'               auxiliary function 'tvcm_get_fitted' was added
-##' 2014-08-30: - deleted 'nsplit' extension of in 'cvloss'. Reason:
-##'               cross-validation for number of split would
-##'               require a different pruning procedure
-##'             - small justifications for the plot
-##' 2014-08-06: - substituted 'cvfolds' by 'folds', which defines
-##'               a list of parameters for the new function
-##'               'tvcm_folds' that creates the cross-validation
-##'               matrix
-##'               matrix
-##' 2014-07-29: - defined 'cvfolds' as method for 'tvcm' objects
-##'             - added new argument 'weights' to 'cvfolds' to
-##'               allow for models where the weights represent
-##'               counts
-##' 2014-07-22: - removed AIC and BIC methods since they do
-##'               not apply to the 'tvcm' framework
-##' 2014-07-17: - change the column names of the cross-validation
-##'               output matrix
-##'             - improve the desciption
-##' 2014-07-08: - remove the 'sub' argument of AIC.tvcm, BIC.tvcm
-##'             - remove additional methods for AIC.tvcm and BIC.tvcm
-##'             - remove stabsel.tvcm and and corresponding methods
-##'             - cvloss: set 'cp' as the only tuning parameter
-##'             - cvloss: add 'direction' as new parameter 
+## Author:          Reto Buergin
+## E-Mail:          rbuergin@gmx.ch
+## Date:            2016-02-22
+##
+## Description:
+## Function for model selection and assessment for 'tvcm' objects.
+##
+## Contents:
+## oobloss.tvcm:        computes the out.of-bag loss
+## folds:               parameters for cross-validation folds
+## tvcm_folds:          create cross-validation folds
+## cvloss.tvcm:         cross-validation for 'tvcm' objects
+## print.cvloss.tvcm:   print for 'cv.tvcm' objects
+## plot.cvloss.tvcm:    plot fot 'cv.tvcm' objects
+##
+## Last modifications:
+## 2016-02-22: adapt code of 'tvcm_folds' to allow creating folds
+##             for olmm objects (not officially!!!)
+## 2014-09-09: tvcm_folds: the 'seed' attribute is now the number
+##             of the seed and not the RNG state anymore.
+## 2014-09-07: modifications for direct call from 'tvcm'
+## 2014-09-02: - modifications on 'tvcm_get_node'. The former
+##               implementation was a time-killer an therefore
+##               there is a new argument 'formList' and a
+##               auxiliary function 'tvcm_get_fitted' was added
+## 2014-08-30: - deleted 'nsplit' extension of in 'cvloss'. Reason:
+##               cross-validation for number of split would
+##               require a different pruning procedure
+##             - small justifications for the plot
+## 2014-08-06: - substituted 'cvfolds' by 'folds', which defines
+##               a list of parameters for the new function
+##               'tvcm_folds' that creates the cross-validation
+##               matrix
+##               matrix
+## 2014-07-29: - defined 'cvfolds' as method for 'tvcm' objects
+##             - added new argument 'weights' to 'cvfolds' to
+##               allow for models where the weights represent
+##               counts
+## 2014-07-22: - removed AIC and BIC methods since they do
+##               not apply to the 'tvcm' framework
+## 2014-07-17: - change the column names of the cross-validation
+##               output matrix
+##             - improve the desciption
+## 2014-07-08: - remove the 'sub' argument of AIC.tvcm, BIC.tvcm
+##             - remove additional methods for AIC.tvcm and BIC.tvcm
+##             - remove stabsel.tvcm and and corresponding methods
+##             - cvloss: set 'cp' as the only tuning parameter
+##             - cvloss: add 'direction' as new parameter 
 ## --------------------------------------------------------- #
 
 
@@ -104,8 +104,6 @@ folds_control <- function(type = c("kfold", "subsampling", "bootstrap"),
 ##'    \code{\link{folds}}.
 ##'
 ##' @return A matrix.
-## --------------------------------------------------------- #
-
 tvcm_folds <- function(object, control) {
 
   stopifnot(inherits(control, "folds"))

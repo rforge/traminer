@@ -1,37 +1,37 @@
-##' -------------------------------------------------------- #
-##' Author:          Reto Buergin
-##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2016-02-16
-##'
-##' Description:
-##' Plot functions for 'tvcm' objects.
-##'
-##' References:
-##' party:           http://CRAN.R-project.org/package=party
-##' partykit:        http://CRAN.R-project.org/package=partykit
-##'
-##' Overview:
-##' plot.tvcm:       generic plot for tree.tvcm objects
-##' panel_partdep:   partial coefficient plots
-##' panel_get_main:  extracts the title for each terminal node
-##' panel_coef:      grapcon generator for coefficient plots
-##' panel_empty:     grapcon generator for empty terminal node plots
-##'
-##' Last modifications:
-##' 2016-02-16: modified titles for 'panel_coef'.
-##' 2016-02-08: add warning in cases 'conf.int = TRUE' in 'panel_coef'.
-##' 2014-09-08: replace 'do.call' by 'eval'
-##' 2014-09-06: solve bugs in 'panel_partdep'
-##' 2014-09-06: - add 'type = "cv"' option for the cases where
-##'               cross validation was incorporated in the
-##'               partitioning stage
-##' 2014-08-30: - automatic titles
-##'             - write '(no split)' in panels where no split
-##'               is applied
-##' 2014-08-27: added the 'yadj' argument for 'panel_coef'
-##' 2014-07-02: make a loop over the partitions
-##' 2014-07-01: add checks for each function
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:          Reto Buergin
+## E-Mail:          rbuergin@gmx.ch
+## Date:            2016-02-16
+##
+## Description:
+## Plot functions for 'tvcm' objects.
+##
+## References:
+## party:           http://CRAN.R-project.org/package=party
+## partykit:        http://CRAN.R-project.org/package=partykit
+##
+## Overview:
+## plot.tvcm:       generic plot for tree.tvcm objects
+## panel_partdep:   partial coefficient plots
+## panel_get_main:  extracts the title for each terminal node
+## panel_coef:      grapcon generator for coefficient plots
+## panel_empty:     grapcon generator for empty terminal node plots
+##
+## Last modifications:
+## 2016-02-16: modified titles for 'panel_coef'.
+## 2016-02-08: add warning in cases 'conf.int = TRUE' in 'panel_coef'.
+## 2014-09-08: replace 'do.call' by 'eval'
+## 2014-09-06: solve bugs in 'panel_partdep'
+## 2014-09-06: - add 'type = "cv"' option for the cases where
+##               cross validation was incorporated in the
+##               partitioning stage
+## 2014-08-30: - automatic titles
+##             - write '(no split)' in panels where no split
+##               is applied
+## 2014-08-27: added the 'yadj' argument for 'panel_coef'
+## 2014-07-02: make a loop over the partitions
+## 2014-07-01: add checks for each function
+## --------------------------------------------------------- #
 
 plot.tvcm <- function(x, type = c("default", "coef", 
                            "simple", "partdep", "cv"),
@@ -288,7 +288,7 @@ panel_partdep <- function(object, parm = NULL,
 }
 
 
-##' -------------------------------------------------------- #
+## -------------------------------------------------------- #
 ##' Specifies a title for a terminal node
 ##'
 ##' @param object a \code{\link{tvcm}} object.
@@ -301,8 +301,6 @@ panel_partdep <- function(object, parm = NULL,
 ##'    title.
 ##'
 ##' @return a character string.
-##' -------------------------------------------------------- #
-
 panel_get_main <- function(object, node, id, nobs) {
   rval <- ""
   if (id) rval <-

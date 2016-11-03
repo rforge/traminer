@@ -1,61 +1,66 @@
-##' -------------------------------------------------------- #
-##' Author:       Reto Buergin
-##' E-Mail:       rbuergin@gmx.ch
-##' Date:         2015-10-30
-##'
-##' References:
-##' ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
-##' lme4:        http://cran.r-project.org/web/packages/lme4/index.html
-##' matrixcalc:  http://cran.r-project.org/web/packages/matrixcalc/index.html
-##' statmod:     http://cran.r-project.org/web/packages/statmod/index.html
-##'
-##' Dependencies:
-##' ucminf:      http://cran.r-project.org/web/packages/ucminf/index.html
-##'
-##'
-##' Modifications:
-##' 2015-10-30: set default 'na.action = na.omit' on 'olmm'
-##' 2015-09-02: started with integration auf gaussian mixed model
-##' 2015-01-15: improved predict.olmm
-##' 2014-09-25: - removed bug for numeric estimation of covariance of
-##'               'olmm' objects
-##'             - define 'score_sbj' and 'score_obs' slot even if
-##'               'numGrad = FALSE' (otherwise olmm_update_marg gives error)
-##' 2014-09-19: allow 'family' to be of class 'function'
-##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
-##' 2014-06-17: convert routine to S3 class
-##' 2014-05-03: moved several control parameters to 'control' argument
-##' 2014-05-02: added 'linkinv' function to families 'cumulative' etc.
-##' 2014-05-01: change offset argument: not it must be a 'matrix'
-##' 2014-04-22: implement change in 'form' object
-##' 2013-09-15: Free() commands were added in olmm.c
-##' 2013-09-07: C implementation for updating the marginal Likelihood
-##' 	        and predicting random-effects was stabilized by 
-##'	        replacing many alloca's by the R built-in function
-##'	        Calloc, which may slow the estimation
-##' 2013-07-27: change 'start' handling and add 'restricted'
-##'             argument
-##' 2013-07-19: correct use of numGrad argument (from now the slots
-##'             score_sbj and score_obs remain empty)
-##' 2013-07-12: improve use of contrasts. There were irritating
-##'             warnings under correct use and now the slot
-##'             'contrasts' also contains contrasts from the
-##'             model matrix for random effects
-##'
-##' To do:
-##' - check 'nlopr' package
-##' - add to family 'link' and 'linkinv' and incorporate
-##'   that in 'predict'
-##' - implement further family options
-##' - find better initial parameter values (see polr.R)
-##' - extract covariance matrix directly from optimizer
-##' - standardized coefficients
-##' - unconstrained covariance-matrix for random-effects
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:       Reto Buergin
+## E-Mail:       rbuergin@gmx.ch
+## Date:         2015-11-03
+##
+## References:
+## ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
+## lme4:        http://cran.r-project.org/web/packages/lme4/index.html
+## matrixcalc:  http://cran.r-project.org/web/packages/matrixcalc/index.html
+## statmod:     http://cran.r-project.org/web/packages/statmod/index.html
+##
+## Dependencies:
+## ucminf:      http://cran.r-project.org/web/packages/ucminf/index.html
+##
+##
+## Modifications:
+## 2016-11-03: modification for new C-code implementation
+## 2016-04-12: modified 'olmm_control' for the 'optim' optimizier. Now
+##             'BFGS' is set as the default and a warning is shown
+##             if a non-gradient based method is chosen while 'numGrad = FALSE'.
+## 2015-10-30: set default 'na.action = na.omit' on 'olmm'
+## 2015-09-02: started with integration auf gaussian mixed model
+## 2015-01-15: improved predict.olmm
+## 2014-09-25: - removed bug for numeric estimation of covariance of
+##               'olmm' objects
+##             - define 'score_sbj' and 'score_obs' slot even if
+##               'numGrad = FALSE' (otherwise olmm_update_marg gives error)
+## 2014-09-19: allow 'family' to be of class 'function'
+## 2014-09-08: partial substitution of 'rep' by 'rep.int'
+## 2014-06-17: convert routine to S3 class
+## 2014-05-03: moved several control parameters to 'control' argument
+## 2014-05-02: added 'linkinv' function to families 'cumulative' etc.
+## 2014-05-01: change offset argument: not it must be a 'matrix'
+## 2014-04-22: implement change in 'form' object
+## 2013-09-15: Free() commands were added in olmm.c
+## 2013-09-07: C implementation for updating the marginal Likelihood
+## 	        and predicting random-effects was stabilized by 
+##	        replacing many alloca's by the R built-in function
+##	        Calloc, which may slow the estimation
+## 2013-07-27: change 'start' handling and add 'restricted'
+##             argument
+## 2013-07-19: correct use of numGrad argument (from now the slots
+##             score_sbj and score_obs remain empty)
+## 2013-07-12: improve use of contrasts. There were irritating
+##             warnings under correct use and now the slot
+##             'contrasts' also contains contrasts from the
+##             model matrix for random effects
+##
+## To do:
+## - check 'nlopr' package
+## - add to family 'link' and 'linkinv' and incorporate
+##   that in 'predict'
+## - implement further family options
+## - find better initial parameter values (see polr.R)
+## - extract covariance matrix directly from optimizer
+## - standardized coefficients
+## - unconstrained covariance-matrix for random-effects
+## --------------------------------------------------------- #
 
 dev.resids <- function(y, mu, wt) {
   sapply(1:nrow(y), function(i) - 2 * log(mu[i, which(y[i, ] > 0)]))
 }
+
 
 cumulative <- function(link = c("logit", "probit", "cauchy")) {
   link <- match.arg(link)
@@ -75,6 +80,7 @@ cumulative <- function(link = c("logit", "probit", "cauchy")) {
   return(rval)
 }
 
+
 baseline <- function(link = "logit") {
   link <- match.arg(link)
   linkinv <- function(eta) {
@@ -89,6 +95,7 @@ baseline <- function(link = "logit") {
                     class = "family.olmm")
   return(rval)
 }
+
 
 adjacent <- function(link = "logit") {
   link <- match.arg(link)
@@ -105,16 +112,29 @@ adjacent <- function(link = "logit") {
   return(rval)
 }
 
+
 print.family.olmm <- function(x, ...) {
   cat("\nFamily:", x$family, "\n")
   cat("Link function:", x$link, "\n\n")
   invisible(x)
 }
 
+
 olmm_control <- function(fit = c("nlminb", "ucminf", "optim"), doFit = TRUE,
                          numGrad = FALSE, numHess = numGrad, nGHQ = 7L,
                          start = NULL, restricted = NULL, verbose = FALSE, ...) {
+    dArgs <- list(...)
+    dArgs <- dArgs[intersect(names(dArgs), names(formals(fit)))]
+    dArgs <- dArgs[!names(dArgs) %in% c("par", "fn", "gr")]
     fit <- match.arg(fit)
+    if (fit == "optim" && is.null(dArgs$method)) {
+        dArgs$method <- "BFGS"
+    }
+    if (fit == "optim" && !dArgs$method %in% c("BFGS", "CG", "L-BFGS-B") && !numGrad) {
+        numGrad <- TRUE
+        warning("'numGrad' is set to TRUE since chosen optimization method is",
+                "not based on gradient search")
+    }
     stopifnot(is.logical(doFit) && length(doFit) == 1)
     stopifnot(is.logical(numGrad) && length(numGrad) == 1)
     stopifnot(is.logical(numHess) && length(numHess) == 1)
@@ -134,10 +154,11 @@ olmm_control <- function(fit = c("nlminb", "ucminf", "optim"), doFit = TRUE,
                         nGHQ = nGHQ,
                         start = start,
                         restricted = restricted,
-                        verbose = verbose), list(...))
+                        verbose = verbose), dArgs)
     class(rval) <- "olmm_control"
     return(rval)
 }
+
 
 olmm <- function(formula, data, family = cumulative(),
                  weights, subset, na.action = na.omit,
@@ -147,7 +168,7 @@ olmm <- function(formula, data, family = cumulative(),
 
   ## append '...' arguments to control
   cArgs <- list(...)
-  cArgs <- cArgs[intersect(names(cArgs), names(formals(olmm_control)))]
+  ## cArgs <- cArgs[intersect(names(cArgs), names(formals(olmm_control)))]
   cArgsNames <- names(cArgs)
   cArgs <- do.call("olmm_control", cArgs)
   control[cArgsNames] <- cArgs[cArgsNames]
@@ -478,13 +499,16 @@ olmm <- function(formula, data, family = cumulative(),
     ## extract the function for fitting the model
     FUN <- object$optim$fit
     subs <- which(names(object$optim) == "fit")
-    object$optim <- object$optim[-subs] 
+    object$optim <- object$optim[-subs]
+    object$optim$env <- environment()
     systemTime <- system.time(object$output <-
-                              suppressWarnings(do.call(FUN, object$optim)))
+        suppressWarnings(do.call(FUN, object$optim)))
     object$optim$fit <- FUN
     
-    ## to get sure ...
-    .Call("olmm_update_marg", object, object$output$par, PACKAGE = "vcrpart")
+    ## overwrite slots
+    new <- .Call("olmm_update_marg", object, object$output$par,
+                 PACKAGE = "vcrpart")
+    object <- modifyList(object, new)
       
     ## print messages for opimization
     if (dims["verb"] > 0L) {
@@ -532,7 +556,7 @@ olmm <- function(formula, data, family = cumulative(),
     ## compute expected standardized random effects
     if (dims["hasRanef"] > 0) {
       if (dims["verb"] > 0L) cat("\n* predicting random effects ... ")
-      .Call("olmm_update_u", object, PACKAGE = "vcrpart")
+      object$u <- .Call("olmm_update_u", object, PACKAGE = "vcrpart")
       if (dims["verb"] > 0L) cat("OK")
     }
     
@@ -546,10 +570,11 @@ olmm <- function(formula, data, family = cumulative(),
   } else {
 
     ## update the object with the current estimates
-    .Call("olmm_update_marg", object, object$coefficients,
-          PACKAGE = "vcrpart")
+    new <- .Call("olmm_update_marg", object, object$coefficients,
+                 PACKAGE = "vcrpart")
+    object <- modifyList(object, new)
     if (dims["hasRanef"] > 0L)
-      .Call("olmm_update_u", object, PACKAGE = "vcrpart")
+      object$u <- .Call("olmm_update_u", object, PACKAGE = "vcrpart")
 
     if (dims["verb"] > 0L) cat("\n* no computations processed, return model object\n")
   }  

@@ -9,12 +9,13 @@
 }
 
 \usage{
-contr.wsum(x, weights = rep.int(1.0, length(x)))
+contr.wsum(x, weights = rep.int(1.0, length(x)), sparse = FALSE)
 }
 
 \arguments{
   \item{x}{a factor vector}
   \item{weights}{a vector of weights with the same length as \code{x}.}
+  \item{sparse}{ogical indicating if the result should be sparse (of class \code{dgCMatrix}), using package \pkg{Matrix}.}
 }
 
 \details{
@@ -31,5 +32,6 @@ contr.wsum(x, weights = rep.int(1.0, length(x)))
 
 \examples{
 x <- factor(rep(LETTERS[1:3], c(10, 20, 30)))
-contr.wsum(x)
+contr.wsum(x) # standard call
+contr.wsum(x, sparse = TRUE) # using a sparse matrix
 }

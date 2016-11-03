@@ -1,63 +1,63 @@
-##' -------------------------------------------------------- #
-##' Author:          Reto Buergin
-##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2016-01-10
-##'
-##' Description:
-##' General utility functions for the 'vcrpart' package.
-##' most of the functions are not exported and documented inline.
-##'
-##' Functions:
-##' neglogLik2.glm:        compute the -2 times likelihood error of
-##'                        a 'glm' object.
-##' addEmptyChar:          add empty spaces to a character
-##' appendDefArgs:         over-write default arguments
-##' deparseCall:           convert a 'call' into a 'character'
-##' formatMatrix:          format matrices for print functions
-##' vcrpart_copy:          duplicate R objects
-##' vcrpart_value_space:   extract the values space of data data.frame
-##' fe, vc, re, ce, ge     special terms for formulas. Are exported.
-##' vcrpart_contr.sum:     compute weighted sum contrasts
-##' vcrpart_fitted:        extract model fitted values
-##' vcrpart_formula_eta:   constructs a formula for linear predictors
-##' vcrpart_formula_cond:  constructs a formula for contitioning variables
-##' vcrpart_formula:       extracts a list of predictor formulas
-##' vcrpart_formula_delEnv: deletes environments of lists of formulas
-##'                         from vcrpart_formula.
-##'
-##' Last modifications:
-##' 2015-09-02: - modified 'vcrpart_formula_eta' for implementation of
-##'               gaussian mixed model.
-##'             - set for baseline model as default category-specific
-##'               effects. 
-##' 2015-06-01: corrected bug of 'vcrpart_formula' in cases where a
-##'             effect modifier has the variable name 'x'. Now I call
-##'             it 'fTerm'.
-##' 2015-01-20: change defaults for random effect specification
-##' 2014-11-10: exported function 'contr.wsum'
-##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
-##' 2014-09-07: added 'vcrpart_fitted' function to avoid replicated
-##'             definitions of the same function.
-##' 2014-09-04: removed 'adj' option in 'vc'
-##' 2014-08-29: add the 'adj' argument to 'vc' to adjust the selection
-##'             if the number of predictors per vc() term varies.
-##' 2014-08-27: allow character vectors in 'vc' terms
-##' 2014-07-31: - added to possibility to remove the intercept
-##'               directly in the formula by a '-1'
-##'             - now more than one varying intercepts are
-##'               allowed to be specificed (the only case in which
-##'               this was critical was when using 'sctest = TRUE',
-##'               and this is not checked in 'tvcm' itself)
-##' 2014-06-17: modified documentation style:
-##' 2014-06-17: new function 'vcrpart_copy' that duplicates objects
-##' 2014-06-17: removed 'vcrpart_slot' after converting 'olmm'
-##'             class to a S3 class
-##' 2014-06-03: modify 'tvcm_formula' to allow component-wise
-##'             trees
-##'
-##' To do:
-##' - 
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:          Reto Buergin
+## E-Mail:          rbuergin@gmx.ch
+## Date:            2016-01-10
+##
+## Description:
+## General utility functions for the 'vcrpart' package.
+## most of the functions are not exported and documented inline.
+##
+## Functions:
+## neglogLik2.glm:        compute the -2 times likelihood error of
+##                        a 'glm' object.
+## addEmptyChar:          add empty spaces to a character
+## appendDefArgs:         over-write default arguments
+## deparseCall:           convert a 'call' into a 'character'
+## formatMatrix:          format matrices for print functions
+## vcrpart_copy:          duplicate R objects
+## vcrpart_value_space:   extract the values space of data data.frame
+## fe, vc, re, ce, ge     special terms for formulas. Are exported.
+## contr.wsum:            compute weighted sum contrasts
+## vcrpart_fitted:        extract model fitted values
+## vcrpart_formula_eta:   constructs a formula for linear predictors
+## vcrpart_formula_cond:  constructs a formula for contitioning variables
+## vcrpart_formula:       extracts a list of predictor formulas
+## vcrpart_formula_delEnv: deletes environments of lists of formulas
+##                         from vcrpart_formula.
+##
+## Last modifications:
+## 2015-09-02: - modified 'vcrpart_formula_eta' for implementation of
+##               gaussian mixed model.
+##             - set for baseline model as default category-specific
+##               effects. 
+## 2015-06-01: corrected bug of 'vcrpart_formula' in cases where a
+##             effect modifier has the variable name 'x'. Now I call
+##             it 'fTerm'.
+## 2015-01-20: change defaults for random effect specification
+## 2014-11-10: exported function 'contr.wsum'
+## 2014-09-08: partial substitution of 'rep' by 'rep.int'
+## 2014-09-07: added 'vcrpart_fitted' function to avoid replicated
+##             definitions of the same function.
+## 2014-09-04: removed 'adj' option in 'vc'
+## 2014-08-29: add the 'adj' argument to 'vc' to adjust the selection
+##             if the number of predictors per vc() term varies.
+## 2014-08-27: allow character vectors in 'vc' terms
+## 2014-07-31: - added to possibility to remove the intercept
+##               directly in the formula by a '-1'
+##             - now more than one varying intercepts are
+##               allowed to be specificed (the only case in which
+##               this was critical was when using 'sctest = TRUE',
+##               and this is not checked in 'tvcm' itself)
+## 2014-06-17: modified documentation style:
+## 2014-06-17: new function 'vcrpart_copy' that duplicates objects
+## 2014-06-17: removed 'vcrpart_slot' after converting 'olmm'
+##             class to a S3 class
+## 2014-06-03: modify 'tvcm_formula' to allow component-wise
+##             trees
+##
+## To do:
+## - 
+## --------------------------------------------------------- #
 
 ## --------------------------------------------------------- #
 ##' Add empty spaces to characters to have the same length.
@@ -68,8 +68,6 @@
 ##'                should be added.
 ##'
 ##' @return A character vector.
-## --------------------------------------------------------- #
-
 addEmptyChar <- function(x, nchar, justify = "left") {
   
   for (i in 1:length(x))
@@ -91,8 +89,6 @@ addEmptyChar <- function(x, nchar, justify = "left") {
 ##' @param default a list of default arguments.
 ##'
 ##' @return A list with arguments.
-## --------------------------------------------------------- #
-
 appendDefArgs <- function(args, default) {
   
   if (is.null(args)) return(default)
@@ -110,8 +106,6 @@ appendDefArgs <- function(args, default) {
 ##' @param x slot of a call, e.g., call$formula.
 ##'
 ##' @return A character.
-## --------------------------------------------------------- #
-
 deparseCall <- function(x) {
   
   if (is.null(x)) return(character())
@@ -127,8 +121,6 @@ deparseCall <- function(x) {
 ##' @param x a matrix
 ##'
 ##' @return A matrix.
-## --------------------------------------------------------- #
-
 formatMatrix <- function(x, ...) {
   
   rowNames <- rownames(x)
@@ -169,8 +161,6 @@ formatMatrix <- function(x, ...) {
 ##' @return A list with arguments.
 ##'
 ##' @details used in 'tvcm_fit_loss'
-## --------------------------------------------------------- #
-
 vcrpart_copy <- function(x)
   return(.Call("vcrpart_duplicate", x, PACKAGE = "vcrpart"))
 
@@ -183,8 +173,6 @@ vcrpart_copy <- function(x)
 ##'    for numeric vectors. 
 ##'
 ##' @return A list with values of the variables in 'data'
-## --------------------------------------------------------- #
-
 vcrpart_value_space <- function(data, neval = 50L) {
   
   FUN <- function(x, neval) {
@@ -281,20 +269,23 @@ ge <- function(formula) {
   return(attr(terms(formula, keep.order = TRUE), "term.labels"))
 }
 
-contr.wsum <- function(x, weights = rep.int(1.0, length(x))) {
+
+contr.wsum <- function(x, weights = rep.int(1.0, length(x)),
+                       sparse = FALSE) {
   stopifnot(is.factor(x))
   stopifnot(is.numeric(weights))
   stopifnot(length(x) == length(weights))
   con <- NULL
-  if (nlevels(x) > 1L) {
-    con <- contr.sum(levels(x))
-    tab <- tapply(weights, x, sum)
-    con[nrow(con),] <- con[nrow(con),] * tab[-length(tab)] / tab[length(tab)]
-    colnames(con) <- levels(x)[1:(nlevels(x) - 1)]
+  if (nlevels(x) > 1L) {     
+      con <- contr.sum(levels(x), sparse = sparse)
+      tab <- tapply(weights, x, sum)
+      tab <- c(con[nrow(con),1:ncol(con)] * tab[-length(tab)] /
+                   tab[length(tab)])
+      con[nrow(con),1:ncol(con)] <- tab
+      colnames(con) <- levels(x)[1:(nlevels(x) - 1)]
   }
   return(con)
 }
-
 
 ## --------------------------------------------------------- #
 ##' Extract model fitted values
@@ -309,8 +300,6 @@ contr.wsum <- function(x, weights = rep.int(1.0, length(x))) {
 ##'
 ##' @details Substitutes 'fitted.fvcm', 'fitted.tvcm' and
 ##'    'fitted.olmm'
-## --------------------------------------------------------- #
-
 vcrpart_fitted <- function(object, ...) {
   call <- call(name = "predict", object = object)
   dotargs <- list(...)
@@ -332,8 +321,6 @@ vcrpart_fitted <- function(object, ...) {
 ##' @return A formula.
 ##'
 ##' @details Used in \code{vcrpart_formula}.
-## --------------------------------------------------------- #
-
 vcrpart_formula_eta <- function(x, family, env) {
 
   terms <- terms(x$eta, specials = c("fe", "vc", "re", "ce", "ge"), keep.order = TRUE)
@@ -521,8 +508,6 @@ vcrpart_formula_cond <- function (x, family, env) {
 ##' \code{\link{olmm}}, \code{\link{predict.olmm}},
 ##' \code{\link{tvcm}}, \code{tvcm_get_node},
 ##' \code{\link{prune.tvcm}}.
-## --------------------------------------------------------- #
-
 vcrpart_formula <- function(formula, family = cumulative(),
                             env = parent.frame()) {
 
@@ -661,8 +646,6 @@ vcrpart_formula <- function(formula, family = cumulative(),
 ##'    \code{\link{vcrpart_formula}}.
 ##'
 ##' @return A list of formulas.
-## --------------------------------------------------------- #
-
 vcrpart_formula_delEnv <- function(formList) {
   if (!is.null(formList$fe)) {
     environment(formList$fe$eta$ce) <- NULL

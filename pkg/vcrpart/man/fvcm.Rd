@@ -107,7 +107,7 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
 
 \examples{
 ## ------------------------------------------------------------------- #
-## Dummy example 1:
+## Dummy example:
 ##
 ## Bagging 'tvcm' on the artificially generated data 'vcrpart_3'. The 
 ## true coefficient function is a sinus curve between -pi/2 and pi/2. 

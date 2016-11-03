@@ -1,68 +1,69 @@
-##' -------------------------------------------------------- #
-##' Author:       Reto Buergin
-##' E-Mail:       rbuergin@gmx.ch
-##' Date:         2016-02-22
-##'
-##' Description:
-##' methods for olmm objects.
-##'
-##' anova:       Likelihood-ratio tests for the comparison of
-##'              models
-##' coef, coefficients: Extract model coefficients
-##' deviance:    -2*Log-likelihood at the ML estimator
-##' drop1:       Drop single fixed effects
-##' estfun:      Negative scores
-##' extractAIC:  Extract the AIC
-##' fitted:      Extract fitted values from the model
-##' fixef:       Extract fixed effect parameters
-##' formula:     Extracts 'formula'
-##' gefp:        Extract cumulated decorrelated score process
-##' getCall:     Extracts 'call'
-##' logLik:      Log-likelihood at the ML estimator
-##' model.frame: Model frame (all needed variables)
-##' model.matrix: Model matrix (for the fixed effects)
-##' predict:     Predict from the fitted model
-##' print:       Print summary output (method for olmm and
-##'              olmm.summary objects)
-##' ranef:       Extract predicted random effects
-##' ranefCov:    Covariance-matrix of random effect terms
-##' resid, residuals Extract different types of residuals from the
-##'              fitted model
-##' show:        Print summary output (method for olmm and
-##'              olmm.summary objects)
-##' simulate:    Simulate responses based on a fitted model
-##' summary:     Extract summary information
-##' terms, terms.olmm: Extracting the terms of the model frame
-##'              for fixed effects
-##' update:      Refits a model
-##' VarCorr, print.VarCorr.olmm: Extract variance and standard
-##'              deviation of random effects and their correlation
-##' vcov:        Variance-covariance matrix for fixed effect parameters
-##' weights:     Weights
-##'
-##' Modifications:
-##' 2016-02-22: removed 'rdig' argument from 'VarCorr' method
-##' 2014-01-16: - improve 'predict.olmm' function
-##' 2014-12-07: - add argument 'center' to 'predecor_control'
-##' 2014-10-24: - improve simulate.olmm
-##'             - improved 'estfun.olmm' call in 'gefp.olmm'
-##' 2014-10-23: - fix bug in predict.olmm
-##' 2014-09-22: - (internal) change 'Ninpute' to 'Nimpute' in estfun.olmm
-##' 2014-09-20: - use tile case in titles
-##' 2014-09-08: - partial substitution of 'rep' by 'rep.int'
-##'             - replace 'do.call' by 'call' in 'resid.olmm'
-##' 2013-03-17: changed many methods to S3 methods (as in lme4)
-##' 2013-09-06: modify formula() method. Now the formula slot
-##'             is called
-##' 2013-09-06: add S3 for terms() method
-##' 2013-09-06: add drop1() method
-##'
-##' To do:
-##' - improve update method
-##' - plot methods
-##' - estfun.olmm: handle equal zero random effects
-##' - anova with a single model
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:       Reto Buergin
+## E-Mail:       rbuergin@gmx.ch
+## Date:         2016-10-31
+##
+## Description:
+## methods for olmm objects.
+##
+## anova:       Likelihood-ratio tests for the comparison of
+##              models
+## coef, coefficients: Extract model coefficients
+## deviance:    -2*Log-likelihood at the ML estimator
+## drop1:       Drop single fixed effects
+## estfun:      Negative scores
+## extractAIC:  Extract the AIC
+## fitted:      Extract fitted values from the model
+## fixef:       Extract fixed effect parameters
+## formula:     Extracts 'formula'
+## gefp:        Extract cumulated decorrelated score process
+## getCall:     Extracts 'call'
+## logLik:      Log-likelihood at the ML estimator
+## model.frame: Model frame (all needed variables)
+## model.matrix: Model matrix (for the fixed effects)
+## predict:     Predict from the fitted model
+## print:       Print summary output (method for olmm and
+##              olmm.summary objects)
+## ranef:       Extract predicted random effects
+## ranefCov:    Covariance-matrix of random effect terms
+## resid, residuals Extract different types of residuals from the
+##              fitted model
+## show:        Print summary output (method for olmm and
+##              olmm.summary objects)
+## simulate:    Simulate responses based on a fitted model
+## summary:     Extract summary information
+## terms, terms.olmm: Extracting the terms of the model frame
+##              for fixed effects
+## update:      Refits a model
+## VarCorr, print.VarCorr.olmm: Extract variance and standard
+##              deviation of random effects and their correlation
+## vcov:        Variance-covariance matrix for fixed effect parameters
+## weights:     Weights
+##
+## Modifications:
+## 2016-10-31: checked new implementation of C-code
+## 2016-02-22: removed 'rdig' argument from 'VarCorr' method
+## 2014-01-16: - improve 'predict.olmm' function
+## 2014-12-07: - add argument 'center' to 'predecor_control'
+## 2014-10-24: - improve simulate.olmm
+##             - improved 'estfun.olmm' call in 'gefp.olmm'
+## 2014-10-23: - fix bug in predict.olmm
+## 2014-09-22: - (internal) change 'Ninpute' to 'Nimpute' in estfun.olmm
+## 2014-09-20: - use tile case in titles
+## 2014-09-08: - partial substitution of 'rep' by 'rep.int'
+##             - replace 'do.call' by 'call' in 'resid.olmm'
+## 2013-03-17: changed many methods to S3 methods (as in lme4)
+## 2013-09-06: modify formula() method. Now the formula slot
+##             is called
+## 2013-09-06: add S3 for terms() method
+## 2013-09-06: add drop1() method
+##
+## To do:
+## - improve update method
+## - plot methods
+## - estfun.olmm: handle equal zero random effects
+## - anova with a single model
+## --------------------------------------------------------- #
 
 anova.olmm <- function(object, ...) {
 
@@ -287,7 +288,9 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
         ordered(apply(probs, 1L, function(x) sample(yLevs, 1L, prob = x)), yLevs)
       
       ## recompute scores
-      .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")      
+      new <-
+          .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")
+      x <- modifyList(x, new)
     }
     
     scores <- x$score_obs
@@ -333,7 +336,8 @@ estfun.olmm <- function(x, predecor = FALSE, control = predecor_control(),
    
   ## ^hack: recompute old model
   x <- xOld
-  .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")
+  new <- .Call("olmm_update_marg", x, x$coefficients, PACKAGE = "vcrpart")
+  x <- modifyList(x, new)
   
   if (control$verbose) cat("\n* return negative scores\n")
   
@@ -643,6 +647,7 @@ predict.olmm <- function(object, newdata = NULL,
                      paste(setdiff(levels(subject), rownames(ranef)),
                            collapse = ", ")))
         }
+        ## !!! has problems with ids = ""
         ranef <- ranef[rownames(ranef) %in% levels(subject),,drop = FALSE]
       }
       
@@ -688,8 +693,9 @@ predict.olmm <- function(object, newdata = NULL,
         probs <- matrix(0, nrow(X), ncol(eta) + 1L)
         colnames(probs) <- levels(object$y)
         rownames(probs) <- rownames(X)
-        .Call("olmm_pred_margNew", object, eta, W, subject,
-              nrow(X), probs, PACKAGE = "vcrpart")
+        probs <-
+            .Call("olmm_pred_margNew", object, eta, W, subject,
+                  nrow(X), probs, PACKAGE = "vcrpart")
         
       } else {
         
@@ -697,8 +703,9 @@ predict.olmm <- function(object, newdata = NULL,
         probs <- matrix(0, nrow(X), ncol(eta) + 1L)
         colnames(probs) <- levels(object$y)
         rownames(probs) <- rownames(X)
-        .Call("olmm_pred_marg", object, eta, W, nrow(X), probs,
-              PACKAGE = "vcrpart")
+        probs <-
+            .Call("olmm_pred_marg", object, eta, W, nrow(X), probs,
+                  PACKAGE = "vcrpart")
 
       }
 

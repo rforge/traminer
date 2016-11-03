@@ -1,22 +1,22 @@
-##' -------------------------------------------------------- #
-##' Author:       Reto Buergin
-##' E-Mail:       rbuergin@gmx.ch
-##' Date:         2014-09-08
-##'
-##' Description:
-##' Unexported functions imported from other packages
-##'
-##' References:
-##' colorspace:      http://cran.r-project.org/web/packages/colorspace/index.html
-##' statmod:         http://cran.r-project.org/web/packages/statmod/
-##' matrixcalc:      http://cran.r-project.org/web/packages/matrixcalc/
-##'
-##' Contents:
-##' stats:                       safe_pchisq
-##' colorspace:                  "rainbowPalette", "divergePalette"
-##' statmod:     version 1.4.15  gauss.quad 
-##' matrixcalc:  version 1.0-2   vec, u.vectors, E.Matrices, L.matrix
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:       Reto Buergin
+## E-Mail:       rbuergin@gmx.ch
+## Date:         2014-09-08
+##
+## Description:
+## Unexported functions imported from other packages
+##
+## References:
+## colorspace:      http://cran.r-project.org/web/packages/colorspace/index.html
+## statmod:         http://cran.r-project.org/web/packages/statmod/
+## matrixcalc:      http://cran.r-project.org/web/packages/matrixcalc/
+##
+## Contents:
+## stats:                       safe_pchisq
+## colorspace:                  "rainbowPalette", "divergePalette"
+## statmod:     version 1.4.15  gauss.quad 
+## matrixcalc:  version 1.0-2   vec, u.vectors, E.Matrices, L.matrix
+## --------------------------------------------------------- #
 
 safe_pchisq <- function (q, df, ...) {
     df[df <= 0] <- NA

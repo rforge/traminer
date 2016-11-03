@@ -1,5 +1,6 @@
 \name{tvcm-control}
 
+\alias{tvcm-control}
 \alias{tvcm_control}
 
 \title{Control parameters for \command{\link{tvcm}}.} 
@@ -92,5 +93,5 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
   \command{\link{fvcm}}}
 
 \examples{
-tvcm_control()
+tvcm_control(minsize = 100)
 }

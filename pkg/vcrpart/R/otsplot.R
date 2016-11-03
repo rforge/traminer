@@ -1,33 +1,33 @@
-##' -------------------------------------------------------- #
-##' Author:          Reto Buergin
-##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2014-11-10
-##'
-##' Description:
-##' Ordinal time series plot and utility functions.
-##'
-##' Contents:
-##'
-##' otsplot_control:      control plot parameters
-##' otsplot_filter:       creates filtering function for
-##'                       fading out patterns
-##' otsplot.default:      default function
-##' print.otsplot:        print method for 'otsplot'
-##' otsplot_panel:        panel function for otsplot
-##' otsplot_data2str:     create trajectory strings
-##' otsplot_layoutObjFun: layout optimization function
-##' otsplot_layout:       layout optimizer
-##' otsplot_color:        function to colour lines
-##' linear:               linear colour filter function
-##' minfreq:              minimal frequency for lines to filter
-##' cumfreq:              filter a given proportion of most frequent
-##'                       sequences
-##'
-##' Modifications:
-##' 2014-11-10: added 'seed' argument to 'otsplot'
-##' 2014-09-08: partial substitution of 'rep' by 'rep.int'
-##' 2014-09-07: added header
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:          Reto Buergin
+## E-Mail:          rbuergin@gmx.ch
+## Date:            2014-11-10
+##
+## Description:
+## Ordinal time series plot and utility functions.
+##
+## Contents:
+##
+## otsplot_control:      control plot parameters
+## otsplot_filter:       creates filtering function for
+##                       fading out patterns
+## otsplot.default:      default function
+## print.otsplot:        print method for 'otsplot'
+## otsplot_panel:        panel function for otsplot
+## otsplot_data2str:     create trajectory strings
+## otsplot_layoutObjFun: layout optimization function
+## otsplot_layout:       layout optimizer
+## otsplot_color:        function to colour lines
+## linear:               linear colour filter function
+## minfreq:              minimal frequency for lines to filter
+## cumfreq:              filter a given proportion of most frequent
+##                       sequences
+##
+## Modifications:
+## 2014-11-10: added 'seed' argument to 'otsplot'
+## 2014-09-08: partial substitution of 'rep' by 'rep.int'
+## 2014-09-07: added header
+## --------------------------------------------------------- #
 
 otsplot_control <- function(cex = 1, lwd = 1/4, col = NULL,
                             hide.col = grey(0.8), seed = NULL,

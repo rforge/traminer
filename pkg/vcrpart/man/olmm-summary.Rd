@@ -39,7 +39,7 @@
  
 \examples{
 ## ------------------------------------------------------------------- #
-## Dummy example 1:
+## Dummy example:
 ##
 ## Printing the summary of a model on artificially generated data.
 ## ------------------------------------------------------------------- #

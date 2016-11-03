@@ -134,7 +134,7 @@ panel_coef(object, parm = NULL,
 
 \examples{
 ## ------------------------------------------------------------------- #
-## Dummy example 1:
+## Dummy example:
 ##
 ## Plotting the types "coef" and "partdep" for a 'tvcm' object fitted 
 ## on the artificial data 'vcrpart_2'.

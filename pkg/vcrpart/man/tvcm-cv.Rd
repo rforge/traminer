@@ -205,7 +205,7 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
 
 \examples{
 ## --------------------------------------------------------- #
-## Dummy Example 1:
+## Dummy Example:
 ##
 ## Model selection for the 'vcrpart_2' data. The example is
 ## merely a syntax template.

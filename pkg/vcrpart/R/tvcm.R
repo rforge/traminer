@@ -1,63 +1,63 @@
-##' -------------------------------------------------------- #
-##' Author:      Reto Buergin
-##' E-Mail:      rbuergin@gmx.ch
-##' Date:        2015-12-28
-##'
-##' Description:
-##' The 'tvcm' function
-##'
-##' tvcolmm         convenience function for 'tvcm'
-##' tvcolmm_control control function for 'tvcolmm'
-##' tvcglm          convenience function for 'tvcm'
-##' tvcglm_control  control function for 'tvglm'
-##' tvcm            the main fitting function
-##' tvcm_control    control function for 'tvcm'
-##'
-##' Last modifications:
-##' 2015-12-28: added the argument 'fast' to 'tvcglm_control'.
-##' 2015-11-31: enable the setting 'mtry <- Inf'
-##' 2015-10-30: set default 'na.action = na.omit' on 'tvcm'
-##' 2015-06-01: - give a warning when no 'vc' terms are specified.
-##' 2014-12-08: - enable 'sctest = FALSE' in 'tvcolmm_control'
-##'             - remove checks on length of argument list, which is
-##'               not necessary because R assigns the argument names
-##'               automatically
-##' 2014-11-05: - set seed at start of 'tvcm' and re-establish old seed
-##'               at the end
-##' 2014-10-23: - improved extraction of fitting arguments (see 'fitargs')
-##'             - added 'tvcolmm_control' and 'tvcglm_control' to better
-##'               distinguish between the articles.
-##' 2014-09-20: - add argument 'ninupute' the 'tvcm_control'
-##' 2014-09-19: - do not call 'cvloss' if no varying coefficients
-##' 2014-09-17: - defined definition of penalization
-##'             - deleted parameter 'maxoverstep'
-##'             - added parameters 'mindev', 'cp'
-##' 2014-09-08: - resolved a problem with 'offset'
-##'             - removed the environment from the model, which
-##'               require a lot of memory
-##' 2014-09-06: - incorporate automatic cross-validation and pruning
-##' 2014-09-04: - assign only those arguments of '...' to 'fit'
-##'               that appear in 'formals(fit)'
-##' 2014-08-02: - the 'formula' slot is now a list of formulas as
-##'               produced by 'vcrpart_formula'. The modification
-##'               was due to acceleration techniques ('vcrpart_formula'
-##'               is usually slow!)
-##' 2014-08-29: - implement adjustment of deviance by number
-##'               of predictor of coefficient-group
-##' 2014-07-31: - set 'sctest = FALSE' as the default
-##'             - return an error if multiple trees and 'sctest = TRUE'
-##'             - check if global intercept is removed if
-##'               intercepts are tested with coef. const. tests
-##'             - add new arguments 'dfsplit' and 'maxoverstep'
-##'               to 'tvcm_control'
-##'             - add new stopping criteria based on 'dfsplit'
-##'               and 'maxoverstep'
-##' 2014-06-26: incorporate new function 'tvcm_grow_setsplits'
-##' 2014-06-16: allow coefficient-wise trees
-##'
-##' To do:
-##' -
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:      Reto Buergin
+## E-Mail:      rbuergin@gmx.ch
+## Date:        2015-12-28
+##
+## Description:
+## The 'tvcm' function
+##
+## tvcolmm         convenience function for 'tvcm'
+## tvcolmm_control control function for 'tvcolmm'
+## tvcglm          convenience function for 'tvcm'
+## tvcglm_control  control function for 'tvglm'
+## tvcm            the main fitting function
+## tvcm_control    control function for 'tvcm'
+##
+## Last modifications:
+## 2015-12-28: added the argument 'fast' to 'tvcglm_control'.
+## 2015-11-31: enable the setting 'mtry <- Inf'
+## 2015-10-30: set default 'na.action = na.omit' on 'tvcm'
+## 2015-06-01: - give a warning when no 'vc' terms are specified.
+## 2014-12-08: - enable 'sctest = FALSE' in 'tvcolmm_control'
+##             - remove checks on length of argument list, which is
+##               not necessary because R assigns the argument names
+##               automatically
+## 2014-11-05: - set seed at start of 'tvcm' and re-establish old seed
+##               at the end
+## 2014-10-23: - improved extraction of fitting arguments (see 'fitargs')
+##             - added 'tvcolmm_control' and 'tvcglm_control' to better
+##               distinguish between the articles.
+## 2014-09-20: - add argument 'ninupute' the 'tvcm_control'
+## 2014-09-19: - do not call 'cvloss' if no varying coefficients
+## 2014-09-17: - defined definition of penalization
+##             - deleted parameter 'maxoverstep'
+##             - added parameters 'mindev', 'cp'
+## 2014-09-08: - resolved a problem with 'offset'
+##             - removed the environment from the model, which
+##               require a lot of memory
+## 2014-09-06: - incorporate automatic cross-validation and pruning
+## 2014-09-04: - assign only those arguments of '...' to 'fit'
+##               that appear in 'formals(fit)'
+## 2014-08-02: - the 'formula' slot is now a list of formulas as
+##               produced by 'vcrpart_formula'. The modification
+##               was due to acceleration techniques ('vcrpart_formula'
+##               is usually slow!)
+## 2014-08-29: - implement adjustment of deviance by number
+##               of predictor of coefficient-group
+## 2014-07-31: - set 'sctest = FALSE' as the default
+##             - return an error if multiple trees and 'sctest = TRUE'
+##             - check if global intercept is removed if
+##               intercepts are tested with coef. const. tests
+##             - add new arguments 'dfsplit' and 'maxoverstep'
+##               to 'tvcm_control'
+##             - add new stopping criteria based on 'dfsplit'
+##               and 'maxoverstep'
+## 2014-06-26: incorporate new function 'tvcm_grow_setsplits'
+## 2014-06-16: allow coefficient-wise trees
+##
+## To do:
+## -
+## --------------------------------------------------------- #
 
 tvcolmm <- function(formula, data, family = cumulative(),
                     weights, subset, offset, na.action = na.omit,

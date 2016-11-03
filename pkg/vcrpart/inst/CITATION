@@ -3,32 +3,37 @@ citHeader("To cite vcrpart in publications please use:")
 p1 <- person("Reto", "B\u00FCrgin", email = "rbuergin@gmx.ch")
 p2 <- person("Gilbert", "Ritschard", email = "gilbert.ritschard@unige.ch")
 
-citEntry(entry="unpublished",
-  author = personList(p1, p2),
-  title = "Coefficient-Wise Tree-Based Varying Coefficient Regression with vcrpart",
-  year = "2015",
-  note = "Article in progress",
-  textVersion = "B\u00FCrgin, R. and G. Ritschard (2015b), Coefficient-Wise Tree-Based Varying Coefficient Regression with vcrpart. Article in progress."
+citEntry(
+    entry="article",
+    author = personList(p1, p2),
+    title = "Coefficient-Wise Tree-Based Varying Coefficient Regression with vcrpart",
+    journal = "Journal of Statistical Software", 
+    year = "2016",
+    note = "Forthcoming",
+    textVersion = "B\u00FCrgin, R. and G. Ritschard (2016), Coefficient-Wise Tree-Based Varying Coefficient Regression with vcrpart. Journal of Statistical Software. Forthcoming."
 )
 
-citEntry(entry="article",
-  author = personList(p1, p2),
-  title = "Tree-Based Varying-Coefficient Regression for Longitudinal Ordinal Responses",
-  journal = "Computational Statistics & Data Analysis", 
-  year = "2015",
-  note = "Forthcoming",
-  textVersion = "B\u00FCrgin, R. and G. Ritschard (2015a), Tree-Based Varying Coefficient Regression for Longitudinal Ordinal Responses. Computational Statistics & Data Analysis. Forthcoming."
+citEntry(
+    entry="article",
+    author = personList(p1, p2),
+    title = "Tree-Based Varying-Coefficient Regression for Longitudinal Ordinal Responses",
+    journal = "Computational Statistics & Data Analysis", 
+    year = "2015",
+    volume = "86",
+    pages = "65--80",
+    textVersion = "B\u00FCrgin, R. and G. Ritschard (2015), Tree-Based Varying Coefficient Regression for Longitudinal Ordinal Responses. Computational Statistics & Data Analysis 86, 65-80."
 )
 
-citEntry(entry="article",
-  author = personList(p1, p2),
-  title = "A Decorated Parallel Coordinate Plot for Categorical Longitudinal Data",
-  journal = "The American Statistician",
-  year = "2014",
-  volume = "68",
-  pages = "98--103",
-  number = "2",
-  textVersion="B\u00FCrgin, R. and G. Ritschard (2014), A Decorated Parallel Coordinate Plot for Categorical Longitudinal Data. The American Statistician 68(2), 98-103.",
+citEntry(
+    entry="article",
+    author = personList(p1, p2),
+    title = "A Decorated Parallel Coordinate Plot for Categorical Longitudinal Data",
+    journal = "The American Statistician",
+    year = "2014",
+    volume = "68",
+    pages = "98--103",
+    number = "2",
+    textVersion="B\u00FCrgin, R. and G. Ritschard (2014), A Decorated Parallel Coordinate Plot for Categorical Longitudinal Data. The American Statistician 68(2), 98-103.",
 )
 
 citFooter("See",sQuote("citation()"),"for citing R itself.")

@@ -181,7 +181,7 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
 
 \examples{
 ## ------------------------------------------------------------------- # 
-## Example 1: Moderated effect effect of unemployment
+## Example: Moderated effect effect of unemployment
 ##
 ## Here we fit a varying coefficient ordinal linear mixed on the 
 ## synthetic ordinal longitudinal data 'unemp'. The interest is whether 

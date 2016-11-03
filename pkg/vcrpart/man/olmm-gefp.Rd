@@ -132,7 +132,7 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
 
 \examples{
 ## ------------------------------------------------------------------- #
-## Dummy example 1:
+## Dummy example :
 ##
 ## Testing coefficient constancy on 'z4' of the 'vcrpart_1' data.
 ## ------------------------------------------------------------------- #

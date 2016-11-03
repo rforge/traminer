@@ -1,152 +1,152 @@
-##' -------------------------------------------------------- #
-##' Author:          Reto Buergin
-##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2016-02-08
-##'
-##' Description:
-##' Workhorse functions for the 'tvcm' function.
-##'
-##' Overview:
-##'
-##' Workhorse functions for partitioning:
-##' tvcm_complexity:          computes the complexity of the model
-##' tvcm_grow:                main function for growing the trees
-##' tvcm_grow_fit:            fits the current model
-##' tvcm_grow_update:          refits the model (with utility function
-##'                           'glm.doNotFit')
-##' tvcm_getNumSplits         get cutpoints of numeric variables
-##' tvcm_getOrdSplits         get cutpoints of ordinal variables
-##' tvcm_getNomSplits         get cutpoints of nominal variables
-##' tvcm_grow_setsplits:      get current splits
-##' tvcm_setsplits_sctest:    update splits after tests
-##' tvcm_setsplits_splitnode: 
-##' tvcm_setsplits_rselect:   randomly select partitions, variables and nodes
-##' tvcm_grow_sctest:         run coefficient constancy tests
-##' tvcm_grow_exsearch:       compute the 'dev' statistics
-##' tvcm_grow_splitnode:      split in variable x.
-##' tvcm_formula:             extract separate formulas for
-##'                           model and partitioning from
-##'                           input formula.
-##' tvcm_grow_setcontrol:     update the control argument before
-##'                           fitting the tree.
-##' tvcm_grow_setparm:        update the 'parm' slot
-##'
-##' Utility functions used by various functions:
-##' tvcm_get_node:            extract node vectors and assign the contrasts
-##' tvcm_get_terms:           creates a list which assigns coefficients
-##'                           to the corresponding type, partition etc.
-##' tvcm_get_vcparm:          extracts the names of the predictors on 'vc' terms
-##' tvcm_get_estimates:       extracts the estimates from a fitted
-##'                           'tvcm' object and creates a list with
-##'                           an entry for each different type of
-##'                           estimate ('fe', 'vc' or 're')
-##' tvcm_print_vclabs:        creates short labels for 'vc' terms
-##'
-##' Functions for pruning:
-##' tvcm_prune_node:          main function for pruning 'partynode'
-##'                           objects
-##' tvcm_prune_maxstep:       recursive function for pruning
-##' tvcm_prune_terminal:      prunes branches
-##' tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
-##'
-##' Last modifications:
-##' 2016-01-08: change in 'tvcm_grow_fit' to allow fitting the approximate
-##'             search modell locally. For now only for 'glm' fits!
-##' 2015-11-31: enable the setting 'mtry <- Inf'
-##' 2015-10-15: add function 'tvcm_grow_setparm'
-##' 2015-08-25: replace 'fit' argument in 'tvcm_formula' by 'family'.
-##' 2015-08-21: - small changes in 'tvcm_grow_fit'.
-##'             - replace 'family' argument in 'tvcm_formula' by 'fit'.
-##' 2015-02-25: add check for fixed effects model matrix in 'tvcm_grow_update'.
-##' 2015-02-24: - improved 'tvcm_getNumSplits' (bugs for the upper limits)
-##' 2014-12-10: - added 'drop = FALSE' commands in 'tvcm_exsearch_nomToOrd'
-##'               which produced errors
-##'             - 'tvcm_getNumSplits' yielded sometimes more than 'maxnumsplit'
-##'               values. Now a random selection is applied for these cases
-##' 2014-12-09: implemented accurate search model. Involves changes in
-##'             'tvcm_formula', 'tvcm_grow_exsearch', 'tvcm_exsearch_dev'
-##'             and 'tvcm_control'.
-##' 2014-11-11: modified transformation of nominal into ordinal variables
-##'             to accelerate exhaustive search. There is now a function
-##'             'tvcm_exsearch_nomToOrd'.
-##' 2014-11-05: parallelized 'estfun.olmm' call in 'tvcm_grow_sctest'
-##' 2014-10-14: - modify dev-grid structure obtained from 'tvcm_grow_exsearch'
-##'               each combination of part/node/var has now a list of three
-##'               elements where the first contains the cuts, the second the
-##'               the loss reduction and the third the difference in the number
-##'               of parameters. Modifications concerned:
-##'               - tvcm_grow_setsplits
-##'               - tvcm_setsplits_sctest
-##'               - tvcm_setsplits_rselect
-##'               - print.splitpath
-##'             - tvcm_setsplits_splitnode allocates for the splitted
-##'               node a list structure (before it was a empty list
-##'               on the node level)
-##'             - small modifications in getSplits function
-##'             - deleted 'tvcm_setsplits_validcats'
-##'             - added 'tvcm_getNumSplits', 'tvcm_getOrdSplits' and
-##'               'tvcm_getNomSplits'
-##' 2014-09-22: deleted unnecessary 'subs' object in 'tvcm_grow_exsearch'
-##'             which I didn't remove when removing the 'keepdev'
-##'             option
-##' 2014-09-17: - delete 'keepdev' argument (also for prune.tvcm)
-##'             - add function 'tvcm_complexity'
-##' 2014-09-15: changed 'dev' labels to 'dev' etc.
-##' 2014-09-10: - add 'control' argument for 'tvcm_grow_update'
-##'               to allow the control of variable centering
-##'             - add variable centering in 'tvcm_grow_update'
-##'               (which was not implemented for some curious reasons)
-##' 2014-09-08: substitute 'rep' function by 'rep.int' or 'rep_len'
-##' 2014-09-07: - added 'tvcm_get_vcparm' function
-##'             - set default values in 'glm.doNotFit'
-##' 2014-09-06: modified function names for 'tvcm_fit_model' and
-##'             'tvcm_refit_model' for consistency reasons. The
-##'             new names are 'tvcm_grow_fit' and 'tvcm_grow_update'
-##' 2014-09-06: added new function 'tvcm_grow', which was formerly
-##'             in 'tvcm'
-##' 2014-09-04: added new function 'tvcm_print_vclabs'
-##' 2014-09-02: modifications on 'tvcm_get_node' to accelerate
-##'             the code
-##' 2014-08-10: modifications to speed-up the code
-##'             - update formulas of 'tvcm_formula' are now
-##'               always identical
-##'             - if 'doFit = FALSE', the call of 'glm.fit'
-##'               is avoided
-##' 2014-08-08: correct bug in 'tvcm_get_terms' for cases where
-##'             multiple vc() terms with equal 'by' arguments
-##'             are present
-##' 2014-08-08: correct bug in 'tvcm_grow_setsplits' regarding
-##'             'keepdev'
-##' 2014-08-08: add suppressWarnings in tvcm_grow_fit
-##' 2014-07-22: the list of splits is now of structure
-##'             partitions-nodes-variables
-##' 2014-07-22: AIC and BIC are no longer criteria and therefore
-##'             multiple functions were adjusted
-##' 2014-07-22: modified some function names
-##' 2014-07-06: implement method to deal with many nominal categories
-##' 2014-06-30: implement random selection if split is not unique
-##' 2014-06-23: correct bug for 'start' argument in 'tvcm_grow_exsearch' 
-##' 2014-06-17: modify documentation style
-##' 2014-06-16: deleted several 'tvcm_prune_XXX' functions
-##' 2014-06-03: modify 'tvcm_formula' to allow partition-wise
-##'             trees
-##' 2014-04-27: complete revision and improved documentation
-##' 2014-04-01: rename 'fluctest' to 'sctest'
-##' 2013-12-02: remove 'tvcm_grow_setupnode'
-##' 2013-11-01: modify 'restricted' and 'terms' correctly in
-##'             'tvcm_modify_modargs'
-##'
-##' Bottleneck functions:
-##' - tvcm_grow_sctest
-##' - tvcm_grow_setsplits
-##' - tvcm_grow_exsearch
-##'
-##' To do:
-##' - fitting local models when 'fast = TRUE' for 'olmm'
-##'   objects
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:          Reto Buergin
+## E-Mail:          rbuergin@gmx.ch
+## Date:            2016-02-08
+##
+## Description:
+## Workhorse functions for the 'tvcm' function.
+##
+## Overview:
+##
+## Workhorse functions for partitioning:
+## tvcm_complexity:          computes the complexity of the model
+## tvcm_grow:                main function for growing the trees
+## tvcm_grow_fit:            fits the current model
+## tvcm_grow_update:          refits the model (with utility function
+##                           'glm.doNotFit')
+## tvcm_getNumSplits         get cutpoints of numeric variables
+## tvcm_getOrdSplits         get cutpoints of ordinal variables
+## tvcm_getNomSplits         get cutpoints of nominal variables
+## tvcm_grow_setsplits:      get current splits
+## tvcm_setsplits_sctest:    update splits after tests
+## tvcm_setsplits_splitnode: 
+## tvcm_setsplits_rselect:   randomly select partitions, variables and nodes
+## tvcm_grow_sctest:         run coefficient constancy tests
+## tvcm_grow_exsearch:       compute the 'dev' statistics
+## tvcm_grow_splitnode:      split in variable x.
+## tvcm_formula:             extract separate formulas for
+##                           model and partitioning from
+##                           input formula.
+## tvcm_grow_setcontrol:     update the control argument before
+##                           fitting the tree.
+## tvcm_grow_setparm:        update the 'parm' slot
+##
+## Utility functions used by various functions:
+## tvcm_get_node:            extract node vectors and assign the contrasts
+## tvcm_get_terms:           creates a list which assigns coefficients
+##                           to the corresponding type, partition etc.
+## tvcm_get_vcparm:          extracts the names of the predictors on 'vc' terms
+## tvcm_get_estimates:       extracts the estimates from a fitted
+##                           'tvcm' object and creates a list with
+##                           an entry for each different type of
+##                           estimate ('fe', 'vc' or 're')
+## tvcm_print_vclabs:        creates short labels for 'vc' terms
+##
+## Functions for pruning:
+## tvcm_prune_node:          main function for pruning 'partynode'
+##                           objects
+## tvcm_prune_maxstep:       recursive function for pruning
+## tvcm_prune_terminal:      prunes branches
+## tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
+##
+## Last modifications:
+## 2016-01-08: change in 'tvcm_grow_fit' to allow fitting the approximate
+##             search modell locally. For now only for 'glm' fits!
+## 2015-11-31: enable the setting 'mtry <- Inf'
+## 2015-10-15: add function 'tvcm_grow_setparm'
+## 2015-08-25: replace 'fit' argument in 'tvcm_formula' by 'family'.
+## 2015-08-21: - small changes in 'tvcm_grow_fit'.
+##             - replace 'family' argument in 'tvcm_formula' by 'fit'.
+## 2015-02-25: add check for fixed effects model matrix in 'tvcm_grow_update'.
+## 2015-02-24: - improved 'tvcm_getNumSplits' (bugs for the upper limits)
+## 2014-12-10: - added 'drop = FALSE' commands in 'tvcm_exsearch_nomToOrd'
+##               which produced errors
+##             - 'tvcm_getNumSplits' yielded sometimes more than 'maxnumsplit'
+##               values. Now a random selection is applied for these cases
+## 2014-12-09: implemented accurate search model. Involves changes in
+##             'tvcm_formula', 'tvcm_grow_exsearch', 'tvcm_exsearch_dev'
+##             and 'tvcm_control'.
+## 2014-11-11: modified transformation of nominal into ordinal variables
+##             to accelerate exhaustive search. There is now a function
+##             'tvcm_exsearch_nomToOrd'.
+## 2014-11-05: parallelized 'estfun.olmm' call in 'tvcm_grow_sctest'
+## 2014-10-14: - modify dev-grid structure obtained from 'tvcm_grow_exsearch'
+##               each combination of part/node/var has now a list of three
+##               elements where the first contains the cuts, the second the
+##               the loss reduction and the third the difference in the number
+##               of parameters. Modifications concerned:
+##               - tvcm_grow_setsplits
+##               - tvcm_setsplits_sctest
+##               - tvcm_setsplits_rselect
+##               - print.splitpath
+##             - tvcm_setsplits_splitnode allocates for the splitted
+##               node a list structure (before it was a empty list
+##               on the node level)
+##             - small modifications in getSplits function
+##             - deleted 'tvcm_setsplits_validcats'
+##             - added 'tvcm_getNumSplits', 'tvcm_getOrdSplits' and
+##               'tvcm_getNomSplits'
+## 2014-09-22: deleted unnecessary 'subs' object in 'tvcm_grow_exsearch'
+##             which I didn't remove when removing the 'keepdev'
+##             option
+## 2014-09-17: - delete 'keepdev' argument (also for prune.tvcm)
+##             - add function 'tvcm_complexity'
+## 2014-09-15: changed 'dev' labels to 'dev' etc.
+## 2014-09-10: - add 'control' argument for 'tvcm_grow_update'
+##               to allow the control of variable centering
+##             - add variable centering in 'tvcm_grow_update'
+##               (which was not implemented for some curious reasons)
+## 2014-09-08: substitute 'rep' function by 'rep.int' or 'rep_len'
+## 2014-09-07: - added 'tvcm_get_vcparm' function
+##             - set default values in 'glm.doNotFit'
+## 2014-09-06: modified function names for 'tvcm_fit_model' and
+##             'tvcm_refit_model' for consistency reasons. The
+##             new names are 'tvcm_grow_fit' and 'tvcm_grow_update'
+## 2014-09-06: added new function 'tvcm_grow', which was formerly
+##             in 'tvcm'
+## 2014-09-04: added new function 'tvcm_print_vclabs'
+## 2014-09-02: modifications on 'tvcm_get_node' to accelerate
+##             the code
+## 2014-08-10: modifications to speed-up the code
+##             - update formulas of 'tvcm_formula' are now
+##               always identical
+##             - if 'doFit = FALSE', the call of 'glm.fit'
+##               is avoided
+## 2014-08-08: correct bug in 'tvcm_get_terms' for cases where
+##             multiple vc() terms with equal 'by' arguments
+##             are present
+## 2014-08-08: correct bug in 'tvcm_grow_setsplits' regarding
+##             'keepdev'
+## 2014-08-08: add suppressWarnings in tvcm_grow_fit
+## 2014-07-22: the list of splits is now of structure
+##             partitions-nodes-variables
+## 2014-07-22: AIC and BIC are no longer criteria and therefore
+##             multiple functions were adjusted
+## 2014-07-22: modified some function names
+## 2014-07-06: implement method to deal with many nominal categories
+## 2014-06-30: implement random selection if split is not unique
+## 2014-06-23: correct bug for 'start' argument in 'tvcm_grow_exsearch' 
+## 2014-06-17: modify documentation style
+## 2014-06-16: deleted several 'tvcm_prune_XXX' functions
+## 2014-06-03: modify 'tvcm_formula' to allow partition-wise
+##             trees
+## 2014-04-27: complete revision and improved documentation
+## 2014-04-01: rename 'fluctest' to 'sctest'
+## 2013-12-02: remove 'tvcm_grow_setupnode'
+## 2013-11-01: modify 'restricted' and 'terms' correctly in
+##             'tvcm_modify_modargs'
+##
+## Bottleneck functions:
+## - tvcm_grow_sctest
+## - tvcm_grow_setsplits
+## - tvcm_grow_exsearch
+##
+## To do:
+## - fitting local models when 'fast = TRUE' for 'olmm'
+##   objects
+## --------------------------------------------------------- #
 
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Compute the complexity of the model.
 ##'
 ##' @param npar    the number of coefficients
@@ -155,13 +155,11 @@
 ##' @param dfsplit the degree of freedom per split
 ##' 
 ##' @return a scalar giving the complexity of the model
-##' -------------------------------------------------------- #
-
 tvcm_complexity <- function(npar, dfpar, nsplit, dfsplit)
     return(dfsplit * nsplit + dfpar * npar)
 
 
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Growing a 'tvcm' tree.
 ##'
 ##' @param object  a 'tvcm' object
@@ -173,8 +171,6 @@ tvcm_complexity <- function(npar, dfpar, nsplit, dfsplit)
 ##' @return A 'tvcm' object.
 ##'
 ##' @details Used in 'cvloss.tvcm' 
-##' -------------------------------------------------------- #
-
 tvcm_grow <- function(object, subset = NULL, weights = NULL) {
 
   mcall <- object$info$mcall
@@ -517,7 +513,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
 }
 
 
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Avoid calling glm.fit if 'fit == FALSE'
 ##'
 ##' @param call    an object of class call
@@ -529,8 +525,6 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
 ##' @details Used in 'tvcm' and 'tvcm_grow_sctest'. 'glm.doNotFit'
 ##' is just an utility function to skip \code{\link{glm.fit}}
 ##' if \code{doFit = FALSE}
-##' -------------------------------------------------------- #
-
 glm.doNotFit <- function(x, y, weights = NULL, start = NULL, etastart = NULL,
                          mustart = NULL, offset = NULL, family = gaussian(),
                          control = list(), intercept = TRUE) {
@@ -593,7 +587,7 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
 }
 
 
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Updates the model matrix and re-fits the current node
 ##' model. Used for the grid-search in 'tvcm_grow_exsearch'.
 ##'
@@ -607,8 +601,6 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
 ##'
 ##' To do:
 ##' Improve performance for non 'olmm' objects
-##' -------------------------------------------------------- #
-
 tvcm_grow_update <- function(object, control, subs = NULL) {
   
   if (inherits(object, "olmm")) {
@@ -667,6 +659,7 @@ tvcm_grow_update <- function(object, control, subs = NULL) {
     optim[[4L]] <- object$restricted
     environment(optim[[2L]]) <- environment()
     if (!object$dims["numGrad"]) environment(optim[[3L]]) <- environment()
+    optim$env <- environment()
     FUN <- optim$fit
     subs <- which(names(optim) == "fit")
     optim <- optim[-subs]
@@ -738,7 +731,7 @@ tvcm_grow_update <- function(object, control, subs = NULL) {
 tvcm_grow_gefp <- gefp.olmm # see 'olmm-methods.R'
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Computes cutpoints of 'numeric' partitioning variables
 ##'
 ##' @param z a numeric vector
@@ -751,7 +744,6 @@ tvcm_grow_gefp <- gefp.olmm # see 'olmm-methods.R'
 ##'    cutpoint
 ##'
 ##' @details Used in 'tvcm_grow_setsplits'.
-##'-------------------------------------------------------- #
 
 tvcm_getNumSplits <- function(z, w, minsize, maxnumsplit) {
   
@@ -817,7 +809,7 @@ tvcm_getNumSplits <- function(z, w, minsize, maxnumsplit) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Computes cutpoints of 'ordinal' partitioning variables
 ##'
 ##' @param z a vector of class 'ordered'
@@ -830,7 +822,6 @@ tvcm_getNumSplits <- function(z, w, minsize, maxnumsplit) {
 ##'    one row for each cutpoint
 ##'
 ##' @details Used in 'tvcm_grow_setsplits'.
-##'-------------------------------------------------------- #
 
 tvcm_getOrdSplits <- function(z, w, minsize, maxordsplit) {
 
@@ -853,7 +844,7 @@ tvcm_getOrdSplits <- function(z, w, minsize, maxordsplit) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Computes cutpoints of 'nominal' partitioning variables
 ##'
 ##' @param z a vector of class 'factor'
@@ -866,7 +857,6 @@ tvcm_getOrdSplits <- function(z, w, minsize, maxordsplit) {
 ##'    one row for each cutpoint
 ##'
 ##' @details Used in 'tvcm_grow_setsplits'.
-##'-------------------------------------------------------- #
 
 tvcm_getNomSplits <- function(z, w, minsize, maxnomsplit) {
 
@@ -907,7 +897,7 @@ tvcm_getNomSplits <- function(z, w, minsize, maxnomsplit) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Computes candidate splits for the current step
 ##'
 ##' @param splits   a list. The former list of splits
@@ -934,8 +924,6 @@ tvcm_getNomSplits <- function(z, w, minsize, maxnomsplit) {
 ##'    zero.
 ##'
 ##' @details Used in 'tvcm'.
-##'-------------------------------------------------------- #
-
 tvcm_grow_setsplits <- function(splits, partid, nodeid, varid,
                                 model, nodes, where,
                                 partData, control) {
@@ -1015,7 +1003,7 @@ tvcm_grow_setsplits <- function(splits, partid, nodeid, varid,
 }
 
 
-##'------------------------------------------------------ #
+## --------------------------------------------------------- #
 ##' Updates the list of splits after coefficient
 ##' constancy tests.
 ##'
@@ -1033,7 +1021,6 @@ tvcm_grow_setsplits <- function(splits, partid, nodeid, varid,
 ##' @return An modified list of splits.
 ##'
 ##' @details Used in 'tvcm'.
-##'------------------------------------------------------ #
 
 tvcm_setsplits_sctest <- function(splits, partid, spart,
                                   nodeid, snode, varid, svar) {
@@ -1053,7 +1040,7 @@ tvcm_setsplits_sctest <- function(splits, partid, spart,
 }
 
 
-##'------------------------------------------------------ #
+## --------------------------------------------------------- #
 ##' Updates the list of splits after grid search
 ##'
 ##' @param splits  a 'list' as produced by 'tvcm_grow_splits'
@@ -1069,8 +1056,6 @@ tvcm_setsplits_sctest <- function(splits, partid, spart,
 ##' @return An modified list of splits.
 ##'
 ##' @details Used in 'tvcm'.
-##'------------------------------------------------------ #
-
 tvcm_setsplits_splitnode <- function(splits, spart, snode, nodeid) {
   
   ## expand the splits list
@@ -1090,7 +1075,7 @@ tvcm_setsplits_splitnode <- function(splits, spart, snode, nodeid) {
 }
 
 
-##'------------------------------------------------------ #
+## --------------------------------------------------------- #
 ##' Randomly select partitions, variables and nodes
 ##'
 ##' @param splits  a 'list' as produced by 'tvcm_grow_splits'
@@ -1106,8 +1091,6 @@ tvcm_setsplits_splitnode <- function(splits, spart, snode, nodeid) {
 ##' @return An modified list of splits.
 ##'
 ##' @details Used in 'tvcm'.
-##'------------------------------------------------------ #
-
 tvcm_setsplits_rselect <- function(splits, control) {
 
   ## extract valid partition/node/variable combinations
@@ -1134,7 +1117,7 @@ tvcm_setsplits_rselect <- function(splits, control) {
 }
 
 
-##'------------------------------------------------------ #
+## --------------------------------------------------------- #
 ##' Processing of nodewise coefficient constancy tests.
 ##'
 ##' @param model    the current model.
@@ -1151,8 +1134,6 @@ tvcm_setsplits_rselect <- function(splits, control) {
 ##' @return A list with partitions 'statistic' and 'p.value'.
 ##'
 ##' @details Used in 'tvcm'.
-##'------------------------------------------------------ #
-
 tvcm_grow_sctest <- function(model, nodes, where, partid, nodeid, varid, 
                              splits, partData, control) {
     
@@ -1286,7 +1267,7 @@ tvcm_sctest_bonf <- function(test, type) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Computes the loss for each possible split.
 ##'
 ##' @param varid    an integer vector indicating the partitioning
@@ -1305,8 +1286,6 @@ tvcm_sctest_bonf <- function(test, type) {
 ##'
 ##' @details Used in 'tvcm'. 'tvcm_grow_ordnom' and
 ##'    'tvcm_grow_dev' are help functions for 'tvcm_grow_exsearch'
-##'-------------------------------------------------------- #
-
 tvcm_exsearch_nomToOrd <- function(cp, pid, nid, vid, 
                                    mcall, weights,
                                    where, partData,
@@ -1638,7 +1617,7 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Incorporates a new binary split into an existing
 ##' tree structure.
 ##'
@@ -1650,8 +1629,6 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
 ##' @return A list of formulas ('root', 'tree' and 'original').
 ##'
 ##' Used in 'tvcm'.
-##'-------------------------------------------------------- #
-
 tvcm_grow_splitnode <- function(nodes, where, dev, partData, step, weights) {
 
   pid <- dev$partid
@@ -1731,7 +1708,7 @@ tvcm_grow_splitnode <- function(nodes, where, dev, partData, step, weights) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Extracts the formula for the root node and the tree
 ##' from the output of \code{\link{vcrpart_formula}}.
 ##'
@@ -1748,8 +1725,6 @@ tvcm_grow_splitnode <- function(nodes, where, dev, partData, step, weights) {
 ##'
 ##' @details Used in \code{\link{predict.fvcm}} and
 ##'    \code{\link{tvcm}}.
-##'-------------------------------------------------------- #
-
 tvcm_formula <- function(formList, root, family,
                          env = parent.frame(),
                          full = TRUE, update = FALSE,
@@ -1931,7 +1906,7 @@ tvcm_formula <- function(formList, root, family,
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Update the 'control_tvcm' object for internal purposes.
 ##'
 ##' @param control  an object of class 'tvcm_control'.
@@ -1943,8 +1918,6 @@ tvcm_formula <- function(formList, root, family,
 ##' @return An updated 'tvcm_control' object.
 ##'
 ##' @details Used in 'tvcm' and 'tvcm_grow'.
-##'-------------------------------------------------------- #
-
 tvcm_grow_setcontrol <- function(control, model, formList, root, parm.only = TRUE) {
 
   family <- model$family
@@ -1983,7 +1956,7 @@ tvcm_grow_setcontrol <- function(control, model, formList, root, parm.only = TRU
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Update the 'parm' slot
 ##'
 ##' @param model a root node regression model, e.g., an 'olmm'
@@ -1999,8 +1972,6 @@ tvcm_grow_setcontrol <- function(control, model, formList, root, parm.only = TRU
 ##'
 ##' @details Used in 'tvcm_grow_setcontrol' and
 ##'    'tvcm_get_estimates'.
-##'-------------------------------------------------------- #
-
 tvcm_grow_setparm <- function(model, formList, root, direct) {
     
     rval <- lapply(formList$vc, function(x) {
@@ -2058,7 +2029,7 @@ tvcm_grow_setparm <- function(model, formList, root, direct) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Extract the node vector from 'newdata' and assign
 ##' the contrasts.
 ##'
@@ -2074,8 +2045,6 @@ tvcm_grow_setparm <- function(model, formList, root, direct) {
 ##'
 ##' @details Used in tvcm.predict and tvcm.prune.
 ##'    \code{tvcm_get_fitted} is merely a help function
-##'-------------------------------------------------------- #
-
 tvcm_get_fitted <- function(pid, object, newdata, weights, setContrasts) {
   fitted <- fitted_node(object$info$node[[pid]],
                         newdata[,colnames(object$data), drop = FALSE])
@@ -2103,7 +2072,7 @@ tvcm_get_node <- function(object, newdata, setContrasts = FALSE, weights,
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Creates a list which can be used to extract the varying
 ##' coefficients.
 ##'
@@ -2121,8 +2090,6 @@ tvcm_get_node <- function(object, newdata, setContrasts = FALSE, weights,
 ##'    node:      the node to which a coefficient belongs to.
 ##'    partition: the partition to which a coefficients
 ##'               belongs to.
-##'-------------------------------------------------------- #
-
 tvcm_get_terms <- function(names, ids, parm, fixed = NULL) {
 
     ## modify 'parm':    
@@ -2202,14 +2169,12 @@ tvcm_get_terms <- function(names, ids, parm, fixed = NULL) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Extracts the names of the predictors on 'vc' terms
 ##' 
 ##' @param object a 'tvcm' object.
 ##'
 ##' @return A character vector.
-##'-------------------------------------------------------- #
-
 tvcm_get_vcparm <- function(object) {
   vcTerms <- terms(object$info$formula$original, specials = "vc")
   vcTerms <- rownames(attr(vcTerms, "factors"))[attr(vcTerms, "specials")$vc]
@@ -2248,7 +2213,7 @@ tvcm_get_vcparm <- function(object) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Extracts the estimates a fitted 'tvcm' object and
 ##' creates a list used in various methods.
 ##' variances of a fitted 'tvcm' object.
@@ -2262,8 +2227,6 @@ tvcm_get_vcparm <- function(object) {
 ##' coefficient partition.
 ##'
 ##' @details Used in 'coef', 'extract'.
-##'-------------------------------------------------------- #
-
 tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
 
     ## extract slots for the readability of the code
@@ -2388,7 +2351,7 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Create short labes for 'vc' terms
 ##'
 ##' @param object a \code{\link{tvcm}} object
@@ -2398,8 +2361,6 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
 ##'    term.
 ##'
 ##' @details Used in 'tvcm_print' and 'plot.tvcm'.
-##'-------------------------------------------------------- #
-
 tvcm_print_vclabs <- function(formList, intercept = FALSE) {
   
   if (length(formList$vc) == 0) return(NULL)
@@ -2441,7 +2402,7 @@ tvcm_print_vclabs <- function(formList, intercept = FALSE) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' The main function to prune an object of class 'partynode'
 ##' according to some criteria.
 ##'
@@ -2454,8 +2415,6 @@ tvcm_print_vclabs <- function(formList, intercept = FALSE) {
 ##' @return A list of class 'partynode'.
 ##'
 ##' @details Used in 'tvcm.prune'.
-##'-------------------------------------------------------- #
-
 tvcm_prune_node <- function(object, alpha = NULL, maxstep = NULL, terminal = NULL) {
 
   stopifnot(class(object)[1] %in% c("tvcm", "party", "partynode"))
@@ -2506,7 +2465,7 @@ tvcm_prune_node <- function(object, alpha = NULL, maxstep = NULL, terminal = NUL
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Recursive function to delete nodes according to
 ##' the step in the algorithm the nodes were created.
 ##'
@@ -2516,8 +2475,6 @@ tvcm_prune_node <- function(object, alpha = NULL, maxstep = NULL, terminal = NUL
 ##' @return A list of class 'partynode'.
 ##'
 ##' @details Used in 'tvcm_prune_node'.
-##'-------------------------------------------------------- #
-
 tvcm_prune_maxstep <- function(node, maxstep) {
   
   if (!is.terminal(node)) {
@@ -2535,7 +2492,7 @@ tvcm_prune_maxstep <- function(node, maxstep) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Recursive function to delete nodes according node labels
 ##'
 ##' @param node     an object of class 'partynode'.
@@ -2545,8 +2502,6 @@ tvcm_prune_maxstep <- function(node, maxstep) {
 ##' @return A list of class 'partynode'.
 ##'
 ##' @details Used in 'tvcm_prune_node'.
-##'-------------------------------------------------------- #
-
 tvcm_prune_terminal <- function(node, terminal) {
   
   if (!is.terminal(node)) {
@@ -2563,7 +2518,7 @@ tvcm_prune_terminal <- function(node, terminal) {
 }
 
 
-##'-------------------------------------------------------- #
+## --------------------------------------------------------- #
 ##' Creates a 'splitpath.tvcm' object for tracing the
 ##' fitting process.
 ##'
@@ -2575,8 +2530,6 @@ tvcm_prune_terminal <- function(node, terminal) {
 ##' @return A list of class 'splitpath.tvcm'.
 ##'
 ##' @details Used in 'tvcm' and 'prune.tvcm'.
-##'-------------------------------------------------------- #
-
 tvcm_grow_splitpath <- function(splitpath, varid, nodes, partData, control) {
     
   if (all(lapply(nodes, width) < 2L)) return(splitpath)  

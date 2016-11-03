@@ -156,7 +156,7 @@ tvcglm_control(minsize = 30, mindev = 2.0,
 
 \examples{
 ## ------------------------------------------------------------------- #  
-## Example 1: Moderated effect of education on poverty
+## Example: Moderated effect of education on poverty
 ##
 ## The algorithm is used to find out whether the effect of high
 ## education 'EduHigh' on poverty 'Poor' is moderated by the civil

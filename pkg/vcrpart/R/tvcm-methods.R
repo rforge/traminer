@@ -1,57 +1,57 @@
-##' -------------------------------------------------------- #
-##' Author:          Reto Buergin
-##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2016-02-16
-##'
-##' Description:
-##' S3 methods for tvcm objects
-##'
-##' References:
-##' party:           http://CRAN.R-project.org/package=party
-##' partykit:        http://CRAN.R-project.org/package=partykit
-##'
-##' Methods:
-##' coef, coefficients:
-##' depth:               depth of trees
-##' extract:
-##' fitted:
-##' formula:
-##' getCall:             extract original call
-##' logLik:              extract log Likelihood
-##' model.frame:         extract the total model frame including model
-##'                      and partitioning variables
-##' nobs:                extract the number of observations
-##' predict:             predict responses (see prediction of 'olmm' class)
-##' print:               print tvcm objects
-##' prune:               prune the tree
-##' ranef:               extract the predicted random effects
-##' resid, residuals:    extract residuals
-##' splitpath:           show information of the splitting procedure
-##' weights:             extract the weights
-##' width:               width of trees
-##' 
-##' Modifications:
-##' 2016-02-16: changed titles for varying coefficients in 'tvcm_print'.
-##' 2016-01-10: changed 'neglokLik2.tvcm' to allow for subsets
-##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
-##' 2014-10-18: added 'depth' and 'width' methods
-##' 2014-10-14: adapt print.splitpath to new dev-grid structure
-##' 2014-10-03: add option 'cv' to 'extract.tvcm'
-##' 2014-09-17: prune.tvcm:
-##'             - 'keepdev' argument in 'prune.tvcm' dropped (to complicated
-##'               to explain)
-##'             - add 'control' argument 
-##' 2014-09-15: 'tab', 'ntab' and 'otab' are not matrices
-##' 2014-09-02: added 'prunepath.tvcm' and 'print.prunepath.tvcm' functions
-##' 2014-09-02: various modifications in 'prune.tvcm' for accelerations:
-##'             - 'do.call' was replaced by 'eval'
-##'             - new option 'keepdev' (reuses information of the previous
-##'               pruning step)
-##'             - new option 'papply' (even though the accrelation is not
-##'               as efficient as expected)
-##' 2014-08-13: modified option 'type = "coef"' of predict.tvcm
-##'             to deal with multiple components
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:          Reto Buergin
+## E-Mail:          rbuergin@gmx.ch
+## Date:            2016-02-16
+##
+## Description:
+## S3 methods for tvcm objects
+##
+## References:
+## party:           http://CRAN.R-project.org/package=party
+## partykit:        http://CRAN.R-project.org/package=partykit
+##
+## Methods:
+## coef, coefficients:
+## depth:               depth of trees
+## extract:
+## fitted:
+## formula:
+## getCall:             extract original call
+## logLik:              extract log Likelihood
+## model.frame:         extract the total model frame including model
+##                      and partitioning variables
+## nobs:                extract the number of observations
+## predict:             predict responses (see prediction of 'olmm' class)
+## print:               print tvcm objects
+## prune:               prune the tree
+## ranef:               extract the predicted random effects
+## resid, residuals:    extract residuals
+## splitpath:           show information of the splitting procedure
+## weights:             extract the weights
+## width:               width of trees
+## 
+## Modifications:
+## 2016-02-16: changed titles for varying coefficients in 'tvcm_print'.
+## 2016-01-10: changed 'neglokLik2.tvcm' to allow for subsets
+## 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
+## 2014-10-18: added 'depth' and 'width' methods
+## 2014-10-14: adapt print.splitpath to new dev-grid structure
+## 2014-10-03: add option 'cv' to 'extract.tvcm'
+## 2014-09-17: prune.tvcm:
+##             - 'keepdev' argument in 'prune.tvcm' dropped (to complicated
+##               to explain)
+##             - add 'control' argument 
+## 2014-09-15: 'tab', 'ntab' and 'otab' are not matrices
+## 2014-09-02: added 'prunepath.tvcm' and 'print.prunepath.tvcm' functions
+## 2014-09-02: various modifications in 'prune.tvcm' for accelerations:
+##             - 'do.call' was replaced by 'eval'
+##             - new option 'keepdev' (reuses information of the previous
+##               pruning step)
+##             - new option 'papply' (even though the accrelation is not
+##               as efficient as expected)
+## 2014-08-13: modified option 'type = "coef"' of predict.tvcm
+##             to deal with multiple components
+## --------------------------------------------------------- #
 
 coef.tvcm <- function(object, ...) tvcm_get_estimates(object, ...)
 

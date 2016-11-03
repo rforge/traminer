@@ -1,3 +1,16 @@
+Changes in Version 0.4-2
+
+    o    Update of citation info
+
+    o    modified 'olmm_control' for the 'optim' optimizier. Now
+         'BFGS' is set as the default and a warning is shown
+         if a non-gradient based method is chosen while 'numGrad = FALSE'.
+
+    o    Enable option 'sparse' for function 'contr.wsum'.
+
+    o    Improved C-code for olmm. Does not have impacts for users. Please
+         report if any changes appear.
+
 Changes in Version 0.4-1
 
     o    Changed titles in 'panel_coef', 'tvcm.print' and 'tvcm.summary'

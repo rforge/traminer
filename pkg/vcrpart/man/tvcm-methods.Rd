@@ -118,7 +118,7 @@
 
 \examples{
 ## ------------------------------------------------------------------- #
-## Dummy example 1:
+## Dummy example:
 ##
 ## Apply various methods on a 'tvcm' object fitted on the 'vcrpart_2'
 ## data. Cross-validation is omitted to accelerate the computations.

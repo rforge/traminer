@@ -1,52 +1,52 @@
-##' -------------------------------------------------------- #
-##' Author:          Reto Buergin
-##' E-Mail:          rbuergin@gmx.ch
-##' Date:            2015-10-31
-##'
-##' Description:
-##' Random forests and bagging for the 'tvcm' algorithm.
-##'
-##' Contents:
-##' fvcolmm:      convenience function for 'fvcm'
-##' fvcglm:       convenience function for 'fvcm'
-##' fvcm:         main fitting function
-##' fvcm_control: control function for 'fvcm'
-##' fitted.fvcm:  extracts fitted values
-##' oobloss.fvcm: extracts out-of-bag loss
-##' plot.fvcm:    plot method for 'fvcm' objects
-##' predict.fvcm: prediction for 'fvcm' objects
-##' print.fvcm:   print method for 'fvcm' objects
-##' ranef.fvcm:   extracts random effects
-##'
-##' To do:
-##' - implement variable importance measures
-##'
-##' Last modifications:
-##' 2015-11-31: - enable the setting 'mtry <- Inf'
-##'             - indicate the 'mtry' parameter in cases of random forests
-##' 2015-10-30: corrected bug in 'predict.fvcm'. When building a dummy
-##'             model the family was not specified.
-##' 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
-##' 2015-06-01: - 'fvcm' gave an error when a linear model is specified
-##'               new version returns the linear model with a warning from
-##'               'tvcm'
-##' 2015-03-08: - change default parameters of control functions.
-##' 2015-02-24: - replace 'ptry', 'ntry' and 'vtry' by 'mtry'.
-##' 2015-02-23: - resolved errors for 'fvcolmm' and 'fvcglm' calls
-##'             - disable 'nimpute' in the defaults
-##' 2014-10-14: found bug in predict.fvcm: now the 'coefi'
-##'             matrices are ordered by the column names of
-##'             'coef'.
-##' 2014-09-07: - improvment of predict.tvcm function
-##'               - treated bugs for 'type = "coef"'
-##'               - deal with ordinal responses in cases not
-##'                 all responses are available in a subset
-##'             - 'fvcm': replaced 'do.call' with 'eval' when
-##'               calling 'cvloss'
-##'             - added 'contrast slot'
-##'             - changed defaults in 'fvcm'
-##' 2014-08-05: - changed specification for folds
-##' -------------------------------------------------------- #
+## --------------------------------------------------------- #
+## Author:          Reto Buergin
+## E-Mail:          rbuergin@gmx.ch
+## Date:            2015-10-31
+##
+## Description:
+## Random forests and bagging for the 'tvcm' algorithm.
+##
+## Contents:
+## fvcolmm:      convenience function for 'fvcm'
+## fvcglm:       convenience function for 'fvcm'
+## fvcm:         main fitting function
+## fvcm_control: control function for 'fvcm'
+## fitted.fvcm:  extracts fitted values
+## oobloss.fvcm: extracts out-of-bag loss
+## plot.fvcm:    plot method for 'fvcm' objects
+## predict.fvcm: prediction for 'fvcm' objects
+## print.fvcm:   print method for 'fvcm' objects
+## ranef.fvcm:   extracts random effects
+##
+## To do:
+## - implement variable importance measures
+##
+## Last modifications:
+## 2015-11-31: - enable the setting 'mtry <- Inf'
+##             - indicate the 'mtry' parameter in cases of random forests
+## 2015-10-30: corrected bug in 'predict.fvcm'. When building a dummy
+##             model the family was not specified.
+## 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
+## 2015-06-01: - 'fvcm' gave an error when a linear model is specified
+##               new version returns the linear model with a warning from
+##               'tvcm'
+## 2015-03-08: - change default parameters of control functions.
+## 2015-02-24: - replace 'ptry', 'ntry' and 'vtry' by 'mtry'.
+## 2015-02-23: - resolved errors for 'fvcolmm' and 'fvcglm' calls
+##             - disable 'nimpute' in the defaults
+## 2014-10-14: found bug in predict.fvcm: now the 'coefi'
+##             matrices are ordered by the column names of
+##             'coef'.
+## 2014-09-07: - improvment of predict.tvcm function
+##               - treated bugs for 'type = "coef"'
+##               - deal with ordinal responses in cases not
+##                 all responses are available in a subset
+##             - 'fvcm': replaced 'do.call' with 'eval' when
+##               calling 'cvloss'
+##             - added 'contrast slot'
+##             - changed defaults in 'fvcm'
+## 2014-08-05: - changed specification for folds
+## --------------------------------------------------------- #
 
 fvcolmm <- function(..., family = cumulative(), control = fvcolmm_control()) {
   mc <- match.call()
@@ -597,7 +597,8 @@ print.fvcm <- function(x, ...) {
       cat(paste0("Control: ", 
                  "minsize = ", paste(x$info$control$minsize, collapse = ", "),
                  ", ntrees = ", length(x$info$forest),
-                 if (x$info$control$mtry < Inf) paste0(", mtry = ", x$info$control$mtry), 
+                 if (x$info$control$mtry < Inf)
+                     paste0(", mtry = ", x$info$control$mtry), 
                  "\n"))
   if (nzchar(mess <- naprint(attr(x$data, "na.action")))) 
     cat("\n(", mess, ")\n", sep = "")
