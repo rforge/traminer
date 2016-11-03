@@ -15,11 +15,11 @@ Visualization and identification of the states that best characterize a group of
 seqimplic(seqdata, group, with.missing = FALSE, weighted = TRUE, na.rm = TRUE)
 \method{plot}{seqimplic}(x, title = NULL, ylim = NULL, xaxis = TRUE,
     ylab = "Implication", yaxis = TRUE, axes = "all", xtlab = NULL,
-	cex.plot = 1, withlegend = "auto", ltext = NULL, cex.legend = 1,
-	legend.prop = NA, rows = NA, cols = NA, siglevel = 0.95, lwd = 1,
+	cex.axis = 1, with.legend = "auto", ltext = NULL, cex.legend = 1,
+	legend.prop = NA, rows = NA, cols = NA, conf.level = 0.95, lwd = 1,
 	only.levels = NULL, ...)
 \method{print}{seqimplic}(x, xtstep = x$xtstep, round = NULL,
-    siglevel = NULL, na.print = "", ...)
+    conf.level = NULL, na.print = "", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
