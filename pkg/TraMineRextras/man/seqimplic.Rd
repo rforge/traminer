@@ -76,10 +76,10 @@ The \code{seqimplic} function builds an object with the position wise typical st
 It presents at each time point the typical states of a subpopulation (for instance women, as opposed to men).
 A state at a given time point is considered to be typical of a group if the rule "Being in this group implies to be in that state at this time point" is relevant according to the implicative statistic.
 
-The implicative statistic assesses the statistical relevance of a rule of the form "A implies B".
+The implicative statistic assesses the statistical relevance of a rule of the form "A implies B" (Gras et al., 2008).
 It does so by measuring the gap between the expected and observed numbers of counter examples.
 The rule is considered to be strongly implicative if we observe much less counter examples than expected under the independence assumption.
-This gap and its significance are computed using adjusted residuals of a contingency table with continuity correction.
+This gap and its significance are computed using adjusted residuals of a contingency table with continuity correction as proposed by Ritschard (2005).
 In order to improve the readability of the graphs, we use here the opposite of the implicative statistic, which is highly negative for significant rules.
 The statistic  \eqn{I(A\rightarrow B)}{I(A->B)} measuring the relevance of the rule  "A implies B" reads as follows:
 
@@ -100,6 +100,8 @@ The strength of rules with negative implicative statistic are not displayed beca
 Studer, Matthias (2015), Comment: On the Use of Globally Interdependent Multiple Sequence Analysis, Sociological Methodology 45, DOI: 10.1177/0081175015588095.
 
 Gras, Régis and Kuntz, Pascale. (2008), An overview of the Statistical Implicative Analysis (SIA) development, in Gras, R., Suzuki, E., Guillet, F. and Spagnolo, F. (eds), Statistical Implicative Analysis: Theory and application, Series Studies in Computational Intelligence, Vol 127, Berlin: Springer-Verlag, pp 11-40.
+
+Ritschard, G. (2005). De l'usage de la statistique implicative dans les arbres de classification. In Gras, R., Spagnolo, F., and David, J., editors, Actes des Troisièmes Rencontres Internationale ASI Analyse Statistique Implicative, volume Secondo supplemento al N.15 of Quaderni di Ricerca in Didattica, pages 305–314. Università a degli Studi di Palermo, Palermo.
 }
 \author{
 Matthias Studer.
