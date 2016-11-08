@@ -209,11 +209,11 @@ olmm(formula, data, family = cumulative(),
 
   Novomestky, F. (2012). matrixcalc: Collection of Functions for 
   Matrix Calculations. R package version 1.0-3. URL 
-  \url{http://CRAN.R-project.org/package=matrixcalc}
+  \url{https://CRAN.R-project.org/package=matrixcalc}
 
   Smyth, G., Y. Hu, P. Dunn, B. Phipson and Y. Chen (2014). statmod:
   Statistical Modeling. R package version 1.4.20. URL
-  \url{http://CRAN.R-project.org/package=statmod} 
+  \url{https://CRAN.R-project.org/package=statmod} 
 }
 
 \seealso{\command{\link{olmm-methods}}, \command{\link{olmm_control}},

@@ -122,7 +122,7 @@ otsplot_filter(method = c("minfreq", "cumfreq", "linear"), level = NULL)
 
   Ihaka, R., P. Murrell, K. Hornik, J. C. Fisher and A. Zeileis (2013).
   colorspace: Color Space Manipulation. R package version 1.2-4. URL
-  \url{http://CRAN.R-project.org/package=colorspace}.
+  \url{https://CRAN.R-project.org/package=colorspace}.
 }
 
 \examples{
