@@ -35,6 +35,10 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	if (with.missing) {
 		if(missing.trate && method == "TRATE") {
 			message(" [>] Substitution costs for missing values derived from transition rates")
+		} else if (method %in% c("INDELS","INDELSLOG")) {
+			message(" [>] Substitution costs for missing values derived from computed indels")
+		} else if (method == "FEATURES") {
+			message(" [>] Substitution costs for missing values derived from features")
 		} else {
 			message(" [>] Substitution costs for missing values set as ",miss.cost)
 		}
@@ -69,7 +73,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	}
 	if (method=="FUTURE") {
 		
-		chisqdist <- function(mat){
+		chisqdista <- function(mat){
 			cs <- colSums(mat)
 			if(any(cs==0)){
 				cs[cs==0] <- Inf
@@ -88,17 +92,17 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
             return(sqrt(dist))
 		}
 		if(time.varying){
-			stop(" [!] time.varying substitution cost are not (yet) implemented for FUTURE method.")
+			stop(" [!] time.varying substitution cost is not (yet) implemented for method FUTURE.")
 		}
 		message(" [>] creating substitution-cost matrix using common future...")
 		tr <- seqtrate(seqdata, time.varying=FALSE, weighted=weighted, lag=lag, with.missing = missing.trate)
-		costs <- chisqdist(tr)
+		costs <- chisqdista(tr)
 		diag(costs) <- 0
         ret$indel <- .5*max(costs)
 	}
 	if (method=="FEATURES") {
 		if(time.varying){
-			stop(" [!] time.varying substitution cost are not (yet) implemented for FEATURES method.")
+			stop(" [!] time.varying substitution cost is not (yet) implemented for method FEATURES.")
 		}
 		if(is.null(state.prop) || nrow(state.prop)!=length(alphabet)){
 			stop(" [!] state.prop should be a data.frame containing one row per state (possibly one for missing values).")
@@ -115,7 +119,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	}
 	if(method=="INDELS"||method=="INDELSLOG"){
 		if(time.varying){
-			stop(" [!] time.varying substitution cost are not (yet) implemented for INDELS and INDELSLOG methods.")
+			stop(" [!] time.varying substitution cost is not (yet) implemented for INDELS and INDELSLOG.")
 		}
 		ww <- attr(seqdata, "weights")
 		if(is.null(ww) ||!weighted){
@@ -220,7 +224,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	}
 
 	##
-	if (with.missing &&(method=="CONSTANT"||(method=="TRATE" && missing.trate==FALSE))) {
+	if (with.missing &&(method=="CONSTANT"||(method=="TRATE" && !missing.trate))) {
 		if (time.varying) {
 			costs[alphsize,1:(alphsize-1),] <- miss.cost
 			costs[1:(alphsize-1),alphsize,] <- miss.cost

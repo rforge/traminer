@@ -15,6 +15,7 @@ seqdistOO <- function(seqdata, method, refseq=NULL, norm=FALSE,
     ## Checking method name
 	metlist <- c("OM", "OMopt", "LCP", "LCS", "LCSopt", "RLCP", "DHD", "HAM",
                  "NMS", "NMSMST", "SVRspell",
+                 "CHI2", "EUCLID",
                  "OMloc", "OMspell", "OMslen", "OMstran", "TWED")
 	OMvariant <- c("OM", "OMloc", "OMspell", "OMslen")
 	if (missing(method)) {
