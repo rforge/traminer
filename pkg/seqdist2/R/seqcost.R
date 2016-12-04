@@ -5,7 +5,8 @@
 seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
     miss.cost=NULL, time.varying=FALSE, weighted=TRUE, transition="both", lag=1,
     missing.trate=FALSE, state.prop=NULL, prop.weights=NULL, prop.type=list(),
-    proximities=FALSE) {
+    proximities=FALSE, miss.cost.fixed=!missing.trate,
+    state.features=state.prop, feature.weights=prop.weights, feature.type = prop.type) {
 
 	if (!inherits(seqdata,"stslist")){
 		stop(" [!] data is NOT a sequence object, see seqdef function to create one")
@@ -33,15 +34,11 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	}
 	## Adding an entry for for missing state
 	if (with.missing) {
-		if(missing.trate && method == "TRATE") {
-			message(" [>] Substitution costs for missing values derived from transition rates")
-		} else if (method %in% c("INDELS","INDELSLOG")) {
-			message(" [>] Substitution costs for missing values derived from computed indels")
-		} else if (method == "FEATURES") {
-			message(" [>] Substitution costs for missing values derived from features")
-		} else {
-			message(" [>] Substitution costs for missing values set as ",miss.cost)
-		}
+##		if(!miss.cost.fixed && method %in% c("TRATE","FUTURE","INDELS","INDELSLOG") {
+##			message(" [>] Substitution costs for missing values derived from data")
+##		} else {
+##			message(" [>] Substitution costs for missing values set as ",miss.cost)
+##		}
 		
 		alphabet <- c(alphabet, attr(seqdata,"nr"))
 	}
@@ -91,29 +88,32 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 			}
             return(sqrt(dist))
 		}
+
 		if(time.varying){
 			stop(" [!] time.varying substitution cost is not (yet) implemented for method FUTURE.")
 		}
 		message(" [>] creating substitution-cost matrix using common future...")
-		tr <- seqtrate(seqdata, time.varying=FALSE, weighted=weighted, lag=lag, with.missing = missing.trate)
+		tr <- seqtrate(seqdata, time.varying=FALSE, weighted=weighted, lag=lag, with.missing = with.missing)
 		costs <- chisqdista(tr)
 		diag(costs) <- 0
         ret$indel <- .5*max(costs)
 	}
+## GR suggestion: use feature.weights, state.features, feature.type in place of
+## prop.weights, state.prop and prop.type
 	if (method=="FEATURES") {
 		if(time.varying){
 			stop(" [!] time.varying substitution cost is not (yet) implemented for method FEATURES.")
 		}
-		if(is.null(state.prop) || nrow(state.prop)!=length(alphabet)){
-			stop(" [!] state.prop should be a data.frame containing one row per state (possibly one for missing values).")
+		if(is.null(state.features) || nrow(state.features)!=length(alphabet)){
+			stop(" [!] state.features should be a data.frame containing one row per state (possibly one for missing values).")
 		}
 		if(!requireNamespace("cluster")){
 			stop(" [!] cluster library is required to use FEATURES method.")
 		}
-		if(is.null(prop.weights)){
-			prop.weights <- rep(1, ncol(state.prop))
+		if(is.null(feature.weights)){
+			feature.weights <- rep(1, ncol(state.features))
 		}
-		costs <- as.matrix(daisy(state.prop, metric="gower", weights=prop.weights, type=prop.type))
+		costs <- as.matrix(daisy(state.features, metric="gower", weights=feature.weights, type=feature.type))
 		diag(costs) <- 0
         ret$indel <- .5*max(costs)
 	}
@@ -152,7 +152,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	if (method=="TRATE") {
 		if (time.varying) {
 			message(" [>] creating time varying substitution-cost matrix using transition rates ...")
-			tr <- seqtrate(seqdata, time.varying=TRUE, weighted=weighted, lag=lag, with.missing=missing.trate)
+			tr <- seqtrate(seqdata, time.varying=TRUE, weighted=weighted, lag=lag, with.missing=with.missing)
 			tmat <- nrow(tr)
 			time <- ncol(seqdata)
 			costs <- array(0, dim=c(alphsize, alphsize, time))
@@ -208,7 +208,7 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 		}
 		else {
 			message(" [>] creating substitution-cost matrix using transition rates ...")
-			tr <- seqtrate(seqdata, time.varying=FALSE, weighted=weighted, lag=lag, with.missing = missing.trate)
+			tr <- seqtrate(seqdata, time.varying=FALSE, weighted=weighted, lag=lag, with.missing = with.missing)
 			tmat <- nrow(tr)
 			costs <- matrix(nrow=alphsize,ncol=alphsize)
 			diag(costs) <- 0
@@ -224,7 +224,8 @@ seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
 	}
 
 	##
-	if (with.missing &&(method=="CONSTANT"||(method=="TRATE" && !missing.trate))) {
+##	if (with.missing &&(method=="CONSTANT"||(method=="TRATE" && !missing.trate))) {
+	if (with.missing && miss.cost.fixed) {
 		if (time.varying) {
 			costs[alphsize,1:(alphsize-1),] <- miss.cost
 			costs[1:(alphsize-1),alphsize,] <- miss.cost

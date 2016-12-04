@@ -49,16 +49,16 @@ For all methods but \code{INDELS} and \code{INDELSLOG}, the indel is set as \eqn
 
 
 \usage{
-seqcost(seqdata, method, cval=NULL, with.missing=FALSE,
+seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
     miss.cost=NULL, time.varying=FALSE, weighted=TRUE, transition="both", lag=1,
     missing.trate=FALSE, state.prop=NULL, prop.weights=NULL, prop.type=list(),
-    proximities=FALSE)
+    proximities=FALSE, miss.cost.fixed=!missing.trate) 
 
 seqsubm(...)
 
 }
 
- \arguments{
+\arguments{
   \item{seqdata}{a sequence object as returned by the \link{seqdef} function.}
 
   \item{method}{Character string. How to generate the costs. One of \code{"CONSTANT"} (same cost for all substitutions), \code{"TRATE"} (derived from the observed transition rates), \code{"FUTURE"} (Chi-squared distance between conditional state distributions \code{lag} positions ahead), \code{"FEATURES"} (Gower distance between state features), \code{"INDELS"}, \code{"INDELSLOG"} (based on estimated indel costs).}
@@ -72,7 +72,9 @@ seqsubm(...)
     If \code{TRUE}, the \sQuote{missing} state is also added to state alphabet. Use this if you want to compute
     distances with missing values inside the sequences. See \cite{Gabadinho et al. (2010)} for more details on the options for handling missing values when computing distances between sequences.}
 
-    \item{miss.cost}{Scalar or vector. Cost for substituting the missing state. Default is \code{cval}.}
+    \item{miss.cost}{Scalar or vector. Cost for substituting the missing state. Default is \code{TRUE}.}
+
+    \item{miss.cost.fixed}{Logical. Should the substitution cost for missing be set as the \code{miss.cost} value. Default is \code{cval}.}
 
     \item{time.varying}{Logical. If \code{TRUE} return an \code{\link{array}} with a distinct matrix for each time unit. Time is the third dimension (subscript) of the returned array.}
 
@@ -83,12 +85,14 @@ seqsubm(...)
     \item{lag}{Integer. For methods \code{TRATE} and \code{FUTURE} only. Time ahead to which transition rates are computed
     (default is \code{lag=1}).}
 
-    \item{missing.trate}{Logical. For methods \code{TRATE} and \code{FUTURE} only.
-    If \code{TRUE}, substitution costs with missing state are also based on transition rates. If \code{FALSE} (default value), the substitution cost for the missing state are set as \code{miss.cost}.}
+    \item{missing.trate}{Logical. Deprecated, use \code{miss.cost.fixed} instead. }
 
-    \item{state.prop}{???}
-    \item{prop.weights}{???}
-    \item{prop.type}{A list, ???},
+    \item{state.features}{Data frame with features values for each state.}
+    \item{feature.weights}{Vector of feature weights with length equal to the number of columns of \code{state.features}}
+    \item{feature.type}{List of feature types. See \code{\link[cluster]{daisy}} for details.}
+    \item{state.prop}{??? Deprecated. Use \code{state.features} instead.}
+    \item{prop.weights}{??? Deprecated. Use \code{feature.weights} instead}
+    \item{prop.type}{??? Deprecated. Use \code{feature.type} instead},
     \item{proximities}{Logical: should state proximities be returned instead of substitution costs?}
     \item{...}{Arguments passed to \code{seqcost}}
 }
@@ -97,7 +101,7 @@ seqsubm(...)
 A list of two elements \code{indel} and \code{sm} with
 
     \item{indel}{The indel cost. Either a scalar or a vector of size \eqn{ns}.}
-    
+
     \item{sm}{The substitution cost matrix of size \eqn{ns*ns}, where
     \eqn{ns} is the number of states in the alphabet of the sequence object.}
 
@@ -109,9 +113,9 @@ For \code{seqsubm}, the matrix \code{sm}.
 }
 
 \references{
-Gabadinho, A., G. Ritschard, N. S. Müller and M. Studer (2011). Analyzing and Visualizing State Sequences in R with TraMineR. \emph{Journal of Statistical Software} \bold{40}(4), 1-37.
+Gabadinho, A., G. Ritschard, N. S. M\"{u}ller and M. Studer (2011). Analyzing and Visualizing State Sequences in R with TraMineR. \emph{Journal of Statistical Software} \bold{40}(4), 1-37.
 
-Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2010). Mining Sequence Data in
+Gabadinho, A., G. Ritschard, M. Studer and N. S. M\"{u}ller (2010). Mining Sequence Data in
 \code{R} with the \code{TraMineR} package: A user's guide. Department of Econometrics and
 Laboratory of Demography, University of Geneva.
 

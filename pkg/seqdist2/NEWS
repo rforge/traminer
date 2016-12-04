@@ -5,7 +5,13 @@ BUG FIXES
         methods CHI2 and EUCLID. Fixed
   o seqcost: When one of the methods "INDELS", "INDELSLOG", or
         "FEATURES" was used with with.missing=TRUE, bad messages
-        regarding substitution costs for missing were displayed.    
+        regarding substitution costs for missing were displayed.
+  o seqcost: New argument miss.cost.fixed to indicate that the
+        substitution cost for missing is set as the miss.cost
+        value. (Generalizes former miss.trate that is now deprecated)
+  o seqcost: Arguments state.prop, prop.weights and prop.type renamed
+        as state.features, feature.weights and feature.type. 
+      
 MISC  
   o Fixed typos in and updated references help pages.
 
