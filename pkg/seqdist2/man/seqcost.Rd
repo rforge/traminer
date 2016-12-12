@@ -49,13 +49,14 @@ For all methods but \code{INDELS} and \code{INDELSLOG}, the indel is set as \eqn
 
 
 \usage{
-seqcost <- function(seqdata, method, cval=NULL, with.missing=FALSE,
-    miss.cost=NULL, time.varying=FALSE, weighted=TRUE, transition="both", lag=1,
-    missing.trate=FALSE, state.prop=NULL, prop.weights=NULL, prop.type=list(),
-    proximities=FALSE, miss.cost.fixed=!missing.trate) 
+seqcost(seqdata, method, cval = NULL, with.missing = FALSE, miss.cost = NULL,
+  time.varying = FALSE, weighted = TRUE, transition = "both", lag = 1,
+  missing.trate = FALSE, state.prop = NULL, prop.weights = NULL,
+  prop.type = list(), proximities = FALSE, miss.cost.fixed = !missing.trate,
+  state.features = state.prop, feature.weights = prop.weights,
+  feature.type = prop.type)
 
 seqsubm(...)
-
 }
 
 \arguments{
