@@ -61,7 +61,7 @@ seqdistOO(seqdata, method, refseq=NULL, norm=FALSE,
 
   \item{previous}{if \code{TRUE}, add transition from previous state (for \code{OMstran}).}
 
-  \item{addcolumn}{if \code{TRUE}, repeat the first (if \code{previous=TRUE}) and the last column (for \code{OMstran}).}
+  \item{addcolumn}{if \code{TRUE}, duplicate the first (if \code{previous=TRUE}) and the last column (for \code{OMstran}).}
 
   \item{breaks}{An optional list containing the spells used to build the intervals (for \code{CHI2}).}
 
@@ -82,7 +82,7 @@ The \code{seqdistOO} function returns a matrix of distances between sequences or
 \itemize{
  \item{\emph{Edit distances}: optimal matching (\code{OM}), localized OM (\code{OMloc}), spell length sensitive OM (\code{OMslen}), OM of spells (\code{OMspell}), OM of sequences of transitions (\code{OMstran}), Hamming (\code{HAM}), dynamic Hamming (\code{DHD}), and the time warp edit distance (\code{TWED}).}
 
- \item{\emph{Metrics based on counts of common attributes}: distance based on the longest common subsequence (\code{LCS}), on the longest common prefix (\code{LCP}), on the longest common suffix (\code{RLCP}), on the number of matching subsequences (\code{NMS}), and the subsequence vectorial representation metric (\code{SVRspell}).}
+ \item{\emph{Metrics based on counts of common attributes}: distance based on the longest common subsequence (\code{LCS}), on the longest common prefix (\code{LCP}), on the longest common suffix (\code{RLCP}), on the number of matching subsequences (\code{NMS}), on the minimum shared time (\code{NMSMST}), and the subsequence vectorial representation metric (\code{SVRspell}).}
 
  \item{\emph{Distances between state distributions}: Euclidean (\code{EUCLID}), Chi-squared (\code{CHI2}).
  %, and the Chi-squared distance between vectors of transition rates to the future states (\code{CHI2fut}).
@@ -97,9 +97,9 @@ Except for a few dissimilarity measures (\code{LCS, LCP, RLCP, NMS}) that do not
   method \tab parameters \cr
   ------------------ \tab ---------------------------------\cr
   \verb{OM} \tab \verb{sm, indel} \cr
-  \verb{OMloc} \tab \verb{sm, expcost, context} \cr
-  \verb{OMslen} \tab \verb{sm, indel, h} \cr
-  \verb{OMspell} \tab \verb{sm, indel, expcost} \cr
+  \verb{OMloc} \tab \verb{sm, expcost, context, link} \cr
+  \verb{OMslen} \tab \verb{sm, indel, h, link} \cr
+  \verb{OMspell} \tab \verb{sm, indel, expcost, tpow} \cr
   \verb{OMstran} \tab \verb{sm, indel, otto, previous, addcolumn, transindel} \cr
   \verb{TWED} \tab \verb{sm, indel, h, nu} \cr
   \verb{HAM, DHD} \tab  \verb{sm}\cr
@@ -117,15 +117,13 @@ In addition, on multiprocessor computers, one can specify the number \code{numcp
 
 %For OM, HAM and DHD, a user specified substitution cost matrix can be provided with the \code{sm} argument.
 
-For DHD, when used \code{sm} should be a series of matrices grouped in a 3-dimensional matrix with the third index referring to the position in the sequence.
-
-When \code{sm} is not specified, a single cost of 2 is used for all substitutions, except for HAM for which it is 1, and for DHD for which the costs are derived from the transition rates at the successive positions.
+The \code{sm} argument is required for \code{"OM", "OMloc", "OMslen", "OMspell", "OMstran", "TWED"}, and \code{"SVRspell"} and is optional for \code{"HAM"} and \code{"DHD"}. For \code{HAM} a default substitution cost of 1 is used when \code{sm=NULL}, and for \code{DHD} the default costs are derived from the transition rates at the successive positions. When provided for \code{DHD}, \code{sm} should be a series of matrices grouped in a 3-dimensional matrix with the third index referring to the position in the sequence. For \code{"SVRspell"}, the \code{sm} argument must be a matrix of state proximities rather than a matrix of state dissimilarities as for all other cases.
 
 Distances can optionally be normalized by means of the \code{norm} argument. If set to \code{TRUE}, Elzinga's normalization (similarity divided by geometrical mean of the two sequence lengths) is applied to LCP, RLCP and LCS distances, while Abbott's normalization (distance divided by length of the longer sequence) is used for OM, HAM and DHD. Elzinga's method can be forced with \code{"gmean"} and Abbott's rule with \code{"maxlength"}. With \code{"maxdist"} the distance is normalized by its maximal possible value. For more details, see \cite{Gabadinho et al. (2009, 2011)}. Finally, \code{"YujianBo"} is the normalization proposed by \cite{Yujian and Bo (2007)} that preserves the triangle inequality.
 
 %Distances to a provided reference sequence (specified with \code{refseq}) can currently not be computed with \code{CHI2}.
 
-When sequences contain gaps and the \code{gaps=NA} option was passed to \code{\link{seqdef}}---i.e. when there are non deleted missing values---the \code{with.missing} argument should be set as \code{TRUE}. If left as \code{FALSE} the function stops when it encounters a gap. This is to make the user aware that there are gaps in his sequences. For methods that need an \code{sm} value, \code{seqdist} expects a substitution cost matrix with a row and a column entry for the missing state (symbol defined with the \code{nr} option of \code{\link{seqdef}}). Substitution cost matrices returned by \code{\link{seqcost}} and \code{\link{seqsubm}} will include these additional entries when the functions are called with \code{with.missing=FALSE}. More details on how to compute distances with sequences containing gaps can be found in \cite{Gabadinho et al. (2009)}.
+When sequences contain gaps and the \code{gaps=NA} option was passed to \code{\link{seqdef}}---i.e. when there are non deleted missing values---the \code{with.missing} argument should be set as \code{TRUE}. If left as \code{FALSE} the function stops when it encounters a gap. This is to make the user aware that there are gaps in his sequences. For methods that need an \code{sm} value, \code{seqdist} expects a substitution cost matrix with a row and a column entry for the missing state (symbol defined with the \code{nr} option of \code{\link{seqdef}}). Substitution cost matrices returned by \code{\link{seqcost}} and \code{\link{seqsubm}} include these additional entries when the functions are called with \code{with.missing=TRUE}. More details on how to compute distances with sequences containing gaps can be found in \cite{Gabadinho et al. (2009)}.
 }
 
 \value{
@@ -133,11 +131,11 @@ When sequences contain gaps and the \code{gaps=NA} option was passed to \code{\l
  }
 
 \seealso{
- \code{\link{seqsubm}}, \code{\link{seqdef}}, and for multichannel distances \code{\link{seqdistmc}}, \code{\link{seqcost}}.
+ \code{\code{\link{seqcost}, \link{seqsubm}}, \code{\link{seqdef}}, and for multichannel distances \code{\link{seqdistmc}}}.
 }
 
 \references{
-Studer, M. & Ritschard, G. (2015), "What matters in differences between life trajectories: A comparative review of sequence dissimilarity measures", \emph{Journal of the Royal Statistical Society, Series A}. \bold{179}(2), 481-511. DOI: \url{http://dx.doi.org/10.1111/rssa.12125}
+Studer, M. & Ritschard, G. (2016), "What matters in differences between life trajectories: A comparative review of sequence dissimilarity measures", \emph{Journal of the Royal Statistical Society, Series A}. \bold{179}(2), 481-511. DOI: \url{http://dx.doi.org/10.1111/rssa.12125}
 
 Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES, Switzerland. DOI: \url{http://dx.doi.org/10.12682/lives.2296-1658.2014.33}
 
