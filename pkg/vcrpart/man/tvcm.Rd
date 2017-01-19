@@ -14,7 +14,7 @@
 \usage{
 tvcm(formula, data, fit, family,
      weights, subset, offset, na.action = na.omit,
-     control = tvcm_control(), ...)
+     control = tvcm_control(), fitargs, ...)
 }
 
 \arguments{
@@ -41,8 +41,11 @@ tvcm(formula, data, fit, family,
     are dropped. See \command{\link{na.action}}.} 
   \item{control}{a list with control parameters as returned by
     \command{\link{tvcm_control}}.}
+  \item{fitargs}{additional arguments passed to the fitting function
+    \code{fit}.} 
   \item{\ldots}{additional arguments passed to the fitting function
-    \code{fit}.}  
+    \code{fit}. Note that using the \code{fitargs} argument is the
+    preferred way to for this.}  
 }
 
 \details{ 

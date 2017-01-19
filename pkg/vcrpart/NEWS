@@ -1,6 +1,9 @@
-Changes in Version 0.4-2
+Changes in Version 0.4-3
 
-    o
+    o    Add new argument 'fitargs' to 'tvcm'. Allows to pass arguments for
+         the fitting function in 'tvcm' and 'fvcm'. This was possible before
+         via the '...', but leads to argument name clashes in some cases. See
+         the help of 'tvcm'.
 
 Changes in Version 0.4-2
 

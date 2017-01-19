@@ -137,7 +137,8 @@ tvcglm_control <- function(minsize = 30, mindev = 2.0,
 
 tvcm <- function(formula, data, fit, family, 
                  weights, subset, offset, na.action = na.omit,
-                 control = tvcm_control(), ...) {
+                 control = tvcm_control(),
+                 fitargs, ...) {
   
   ## get specified arguments
   mc <- match.call(expand.dots = FALSE)
@@ -174,6 +175,13 @@ tvcm <- function(formula, data, fit, family,
   }
   if (!fit %in% c("glm", "olmm")) stop("'fit' not recognized.")
   if (fit != "olmm") control$estfun <- NULL
+
+  ## check and set 'fitargs'
+  if (missing(fitargs)) {
+      fitargs <- list()
+  } else {
+      if (!is.list(fitargs)) stop("'fitargs' must be a list.")
+  }
   
   ## set formulas
   if (control$verbose) cat("OK\n* setting formulas ... ")
@@ -221,18 +229,22 @@ tvcm <- function(formula, data, fit, family,
                 formula = quote(ff$full),
                 family = quote(family),
                 data = quote(mf))
- 
+  
+  fitfunargs <-
+      switch(fit,
+             olmm = union(names(formals(olmm)), names(formals(olmm_control))),
+             glm = union(names(formals(glm)), names(formals(glm.control))),
+             "")
+
   mce <- match.call(expand.dots = TRUE)
   dotargs <- setdiff(names(mce), names(mc))
-  fitargs <-
-    switch(fit,
-           olmm = union(names(formals(olmm)), names(formals(olmm_control))),
-           glm = union(names(formals(glm)), names(formals(glm.control))),
-           "")
-  dotargs <- intersect(fitargs, dotargs)
-  dotargs <- setdiff(dotargs, names(mcall))
+  dotargs <- intersect(fitfunargs, dotargs)
+  dotargs <- setdiff(dotargs, names(fitargs))
   dotargs <- list(...)[dotargs]
-  mcall[names(dotargs)] <- dotargs
+  fitargs <- fitargs[intersect(fitfunargs, names(fitargs))]
+  fitargs <- append(fitargs, dotargs)
+  mcall[names(fitargs)] <- fitargs
+  
   mode(mcall) <- "call"
   mcall$weights <- weights
   mcall$offset <- offset    

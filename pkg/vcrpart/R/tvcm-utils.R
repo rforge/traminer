@@ -1803,6 +1803,8 @@ tvcm_formula <- function(formList, root, family,
                       ",intercept='", formList$re$intercept, "')")
     } else {
         reForm <- NULL
+        ## warning("the entered random effect is ignored. Currently random ",
+        ##         "effects are only supported for the 'olmm' model family.")
     }
   } else {
     reForm <- NULL

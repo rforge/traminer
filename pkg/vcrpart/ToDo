@@ -1,3 +1,5 @@
+- Give a warning if a random coefficient is called in fvcglm resp. tvcglm 
+  function
 - Check Gauss-Hermite integration points of the 'lme4' package
 - Check if 'ucminf' works again
 - Check nloptr package
