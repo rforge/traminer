@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:      Reto Buergin
 ## E-Mail:      rbuergin@gmx.ch
-## Date:        2015-12-28
+## Date:        2017-01-19
 ##
 ## Description:
 ## The 'tvcm' function
@@ -14,6 +14,7 @@
 ## tvcm_control    control function for 'tvcm'
 ##
 ## Last modifications:
+## 2017-01-19: added the argument 'fitargs'
 ## 2015-12-28: added the argument 'fast' to 'tvcglm_control'.
 ## 2015-11-31: enable the setting 'mtry <- Inf'
 ## 2015-10-30: set default 'na.action = na.omit' on 'tvcm'
