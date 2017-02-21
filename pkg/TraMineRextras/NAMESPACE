@@ -11,7 +11,7 @@ importFrom("combinat", "permn")
 export(
     group.p,
     convert.g,
-    ctplot,
+    ##ctplot,
     pamward,
     rowmode,
     seqplot.tentrop,

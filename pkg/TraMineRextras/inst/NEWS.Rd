@@ -1,10 +1,11 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.3.6 [2016-11-09]}{
+\section{Changes in version 0.3.6 [2017-02-21]}{
 \subsection{Misc}{
   \itemize{
-    \item{No changes so far.}
+    \item{Function ctplot() suppressed. It is superseded by the 
+    function seqpcplot() of the TraMineR package.}
 }} }
 
 \section{Changes in version 0.2.5 [2016-11-10]}{
