@@ -1,6 +1,6 @@
 Package: TraMineRextras
-Version: 0.3.6
-Date: 2017-02-21
+Version: 0.3.7
+Date: 2017-03-01
 Title: TraMineR Extension
 Authors@R: c(
   person("Gilbert", "Ritschard", role = c("aut", "cre", "ths", "cph"),
@@ -16,10 +16,4 @@ Description: Collection of ancillary functions and utilities to be used in conju
 License: GPL (>= 2)
 URL: http://traminer.unige.ch/
 Encoding: UTF-8
-Author: Gilbert Ritschard [aut, cre, ths, cph],
-  Matthias Studer [aut],
-  Reto Buergin [aut],
-  Alexis Gabadinho [ctb],
-  Nicolas Muller [ctb],
-  Patrick Rousset [ctb]
 Maintainer: Gilbert Ritschard <gilbert.ritschard@unige.ch>
