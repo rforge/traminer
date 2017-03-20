@@ -17,7 +17,7 @@ seqLLCP <- function(seq1,seq2) {
 	l1 <- seqlength(seq1)
 	l2 <- seqlength(seq2)
 
-	result <- .C(TMR_cLCP, as.integer(seq1), as.integer(seq2), as.double(c(l1,l2)), result = as.integer(0))$result
+	result <- .C(C_cLCP, as.integer(seq1), as.integer(seq2), as.double(c(l1,l2)), result = as.integer(0))$result
 
 	return(result)
 }

@@ -1,5 +1,5 @@
 is.subseqelist<-function(s){
-#   return(.Call("istmrsequence",s, PACKAGE="TraMineR"))
+#   return(.Call(C_istmrsequence,s))
 	return(inherits(s, "subseqelist"))
 }
 

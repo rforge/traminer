@@ -11,7 +11,7 @@ olddissassoc <- function(diss, group , R=1000) {
 		diss <- dist2matrix(diss)
 	}
 	dissmatrix <- diss[!is.na(group), !is.na(group)]
-	SCtot <- .Call(TMR_tmrsubmatrixinertia, dissmatrix, 1:nrow(dissmatrix))
+	SCtot <- .Call(C_tmrsubmatrixinertia, dissmatrix, 1:nrow(dissmatrix))
 	n <- nrow(dissmatrix)
 	ind <- 1:n
 	grp <- factor(group[!is.na(group)])
@@ -34,7 +34,7 @@ olddissassoc <- function(diss, group , R=1000) {
 		}
 		else {
 			indgrp[[i]] <- ind[cond]
-			r <- .Call(TMR_tmrsubmatrixinertia, dissmatrix, as.integer(indgrp[[i]]))
+			r <- .Call(C_tmrsubmatrixinertia, dissmatrix, as.integer(indgrp[[i]]))
 			ret$groups$variance[i] <- r/ret$groups$n[i]
 			SCres <- r+SCres
 		}
@@ -110,11 +110,11 @@ internalBootstrapCompareGroups <- function(seqdata, ind, dissmatrix, indgrp, SCt
 	for (i in 1:k) {
 		#on crée le groupe en question
 		groupe <- sort.int(ind[as.integer(indgrp[[i]])], method="quick")
-#		SCresi <- .Call("tmrsubmatrixinertia", dissmatrix, groupe, PACKAGE="TraMineR")
+#		SCresi <- .Call(C_tmrsubmatrixinertia, dissmatrix, groupe)
 #		groupe <- as.integer(ind[indgrp[[i]]])
 		ni <- length(groupe)
 		#on calcul l'inertie intraclasse
-		SCresi <- .Call(TMR_tmrsubmatrixinertia, dissmatrix, groupe)
+		SCresi <- .Call(C_tmrsubmatrixinertia, dissmatrix, groupe)
 		vari <- SCresi/ni
 		s1ni <- s1ni+(1/(ni-1))
 		lns <- lns+(ni-1)*(vari/(n-k))

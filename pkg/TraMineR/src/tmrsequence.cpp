@@ -42,10 +42,6 @@ extern "C" {
         {"tmrmatrixsubseqinseq", (DL_FUNC) tmrmatrixsubseqinseq, 8},
         {NULL}
     };*/
-    void R_init_TraMineR(DllInfo *info) {
-        //   TMRSEQUENCE_type_tag= install("TMRSEQUENCE_TYPE_TAG");
-        //R_registerRoutines(info, NULL, TMRSEQUENCE_CallDefs, NULL, 0);
-    }
 
     /**
     	Build one sequence obect, a given idpers, time should be double and event integer

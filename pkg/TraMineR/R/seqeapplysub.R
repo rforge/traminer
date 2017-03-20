@@ -39,7 +39,7 @@ seqeapplysub<-function(subseq,method=NULL,
     }
     if(!rules)
       {
-        return(.Call("tmrmatrixsubseqinseq",
+        return(.Call(C_tmrmatrixsubseqinseq,
                      unlist(list(subseq$subseq)),
                      unlist(list(subseq$seqe)),
                      as.double(c(constraint$maxGap)),
@@ -47,11 +47,10 @@ seqeapplysub<-function(subseq,method=NULL,
                      as.double(c(constraint$ageMin)),
                      as.double(c(constraint$ageMax)),
                      as.double(c(constraint$ageMaxEnd)),
-                     as.double(c(constraint$countMethod)),
-                     PACKAGE="TraMineR"))
+                     as.double(c(constraint$countMethod))))
       }
     else {
-      return(.Call("tmrmatrixsubseqinseq",
+      return(.Call(C_tmrmatrixsubseqinseq,
                    unlist(list(subseq$subseq)),
                    unlist(list(subseq$subseq)),
                    as.double(c(constraint$maxGap)),
@@ -59,7 +58,6 @@ seqeapplysub<-function(subseq,method=NULL,
                    as.double(c(constraint$ageMin)),
                    as.double(c(constraint$ageMax)),
                    as.double(c(constraint$ageMaxEnd)),
-                   as.double(c(constraint$countMethod)),
-                   PACKAGE="TraMineR"))
+                   as.double(c(constraint$countMethod))))
     }
   }

@@ -6,5 +6,5 @@ seqecontain<-function(seq, eventList,exclude=FALSE){
   elist<-factor(eventList,levels=dict)
   if(exclude)excl=as.integer(c(1))
   else excl=as.integer(c(0))
-  return(.Call(TMR_tmrsequencecontainevent, seq, as.integer(elist), excl))
+  return(.Call(C_tmrsequencecontainevent, seq, as.integer(elist), excl))
 }

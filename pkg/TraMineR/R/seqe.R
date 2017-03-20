@@ -2,15 +2,15 @@
 ## Check if subsequence
 ## ========================================
 is.seqe<-function(s){
-#   return(.Call("istmrsequence",s, PACKAGE="TraMineR"))
+#   return(.Call(C_istmrsequence,s))
     return(inherits(s,"seqe"))
 }
 is.seqelist<-function(s){
-#   return(.Call("istmrsequence",s, PACKAGE="TraMineR"))
+#   return(.Call(C_istmrsequence,s))
    return(inherits(s,"seqelist"))
 }
 #as.seqelist<-function(s){
-#   return(.Call("istmrsequence",s, PACKAGE="TraMineR"))
+#   return(.Call(C_istmrsequence,s))
 #    class(s)<-c("seqelist","list")
 #    return(s)
 #}
@@ -54,12 +54,12 @@ Summary.seqe<-function(...) {
 
 levels.seqe<-function(x,...){
   if(!is.seqe(x))stop("x should be a seqe object. See help on seqecreate.")
-  return(.Call(TMR_tmrsequencegetdictionary,x))
+  return(.Call(C_tmrsequencegetdictionary,x))
 }
 
 levels.seqelist<-function(x,...){
   if(!is.seqelist(x))stop("x should be a seqelist. See help on seqecreate.")
-  if(length(x)>0) return(.Call(TMR_tmrsequencegetdictionary,x[[1]]))
+  if(length(x)>0) return(.Call(C_tmrsequencegetdictionary,x[[1]]))
 }
 ## ========================================
 ## Return a string representation of a sequence
@@ -79,21 +79,21 @@ str.seqelist<-function(object,...){
 str.seqe<-function(object,...){
 #  seqestr(s)
   if(!is.seqe(object))stop("object should be a seqe object. See help on seqecreate.")
-  object <- .Call(TMR_tmrsequencestring, object)
+  object <- .Call(C_tmrsequencestring, object)
   NextMethod("str")
 }
 
 as.character.seqe<-function(x, ...){
 #  seqestr(s)
   if(!is.seqe(x))stop("x should be a seqe object. See help on seqecreate.")
-  x<-.Call(TMR_tmrsequencestring,x)
+  x<-.Call(C_tmrsequencestring,x)
   NextMethod("as.character")
 }
 
 as.character.seqelist<-function(x, ...){
   tmrsequencestring.internal<-function(s){
     if(is.seqe(s)){
-      return(.Call(TMR_tmrsequencestring, s))
+      return(.Call(C_tmrsequencestring, s))
     }
     return(as.character(s))
   }

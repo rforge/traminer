@@ -5,7 +5,7 @@
 seqeid<-function(s){
   tmrsequenceid.internal<-function(s){
     if(is.seqe(s)){
-      return(.Call(TMR_tmrsequencegetid, s))
+      return(.Call(C_tmrsequencegetid, s))
     }
     return(NA)
   }

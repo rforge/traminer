@@ -33,7 +33,7 @@ seqefsub <- function(seq, strsubseq=NULL, minSupport=NULL, pMinSupport=NULL,
                              type="user")
     constraint2 <- constraint
     constraint2$countMethod <- 1
-    
+
     ret2 <- createsubseqelist(seq, constraint2, subseq, data.frame(),
                               type="user")
     ww <- seqeweight(seq)
@@ -56,18 +56,18 @@ seqefsub <- function(seq, strsubseq=NULL, minSupport=NULL, pMinSupport=NULL,
     minSupport<-pMinSupport*sum(seqeweight(seq))
   }
   classname <- c("seqe")
-  subseq <- .Call("tmrfindsubsequences",
+  subseq <- .Call(C_tmrfindsubsequences,
                   unlist(list(seq)),
-                  as.double(c(constraint$maxGap)), 
+                  as.double(c(constraint$maxGap)),
                   as.double(c(constraint$windowSize)),
-                  as.double(c(constraint$ageMin)), 
+                  as.double(c(constraint$ageMin)),
                   as.double(c(constraint$ageMax)),
-                  as.double(c(constraint$ageMaxEnd)), 
+                  as.double(c(constraint$ageMaxEnd)),
                   as.double(c(constraint$countMethod)),
-                  as.double(c(minSupport)), 
+                  as.double(c(minSupport)),
                   as.integer(c(maxK)),
-                  classname, PACKAGE="TraMineR")
-  
+                  classname)
+
   ord <- order(unlist(subseq[2]),decreasing=TRUE)
   support <- unlist(subseq[1])[ord]
   count <- unlist(subseq[2])[ord]

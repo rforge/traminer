@@ -4,7 +4,7 @@
 
 
 #tmrsequence<-function(id,timestamp,event){
-#  .Call("tmrsequence",as.integer(id),as.double(timestamp),as.integer(event), PACKAGE="TraMineR")
+#  .Call(C_tmrsequence,as.integer(id),as.double(timestamp),as.integer(event))
 #}
 seqecreate <- function(data=NULL, id=NULL,timestamp=NULL, event=NULL, endEvent=NULL,
 						tevent="transition", use.labels=TRUE, weighted=TRUE){
@@ -82,7 +82,7 @@ seqecreate.internal <- function(data, id, timestamp, event, endEvent, tevent,
 	event <- as.integer(event)
 
 	
-	ret <- .Call(TMR_tmrsequenceseveral, as.integer(id),
+	ret <- .Call(C_tmrsequenceseveral, as.integer(id),
 		as.double(timestamp), as.integer(event),
 		as.integer(c(intEvent)), classname, as.character(dictionnary))
 
@@ -136,13 +136,13 @@ seqecreatesub <- function(subseq, seqe){
 		events <- as.integer(events)
 		sortedindex <- order(timestamp, events)
 		
-		ret[[iseq]]<-.Call(TMR_tmrsequence, as.integer(-1),
+		ret[[iseq]]<-.Call(C_tmrsequence, as.integer(-1),
 			as.double(timestamp[sortedindex]), as.integer(events[sortedindex]),
 			classname, seqe[[1]])
 			iseq <- iseq + 1
 	}
 #  e<-factor(event,levels=levels(seq))
- # ret<-list(.Call("tmrsequence",as.integer(-1),as.double(timestamp),as.integer(e),classname,seq, PACKAGE="TraMineR"))
+ # ret<-list(.Call(C_tmrsequence,as.integer(-1),as.double(timestamp),as.integer(e),classname,seq))
 	class(ret) <- c("seqelist", "list")
 	return(ret)
 }
