@@ -1,9 +1,13 @@
 ## =========
 Version 1.9-14 (Development version)
 
+Misc:
+  - Registration of native routines for R 3.4.x.
+    See https://stat.ethz.ch/pipermail/r-devel/2017-February/073755.html.
+
 
 ## =========
-Version 1.8-13 
+Version 1.8-13
 
 Misc:
   - Changes in C-code for the seqefsub function: replaced call
