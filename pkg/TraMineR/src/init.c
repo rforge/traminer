@@ -8,8 +8,6 @@ extern void cLCP(int *, int * , double *, int *);
 extern void cLCS(int *, int *, double *, int *);
 
 /* .Call calls */
-extern SEXP henikoff(SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP saltt(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP checktriangleineq(SEXP, SEXP, SEXP);
 extern SEXP cstringdistance(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP cstringrefseqdistance(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -46,8 +44,6 @@ static const R_CMethodDef CEntries[] = {
 };
 
 static const R_CallMethodDef CallEntries[] = {
-  {"henikoff",                     (DL_FUNC) &henikoff,                      5},
-  {"saltt",                        (DL_FUNC) &saltt,                        12},
   {"checktriangleineq",            (DL_FUNC) &checktriangleineq,             3},
   {"cstringdistance",              (DL_FUNC) &cstringdistance,               8},
   {"cstringrefseqdistance",        (DL_FUNC) &cstringrefseqdistance,         7},

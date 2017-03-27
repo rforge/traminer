@@ -15,7 +15,6 @@ seqelength(s) <- value
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{s}{An event sequence object (\code{seqelist}).}
-  \item{len}{A list of sequence lengths.}
   \item{value}{A list of sequence lengths.}
 }
 \value{
