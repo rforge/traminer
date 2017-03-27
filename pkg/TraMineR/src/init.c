@@ -6,16 +6,17 @@
 /* .C calls */
 extern void cLCP(int *, int * , double *, int *);
 extern void cLCS(int *, int *, double *, int *);
-extern void cLEVEN(int *, int *, double *, double *, double *);
 
 /* .Call calls */
 extern SEXP henikoff(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP saltt(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP checktriangleineq(SEXP, SEXP, SEXP);
-extern SEXP cstringdistance(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP cstringdistance(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP cstringrefseqdistance(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP dist2matrix(SEXP, SEXP);
 extern SEXP getTraMineRDebugLevel();
 extern SEXP setTraMineRDebugLevel(SEXP);
+extern SEXP tmrChisq(SEXP, SEXP, SEXP);
 extern SEXP tmreventinseq(SEXP, SEXP);
 extern SEXP tmrinertiacontribext(SEXP, SEXP, SEXP);
 extern SEXP tmrseqedist(SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -39,9 +40,8 @@ extern SEXP tmrmatrixsubseqinseq(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP)
 extern SEXP tmrseqetotse(SEXP);
 
 static const R_CMethodDef CEntries[] = {
-  {"cLCP",   (DL_FUNC) &cLCP,   4},
-  {"cLCS",   (DL_FUNC) &cLCS,   4},
-  {"cLEVEN", (DL_FUNC) &cLEVEN, 5},
+  {"cLCP", (DL_FUNC) &cLCP, 4},
+  {"cLCS", (DL_FUNC) &cLCS, 4},
   {NULL, NULL, 0}
 };
 
@@ -49,10 +49,12 @@ static const R_CallMethodDef CallEntries[] = {
   {"henikoff",                     (DL_FUNC) &henikoff,                      5},
   {"saltt",                        (DL_FUNC) &saltt,                        12},
   {"checktriangleineq",            (DL_FUNC) &checktriangleineq,             3},
-  {"cstringdistance",              (DL_FUNC) &cstringdistance,              10},
+  {"cstringdistance",              (DL_FUNC) &cstringdistance,               8},
+  {"cstringrefseqdistance",        (DL_FUNC) &cstringrefseqdistance,         7},
   {"dist2matrix",                  (DL_FUNC) &dist2matrix,                   2},
   {"getTraMineRDebugLevel",        (DL_FUNC) &getTraMineRDebugLevel,         0},
   {"setTraMineRDebugLevel",        (DL_FUNC) &setTraMineRDebugLevel,         1},
+  {"tmrChisq",                     (DL_FUNC) &tmrChisq,                      3},
   {"tmreventinseq",                (DL_FUNC) &tmreventinseq,                 2},
   {"tmrinertiacontribext",         (DL_FUNC) &tmrinertiacontribext,          3},
   {"tmrseqedist",                  (DL_FUNC) &tmrseqedist,                   5},

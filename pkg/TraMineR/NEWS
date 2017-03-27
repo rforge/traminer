@@ -1,4 +1,34 @@
 ## =========
+Version 2.1-0 (Development version)
+
+New function:
+  - seqcost(): Evolution of seqsubm() that offers different ways (CONSTANT,
+    TRATE, INDELS, INDELSLOG, FUTURE, FEATURES) to determine indel and
+    substitution costs (see the documentation of seqcost() for details). Unlike
+    seqsubm(), seqcost() returns both the indel and the substitution costs.
+
+Changes in existing functions:
+  - seqdist():
+    - New major version with many new features and an new extensible, robust
+      and documented implementation (R code).
+    - New methods: localized OM (OMloc), spell length sensitive OM (OMslen),
+      OM of spells (OMspell), OM of sequences of transitions (OMstran),
+      Time Warp Edit Distance (TWED), Number of Matching Subsequences (NMS),
+      Number of Matching Subsequences weighted by the Minimum Shared Time (NMSMST),
+      Subsequence Vectorial Representation (SVRspell), Euclidean distance (EUCLID),
+      Chi-squared distance (CHI2).
+    - New arguments: 'kweights', 'tpow', 'expcost', 'context', 'link', 'h', 'nu',
+      'transindel', 'otto', 'previous', 'add.column', 'breaks', 'step', 'overlap',
+      'weighted', 'prox'.
+    - 'sm': value "CONSTANT" has been removed for DHD as it doesn't make sense
+      and the values "INDELS" and "INDELSLOG" have been added (see seqcost()
+      documentation).
+    - 'norm': value TRUE is replaced by "auto" and FALSE by "none".
+    - See the updated documentation of seqdist() for details.
+  - seqsubm(): This now an alias for seqcost(...)$sm.
+
+
+## =========
 Version 1.9-14 (Development version)
 
 Misc:

@@ -326,13 +326,13 @@ Specific \traminer functions can be combined in the same script with any of the 
 \tabularnewline
 		%\cline{2-4}
 		dissimilarities (Section \ref{sec_similarities}) & seqdist() & & Pairwise distances or distances to a baseline sequence \tabularnewline
-		%\cline{2-4}					
+		%\cline{2-4}
 			& seqdistmc() & & Multichannel distances \tabularnewline
-		%\cline{2-4}						
+		%\cline{2-4}
 %											& disscenter() & & Distances to the (virtual) center of the set \tabularnewline
-%		\cline{2-4}							
+%		\cline{2-4}
 %											& dissvar() & & Pseudo-variance of a set of sequences \tabularnewline
-%		\cline{2-4}							
+%		\cline{2-4}
 											& seqrep() & seqrplot() & Extracting sets of non-redundant representative sequences  \tabularnewline
 		\hline
 
@@ -340,7 +340,7 @@ Specific \traminer functions can be combined in the same script with any of the 
 
 \caption{\pkg{TraMineR}'s key functions.}
 \label{tab:Overview}
-\end{table}	
+\end{table}
 %
 
 \traminer is readily installed from  within \R via \code{install.packages("TraMineR")}. %
@@ -764,7 +764,7 @@ of the dissimilarities between sequences (Figure~\ref{fg_mvad-full-seqIplot}). B
 <<Iplot-mdscale, echo=FALSE, results=hide, fig=FALSE, cache=TRUE>>=
 mvad.lcs <- seqdist(mvad.seq, method="LCS")
 mds <- cmdscale(mvad.lcs, k=1)
-dref <- seqdist(mvad.seq, ref=0, method="LCS")
+dref <- seqdist(mvad.seq, refseq=0, method="LCS")
 @
 
 <<Iplot-sorted, echo=FALSE, results=hide, fig=FALSE>>=
