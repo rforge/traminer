@@ -1,4 +1,12 @@
 ## =========
+Version 2.1-1 (Development version)
+
+Misc:
+  - Remove the following unused functions: vidx(), seqmatsaltt(), seqmathenikoff().
+  - Remove function deprecated in TraMineR 1.x: seqesetlength(), dissreg(), dissmfac().
+
+
+## =========
 Version 2.1-0 (Development version)
 
 New function:

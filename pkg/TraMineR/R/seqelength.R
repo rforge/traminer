@@ -28,14 +28,3 @@ seqelength<-function(s){
 	.Call(C_tmrsequencesetlength, s, as.double(value))
 	return(s)
 }
-seqesetlength<-function(s, len){
-	warning(" [!] This function has been depreaceted, use (seqelength(s) <- len) instead ")
-	if(!is.seqelist(s)) {
-		stop("s should be a seqelist. See help on seqecreate.")
-	}
-	if(length(s)!=length(len)) {
-		stop("s and len should be of the same size.")
-	}
-	return(invisible(.Call(C_tmrsequencesetlength, s, as.double(len))))
-}
-

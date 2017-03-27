@@ -51,7 +51,7 @@ An object of class \code{disstree} that contains the following components:
   In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),
   \emph{Advances in Knowledge Discovery and Management},
   Studies in Computational Intelligence, Volume 292, pp. 3-19. Berlin: Springer.
-	
+
   Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2009)
   Analyse de dissimilarités par arbre d'induction. In EGC 2009,
   \emph{Revue des Nouvelles Technologies de l'Information}, Vol. E-15, pp. 7-18.
@@ -77,7 +77,7 @@ algorithm. \emph{Journal of the Royal Statistical Society A} \bold{170}(4), 1061
    \cr
    \code{\link{dissassoc}} to test association between objects represented by their dissimilarities and a covariate.
    \cr
-	 \code{\link{dissmfac}} to perform multi-factor analysis of variance from pairwise dissimilarities.
+	 \code{\link{dissmfacw}} to perform multi-factor analysis of variance from pairwise dissimilarities.
 \cr
 \code{\link{disscenter}} to compute the distance of each object to its group center from pairwise dissimilarities.
 

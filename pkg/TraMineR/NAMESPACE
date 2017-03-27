@@ -124,9 +124,7 @@ S3method(hist ,TraMineRPermut)
 export(
     dissassoc,
     disscenter,
-    dissreg,
     dissrep,
-    dissmfac,
     dissmfacw,
     disstreedisplay,
     disstree2dot,
@@ -141,7 +139,6 @@ export(
 )
 S3method(hist,dissassoc)
 S3method(print,dissassoc)
-S3method(print,dissregression)
 S3method(print,dissmultifactor)
 S3method(print,disstree)
 S3method(print,seqtree)
@@ -184,7 +181,6 @@ export(
     seqefsub,
     seqeid,
     seqelength,
-    seqesetlength,
     "seqelength<-",
     seqeweight,
     "seqeweight<-",

@@ -1,9 +1,6 @@
-\name{dissmfac}
-\alias{dissmfac}
+\name{dissmfacw}
 \alias{dissmfacw}
-\alias{dissreg}
 \alias{gower_matrix}
-\alias{print.dissregression}
 \alias{print.dissmultifactor}
 \encoding{latin1}
 \title{Multi-factor ANOVA from a dissimilarity matrix}
@@ -13,8 +10,6 @@
 \usage{
 dissmfacw(formula, data, R = 1000, gower = FALSE, squared = FALSE,
     weights = NULL)
-dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
-    permutation = "dissmatrix")
 }
 
 \arguments{
@@ -24,16 +19,15 @@ dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
   \item{gower}{Logical: Is the dissimilarity matrix already a Gower matrix?}
   \item{squared}{Logical: Should we square the provided dissimilarities?}
   \item{weights}{Optional numerical vector of case weights.}
-  \item{permutation}{Deprecated. Kept for backward compatibility.}
 }
 \details{
   This method is, in some way, a generalization of \code{\link{dissassoc}} to account for several explanatory variables.
   The function computes the part of discrepancy explained by the list of covariates specified in the \code{formula}.
   It provides for each covariate the Type-II effect, i.e. the effect measured when removing the covariate from the full model with all variables included.
-  
+
   (The returned F values may slightly differ from those obtained with TraMineR versions older than 1.8-9. Since 1.8-9, the within sum of squares at the denominator is divided by \eqn{n-m} instead of \eqn{n-m-1}, where \eqn{n} is the sample size and \eqn{m} the total number of predictors and/or contrasts used to represent categorical factors.)
-  
-  For a single factor \code{dissmfac} is slower than \code{\link{dissassoc}}.
+
+  For a single factor \code{dissmfacw} is slower than \code{\link{dissassoc}}.
   Moreover, the latter performs also tests for homogeneity in within-group discrepancies (equality of variances) with a generalization of Levene's and Bartlett's statistics.
 
   Part of the function is based on the Multivariate Matrix Regression with qr decomposition algorithm written in SciPy-Python by Ondrej Libiger and Matt Zapala (See \cite{Zapala and Schork}, 2006, for a full reference.)  The algorithm has been adapted for Type-II effects and extended to account for case weights.
@@ -53,7 +47,7 @@ dissmfac(formula, data, R = 1000, gower = FALSE, squared = TRUE,
   In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),
   \emph{Advances in Knowledge Discovery and Management},
   Studies in Computational Intelligence, Volume 292, pp. 3-19. Berlin: Springer.
-	
+
   Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2009).
   Analyse de dissimilarités par arbre d'induction. In EGC 2009,
   \emph{Revue des Nouvelles Technologies de l'Information}, Vol. E-15, pp. 7-18.
@@ -87,7 +81,7 @@ mvad.seq <- seqdef(mvad[, 17:86])
 mvad.ham <- seqdist(mvad.seq, method="HAM")
 
 ## And now the multi-factor analysis
-print(dissmfac(mvad.ham ~ male + Grammar + funemp +
+print(dissmfacw(mvad.ham ~ male + Grammar + funemp +
 	gcse5eq + fmpr + livboth, data=mvad, R=10))
 }
 \author{Matthias Studer (with Gilbert Ritschard for the help page)}

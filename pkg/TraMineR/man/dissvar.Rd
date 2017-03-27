@@ -54,7 +54,7 @@ In the Euclidean case, the sum of squares can be expressed as:
 \cr
 \code{\link{disscenter}} to compute the distance of each object to its group center from pairwise dissimilarities.
    \cr
-	 \code{\link{dissmfac}} to perform multi-factor analysis of variance from pairwise dissimilarities.
+	 \code{\link{dissmfacw}} to perform multi-factor analysis of variance from pairwise dissimilarities.
 }
 
 \examples{

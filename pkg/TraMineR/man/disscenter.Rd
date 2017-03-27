@@ -73,7 +73,7 @@ center, each column corresponding to a group.}
   \cr
   \code{\link{disstree}} for an induction tree analyse of objects characterized by a dissimilarity matrix.
   \cr
-  \code{\link{dissmfac}} to perform multi-factor analysis of variance from pairwise dissimilarities.
+  \code{\link{dissmfacw}} to perform multi-factor analysis of variance from pairwise dissimilarities.
 }
 
 \examples{
