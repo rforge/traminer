@@ -51,12 +51,12 @@ seqeconstraint(maxGap = -1, windowSize = -1, ageMin = -1,
   Sequential Patterns \emph{Proceedings of the KDD'2001 Workshop on
   Temporal Data Mining}, San Francisco.
 
-  Ritschard, G., A. Gabadinho, N.S. Müller and M. Studer (2008), Mining event sequences: A social science perspective, \emph{International Journal of Data Mining, Modelling and Management, IJDMMM}, 1(1), 68-90.
+  Ritschard, G., A. Gabadinho, N.S. MÃ¼ller and M. Studer (2008), Mining event sequences: A social science perspective, \emph{International Journal of Data Mining, Modelling and Management, IJDMMM}, 1(1), 68-90.
   }
 
 \seealso{\code{\link{seqefsub}}, \code{\link{seqeapplysub}}}
 
-\author{Matthias Studer, Nicolas S. Müller and Reto Bürgin (alternative counting methods) (with Gilbert Ritschard for the help page)}
+\author{Matthias Studer, Nicolas S. MÃ¼ller and Reto BÃ¼rgin (alternative counting methods) (with Gilbert Ritschard for the help page)}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{Event sequences}

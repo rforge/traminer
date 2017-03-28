@@ -154,7 +154,7 @@ seqcost <- function(seqdata, method, cval = NULL, with.missing = FALSE,
       tratecostBoth <- function(trate, time, state1, state2, debut, fin) {
         cost <- 0
         if (!debut) {
-          ## Premier état
+          ## Premier Ã©tat
           cost <- cost - trate[state1, state2, time - 1] - trate[state2,
           state1, time - 1]
         }
@@ -172,7 +172,7 @@ seqcost <- function(seqdata, method, cval = NULL, with.missing = FALSE,
       tratecostPrevious <- function(trate, time, state1, state2, debut, fin) {
         cost <- 0
         if (!debut) {
-          ## Premier état
+          ## Premier Ã©tat
           cost <- cost - trate[state1, state2, time - 1] - trate[state2,
           state1, time - 1]
         }

@@ -28,17 +28,17 @@ sequences and vice versa.
 }
 
 \author{
-Alexis Gabadinho, Matthias Studer, Nicolas S. Muller, Reto Buergin, and Gilbert Ritschard
+Alexis Gabadinho, Matthias Studer, Nicolas S. Müller, Reto Bürgin, and Gilbert Ritschard
 
 }
 
 
 \references{
-    Gabadinho, A., G. Ritschard, N. S. M�ller and M. Studer (2011).
+    Gabadinho, A., G. Ritschard, N. S. Müller and M. Studer (2011).
     Analyzing and Visualizing State Sequences in R with TraMineR.
     \emph{Journal of Statistical Software} \bold{40}(4), 1-37.
 
-    Gabadinho, A., G. Ritschard, M. Studer and N. S. M�ller (2009).
+    Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009).
     Mining Sequence Data in \code{R} with the \code{TraMineR} package:
     A user's guide. Department of Econometrics and Laboratory of
     Demography, University of Geneva

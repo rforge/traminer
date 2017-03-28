@@ -187,7 +187,7 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
 \seealso{ \code{\link{seqplot}}, \code{\link{seqdef}}, \code{\link{seqecreate}}}
 
 \references{
-  Bürgin, R. and G. Ritschard (2014), A decorated parallel coordinate plot for categorical longitudinal data, \emph{The American Statistician} 68(2), 98-103.
+  BÃ¼rgin, R. and G. Ritschard (2014), A decorated parallel coordinate plot for categorical longitudinal data, \emph{The American Statistician} 68(2), 98-103.
 }
 
 \examples{
@@ -323,7 +323,7 @@ seqpcplot(seqdata = biofam.seqe,
 
 }
 
-\author{Reto Bürgin (with Gilbert Ritschard for the help page)}
+\author{Reto BÃ¼rgin (with Gilbert Ritschard for the help page)}
 
 \keyword{Plot}
 \keyword{Event sequences}

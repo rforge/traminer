@@ -17,7 +17,7 @@ ComputeWeightedTestValues <- function(allindiv, ind, SCresiFunc, weights, SCtot,
 		s1ni <- 0
 		#sumexp <- 0
 		for (i in 1:k) {
-			#on crée le groupe en question
+			#on crÃ©e le groupe en question
 			SCresif <- SCresiFunc(allindiv, ind, i, weights)
 			SCresi <- SCresif[2]
 			ni <- SCresif[1]
@@ -246,7 +246,7 @@ dissassocweighted.permbootstrap <- function(diss, grpint, weights, R, ret, sampl
 
 dissassocweighted <- function(diss, group, weights, R, weight.permutation, squared, samplesize=NULL) {
 	
-	## Notation comme pour l'ANOVA, SC=Inertia dans le sens du criète de Ward
+	## Notation comme pour l'ANOVA, SC=Inertia dans le sens du criÃ¨te de Ward
 	if (inherits(diss, "dist")) {
 		diss <- dist2matrix(diss)
 	}

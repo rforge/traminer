@@ -1,7 +1,6 @@
 \name{disstree}
 \alias{disstree}
 \alias{print.disstree}
-\encoding{latin1}
 \title{Dissimilarity Tree}
 \description{
   Tree structured discrepancy analysis of objects described by their pairwise dissimilarities.
@@ -44,16 +43,16 @@ An object of class \code{disstree} that contains the following components:
   \item{weights}{weights}
 }
 \references{
-    Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
+    Studer, M., G. Ritschard, A. Gabadinho and N. S. MÃ¼ller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
 
-  Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
+  Studer, M., G. Ritschard, A. Gabadinho and N. S. MÃ¼ller (2010)
   Discrepancy	analysis of complex objects using dissimilarities.
   In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),
   \emph{Advances in Knowledge Discovery and Management},
   Studies in Computational Intelligence, Volume 292, pp. 3-19. Berlin: Springer.
 
-  Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2009)
-  Analyse de dissimilarités par arbre d'induction. In EGC 2009,
+  Studer, M., G. Ritschard, A. Gabadinho and N. S. MÃ¼ller (2009)
+  Analyse de dissimilaritÃ©s par arbre d'induction. In EGC 2009,
   \emph{Revue des Nouvelles Technologies de l'Information}, Vol. E-15, pp. 7-18.
 
   Anderson, M. J. (2001) A new method for non-parametric multivariate analysis of variance.

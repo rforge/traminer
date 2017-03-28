@@ -1,5 +1,12 @@
 ## =========
-Version 2.1-1 (Development version)
+Version 2.1-2 [2017-03-28] (Development version)
+
+Misc:
+  - Change character encoding from latin1 (ISO-8859-1) to UTF-8.
+
+
+## =========
+Version 2.1-1 [2017-03-27] (Development version)
 
 Misc:
   - Remove the following unused functions: vidx(), seqmatsaltt(), seqmathenikoff().
@@ -7,7 +14,7 @@ Misc:
 
 
 ## =========
-Version 2.1-0 (Development version)
+Version 2.1-0 [2017-03-27] (Development version)
 
 New function:
   - seqcost(): Evolution of seqsubm() that offers different ways (CONSTANT,
@@ -37,7 +44,7 @@ Changes in existing functions:
 
 
 ## =========
-Version 1.9-14 (Development version)
+Version 1.9-14 [2017-03-20] (Development version)
 
 Misc:
   - Registration of native routines for R 3.4.x.
@@ -324,8 +331,8 @@ Bug fixes:
         the plotting function.
   - dissrep(), seqrep(): error when 'nrep' cannot be reached (reported by M. Studer)
   - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint
-        was not taken into account (Reported by Reto Buergin).
-  - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto Buergin).
+        was not taken into account (Reported by Reto Bürgin).
+  - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto Bürgin).
   - print.seqelist() and as.character.seqelist(): generated segfault when
         converting long event sequences to character (Reported by Pierre Molinier).
   - seqsubm(): Very small rounding errors (1e-16) were sometimes leading to non symmetric

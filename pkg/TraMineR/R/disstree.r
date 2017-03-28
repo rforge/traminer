@@ -1,14 +1,14 @@
 #################
 ##DisTreeNode
 #################
-# Donnée accessible
-# predictor : liste des prédicteurs
-# dissmatrix : matrices des dissimilarités internes
+# DonnÃ©e accessible
+# predictor : liste des prÃ©dicteurs
+# dissmatrix : matrices des dissimilaritÃ©s internes
 #
 
-#Donnée interne
+#DonnÃ©e interne
 # split : predicteur choisi(NULL pour noeux terminaux)
-# vardis : variabilité interne
+# vardis : variabilitÃ© interne
 # children : noeud enfant (NULL pour noeux terminaux)
 # ind: liste des index des individus du noeuds.
 # depth: profondeur du noeud
@@ -347,7 +347,7 @@ DTNGroupFactorBinary <- function(dissmatrix, currentSCres, pred, minSize, varind
 	grpSize <- numeric(length=nbGrp)
 	grpSize[] <- 0
 	for (i in 1:length(lgrp)) {
-		## on crée le groupe en question
+		## on crÃ©e le groupe en question
 		grpCond[[i]] <- (grp==lgrp[i])
 		grpCond[[i]][is.na(grpCond[[i]])] <- FALSE
 		grpSize[i] <- sum(weights[ind[grpCond[[i]]]])

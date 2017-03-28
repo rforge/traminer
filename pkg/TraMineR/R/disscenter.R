@@ -60,7 +60,7 @@ disscentertrim <- function(diss, group=NULL, medoids.index=NULL, allcenter=FALSE
 	keep=1-trim
 	## pour chaque valeur du groupe
 	for (i in 1:length(lgrp)) {
-		## on crée le groupe en question
+		## on crÃ©e le groupe en question
 		cond <- grp==lgrp[i]
 		grpindiv <- sort(ind[cond])
 		## on calcul la contribution a l'inertie intraclasse

@@ -18,7 +18,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 	## Preparing if group is not null
 	## ==============================
 
-        if (type == "pc") { # modification of Reto Buergin 16.08.2012
+        if (type == "pc") { # modification of Reto Bürgin 16.08.2012
           oolist <- append(oolist, list(group = group, rows = rows, cols = cols))
           group <- NULL
         }
@@ -149,7 +149,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 
 			## Removing unused arguments
 			plist <- plist[!names(plist) %in% "yaxis"]
-			
+
 			## Selecting distances according to group
 			if (!"dist.matrix" %in% names(olist))
 				stop("You must provide a distance matrix", call.=FALSE)
@@ -167,7 +167,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 				}
 			}
 
-                      } else if (type == "pc") { # modification of Reto Buergin 16.08.2012
+                      } else if (type == "pc") { # modification of Reto Bürgin 16.08.2012
 
                         plist$title <- title
                         olist <- c(olist, plist)
@@ -177,7 +177,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
                         plist <- list()
                       }
 		else
-			stop("Unknown 'type' argument.")		
+			stop("Unknown 'type' argument.")
 
 		## Calling appropriate function and plotting
 		flist <- names(formals(f))
@@ -203,7 +203,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 		olist <- olist[!match.args]
 		plist <- c(list(x=res), plist, olist)
 		do.call(plot, args=plist)
-	}	
+	}
 
 	## Plotting the legend
 	if (!is.null(legpos)) {

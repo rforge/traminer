@@ -1,4 +1,3 @@
-\encoding{latin1}
 \name{seqdiff}
 \alias{seqdiff}
 \alias{print.seqdiff}
@@ -39,14 +38,14 @@ seqdiff(seqdata, group, cmprange = c(0, 1),
 }
 
 \references{
-  Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
+  Studer, M., G. Ritschard, A. Gabadinho and N. S. MÃ¼ller (2010)
   Discrepancy analysis of complex objects using dissimilarities.
   In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),
   \emph{Advances in Knowledge Discovery and Management},
   Studies in Computational Intelligence, Volume 292, pp. 3-19. Berlin: Springer.
-	
-  Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2009)
-  Analyse de dissimilarités par arbre d'induction. In EGC 2009,
+
+  Studer, M., G. Ritschard, A. Gabadinho and N. S. MÃ¼ller (2009)
+  Analyse de dissimilaritÃ©s par arbre d'induction. In EGC 2009,
   \emph{Revue des Nouvelles Technologies de l'Information}, Vol. E-15, pp. 7-18.
 
  }

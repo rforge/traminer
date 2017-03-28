@@ -1,4 +1,3 @@
-\encoding{latin1}
 \name{plot.stslist.rep}
 \alias{plot.stslist.rep}
 %- Also NEED an '\alias' for EACH other topic documented here.

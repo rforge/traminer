@@ -1,6 +1,5 @@
 % Author for TraMineR 2: Pierre-Alexandre Fonta (2016-2017)
 
-\encoding{latin1}
 \name{seqdist}
 \alias{seqdist}
 \title{Distances (dissimilarities) between sequences}
@@ -334,11 +333,11 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES,
   Switzerland. DOI: \url{http://dx.doi.org/10.12682/lives.2296-1658.2014.33}
 
-  Gabadinho, A., G. Ritschard, N. S. Müller and M. Studer (2011). Analyzing and
+  Gabadinho, A., G. Ritschard, N. S. MÃ¼ller and M. Studer (2011). Analyzing and
   Visualizing State Sequences in R with TraMineR. \emph{Journal of Statistical
   Software} \bold{40}(4), 1--37.
 
-  Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009). Mining
+  Gabadinho, A., G. Ritschard, M. Studer and N. S. MÃ¼ller (2009). Mining
   Sequence Data in \code{R} with the \code{TraMineR} package: A user's guide
   Department of Econometrics and Laboratory of Demography, University of Geneva
 
@@ -360,7 +359,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   See also all references in \cite{Studer and Ritschard (2014, 2016)}
 }
 \author{
-  Matthias Studer, Pierre-Alexandre Fonta, Alexis Gabadinho, Nicolas S. Müller,
+  Matthias Studer, Pierre-Alexandre Fonta, Alexis Gabadinho, Nicolas S. MÃ¼ller,
   Gilbert Ritschard.
 }
 \seealso{

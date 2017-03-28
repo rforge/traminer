@@ -1,4 +1,3 @@
-\encoding{latin1}
 \name{seqalign}
 \alias{seqalign}
 \alias{plot.seqalign}

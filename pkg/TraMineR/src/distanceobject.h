@@ -6,8 +6,8 @@
 //using namespace std;
 //#define TMRDISTINDEX(i,j,n) (n*(i-1) - i*(i-1)/2 + j-i-1)
 
-//Définition de type pour aleger le code
-//Une map sur le type d'événements, et la classe événement
+//DÃ©finition de type pour aleger le code
+//Une map sur le type d'Ã©vÃ©nements, et la classe Ã©vÃ©nement
 class DistanceObject{
 protected:
   int* magicIndex;

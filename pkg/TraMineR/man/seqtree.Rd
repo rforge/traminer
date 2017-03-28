@@ -41,7 +41,7 @@ The \code{seqtree} objects can be "plotted" with \code{\link{seqtreedisplay}}. A
 }
 
 \references{
-Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
+Studer, M., G. Ritschard, A. Gabadinho and N. S. MÃ¼ller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
 }
 
 \seealso{

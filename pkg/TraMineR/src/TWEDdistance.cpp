@@ -19,7 +19,7 @@ TWEDdistance::~TWEDdistance(){
 }
 double TWEDdistance::distance(const int&is, const int& js){
 double minimum=0, i_warp=0, j_warp=0, sub=0;//, lenmax=0;
-    //etats comparés
+    //etats comparÃ©s
     int i_state, j_state;
     int i_m1_state, j_m1_state; // BH Need previous state also
     double cost, maxpossiblecost;

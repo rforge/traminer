@@ -19,7 +19,7 @@ OMvdistance::~OMvdistance(){
 double OMvdistance::distance(const int&is, const int& js){
      //On passe les prefix commun
     double minimum=0, j_indel=0, sub=0;//, lenmax=0;
-    //etats comparés
+    //etats comparÃ©s
     int i_state, j_state;
     double maxpossiblecost;
     int i=1;

@@ -67,7 +67,6 @@ The functions can then easily retrieve this information to ensure presentation h
 
 
 %\documentclass[10pt,a4paper]{article}
-%\usepackage[latin1]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
@@ -155,7 +154,7 @@ The functions can then easily retrieve this information to ensure presentation h
 
 %% preliminary R commands
 <<preliminary, echo=FALSE, results=hide>>=
-options(width=76, prompt="R> ", continue="+   ", encoding="latin1", useFancyQuotes=FALSE)
+options(width=76, prompt="R> ", continue="+   ", encoding="UTF-8", useFancyQuotes=FALSE)
 library(TraMineR)
 library(xtable)
 

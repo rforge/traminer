@@ -27,7 +27,7 @@ OMVIdistance::~OMVIdistance(){
 double OMVIdistance::distance(const int&is, const int& js){
      //On passe les prefix commun
     double minimum=0, j_indel=0, sub=0;//, lenmax=0;
-    //etats comparés
+    //etats comparÃ©s
     double maxpossiblecost;
     int i=1;
     int j=1;

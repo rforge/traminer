@@ -31,7 +31,7 @@ void cLCS(int *iseq, int *jseq , double *length, int *result) {
                 L[i][j] = 1 + L[i-1][j-1];
                 //	   Rprintf("temp = %i jseq = %i, L[%i][%i] = %i\n", temp, jseq[j-1], i, j, L[i][j]);
             } else {
-                //   Rprintf("�gal 0 pour i %d", i);
+                //   Rprintf("égal 0 pour i %d", i);
                 a = L[i-1][j];
                 b = L[i][j-1];
                 max = a;

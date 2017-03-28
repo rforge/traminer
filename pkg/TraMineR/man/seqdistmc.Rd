@@ -1,4 +1,3 @@
-\encoding{latin1}
 \name{seqdistmc}
 \alias{seqdistmc}
 \title{Multichannel distances between sequences}
@@ -61,7 +60,7 @@ left.seq <- seqdef(left)
 
 ## Using transition rates to compute substitution costs on each channel
 mcdist <- seqdistmc(channels=list(child.seq, marr.seq, left.seq),
- 	method="OM", sm =list("TRATE", "TRATE", "TRATE")) 	
+ 	method="OM", sm =list("TRATE", "TRATE", "TRATE"))
 
 ## Using a weight of 2 for children channel and specifying substitution-cost
 smatrix <- list()

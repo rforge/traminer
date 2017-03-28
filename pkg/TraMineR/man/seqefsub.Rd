@@ -82,7 +82,7 @@ fsubseq <- seqefsub(actcal.seqe, minSupport=10,
 fsubseq[1:10]
 }
 
-\author{Matthias Studer and Reto Bürgin (alternative counting methods) (with Gilbert Ritschard for the help page)}
+\author{Matthias Studer and Reto BÃ¼rgin (alternative counting methods) (with Gilbert Ritschard for the help page)}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{Event sequences}
