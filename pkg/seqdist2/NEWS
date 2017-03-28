@@ -1,3 +1,9 @@
+              DEPRECATED [2017-03-27]
+
+<!>
+  o seqdist2 is now deprecated in favour of TraMineR 2.x
+    functions seqdist() and seqcost().
+
               CHANGES IN seqdist2 VERSION 0.9-2 [2016-12-01]
 
 BUG FIXES
@@ -10,9 +16,9 @@ BUG FIXES
         substitution cost for missing is set as the miss.cost
         value. (Generalizes former miss.trate that is now deprecated)
   o seqcost: Arguments state.prop, prop.weights and prop.type renamed
-        as state.features, feature.weights and feature.type. 
-      
-MISC  
+        as state.features, feature.weights and feature.type.
+
+MISC
   o Fixed typos in and updated references help pages.
 
               CHANGES IN seqdist2 VERSION 0.9-1 [2015-11-16]
