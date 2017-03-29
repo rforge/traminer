@@ -3,6 +3,7 @@ Version 2.1-2 [2017-03-28] (Development version)
 
 Misc:
   - Change character encoding from latin1 (ISO-8859-1) to UTF-8.
+  - Normalize line endings: LF.
 
 
 ## =========
