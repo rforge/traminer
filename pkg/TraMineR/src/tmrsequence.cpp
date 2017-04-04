@@ -240,7 +240,7 @@ extern "C" {
 				      REAL(countMethod)[0]);
     //REprintf((char*)"branches/nico 1\n\n");
 
-    double mGap = cst->getmaxGap();;
+    double mGap = cst->getmaxGap();
     double wSize = cst->getwindowSize();
     double aMin = cst->getageMinBegin();
     double aMax = cst->getageMaxBegin();
@@ -357,6 +357,7 @@ extern "C" {
     SET_VECTOR_ELT(ans,2,subseq); // list of subsequences
     UNPROTECT(4);
     delete root;
+    delete cst;
     return ans;
   }
 
