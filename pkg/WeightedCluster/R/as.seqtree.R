@@ -65,10 +65,10 @@ as.seqtree.default <- function(object, seqdata, diss, weighted=TRUE, ...) {
 				# print(diss)
 				lSCres <- .Call(TraMineR:::C_tmrWeightedInertiaDist, diss, as.integer(nrow(diss)),
 					as.integer(FALSE), as.integer(ind[bestSpl$variable]), as.double(weights),
-					as.integer(FALSE))
+					as.integer(FALSE), PACKAGE="TraMineR")
 				rSCres <- .Call(TraMineR:::C_tmrWeightedInertiaDist, diss, as.integer(nrow(diss)),
 					as.integer(FALSE), as.integer(ind[!bestSpl$variable]), as.double(weights),
-					as.integer(FALSE))
+					as.integer(FALSE), PACKAGE="TraMineR")
 				info <- list(
 						lpop=sum(weights[ind[bestSpl$variable]]),
 						rpop=sum(weights[ind[!bestSpl$variable]]),
