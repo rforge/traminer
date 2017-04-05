@@ -41,8 +41,10 @@ extern "C" {
 		SEXP ClusterAlgo;
 		PROTECT(ClusterAlgo= KMedoidBaseWorker(km));
 		km->findCluster();
-		UNPROTECT(1);
 		TRAMINER_DEBUG_LEVEL=old_debug;
-		return(km->getClustering());
+		SEXP ans;
+		PROTECT(ans=km->getClustering());
+		UNPROTECT(2);
+		return(ans);
 	}
 }
