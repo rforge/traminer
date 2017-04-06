@@ -216,11 +216,12 @@ extern "C" {
     }
     /**Return a string representation of a sequence*/
     SEXP tmrsequencestring(SEXP seq) {
-        SEXP str=tmrsequencestringinternal(seq);
+        SEXP str;
+        PROTECT(str = tmrsequencestringinternal(seq));
         SEXP ret;
         PROTECT(ret = allocVector(STRSXP, 1));
         SET_STRING_ELT(ret, 0, str);
-        UNPROTECT(1);
+        UNPROTECT(2);
         return ret;
     }
 

@@ -1,8 +1,10 @@
 ## =========
-Version 2.1-3 [2017-04-04] (Development version)
+Version 2.1-3 [2017-04-06] (Development version)
 
 Misc:
-  - Fix two memory errors detected by Valgrind in TraMineR 1.8-13.
+  - In src/tmrsequence.cpp from TraMineR 1.8-13:
+    - Fix two memory errors detected by Valgrind.
+    - Fix a PROTECT error.
 
 
 ## =========

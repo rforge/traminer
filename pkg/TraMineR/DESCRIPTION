@@ -1,6 +1,6 @@
 Package: TraMineR
 Version: 2.1-3
-Date: 2017-04-04
+Date: 2017-04-06
 Title: Trajectory Miner: a Toolbox for Exploring and Rendering Sequences
 Authors@R: c(
   person("Alexis", "Gabadinho", role = c("aut", "cph")),
