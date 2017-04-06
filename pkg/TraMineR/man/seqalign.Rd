@@ -10,9 +10,9 @@ The function provides details about a pairwise alignment.
 \usage{
 seqalign(seqdata, indices, indel=1, sm, with.missing = FALSE)
 
-\method{plot}{seqalign}(x, cpal=NULL, missing.color=NULL,
-    ylab=NULL, yaxis=TRUE, xaxis=TRUE, ytlab=NULL, ylas=0,
-    xtlab=NULL, cex.plot=1, ...)
+\method{plot}{seqalign}(x, cpal = NULL, missing.color = NULL, ylab = NULL,
+  yaxis = TRUE, xaxis = TRUE, ytlab = NULL, ylas = 0, xtlab = NULL,
+  cex = 1, cex.plot, ...)
 
 \method{print}{seqalign}(x, digits=3, ...)
 }
@@ -43,9 +43,10 @@ seqalign(seqdata, indices, indel=1, sm, with.missing = FALSE)
     \item{ytlab}{ytlab}
     \item{ylas}{ylas}
     \item{xtlab}{xtlab}
-    \item{cex.plot}{plot font size}
+    \item{cex}{plot font size}
     \item{digits}{number of digits for printed output}
-    \item{...}{additional arguments passed to other functions}
+  \item{cex.plot}{Deprecated. Use \code{cex} instead.}
+  \item{...}{additional arguments passed to other functions}
 }
 \details{
 There are print and plot methods for \code{seqalign} objects.

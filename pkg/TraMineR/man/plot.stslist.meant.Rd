@@ -6,8 +6,8 @@
 This is the plot method for objects of class \emph{stslist.meant} produced by the \code{\link{seqmeant}} function.
 }
 \usage{
-\method{plot}{stslist.meant}(x, cpal = NULL, ylab = NULL, yaxis = TRUE, xaxis = TRUE,
-     cex.plot = 1, ylim = NULL, ...)
+\method{plot}{stslist.meant}(x, cpal = NULL, ylab = NULL, yaxis = TRUE,
+  xaxis = TRUE, cex.axis = 1, ylim = NULL, cex.plot, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -17,10 +17,9 @@ This is the plot method for objects of class \emph{stslist.meant} produced by th
   \item{yaxis}{controls whether the y axis is plotted. Default is \code{TRUE}.}
   \item{xaxis}{if \code{TRUE} (default) the xaxis is plotted.}
 
-  \item{cex.plot}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
-
+  \item{cex.axis}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
   \item{ylim}{an optional vector setting the limits for the y axis. If \code{NULL} (default), limits are set to (0, max. sequence length).}
-
+  \item{cex.plot}{Deprecated. Use \code{cex.axis} instead.}
   \item{\dots}{further graphical parameters. For more details about the graphical parameter arguments, see \code{barplot} and \code{par}.}
 }
 \details{This is the plot method for the output produced by the \code{\link{seqmeant}} function, i.e., objects of class \emph{stslist.meant}. It produces a plot showing the mean times spent in each state of the alphabet.

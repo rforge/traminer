@@ -8,18 +8,19 @@
 }
 \usage{
 seqdiff(seqdata, group, cmprange = c(0, 1),
-    seqdist_arg=list(method="LCS",norm=TRUE),
-    with.missing = FALSE, weighted = TRUE, squared = FALSE)
+  seqdist.args = list(method = "LCS", norm = TRUE), with.missing = FALSE,
+  weighted = TRUE, squared = FALSE, seqdist_arg)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{seqdata}{a state sequence object created with the \code{\link{seqdef}} function.}
   \item{group}{The group variable.}
   \item{cmprange}{The time range of the sliding window on which subsequences are compared.}
-  \item{seqdist_arg}{List of arguments passed to \code{\link{seqdist}} for computing the distances.}
+  \item{seqdist.args}{List of arguments passed to \code{\link{seqdist}} for computing the distances.}
   \item{with.missing}{Logical. If \code{TRUE}, missing values are considered as an additional state. If \code{FALSE} subsequences with missing values are removed from the analysis.}
   \item{weighted}{Logical. If \code{TRUE}, \code{seqdiff} uses the weights specified in \code{seqdata}.}
   \item{squared}{Logical. If \code{TRUE} the dissimilarities are squared for computing the discrepancy.}
+  \item{seqdist_arg}{Deprecated. Use \code{seqdist.args} instead.}
 }
 \details{
   The function analyses how the part of discrepancy explained by the \code{group} variable evolves along the position axis. It runs successively discrepancy analyses within a sliding time-window of range \code{cmprange}). At

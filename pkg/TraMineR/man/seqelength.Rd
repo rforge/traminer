@@ -9,13 +9,14 @@ The length of an event sequence is its time span, i.e., the total time of observ
 \code{seqelength <-} sets the length of the sequences.
 }
 \usage{
-seqelength(s)
-seqelength(s) <- value
+seqelength(eseq, s)
+seqelength(eseq, s) <- value
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{s}{An event sequence object (\code{seqelist}).}
+  \item{eseq}{An event sequence object (\code{seqelist}).}
   \item{value}{A list of sequence lengths.}
+  \item{s}{Deprecated. Use \code{eseq} instead.}
 }
 \value{
   A numeric vector with the lengths of the sequences.
@@ -27,15 +28,15 @@ seqelength(s) <- value
 %\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
 data(actcal.tse)
-actcal.seqe <- seqecreate(actcal.tse)
-## Since endEvent is not specified, contains no sequence lengths
+actcal.eseq <- seqecreate(actcal.tse)
+## Since end.event is not specified, contains no sequence lengths
 ## We set them manually as 12 for all sequences
 sl <- numeric()
 sl[1:2000] <- 12
-seqelength(actcal.seqe) <- sl
-actcal.seqe[1:10]
+seqelength(actcal.eseq) <- sl
+actcal.eseq[1:10]
 ## Retrieve lengths
-seqelength(actcal.seqe)
+seqelength(actcal.eseq)
 }
 %\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
 \author{Matthias Studer (with Gilbert Ritschard for the help page)}

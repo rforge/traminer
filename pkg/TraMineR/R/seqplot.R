@@ -2,11 +2,13 @@
 ## Generic function for plotting state sequence objects
 ## ====================================================
 
-seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
-	cpal=NULL, missing.color=NULL,
-	ylab=NULL, yaxis=TRUE, axes="all", xtlab=NULL, cex.plot=1,
-	withlegend="auto", ltext=NULL, cex.legend=1,
-	use.layout=(!is.null(group) | withlegend!=FALSE), legend.prop=NA, rows=NA, cols=NA, ...) {
+seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
+  missing.color = NULL, ylab = NULL, yaxis = TRUE, axes = "all", xtlab = NULL,
+  cex.axis = 1, with.legend = "auto", ltext = NULL, cex.legend = 1,
+  use.layout = (!is.null(group) | with.legend != FALSE), legend.prop = NA,
+  rows = NA, cols = NA, title, cex.plot, withlegend, ...) {
+
+  checkargs(alist(main = title, cex.axis = cex.plot, with.legend = withlegend))
 
 	if (!inherits(seqdata,"stslist"))
 		stop(call.=FALSE, "seqplot: data is not a sequence object, use seqdef function to create one")
@@ -37,10 +39,10 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
             gindex[[s]] <- which(group==levels(group)[s])
 
           ## Title of each plot
-          if (!is.null(title))
-            title <- paste(title,"-",levels(group))
+          if (!is.null(main))
+            main <- paste(main,"-",levels(group))
           else
-            title <- levels(group)
+            main <- levels(group)
 	} else {
           nplot <- 1
           gindex <- vector("list",1)
@@ -50,7 +52,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 	## ===================
 	## Defining the layout
 	## ===================
-	if (type=="Ht" | type =="pc") { withlegend=FALSE }
+	if (type=="Ht" | type =="pc") { with.legend=FALSE }
 
 	## IF xaxis argument is provided
 	## it interferes with axes argument
@@ -65,7 +67,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 		## Saving graphical parameters
 		savepar <- par(no.readonly = TRUE)
 
-		lout <- TraMineR.setlayout(nplot, rows, cols, withlegend, axes, legend.prop)
+		lout <- TraMineR.setlayout(nplot, rows, cols, with.legend, axes, legend.prop)
 	  	layout(lout$laymat, heights=lout$heights, widths=lout$widths)
 
 		## Axis should be plotted or not ?
@@ -86,16 +88,12 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 		## Storing ... arguments in a list
 		olist <- oolist
 		if ("sortv" %in% names(olist)) {sortv <- olist[["sortv"]]}
-		if ("dist.matrix" %in% names(olist)) {dist.matrix <- olist[["dist.matrix"]]}
-		if ("with.miss" %in% names(olist)) {
-			missidx <- which(names(olist)=="with.miss")
-			names(olist)[missidx] <- "with.missing"
-			message(" [i] argument 'with.miss' is obsolete and replaced by 'with.missing'")
-		}
+		if ("diss" %in% names(olist)) {diss <- olist[["diss"]]}
+		else if ("dist.matrix" %in% names(olist)) { diss <- olist[["dist.matrix"]] } # FIXME dist.matrix is deprecated
 
-		plist <- list(main=title[np], cpal=cpal, missing.color=missing.color,
+		plist <- list(main=main[np], cpal=cpal, missing.color=missing.color,
 			ylab=ylab, yaxis=yaxis, xaxis=xaxis[np],
-			xtlab=xtlab, cex.plot=cex.plot)
+			xtlab=xtlab, cex.axis=cex.axis)
 
 		## Selecting sub sample for x
 		## according to 'group'
@@ -131,7 +129,7 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 			}
 
 			if (type=="I") {
-				if (!"tlim" %in% names(olist)) {olist <- c(olist, list(tlim=0))}
+				if (!"idxs" %in% names(olist)) {olist <- c(olist, list(idxs=0))}
 				if (!"space" %in% names(olist)) {olist <- c(olist, list(space=0))}
 				if (!"border" %in% names(olist)) {olist <- c(olist, list(border=NA))}
 			}
@@ -151,25 +149,28 @@ seqplot <- function(seqdata, group=NULL, type="i", title=NULL,
 			plist <- plist[!names(plist) %in% "yaxis"]
 
 			## Selecting distances according to group
-			if (!"dist.matrix" %in% names(olist))
+			# FIXME dist.matrix is deprecated
+			if (! "diss" %in% names(olist)  && ! "dist.matrix" %in% names(olist))
 				stop("You must provide a distance matrix", call.=FALSE)
 			else {
-				if (inherits(dist.matrix, "dist")) {
-        				dist.matrix <- dist2matrix(dist.matrix)
+				if (inherits(diss, "dist")) {
+        				diss <- dist2matrix(diss)
 				}
 
-				olist[["dist.matrix"]] <- dist.matrix[gindex[[np]],gindex[[np]]]
+				olist[["diss"]] <- diss[gindex[[np]],gindex[[np]]]
 
 				## Max theoretical distance for the scale
 				if (!"dmax" %in% names(olist)) {
-					dmax <- max(dist.matrix)
+					dmax <- max(diss)
 					olist <- c(olist,list(dmax=dmax))
 				}
 			}
 
+                      # FIXME dist.matrix is deprecated
+                      olist <- olist[names(olist) != "dist.matrix"]
                       } else if (type == "pc") { # modification of Reto Bürgin 16.08.2012
 
-                        plist$title <- title
+                        plist$main <- main
                         olist <- c(olist, plist)
                         olist$plot <- FALSE
                         f <- seqpcplot

@@ -155,17 +155,17 @@ S3method(Math,seqelist)
 S3method(Ops,seqelist)
 S3method(plot,seqelist)
 S3method(Summary,seqelist)
-S3method(Math,seqe)
-S3method(Ops,seqe)
-S3method(plot,seqe)
-S3method(Summary,seqe)
-S3method(levels,seqe)
+S3method(Math,eseq)
+S3method(Ops,eseq)
+S3method(plot,eseq)
+S3method(Summary,eseq)
+S3method(levels,eseq)
 S3method(levels,seqelist)
 S3method(str,seqelist)
-S3method(str,seqe)
-S3method(as.character,seqe)
+S3method(str,eseq)
+S3method(as.character,eseq)
 S3method(as.character,seqelist)
-S3method(print,seqe)
+S3method(print,eseq)
 S3method(print,seqelist)
 S3method(print,seqeconstraint)
 S3method(print,subseqelist)
@@ -184,7 +184,7 @@ export(
     "seqelength<-",
     seqeweight,
     "seqeweight<-",
-    is.seqe,
+    is.eseq,
     is.seqelist,
     seqetm
 )

@@ -41,13 +41,13 @@ Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009). Mining Sequence
 data(actcal.tse)
 
 ## Creating the event sequence object
-actcal.seqe <- seqecreate(actcal.tse)
+actcal.eseq <- seqecreate(actcal.tse)
 
 ## Printing sequences
-actcal.seqe[1:10]
+actcal.eseq[1:10]
 
 ## Looking for frequent subsequences
-fsubseq <- seqefsub(actcal.seqe,pMinSupport=0.01)
+fsubseq <- seqefsub(actcal.eseq,pmin.support=0.01)
 
 ## Counting the number of occurrences of each subsequence
 msubcount <- seqeapplysub(fsubseq,method="count")

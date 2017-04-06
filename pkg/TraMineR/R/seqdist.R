@@ -417,7 +417,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
     }
     # most frequent
     else if (refseq.type == "most frequent") {
-      mfseq.freq <- seqtab(seqdata.num, tlim = 1)
+      mfseq.freq <- seqtab(seqdata.num, idxs = 1)
       mfseq.idxs <- suppressMessages(seqfind(mfseq.freq, seqdata.num))
       msg("the most frequent sequence appears", length(mfseq.idxs), "time(s)")
       mfseq.idx <- mfseq.idxs[1]
