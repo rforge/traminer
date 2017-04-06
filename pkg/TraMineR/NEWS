@@ -5,6 +5,8 @@ Misc:
   - In src/tmrsequence.cpp from TraMineR 1.8-13:
     - Fix two memory errors detected by Valgrind.
     - Fix a PROTECT error.
+  - Fixed issues with examples in documentation pages of
+    dissmfacw, disstree, seqtree, and plot.stslist.meant.
 
 
 ## =========

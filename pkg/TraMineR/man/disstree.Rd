@@ -89,8 +89,10 @@ mvad.seq <- seqdef(mvad[, 17:86])
 
 ## Computing dissimilarities (any dissimilarity measure can be used)
 mvad.ham <- seqdist(mvad.seq, method="HAM")
+## Grow the tree using using a low R value for illustration.
+## For R=10, pval cannot be lower than 0.1
 dt <- disstree(mvad.ham~ male + Grammar + funemp + gcse5eq + fmpr + livboth,
-    data=mvad, R = 10)
+    data=mvad, R = 10, pval = 0.1)
 print(dt)
 
 

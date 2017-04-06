@@ -42,7 +42,7 @@ dissmfacw(formula, data, R = 1000, gower = FALSE, squared = FALSE,
     Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2011). Discrepancy analysis of state sequences, \emph{Sociological Methods and Research}, Vol. 40(3), 471-510.
 
   Studer, M., G. Ritschard, A. Gabadinho and N. S. Müller (2010)
-  Discrepancy	analysis of complex objects using dissimilarities.
+  Discrepancy analysis of complex objects using dissimilarities.
   In F. Guillet, G. Ritschard, D. A. Zighed and H. Briand (Eds.),
   \emph{Advances in Knowledge Discovery and Management},
   Studies in Computational Intelligence, Volume 292, pp. 3-19. Berlin: Springer.
@@ -75,13 +75,15 @@ the National Academy of Sciences of the United States of America} 103(51), 19430
 ## Define the state sequence object
 data(mvad)
 mvad.seq <- seqdef(mvad[, 17:86])
+## Here, we use only first 100 sequences
+mvad.seq <- mvad.seq[1:100,]
 
 ## Compute dissimilarities (any dissimilarity measure can be used)
 mvad.ham <- seqdist(mvad.seq, method="HAM")
 
 ## And now the multi-factor analysis
 print(dissmfacw(mvad.ham ~ male + Grammar + funemp +
-	gcse5eq + fmpr + livboth, data=mvad, R=10))
+	gcse5eq + fmpr + livboth, data=mvad[1:100,], R=10))
 }
 \author{Matthias Studer (with Gilbert Ritschard for the help page)}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
