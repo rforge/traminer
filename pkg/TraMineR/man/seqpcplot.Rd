@@ -223,18 +223,6 @@ seqplot(seqdata = biofam.seq, type = "pc", order.align = "first")
 biofam.DSS <- seqdss(seqdata = biofam.seq) # prepare format
 seqpcplot(seqdata = biofam.DSS)
 
-## plot TSE data converted from state sequences
-## ============================================
-
-## conversion
-biofam.TSE <- seqformat(data = biofam.seq, from = "STS", to = "TSE",
-                        tevent = seqetm(biofam.seq, method = "state"))
-biofam.TSE$event <- factor(biofam.TSE$event, levels = lab) # define alphabet
-biofam.TSE$time <- biofam.TSE$time + 15 # correct age
-
-seqpcplot(seqdata = biofam.TSE, order.align = "time")
-
-
 ## plot event sequences
 ## ====================
 
