@@ -22,7 +22,7 @@ seqpcplot(seqdata, group = NULL, weights = NULL, cex = 1, lwd = 1/4,
   filter = NULL, hide.col = "grey80", alphabet = NULL,
   missing = "auto", order.align = "first", main = NULL, xlab = NULL,
   ylab = NULL, xaxis = TRUE, yaxis = TRUE, axes = "all", xtlab = NULL,
-  cex.axis = 1, rows = NA, cols = NA, plot = TRUE, seed = NULL,
+  cex.lab = 1, rows = NA, cols = NA, plot = TRUE, seed = NULL,
   title, cex.plot, ...)
 
 seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
@@ -42,7 +42,7 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
   \item{weights}{a numeric vector of weights of length equal the number
   of sequences. Overrides weights in the \code{seqdata} object.}
 
-  \item{cex}{expansion factor for the squared symbols.}
+  \item{cex}{Plotting text and symbols magnification. See \code{\link{par}}.}
 
   \item{lwd}{expansion factor for line widths. The expansion is
     relative to the size of the squared symbols.}
@@ -99,10 +99,7 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
 
   \item{xtlab}{labels for the x-axis ticks.}
 
-  \item{cex.axis}{expansion factor for the size of the font for
-    the axis labels and names. The default value is 1. Values lesser
-    than 1 will reduce the size of the font, values greater than 1 will
-    increase the size.}
+  \item{cex.lab}{x and y labels magnification. See \code{\link{par}}.}
 
   \item{rows,cols}{integers to arrange the plot panel design.}
 
@@ -118,7 +115,7 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
   \item{level}{numeric scalar between 0 and 1. The frequency threshold
     for the filtering methods \code{"minfreq"} and \code{"cumfreq"}.}
   \item{title}{Deprecated. Use \code{main} instead.}
-  \item{cex.plot}{Deprecated. Use \code{cex.axis} instead.}
+  \item{cex.plot}{Deprecated. Use \code{cex.lab} instead.}
   \item{...}{arguments to be passed to other methods, such as graphical
     parameters (see \code{\link{par}}).}
 }

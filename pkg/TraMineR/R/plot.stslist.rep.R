@@ -4,9 +4,9 @@
 
 plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
   dmax = NULL, stats = TRUE, ylab = NULL, xaxis = TRUE, xtlab = NULL,
-  xtstep = NULL, cex.axis = 1, cex.plot, ...) {
+  xtstep = NULL, cex.with.axis = 1, cex.plot, ...) {
 
-  checkargs(alist(cex.axis = cex.plot))
+  checkargs(alist(cex.with.axis = cex.plot))
 
 	## Extracting attributes
 	n <- attr(x,"nbseq")
@@ -99,7 +99,7 @@ plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
 		axis(1, at=tpos-0.5, labels=xtlab[tpos],
 			pos=-0.04,
 			## mgp=c(.5,.5,0),
-			cex.axis=cex.axis)
+			cex.axis=cex.with.axis)
 	}
 
 	## y (percents) axis
@@ -109,14 +109,14 @@ plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
 	## axis(2, at=y.lab.pos,
 	##	labels=c("0%", "100%"),
 	##	las=1,
-	##	cex.axis=cex.axis)
+	##	cex.axis=cex.with.axis)
 
 	## Frequency of the representative sequence
 	nbprox <- sum(Statistics$nb[1:nbrep])
 	ctfreq <- round((nbprox/n)*100,1)
 	text(seql/2, 1.3,
 		paste("Criterion=",ctname,", coverage=", ctfreq ,"%", sep=""),
-		cex=cex.axis)
+		cex=cex.with.axis)
 
 	## ==========
 	## Statistics
@@ -133,11 +133,11 @@ plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
 		spval <- space/nbrep
 		y.lab.pos <- (barw[1]/2)+spval
 		lines(-1, y.lab.pos, type="b", pch=repsymb[1], lwd=3,
-			col=repcol[1], cex=cex.axis+barw[1])
+			col=repcol[1], cex=cex.with.axis+barw[1])
 		for (p in 2:nbrep) {
 			y.lab.pos <- sum(barw[1:p-1])+(p*spval)+(barw[p]/2)
 			lines(-1, y.lab.pos, type="b", pch=repsymb[p], lwd=3,
-				col=repcol[p], cex=cex.axis+barw[p])
+				col=repcol[p], cex=cex.with.axis+barw[p])
 		}
 
 		## Distance to representative seq.
@@ -157,7 +157,7 @@ plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
 		for (i in 1:nbrep) {
 			lines(Statistics$V[i]/dist.scaling,
 				y.sym.pos,
-				type="b", pch=repsymb[i], lwd=3, col=repcol[i], cex=cex.axis+barw[i])
+				type="b", pch=repsymb[i], lwd=3, col=repcol[i], cex=cex.with.axis+barw[i])
 		}
 
 		legend.A <- paste("(A) Discrepancy (mean dist. to center)",sep="")
@@ -170,19 +170,19 @@ plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
 		axis(1, at=seq(0,seql,seql/4),
 			labels=round(seq(0,dmax,dmax/4),nbdec),
 			pos=dypos, mgp=c(.5,.5,0),
-			cex.axis=cex.axis)
+			cex.axis=cex.with.axis)
 
 		axis(2, at=c(dist.rep.pos,dist.center.pos),
 			labels=c("B","A"),
 			las=2,
-			cex.axis=cex.axis)
+			cex.axis=cex.with.axis)
 
 		legend(seql/2, ymax, legend=c(legend.A, legend.B),
 			xjust=0.5,
 			yjust=0.7,
 			## title="Distance",
 			box.lty=0,
-			cex=cex.axis)
+			cex=cex.with.axis)
 	}
 }
 

@@ -31,13 +31,19 @@ disstreedisplay(tree, filename = NULL, image.data= NULL, image.fun = plot,
   \item{only.leaf}{Logical. If \code{TRUE} sequences are plotted only in terminal nodes.}
   \item{sortv}{Argument passed to \code{\link{seqplot}}}
   \item{diss}{Argument passed to \code{\link{seqplot}}}
-  \item{cex.main}{The \code{cex} value for the node titles (see \code{\link{par}}).}
+  \item{cex.main}{Node title magnification. See \code{\link{par}}.}
   \item{with.legend}{Logical. Should the color legend be displayed on the plot?}
-  \item{cex.legend}{Font \code{cex} value for the legend.}
+  \item{cex.legend}{
+    Legend magnification. See \code{\link{par}}. If not specified, use the
+    value of \code{cex.main}.
+  }
   \item{axes}{Argument passed to \code{\link{seqplot}}}
   \item{image.format}{Image format of the output file (\code{filename})}
   \item{with.quality}{If \code{TRUE}, a node displaying fitting measures of the tree is added to the plot.}
-  \item{cex.quality}{Numeric. Size of the font of the fitting measures node.}
+  \item{cex.quality}{
+    Fitting measure text magnification. See \code{\link{par}}. If not specified,
+    use the value of \code{cex.main}.
+  }
   \item{legend.text}{Character. Optional text information that should be added.}
   \item{show.tree}{Logical. Should the tree be shown on the screen?}
   \item{show.depth}{Logical. If \code{TRUE}, the splits are ordered according to their global pseudo-R2.}

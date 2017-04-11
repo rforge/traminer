@@ -4,7 +4,7 @@
 
 plot.stslist.statd <- function(x, type = "d", cpal = NULL, ylab = NULL,
   yaxis = TRUE, xaxis = TRUE, xtlab = NULL,xtstep = NULL, cex.axis = 1,
-  space = 0, cex.plot, ...) {
+  space = 0, xlab = NULL, cex.plot, ...) {
 
   checkargs(alist(cex.axis = cex.plot))
 
@@ -67,7 +67,7 @@ plot.stslist.statd <- function(x, type = "d", cpal = NULL, ylab = NULL,
 			axes=FALSE,
 			ylim=0:1,
 			ylab=ylab,
-			xlab=NA,
+			xlab=xlab,
 			...)
 
 		## Plotting the x axis

@@ -12,7 +12,7 @@ seqalign(seqdata, indices, indel=1, sm, with.missing = FALSE)
 
 \method{plot}{seqalign}(x, cpal = NULL, missing.color = NULL, ylab = NULL,
   yaxis = TRUE, xaxis = TRUE, ytlab = NULL, ylas = 0, xtlab = NULL,
-  cex = 1, cex.plot, ...)
+  cex.axis = 1, cex.plot, ...)
 
 \method{print}{seqalign}(x, digits=3, ...)
 }
@@ -43,9 +43,9 @@ seqalign(seqdata, indices, indel=1, sm, with.missing = FALSE)
     \item{ytlab}{ytlab}
     \item{ylas}{ylas}
     \item{xtlab}{xtlab}
-    \item{cex}{plot font size}
+    \item{cex.axis}{Axis annotation magnification. See \code{\link{par}}.}
     \item{digits}{number of digits for printed output}
-  \item{cex.plot}{Deprecated. Use \code{cex} instead.}
+  \item{cex.plot}{Deprecated. Use \code{cex.axis} instead.}
   \item{...}{additional arguments passed to other functions}
 }
 \details{

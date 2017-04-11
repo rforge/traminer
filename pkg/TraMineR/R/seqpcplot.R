@@ -3,10 +3,10 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL, cex = 1, lwd = 1/4,
   lorder = NULL , lcourse = "upwards", filter = NULL, hide.col = "grey80",
   alphabet = NULL, missing = "auto", order.align = "first", main = NULL,
   xlab = NULL, ylab = NULL, xaxis = TRUE, yaxis = TRUE, axes = "all",
-  xtlab = NULL, cex.axis = 1, rows = NA, cols = NA, plot = TRUE, seed = NULL,
+  xtlab = NULL, cex.lab = 1, rows = NA, cols = NA, plot = TRUE, seed = NULL,
   title, cex.plot, ...) {
 
-  checkargs(alist(main = title, cex.axis = cex.plot))
+  checkargs(alist(main = title, cex.lab = cex.plot))
 
   seqpcplot_private(seqdata = seqdata, group = group, weights = weights,
                     cex = cex, lwd = lwd, cpal = cpal,
@@ -19,7 +19,7 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL, cex = 1, lwd = 1/4,
                     main = main, xlab = xlab, ylab = ylab,
                     xaxis = xaxis, yaxis = yaxis,
                     axes = axes, xtlab = xtlab,
-                    cex.axis = cex.axis,
+                    cex.lab = cex.lab,
                     rows = rows, cols = cols, plot = plot, seed = seed,
                     ...)
 
@@ -43,7 +43,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
                               R = 1000, order.align = NULL, maxit = 300,
                               xtlab = xtlab,
                               xaxis = TRUE, yaxis = TRUE, axes = "all",
-                              cex.axis = 1, rows = NA, cols = NA,
+                              cex.lab = 1, rows = NA, cols = NA,
                               plot = TRUE, seed = NULL, add = FALSE,
                               verbose = FALSE, ...) {
 
@@ -828,7 +828,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
               lwd = lwd, lorder = lorder, col.nobs = col.nobs,
               sf.cex = sf.cex, sf.cex.leaves = sf.cex.leaves,
               add = add, xaxis = xaxis, yaxis = yaxis, axes = axes,
-              cex.axis = cex.axis)
+              cex.lab = cex.lab)
     class(x) <- "seqpcplot" # to allow replot
 
   }
@@ -863,7 +863,8 @@ plot.seqpcplot <- function(x, add = NULL, which = NULL, ...) {
     layout(matrix(1:(x$nxl * x$nyl), ncol = x$nxl, nrow = x$nyl, byrow = TRUE))
   }
 
-  par(cex.lab = x$cex.axis)
+  op <- par(cex.lab = x$cex.lab)
+
   plist <- list(x = 1, y = 1, xlab = x$xlab, ylab = x$ylab, xlim = x$xlim, ylim = x$ylim, type = "n", axes = FALSE)
   plist <- c(plist, list(...)[!names(list(...)) %in% names(plist)])
 
@@ -958,6 +959,7 @@ plot.seqpcplot <- function(x, add = NULL, which = NULL, ...) {
       box()
     }
   }
+  par(op)
 }
 
 ## create ordering of events

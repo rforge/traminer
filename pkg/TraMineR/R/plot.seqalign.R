@@ -3,10 +3,10 @@
 ## =============================
 
 plot.seqalign <- function(x, cpal = NULL, missing.color = NULL, ylab = NULL,
-  yaxis = TRUE, xaxis = TRUE, ytlab = NULL, ylas = 0, xtlab = NULL, cex = 1,
+  yaxis = TRUE, xaxis = TRUE, ytlab = NULL, ylas = 0, xtlab = NULL, cex.axis = 1,
   cex.plot, ...) {
 
-  checkargs(alist(cex = cex.plot))
+  checkargs(alist(cex.axis = cex.plot))
 
 	showop <- "bars"
 	n <- 2
@@ -105,7 +105,7 @@ plot.seqalign <- function(x, cpal = NULL, missing.color = NULL, ylab = NULL,
 	if (xaxis) {
 	axis(1, at=1:seql-0.5, labels=1:seql,
 		## mgp=c(3,0.5,0),
-		cex.axis=cex)
+		cex.axis=cex.axis)
 	}
 
 
@@ -120,11 +120,11 @@ plot.seqalign <- function(x, cpal = NULL, missing.color = NULL, ylab = NULL,
 		if (is.null(ytlab)) {ytlab <- paste("seq",2:1, sep="")}
 		## else if (ytlab=="id") {ytlab <- rownames(x)[tlim]}
 
-		axis(2, at=y.lab.pos, mgp=c(1.5,0.5,0), labels=ytlab, las=ylas, tick=FALSE, cex.axis=cex)
+		axis(2, at=y.lab.pos, mgp=c(1.5,0.5,0), labels=ytlab, las=ylas, tick=FALSE, cex.axis=cex.axis)
 
 		lab.op.pos <- c(2.7+sp, 3.0+sp, 3.3+sp)
 		axis(2, at=lab.op.pos, mgp=c(1.5,0.5,0), labels=c("IND","SUB","EQU"),
-			las=2, tick=FALSE, cex.axis=cex)
+			las=2, tick=FALSE, cex.axis=cex.axis)
 
 	}
 

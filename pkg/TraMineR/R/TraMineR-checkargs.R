@@ -32,16 +32,20 @@ checkargs <- function(arg.pairs) {
     old.name <- old.names[i]
     if (new.name %in% fun.args && old.name %in% fun.args) {
       calling.fun <- paste0(as.character(sys.calls()[[1]])[1], "()")
-      new.val <- eval(substitute(pf$naa, list(naa = new.name)))
-      old.val <- eval(substitute(pf$oaa, list(oaa = old.name)))
+      new.val <- eval(substitute(pf$nn, list(nn = new.name)))
+      old.val <- eval(substitute(pf$on, list(on = old.name)))
       has.new <- !missing(new.val) # TRUE if new has a default value!
       has.old <- !missing(old.val)
       fun.args.default <- formals(sys.function(-1))
       new.default <- eval(substitute(fun.args.default$nn, list(nn = new.name)))
       has.new.default <- !missing(new.default)
-      # Second eval() for '1:10' like expressions
-      if (has.new.default)
-        new.default <- eval(new.default)
+      if (has.new.default) {
+        new.default <- tryCatch(
+          # For '1:10' like expressions
+          eval(new.default),
+          # For argument which default value is an other argument
+          error = function(e) eval(substitute(pf$nd, list(nd = new.default))))
+      }
       if (has.old) {
         if (has.new && (!has.new.default || (has.new.default && !identical(new.val, new.default)))) {
           msg.stop("In", calling.fun, ":", new.name, "and", old.name,

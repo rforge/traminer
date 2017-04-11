@@ -23,7 +23,7 @@ Plot method for output produced by the seqmodst function, i.e objects of class s
 
   \item{xtstep}{optional interval at which the tick-marks and labels of the x-axis are displayed. For example, with xtstep=3 a tick-mark is drawn at position 1, 4, 7, etc... The display of the corresponding labels depends on the available space and is dealt with automatically. If unspecified, the \code{xtstep} attribute of the \code{x} object is used.}
 
-  \item{cex.axis}{expansion factor for setting the size of the font for the axis labels and names. The default value is 1. Values lesser than 1 will reduce the size of the font, values greater than 1 will increase the size.}
+  \item{cex.axis}{Axis annotation magnification. See \code{\link{par}}.}
 
   \item{cex.plot}{Deprecated. Use \code{cex.axis} instead.}
 
