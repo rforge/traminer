@@ -2,15 +2,16 @@
 Version 2.1-4 [2017-04-11] (Development version)
 
 Changes in existing functions:
-  - Rename several argument names for a better consistency within TraMineR and
-    between TraMineR and R and to normalize them within TraMineR with a unique
-    naming convention. A new internal function - checkargs() - guarantees
+  - Rename several argument names to increase consistency within TraMineR and
+    between TraMineR and R and to normalize the names within TraMineR according
+    to a common naming convention.
+    A new internal function - checkargs() - is used to guarantee
     backward compatibility. If the old argument name is used instead of the new
     one, a warning message with an explanation is displayed and the execution
     continues. If the new and old argument names are used together, an error
-    message is displayed and the execution stops. One function had it name
-    renamed: is.seqe(). Please use is.eseq() instead. The following functions
-    have at least one renamed argument: dissrep(), disstree(), disstree2dot(),
+    message is displayed and the execution stops.
+    The following functions have at least one renamed argument:
+    dissrep(), disstree(), disstree2dot(),
     disstree2dotp(), disstreedisplay(), is.eseq(), is.seqelist(), seqdiff(),
     seqeconstraint(), seqecontain(), seqecreate(), seqefsub(), seqeid(),
     seqelength(), seqelength<-, seqetm(), seqeweight(), seqeweight<-,
@@ -20,6 +21,9 @@ Changes in existing functions:
     plot.stslist.meant(), plot.stslist.modst(), plot.stslist.rep(),
     plot.stslist.statd(), plot.subseqelistchisq(). See the help page of each of
     these functions for the mapping between old and new argument names.
+  - Renamed function: is.seqe() was renamed as is.eseq().
+
+Misc: Fixed an issue with an example in the documentation page of seqpcplot.
 
 
 ## =========
