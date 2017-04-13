@@ -85,7 +85,7 @@ sequence length
 \deqn{
 MSF(s)=\frac{1}{\ell} \sum_{i=1}^{\ell} f_{s_{i}}
 }{
-	MSF(s)=1/l sum f(s_i)
+	MSF(s) = sum f(s_i) / l
 }
 %
 The lower and upper boundaries of \eqn{MSF} are \eqn{0} and \eqn{1}. \eqn{MSF} is equal to \eqn{1} when all the sequences
@@ -108,11 +108,11 @@ with \eqn{P(s_{t},t)}{P(s_t,t)} the probability to observe state \eqn{s_t} at po
 The question is how to determinate the state probabilities \eqn{P(s_{t},t)}{P(s_t,t)}. One commonly used method for
 computing them is to postulate a Markov Chain model, which can be of various order. The implemented criterion considers the
 probabilities derived from the first order Markov model, that is each \eqn{P(s_{t},t)}{P(s_t,t)}, \eqn{t>1} is set to the
-transition rate \eqn{p(s_t|s_{t-1})}{p(s_t)|s_t-1} estimated across sequences from the observations at positions \eqn{t}
+transition rate \eqn{p(s_t|s_{t-1})}{p(s_t|s_(t-1))} estimated across sequences from the observations at positions \eqn{t}
 and \eqn{t-1}. For \eqn{t=1}, we set \eqn{P(s_1,1)} to the observed frequency of the state \eqn{s_1} at position 1.
 
 The likelihood \eqn{P(s)} being generally very small, we use
-\eqn{-\log P(s)} as sorting criterion. The latter quantity reaches its minimum for
+\eqn{-log P(s)} as sorting criterion. The latter quantity reaches its minimum for
 \eqn{P(s)} equal to 1, which leads to sort the sequences in
 ascending order of their score.
 

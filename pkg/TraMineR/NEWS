@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-4 [2017-04-11] (Development version)
+Version 2.1-4 [2017-04-13] (Development version)
 
 Changes in existing functions:
   - Rename several argument names to increase consistency within TraMineR and
@@ -23,7 +23,9 @@ Changes in existing functions:
     these functions for the mapping between old and new argument names.
   - Renamed function: is.seqe() was renamed as is.eseq().
 
-Misc: Fixed an issue with an example in the documentation page of seqpcplot.
+Misc:
+  - Fixed an issue with an example in the documentation page of seqpcplot().
+  - Fix equation typing errors in seqrep() documentation.
 
 
 ## =========
