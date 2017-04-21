@@ -112,7 +112,7 @@ transition rate \eqn{p(s_t|s_{t-1})}{p(s_t|s_(t-1))} estimated across sequences 
 and \eqn{t-1}. For \eqn{t=1}, we set \eqn{P(s_1,1)} to the observed frequency of the state \eqn{s_1} at position 1.
 
 The likelihood \eqn{P(s)} being generally very small, we use
-\eqn{-log P(s)} as sorting criterion. The latter quantity reaches its minimum for
+\eqn{-\log P(s)}{-log P(s)} as sorting criterion. The latter quantity reaches its minimum for
 \eqn{P(s)} equal to 1, which leads to sort the sequences in
 ascending order of their score.
 
