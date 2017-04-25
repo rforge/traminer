@@ -55,7 +55,7 @@ biofam.lab <- c("Parent", "Left", "Married", "Left+Marr",
 "Child", "Left+Child", "Left+Marr+Child", "Divorced")
 biofam.short <- c("P","L","M","LM","C","LC","LMC","D")
 biofam.seq <- seqdef(biofam[,10:25], alphabet=0:7, states=biofam.short, labels=biofam.lab)
-dist <- seqdist(biofam.seq, method="HAM", with.missing=TRUE)
+dist <- seqdist(biofam.seq, method="HAM")
 
 seqrep.grp(biofam.seq, group=biofam$plingu02, mdis=dist, trep=.2, tsim=.1)
 seqrep.grp(biofam.seq, group=biofam$plingu02, mdis=dist, ret="rep", trep=.2, tsim=.1)
