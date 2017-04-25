@@ -31,8 +31,6 @@ seqtrate <- function(seqdata, sel.states = NULL, time.varying = FALSE,
 
 	sdur <- ncol(seqdata)
 
-	seqdata <- as.matrix(seqdata)
-
 	if (lag<0) {
 		alltransition <- (abs(lag)+1):sdur
 	} else {
@@ -113,5 +111,3 @@ seqtrate <- function(seqdata, sel.states = NULL, time.varying = FALSE,
 	}
 	return(tmat)
 }
-
-
