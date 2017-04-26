@@ -1,8 +1,10 @@
 ## =========
-Version 2.1-5 [2017-04-25] (Development version)
+Version 2.1-5 [2017-04-26] (Development version)
 
 Bug fixes:
-  - seqtrate(): now accepts a sequence object containing only one sequence.
+  - seqtrate(): now accepts a sequence object ('seqdata') containing only one sequence.
+  - seqdist(): now accepts a reference sequence object ('refseq') containing
+    missing values while the main sequence object ('seqdata') doesn't.
 
 
 ## =========

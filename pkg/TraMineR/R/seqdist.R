@@ -45,21 +45,11 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
   if (!inherits(seqdata, "stslist"))
     msg.stop("'seqdata' must be a state sequence object created with seqdef()")
 
-  # with.missing
-  if (isTRUE(with.missing) && !any(seqdata == attr(seqdata, "nr")))
-    msg.stop("'with.missing' must be FALSE when 'seqdata' doesn't contain missing values")
-  if (!isTRUE(with.missing) && any(seqdata == attr(seqdata, "nr")))
-    msg.stop("'with.missing' must be TRUE when 'seqdata' contains missing values")
-
   nseqs <- nrow(seqdata)
   alphabet <- alphabet(seqdata)
   nstates <- length(alphabet)
-  if (isTRUE(with.missing)) {
-    nstates <- nstates + 1
-    msg("including missing values as an additional state")
-  }
-  msg(nseqs, "sequences with", nstates, "distinct states")
   seqs.dlens <- unique(seqlength(seqdata))
+  seqdata.nr <- attr(seqdata, "nr")
 
   # method
   # Add here new method names
@@ -77,6 +67,9 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
         msg.stop("'refseq' must contain a (single) sequence")
       if (!identical(alphabet(refseq), alphabet))
         msg.stop("'refseq' and 'seqdata' must have the same alphabet")
+      refseq.nr <- attr(refseq, "nr")
+      if (!identical(seqdata.nr, refseq.nr))
+        msg.stop("'refseq' and 'seqdata' must have the same code for missing values")
       refseq.type <- "sequence"
     } else if (is.positive.integer(refseq)) {
       if (refseq > nseqs)
@@ -88,6 +81,22 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
   } else {
     refseq.type <- "none"
   }
+
+  # with.missing
+  has.seqdata.missings <- any(seqdata == seqdata.nr)
+  has.refseq.missings <- if (refseq.type == "sequence" && any(refseq == refseq.nr)) TRUE else FALSE
+  if (isTRUE(with.missing) && !has.seqdata.missings && !has.refseq.missings) {
+    with.missing <- FALSE
+    msg.warn("'with.missing' set to FALSE as 'seqdata' doesn't contain missing values")
+  }
+  if (!isTRUE(with.missing) && (has.seqdata.missings || has.refseq.missings))
+    msg.stop("'with.missing' must be TRUE when 'seqdata' or 'refseq' contains missing values")
+
+  if (isTRUE(with.missing)) {
+    nstates <- nstates + 1
+    msg("including missing values as an additional state")
+  }
+  msg(nseqs, "sequences with", nstates, "distinct states")
 
   # norm
   # "auto" must be the first element
@@ -392,8 +401,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
         refseq.mat.ext[i] <- refseq.mat[i]
       refseq.mat <- refseq.mat.ext
     }
-    # Set 'missing' parameter in seqdef() to avoid error on duplicate levels
-    seqdata <- suppressMessages(seqdef(rbind(as.matrix(seqdata), refseq.mat), missing = attr(seqdata, "nr")))
+    # Tell seqdef() that the seqdata.nr/refseq.nr code is the one for missing values
+    seqdata <- suppressMessages(seqdef(rbind(as.matrix(seqdata), refseq.mat), missing = seqdata.nr))
   }
 
   # Transform the alphabet into numbers

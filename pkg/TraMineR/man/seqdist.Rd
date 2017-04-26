@@ -112,8 +112,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     Default: \code{FALSE}.
     When \code{method} isn't \code{"OMslen"} or \code{"OMstran"}, should the
     non-deleted gap (missing value) be added to the alphabet as an additional
-    state? If \code{FALSE} and \code{seqdata} contains such gaps, an error is
-    raised.
+    state? If \code{FALSE} and \code{seqdata} or \code{refseq} contains such
+    gaps, an error is raised.
   }
   \item{full.matrix}{
     Logical.
