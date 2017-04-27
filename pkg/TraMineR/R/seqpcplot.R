@@ -1080,7 +1080,7 @@ colourize <- function(value, col1, col2) { # define colouring function
 seqpcfilter <- function(method = c("minfreq", "cumfreq", "linear"), level = 0.05) {
   value <- match.arg(method)
   if (is.null(level) && method %in% c("minfreq", "cumfreq"))
-    stop("'seqpcfilter' requires an inpute for 'level'.")
+    stop("'seqpcfilter' requires a valid 'level' value.")
   return(structure(list(type = "function", value = value,
                         level = level), class = "seqpcfilter"))
 }
