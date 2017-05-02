@@ -1,7 +1,14 @@
-﻿                CHANGES IN TraMineRextras VERSION 0.3.7 [2017-03-01]
+                CHANGES IN TraMineRextras VERSION 0.3.7 [2017-04-25]
 
-    o   No changes
-    
+Bug Fixes
+    o   TSE_to_STS(): Latest sequences were not converted.
+
+Misc
+    o   seqrep.grp(): Removed 'with.missing=TRUE' in a help example as biofam.seq
+        doesn't contain missing values and to conform to TraMineR 2.1-4+.
+    o   seqeformat(), seqentrans(), seqerulesdisc(): Renamed 'seqe' to 'eseq'
+        in internal code to conform to TraMineR 2.1-4+.
+
 
                 CHANGES IN TraMineRextras VERSION 0.2.6 [2017-03-01]
 
