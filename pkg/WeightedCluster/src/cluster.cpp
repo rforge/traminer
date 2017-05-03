@@ -9,7 +9,7 @@ int TRAMINER_DEBUG_LEVEL=0;
 void finalizeKMedoidBase(SEXP ptr){
 	KMedoidBase * sdo;
 	sdo= static_cast<KMedoidBase *>(R_ExternalPtrAddr(ptr));
-	sdo->clean();
+	//sdo->clean();
 	delete sdo;
 }
 
@@ -44,6 +44,7 @@ extern "C" {
 		TRAMINER_DEBUG_LEVEL=old_debug;
 		SEXP ans;
 		PROTECT(ans=km->getClustering());
+		km->clean();
 		UNPROTECT(2);
 		return(ans);
 	}
