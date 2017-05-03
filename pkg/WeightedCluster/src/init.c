@@ -5,7 +5,6 @@
 
 /* .Call calls */
 extern SEXP RClusterQualBootSeveral(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-//extern SEXP tmrWeightedInertiaDist(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP RClusterComputeIndivASW(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP RClusterQual(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP RClusterQualKendall(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -14,7 +13,6 @@ extern SEXP RKmedoids(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP
 
 static const R_CallMethodDef CallEntries[] = {
   {"RClusterQualBootSeveral",    (DL_FUNC) &RClusterQualBootSeveral,    11},
-//  {"tmrWeightedInertiaDist",     (DL_FUNC) &tmrWeightedInertiaDist,      7},
   {"RClusterComputeIndivASW",    (DL_FUNC) &RClusterComputeIndivASW,     5},
   {"RClusterQual",               (DL_FUNC) &RClusterQual,                6},
   {"RClusterQualKendall",        (DL_FUNC) &RClusterQualKendall,         6},
