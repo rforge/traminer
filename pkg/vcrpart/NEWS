@@ -5,6 +5,10 @@ Changes in Version 0.4-3
          via the '...', but leads to argument name clashes in some cases. See
          the help of 'tvcm'.
 
+    o    Improve the help of 'vcpart-formula'.
+
+    o    fixed an unnecessary error case in 'tvcm_folds'.
+
 Changes in Version 0.4-2
 
     o    Update of citation info

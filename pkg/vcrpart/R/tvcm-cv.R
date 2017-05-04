@@ -119,11 +119,11 @@ tvcm_folds <- function(object, control) {
   
   subject <- object$subject
   if (inherits(object, "olmm")) {
-    if (max(table(subject)) > 0L) {
+    if (max(table(subject)) > 1L) {
       if (weights == "freq")
         stop("option 'weights = 'freq'' is not available for 'olmm' objects")
       if (type == "bootstrap")
-        stop("option 'type = 'bootstrap'' is not available for 'olmm' object",
+        stop("option 'type = 'bootstrap'' is not available for 'olmm' objects",
              "with 2-stage structures.")
     }
   }

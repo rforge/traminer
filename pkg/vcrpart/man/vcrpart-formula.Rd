@@ -18,7 +18,7 @@ fe(formula, intercept = TRUE)
 re(formula, intercept = TRUE)
 vc(..., by, intercept = missing(by), nuisance = character())
 ce(formula)
-ce(formula)
+ge(formula)
 }
 
 \arguments{

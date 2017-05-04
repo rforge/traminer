@@ -1,3 +1,5 @@
+- formulas like -1 + factor(x) will drop the first level of 'x' but not
+  introduce an intercept. please check the 'vcrpart_formula_eta' function
 - Give a warning if a random coefficient is called in fvcglm resp. tvcglm 
   function
 - Check Gauss-Hermite integration points of the 'lme4' package
