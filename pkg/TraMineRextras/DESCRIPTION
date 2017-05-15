@@ -1,6 +1,6 @@
 Package: TraMineRextras
-Version: 0.3.7
-Date: 2017-04-25
+Version: 0.5.1
+Date: 2017-05-15
 Title: TraMineR Extension
 Authors@R: c(
   person("Gilbert", "Ritschard", role = c("aut", "cre", "ths", "cph"),
@@ -10,7 +10,7 @@ Authors@R: c(
   person("Alexis", "Gabadinho", role = "ctb"),
   person("Nicolas", "Muller", role = "ctb"),
   person("Patrick", "Rousset", role = "ctb"))
-Depends: R (>= 2.10), TraMineR (>= 2.1-4), RColorBrewer, survival, cluster
+Depends: R (>= 3.0.0), TraMineR (>= 2.0-5), RColorBrewer, survival, cluster
 Imports: combinat, grDevices, graphics, stats
 Description: Collection of ancillary functions and utilities to be used in conjunction with the 'TraMineR' package for sequence data exploration. Most of the functions are in test phase, lack systematic consistency check of the arguments and are subject to changes. Once fully checked, some of the functions of this collection could be included in a next release of 'TraMineR'.
 License: GPL (>= 2)
