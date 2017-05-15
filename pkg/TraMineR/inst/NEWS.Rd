@@ -7,12 +7,10 @@
 \subsection{Note:}{
   \itemize{
     \item
-    This is a major update of the CRAN version of TraMineR.
-    \item
-    Check also changes in versions 1.9-14, 2.0-0, 2.0-1, 2.0-2, 2.0-3, and 2.0-4 that have not been released on the CRAN.
+    No changes.
     }
 }
-
+}
 
 \section{Changes in version 2.0-5 [2017-05-13]}{
 
