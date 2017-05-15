@@ -1,6 +1,6 @@
 ## multichannel distances
 
-seqdistmc <- function(channels, method, norm=FALSE, indel=1, sm=NULL,
+seqdistmc <- function(channels, method, norm="none", indel=1, sm=NULL,
 	with.missing=FALSE, full.matrix=TRUE, link="sum", cval=2, miss.cost=2, cweight=NULL ) {
 
 	## Checking arguments

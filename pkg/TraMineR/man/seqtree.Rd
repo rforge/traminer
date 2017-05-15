@@ -10,7 +10,7 @@ Facility for growing a regression tree for a state sequence object.
 \usage{
 seqtree(formula, data = NULL, weighted = TRUE, min.size = 0.05,
   max.depth = 5, R = 1000, pval = 0.01, weight.permutation = "replicate",
-  seqdist.args = list(method = "LCS", norm = TRUE), diss = NULL,
+  seqdist.args = list(method = "LCS", norm = "auto"), diss = NULL,
   squared = FALSE, first = NULL, minSize, maxdepth, seqdist_arg)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -63,7 +63,7 @@ mvad.seq <- seqdef(mvad[, 17:86])
 ##   We recommend to set R at least as R=1000.
 ##   To comply with this small R value, we set pval = 0.1.
 seqt <- seqtree(mvad.seq~ male + Grammar + funemp + gcse5eq + fmpr + livboth,
-    data=mvad, R=10, pval=0.1, seqdist.arg=list(method="HAM", norm=TRUE))
+    data=mvad, R=10, pval=0.1, seqdist.arg=list(method="HAM", norm="auto"))
 print(seqt)
 
 ## Growing a seqtree from an existing distance matrix
