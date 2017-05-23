@@ -1,8 +1,51 @@
 ## =========
-Version 2.1-6 [2017-05-15] (Development version)
+Version 2.1-6 [2017-05-23] (Development version)
 
-Note:
-  - No changes.
+Changes in existing functions:
+  - seqformat():
+    - Redesigned version with a new extensible, robust and documented implementation.
+    - Rewrited documentation with argument types, default values, scopes and
+      detailed explanations.
+    - Added conversion to "SPELL" from TraMineRextras after generalization. Added
+      'with.missing' argument (specific to this conversion).
+    - Added the possibility to pass directly the unique individual IDs with 'id'
+      when converting to "TSE" (ie. row names).
+    - Precised 'id' argument meaning. Changed the position in the arguments to
+      reflect this.
+    - Changed 'id', 'begin', 'end', 'status' arguments default value ("SPELL" oriented).
+    - Renamed 'compressed' argument to 'compress' to avoid confusion (ie. it
+      applies to output data, not to input data).
+    - Renamed 'nr' argument to 'missing' to avoid confusion (ie. it specifies
+      the code to consider as missing values in input data, not the TraMineR
+      internal code to represent missing values in state sequence objects).
+    - Adapted function calls to match the renamed argument names ('compressed',
+      'nr') and the new input type checking (ie. single strings are deprecated).
+    - See the updated documentation of seqformat() for details.
+  - SPS_to_STS(): renamed 'nr' argument to 'missing' to match seqformat()
+    argument names renaming.
+
+Bug fixes:
+  - seqformat():
+    - From "SPELL" to "TSE": the output IDs were incorrect.
+    - From "SPELL" to "STS": the states not appearing in the data were deleted
+      in the output column levels.
+
+Misc:
+  - Added new internal helper functions:
+    - msg.warn0(): same as the existing msg.warn() but without white space insertion.
+    - is.positive.integers(): check if an object is a vector of positive integers.
+    - is.a.character(): check if an object is a (unique) character.
+    - is.a.string(): check if an object is a string.
+    - is.strings(): check if an object is a vector of strings.
+    - is.index(): check if an object is a positive integer or a string.
+    - is.indexes(): check if an object is a vector of positive integers or strings.
+    - checkindex(): check if an object is a valid data frame or matrix index;
+      otherwise, an error is raised and an information message is displayed.
+    - checkindexes(): check if an object is a vector of valid data frame or
+      matrix indexes; otherwise, an error is raised and an information message
+      is displayed.
+  - Regrouped internal 'is.xxx' helper functions into one file, TraMineR-is_helpers.R.
+  - Generalized msg.warn() / msg.warn0() and msg() / msg0() code.
 
 
 ## =========
@@ -29,7 +72,7 @@ Misc:
 Version 2.0-4 [2017-04-13] (Unreleased version)
 
 Changes in existing functions:
-  - Rename several argument names to increase consistency within TraMineR and
+  - Renamed several argument names to increase consistency within TraMineR and
     between TraMineR and R. The aim is also to have a common naming
     convention within TraMineR.
     A new internal function - checkargs() - is used to guarantee backward
@@ -51,7 +94,7 @@ Changes in existing functions:
 
 Misc:
   - Fixed an issue with an example in the documentation page of seqpcplot().
-  - Fix equation typing errors in seqrep() documentation.
+  - Fixed equation typing errors in seqrep() documentation.
 
 
 ## =========
@@ -59,8 +102,8 @@ Version 2.0-3 [2017-04-06] (Unreleased version)
 
 Misc:
   - In src/tmrsequence.cpp from TraMineR 1.8-13:
-    - Fix two memory errors detected by Valgrind.
-    - Fix a PROTECT error.
+    - Fixed two memory errors detected by Valgrind.
+    - Fixed a PROTECT error.
   - Fixed issues with examples in documentation pages of
     dissmfacw, disstree, seqtree, and plot.stslist.meant.
 
@@ -69,16 +112,16 @@ Misc:
 Version 2.0-2 [2017-03-28] (Unreleased version)
 
 Misc:
-  - Change character encoding from latin1 (ISO-8859-1) to UTF-8.
-  - Normalize line endings: LF.
+  - Changed character encoding from latin1 (ISO-8859-1) to UTF-8.
+  - Normalized line endings: LF.
 
 
 ## =========
 Version 2.0-1 [2017-03-27] (Unreleased version)
 
 Misc:
-  - Remove the following unused functions: vidx(), seqmatsaltt(), seqmathenikoff().
-  - Remove the functions deprecated in TraMineR 1.x: seqesetlength(), dissreg(), dissmfac().
+  - Removed the following unused functions: vidx(), seqmatsaltt(), seqmathenikoff().
+  - Removed the functions deprecated in TraMineR 1.x: seqesetlength(), dissreg(), dissmfac().
 
 
 ## =========
@@ -92,7 +135,7 @@ New function:
 
 Changes in existing functions:
   - seqdist():
-    - New major version with many new features and an new extensible, robust
+    - New major version with many new features and a new extensible, robust
       and documented implementation (R code).
     - New methods: localized OM (OMloc), spell length sensitive OM (OMslen),
       OM of spells (OMspell), OM of sequences of transitions (OMstran),
