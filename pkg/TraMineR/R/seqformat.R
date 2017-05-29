@@ -55,8 +55,8 @@ seqformat <- function(data, var = NULL, from, to, compress = FALSE, nrep = NULL,
   if (from == "SPS" && (is.stslist || !any(is.data.frame(data), is.matrix(data))))
     msg.stop("'data' must be a data frame or a matrix")
 
-  if (from == "SPELL" && (is.stslist || !all(is.data.frame(data), ncol(data) >= 4)))
-    msg.stop("'data' must be a data frame with at least four columns")
+  if (from == "SPELL" && (is.stslist || !all(is.data.frame(data), ncol(data) >= 3)))
+    msg.stop("'data' must be a data frame with at least three columns")
 
   # var
   if (!is.null(var))
