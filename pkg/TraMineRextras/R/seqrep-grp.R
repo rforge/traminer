@@ -1,4 +1,6 @@
-seqrep.grp <- function(seqdata, group=NULL, diss=NULL, ret="stat", mdis=diss, ...){
+seqrep.grp <- function(seqdata, group = NULL, diss = NULL, ret = "stat", mdis, ...) {
+
+  TraMineR:::checkargs(alist(diss = mdis))
 
 	if (!inherits(seqdata,"stslist")){
 		stop("data is NOT a state sequence object, see seqdef function to create one",

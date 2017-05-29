@@ -33,7 +33,7 @@ STS_to_SPELL <- function(seqdata, pdata = NULL, pvar = NULL, with.missing = TRUE
 
 	begin <- numeric(sltot)
 	end <-  numeric(sltot)
-	ids <- vector(mode = "numeric", length = sltot)
+	ids <- vector(mode = mode(pids), length = sltot)
 	states <- character(sltot)
 	if(with.missing) {
 		statl <- c(statl, nr)

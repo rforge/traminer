@@ -9,7 +9,7 @@ Finding representative sets by group and their quality statistics.
 This function determines representative sequences by group and returns the representatives by group and/or the quality statistics of the representative sets. The function is a wrapper for the TraMineR \code{\link{seqrep}} function.
 }
 \usage{
-seqrep.grp(seqdata, group = NULL, diss = NULL, ret="stat", mdis=diss,...)
+seqrep.grp(seqdata, group = NULL, diss = NULL, ret = "stat", mdis, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,8 +24,7 @@ seqrep.grp(seqdata, group = NULL, diss = NULL, ret="stat", mdis=diss,...)
         }
   \item{ret}{
         What should be returned? One of \code{"stat"} (default), \code{"rep"} or \code{"both"}.   }
-  \item{mdis}{
-        Deprecated, use \code{"diss"} instead.}
+  \item{mdis}{Deprecated. use \code{"diss"} instead.}
   \item{...}{
         additional arguments passed to \code{\link{seqrep}} .
         }
