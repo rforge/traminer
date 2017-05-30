@@ -46,6 +46,8 @@ Misc:
       is displayed.
   - Regrouped internal 'is.xxx' helper functions into one file, TraMineR-is_helpers.R.
   - Generalized msg.warn() / msg.warn0() and msg() / msg0() code.
+  - Made public for the WeightedCluster package the internal C/C++ function
+    tmrWeightedInertiaDist() as the R function TraMineRInternalWeightedInertiaDist().
 
 
 ## =========
