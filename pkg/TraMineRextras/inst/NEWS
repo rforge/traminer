@@ -1,7 +1,8 @@
-                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-05-13]
+                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-05-30]
 
-Note
-    o   No changes.
+Changes in existing functions
+    o   STS_to_SPELL(): Deleted. Converting to the "SPELL" format is now a
+        feature of seqformat() in TraMineR 2.1-6+.
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.0 [2017-05-13]
@@ -14,9 +15,8 @@ Bug Fixes
 
 Changes in existing functions
     o   seqplot.rf(), seqplot.tentrop(), seqrep.grp(), dissvar.grp(),
-        plot.seqimplic():
-        adjusted argument names (e.g., main, with.legend, legend.pos,
-        diss, ...) to conform to the TraMineR 2 naming convention.
+        plot.seqimplic(): adjusted argument names (e.g., main, with.legend,
+        legend.pos, diss, ...) to conform to the TraMineR 2 naming convention.
 
 Misc
     o   seqrep.grp(): Removed 'with.missing=TRUE' in a help example as biofam.seq

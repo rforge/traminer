@@ -22,7 +22,6 @@ export(
     HSPELL_to_STS,
     seqe2stm,
     TSE_to_STS,
-    STS_to_SPELL,
     seqedist,
     seqedplot,
     createdatadiscrete,

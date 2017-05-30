@@ -1,14 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.1 [2017-05-13] (Development version}{
-
-\subsection{Note}{
-  \itemize{
-    \item
-    No changes.
+\section{Changes in version 0.5.1 [2017-05-30] (Development version}{
+  \subsection{Changes in existing functions}{
+    \itemize{
+      \item
+      STS_to_SPELL(): Deleted. Converting to the "SPELL" format is now a feature
+      of seqformat() in TraMineR 2.1-6+.
+    }
   }
-}
 }
 
 \section{Changes in version 0.4.0 [2017-05-13]}{
