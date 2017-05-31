@@ -225,7 +225,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   \item{prox}{
     \code{NULL} or Matrix.
     Default: \code{NULL}.
-    The matrix of state proximities when \code{method = "SVRspell"}.
+    The matrix of state proximities when \code{method = "NMS"} or
+    \code{method = "SVRspell"}.
   }
 }
 \details{
