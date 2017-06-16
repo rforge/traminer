@@ -117,9 +117,9 @@ seqformat(data, var = NULL, from, to, compress = FALSE, nrep = NULL, tevent,
 
     When \code{to = "TSE"}, the index or the name of the column containing
     the individual IDs in \code{data} (after \code{var} filtering) or the unique
-    individual IDs. If \code{id} is not manually specified, \code{id} is set to
+    individual IDs. If \code{id} is not manually specified, \code{id} is set as
     \code{NULL} for backward compatibility with TraMineR 1.8-13 behaviour. If
-    \code{id} is manually or automatically set to \code{NULL}, the original
+    \code{id} is manually or automatically set as \code{NULL}, the original
     individual IDs are ignored and replaced by the index of the sequence in the
     input data.
 
@@ -131,21 +131,21 @@ seqformat(data, var = NULL, from, to, compress = FALSE, nrep = NULL, tevent,
     % from SPELL
     Integer or String.
     Default: \code{2}.
-    The index or the name of the column containing each spell start times in
+    The index or the name of the column containing the spell start times in
     \code{data} (after \code{var} filtering) when \code{from = "SPELL"}.
   }
 	\item{end}{
 	  % from SPELL
     Integer or String.
     Default: \code{3}.
-    The index or the name of the column containing each spell end times in
+    The index or the name of the column containing the spell end times in
     \code{data} (after \code{var} filtering) when \code{from = "SPELL"}.
   }
 	\item{status}{
 		% from SPELL
     Integer or String.
     Default: \code{4}.
-    The index or the name of the column containing each spell status in
+    The index or the name of the column containing the spell status in
     \code{data} (after \code{var} filtering) when \code{from = "SPELL"}.
 	}
 	\item{process}{
@@ -154,8 +154,8 @@ seqformat(data, var = NULL, from, to, compress = FALSE, nrep = NULL, tevent,
     Default: \code{TRUE}.
     When \code{from = "SPELL"}, if \code{TRUE}, create sequences on a process
     time axis, if \code{FALSE}, create sequences on a calendar time axis.
-    If times are ages in \code{data}, only \code{process = FALSE} is currently
-    implemented.
+    %If times are ages in \code{data}, only \code{process = FALSE} is currently
+    %implemented. %% gr: I do not understand this and have to check.
   }
   \item{pdata}{
     % from SPELL

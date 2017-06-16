@@ -1,34 +1,36 @@
 ## =========
-Version 2.1-6 [2017-05-23] (Development version)
+Version 2.1-6 [2017-06-07] (Development version)
 
 Changes in existing functions:
   - seqformat():
-    - Redesigned version with a new extensible, robust and documented implementation.
-    - Rewrited documentation with argument types, default values, scopes and
+    - Redesigned version of the function with a new extensible, robust and
+      documented implementation.
+    - Rewritten documentation with argument types, default values, scopes and
       detailed explanations.
-    - Added conversion to "SPELL" from TraMineRextras after generalization. Added
-      'with.missing' argument (specific to this conversion).
-    - Added the possibility to pass directly the unique individual IDs with 'id'
-      when converting to "TSE" (ie. row names).
-    - Precised 'id' argument meaning. Changed the position in the arguments to
-      reflect this.
-    - Changed 'id', 'begin', 'end', 'status' arguments default value ("SPELL" oriented).
-    - Renamed 'compressed' argument to 'compress' to avoid confusion (ie. it
-      applies to output data, not to input data).
-    - Renamed 'nr' argument to 'missing' to avoid confusion (ie. it specifies
-      the code to consider as missing values in input data, not the TraMineR
-      internal code to represent missing values in state sequence objects).
+    - Added and generalized conversion to "SPELL" (previously in TraMineRextras);
+      added a 'with.missing' argument specifically for this conversion.
+    - Added the possibility to pass directly the unique individual IDs (row names)
+      of the input sequences with 'id' when converting to "TSE".
+    - Clarified meaning of 'id' argument and changed its position in the
+      list of arguments to reflect this.
+    - Changed the default value of the 'id', 'begin', 'end', and 'status'
+      arguments (now "SPELL" oriented).
+    - Renamed 'compressed' argument as 'compress' to avoid confusion (here it
+      applies to the output, not to input data).
+    - Renamed 'nr' argument as 'missing' to avoid confusion (here it specifies
+      the code to consider as missing values in input data, which is not
+      the TraMineR internal code for missing values in state sequence objects).
     - Adapted function calls to match the renamed argument names ('compressed',
       'nr') and the new input type checking (ie. single strings are deprecated).
     - See the updated documentation of seqformat() for details.
-  - SPS_to_STS(): renamed 'nr' argument to 'missing' to match seqformat()
+  - SPS_to_STS(): renamed 'nr' argument as 'missing' to match seqformat()
     argument names renaming.
 
 Bug fixes:
   - seqformat():
-    - From "SPELL" to "TSE": the output IDs were incorrect.
-    - From "SPELL" to "STS": the states not appearing in the data were deleted
-      in the output column levels.
+    - From "SPELL" to "TSE": output IDs were incorrect.
+    - From "SPELL" to "STS": states not appearing in the data were dropped
+      from the output column levels.
 
 Misc:
   - Added new internal helper functions:
@@ -44,10 +46,11 @@ Misc:
     - checkindexes(): check if an object is a vector of valid data frame or
       matrix indexes; otherwise, an error is raised and an information message
       is displayed.
-  - Regrouped internal 'is.xxx' helper functions into one file, TraMineR-is_helpers.R.
+  - Grouped internal 'is.xxx' helper functions into a single
+    TraMineR-is_helpers.R file.
   - Generalized msg.warn() / msg.warn0() and msg() / msg0() code.
-  - Made public for the WeightedCluster package the internal C/C++ function
-    tmrWeightedInertiaDist() as the R function TraMineRInternalWeightedInertiaDist().
+  - Internal C/C++ function \code{tmrWeightedInertiaDist()} made public as the R
+    function TraMineRInternalWeightedInertiaDist(). (Used by package Weightedcluster).
 
 
 ## =========
