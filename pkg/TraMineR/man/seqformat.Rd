@@ -156,6 +156,12 @@ seqformat(data, var = NULL, from, to, compress = FALSE, nrep = NULL, tevent,
     time axis, if \code{FALSE}, create sequences on a calendar time axis.
     %If times are ages in \code{data}, only \code{process = FALSE} is currently
     %implemented. %% gr: I do not understand this and have to check.
+    
+    This \code{process} argument as well as the associated \code{pdata} and \code{pvar}
+    arguments are intended for spell data (in \code{data}) with calendar begin 
+    and end times. When those times are ages, use \code{process = FALSE} with 
+    \code{pdata=NULL} to use those ages as process times. Option \code{process = TRUE} 
+    does currently not work for age times. 
   }
   \item{pdata}{
     % from SPELL
@@ -256,6 +262,9 @@ seqformat(data, var = NULL, from, to, compress = FALSE, nrep = NULL, tevent,
   plotting and mining sequences (use the \code{\link{seqdef}} function for that).
   See \cite{Gabadinho et al. (2009)} and \cite{Ritschard et al. (2009)} for more
   details on longitudinal data formats and converting between them.
+  
+  When data are in \code{"SPELL"} format, the begin and end times expected
+  to be positions in the sequences. Therefore they should be strictly positive integers.
 }
 \value{
   A data frame for \code{SRS}, \code{TSE}, and \code{SPELL}, a matrix otherwise.
