@@ -24,7 +24,7 @@ seqrep.grp(seqdata, group = NULL, diss = NULL, ret = "stat", mdis, ...)
         }
   \item{ret}{
         What should be returned? One of \code{"stat"} (default), \code{"rep"} or \code{"both"}.   }
-  \item{mdis}{Deprecated. use \code{"diss"} instead.}
+  \item{mdis}{Deprecated. Use \code{"diss"} instead.}
   \item{...}{
         additional arguments passed to \code{\link{seqrep}} .
         }
