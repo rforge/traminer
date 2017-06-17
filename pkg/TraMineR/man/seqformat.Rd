@@ -158,7 +158,7 @@ seqformat(data, var = NULL, from, to, compress = FALSE, nrep = NULL, tevent,
     %implemented. %% gr: I do not understand this and have to check.
     
     This \code{process} argument as well as the associated \code{pdata} and \code{pvar}
-    arguments are intended for spell data (in \code{data}) with calendar begin 
+    arguments are intended for \code{data} containing spell data with calendar begin 
     and end times. When those times are ages, use \code{process = FALSE} with 
     \code{pdata=NULL} to use those ages as process times. Option \code{process = TRUE} 
     does currently not work for age times. 
