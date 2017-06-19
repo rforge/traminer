@@ -1,6 +1,6 @@
 Package: WeightedCluster
 Version: 1.2-1
-Date: 2017-06-18
+Date: 2017-06-19
 Title: Clustering of Weighted Data
 Authors@R:person("Matthias", "Studer", email = "matthias.studer@unige.ch", role = c("aut", "cre"))
 Depends: R (>= 3.0.0), TraMineR (>= 1.8-14), cluster
