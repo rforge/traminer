@@ -1,8 +1,17 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
+\section{Changes in version 2.1-7 [2017-06-19] (Development version)}{
+  \subsection{Misc:}{
+   \begin{itemize}
+      \item
+      No changes
+   \end{itemize} 
+}
+}
 
-\section{Changes in version 2.1-6 [2017-06-07] (Development version}{
+
+\section{Changes in version 2.0-6 [2017-06-17] {
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
@@ -91,7 +100,7 @@
         message is displayed.
       }
       \item
-      Grouped internal \code{is.xxx} helper functions into a single 
+      Grouped internal \code{is.xxx} helper functions into a single
       TraMineR-is_helpers.R file.
       \item
       Generalized \code{msg.warn()} / \code{msg.warn0()} and \code{msg()} /
