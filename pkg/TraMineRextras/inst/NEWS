@@ -2,7 +2,7 @@
 
 Changes in existing functions
     o   STS_to_SPELL(): Deleted. Converting to the "SPELL" format is now a
-        feature of seqformat() in TraMineR 2.1-6+.
+        feature of seqformat() in TraMineR 2.0-6+.
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.0 [2017-05-13]
