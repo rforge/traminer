@@ -1,5 +1,11 @@
 Changes in Version 0.4-3
 
+    o    In 'fvcolmm_control' the 'alpha' argument has mistakingly been
+         ignored. Bug fix.
+
+    o    'fvcolmm_control' gives a warning if the arguments 'prune' and
+         'cv' are passed, because they are disabled
+
     o    Add new argument 'fitargs' to 'tvcm'. Allows to pass arguments for
          the fitting function in 'tvcm' and 'fvcm'. This was possible before
          via the '...', but leads to argument name clashes in some cases. See

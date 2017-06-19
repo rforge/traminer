@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2015-10-31
+## Date:            2017-06-19
 ##
 ## Description:
 ## Random forests and bagging for the 'tvcm' algorithm.
@@ -22,6 +22,8 @@
 ## - implement variable importance measures
 ##
 ## Last modifications:
+## 2017-06-19: - improve bugs in 'fvcolmm_control' (function ignores
+##               arguments.
 ## 2015-11-31: - enable the setting 'mtry <- Inf'
 ##             - indicate the 'mtry' parameter in cases of random forests
 ## 2015-10-30: corrected bug in 'predict.fvcm'. When building a dummy
@@ -73,7 +75,7 @@ fvcolmm_control <- function(maxstep = 10,
   mc$maxstep <- maxstep
   mc$folds <- folds
   mc$mtry <- mtry
-  mc$alpha <- 1
+  mc$alpha <- alpha
   mc$minsize <- minsize
   mc$nimpute <- nimpute
   return(eval.parent(mc))
@@ -177,6 +179,11 @@ fvcm_control <- function(maxstep = 10, folds = folds_control("subsampling", K = 
   } else {
     papply <- deparse(formals(tvcm_control)$papply)
   }
+
+  if (!is.null(list(...)$cv) && list(...)$cv)
+      warning("'cv' is not a tuning parameter of 'fvcm_control'. Set to FALSE.")
+  if (!is.null(list(...)$prune) && list(...)$prune)
+      warning("'prune' is not a tuning parameter of 'fvcm_control'. Set to FALSE.")
   
   ## combine the parameter to a list and disble cross validation and pruning 
   call <- list(maxstep = maxstep, folds = folds,
