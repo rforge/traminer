@@ -1,8 +1,10 @@
-              DEPRECATED [2017-03-27]
+              DEPRECATED [2017-06-19]
 
-<!>
-  o seqdist2 is now deprecated in favour of TraMineR 2.x
-    functions seqdist() and seqcost().
+XXX
+  o seqdist2 is deprecated. The content of the package is now 
+    integrated in functions seqdist() and seqcost() of 
+    TraMineR (>= 2.0-5) with many improvements.
+    
 
               CHANGES IN seqdist2 VERSION 0.9-2 [2016-12-01]
 

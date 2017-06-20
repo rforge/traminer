@@ -1,12 +1,12 @@
 Package: seqdist2
 Version: 0.9-2
-Date: 2016-12-01
+Date: 2017-06-19
 Title: Distance Between State Sequences
 Author: Matthias Studer <matthias.studer@unige.ch>, Gilbert Ritschard <gilbert.ritschard@unige.ch>
 Maintainer: Matthias Studer <matthias.studer@unige.ch>
 Depends: TraMineR
 Imports: cluster, stats
-Description: Collection of dissimilarity measures between state sequences and methods of determining substitution and indel costs for optimal-matching-based dissimilarities. The main function is seqdistOO.
+Description: Obsolete. The content of this package is now integrated in the functions seqdist and seqcost of TraMineR (>= 2.0-5) with many improvements.
 License: GPL (>= 2)
-URL: http://mephisto.unige.ch/traminer
+URL: http://traminer.unige.ch
 Encoding: latin1
