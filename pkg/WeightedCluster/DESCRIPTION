@@ -8,6 +8,6 @@ Imports: utils, RColorBrewer
 Suggests: RUnit, knitr, isotone, vegan, lattice
 SystemRequirements: C++11
 VignetteBuilder: knitr
-Description: Clusters state sequences and weighted data. These functionalities include aggregating replicated cases, an optimized weighted PAM algorithm, computing cluster quality measures for a range of clustering solutions and plotting clustering solutions of state sequences.
+Description: Clusters state sequences and weighted data. It provides an optimized weighted PAM algorithm as well as functions for aggregating replicated cases, computing cluster quality measures for a range of clustering solutions and plotting clusters of state sequences.
 License: GPL (>= 2)
 URL: http://mephisto.unige.ch/weightedcluster
