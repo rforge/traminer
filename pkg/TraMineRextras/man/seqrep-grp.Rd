@@ -1,4 +1,3 @@
-\encoding{latin1}
 \name{seqrep.grp}
 \alias{seqrep.grp}
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -59,7 +58,7 @@ biofam.seq <- seqdef(biofam[,10:25], alphabet=0:7, states=biofam.short, labels=b
 dist <- seqdist(biofam.seq, method="HAM")
 
 seqrep.grp(biofam.seq, group=biofam$plingu02, diss=dist, coverage=.2, pradius=.1)
-seqrep.grp(biofam.seq, group=biofam$plingu02, diss=dist, ret="rep", coverage=.2, tsim=.1)
+seqrep.grp(biofam.seq, group=biofam$plingu02, diss=dist, ret="rep", coverage=.2, pradius=.1)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

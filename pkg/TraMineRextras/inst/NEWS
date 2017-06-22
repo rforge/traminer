@@ -1,8 +1,11 @@
-                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-05-30]
+                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-06-22]
 
 Changes in existing functions
     o   STS_to_SPELL(): Deleted. Converting to the "SPELL" format is now a
         feature of seqformat() in TraMineR 2.0-6+.
+        
+Misc
+    o   Replaced deprecated argument names in example of seqrep.grp().        
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.0 [2017-05-13]
