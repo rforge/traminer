@@ -1,12 +1,16 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-7 [2017-06-19] (Development version)}{
-  \subsection{Misc:}{
-   \begin{itemize}
+\section{Changes in version 2.1-7 [2017-07-01] (Development version)}{
+  \subsection{Bug fixes}{
+   \itemize{
       \item
-      No changes
-   \end{itemize} 
+      \code{seqpcplot}
+       \itemize{
+          \item
+          Due to a change in the R \code{tapply} function, option \code{ltype="non-embeddable"} did no longer work.
+       } 
+   }
 }
 }
 

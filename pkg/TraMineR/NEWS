@@ -1,12 +1,14 @@
 ## =========
-Version 2.1-7 [2017-06-19] (Development version)
+Version 2.1-7 [2017-07-01] (Development version)
 
-Misc:
-  - No changes.
+Bug fixes:
+  - seqpcplot():
+    - Due to a change in the R tapply function, option ltype="non-embeddable" 
+      did no longer work. 
 
 
 ## =========
-Version 2.0-6 [2017-06-17] 
+Version 2.0-6 [2017-06-17]
 
 Changes in existing functions:
   - seqformat():
