@@ -1,10 +1,13 @@
 ## =========
-Version 2.1-7 [2017-07-01] (Development version)
+Version 2.1-7 [2017-07-03] (Development version)
 
 Bug fixes:
-  - seqpcplot():
-    - Due to a change in the R tapply function, option ltype="non-embeddable" 
-      did no longer work. 
+  - seqpcplot(): Due to a change in the R tapply function, option ltype="non-embeddable" 
+    did no longer work.
+  - seqefsub() with non-null str.subseq argument: multiple partial 
+    matches between events in str.subseq and the alphabet of events of 
+    the eseq event sequence object crashed the R session. Fixed by a change
+    in the internal seqecreatesub function. 
 
 
 ## =========
