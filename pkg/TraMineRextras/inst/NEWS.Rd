@@ -16,6 +16,8 @@
     \itemize{
       \item
       Replaced deprecated argument names in example of \code{seqrep.grp()}.
+      \item
+      Now imports from RColorBrewer, survival and cluster instead of depending on those packages.
     }
   }
 

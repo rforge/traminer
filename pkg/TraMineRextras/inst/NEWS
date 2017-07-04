@@ -9,6 +9,8 @@ Changes in existing functions
 
 Misc
     o   Replaced deprecated argument names in example of seqrep.grp().
+    o   Now imports from RColorBrewer, survival, and cluster instead of 
+        depending on those packages.
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.0 [2017-05-13]
