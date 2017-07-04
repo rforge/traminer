@@ -1,12 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.1 [2017-06-22] (Development version)}{
+\section{Changes in version 0.5.1 [2017-07-04] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
       \code{STS_to_SPELL()}: Deleted. Converting to the \code{"SPELL"} format is now a feature
       of \code{seqformat()} in TraMineR 2.0-6+.
+      \item
+      \code{seqrep.grp()}: Added argument \code{with.missing} to allow computing the default distances (when \code{diss = NULL}) for sequences with missing values.
     }
   }
 
