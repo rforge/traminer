@@ -3,7 +3,17 @@
 ## ============================================
 
 alphabet <- function(seqdata) {
-	statl <- attr(seqdata,"alphabet")
-	return(statl)
+
+	if (inherits(seqdata,"stslist")){
+    statl <- attr(seqdata,"alphabet")
+  }
+  else if (inherits(seqdata,"seqelist")){
+    statl <- levels(seqdata)
+  }
+  else {
+		stop("seqdata is nor a state sequence object, nor en event sequence object. Use seqdef or seqecreate.")
+  }
+
+return(statl)
 }
 	

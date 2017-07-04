@@ -1,13 +1,16 @@
 ## =========
-Version 2.1-7 [2017-07-03] (Development version)
+Version 2.1-7 [2017-07-04] (Development version)
+
+Changes in existing functions:
+  - alphabet(): the get form now also applies to event sequences.
 
 Bug fixes:
-  - seqpcplot(): Due to a change in the R tapply function, option ltype="non-embeddable" 
+  - seqpcplot(): Due to a change in the R tapply function, option ltype="non-embeddable"
     did no longer work.
-  - seqefsub() with non-null str.subseq argument: multiple partial 
-    matches between events in str.subseq and the alphabet of events of 
+  - seqefsub() with non-null str.subseq argument: multiple partial
+    matches between events in str.subseq and the alphabet of events of
     the eseq event sequence object crashed the R session. Fixed by a change
-    in the internal seqecreatesub function. 
+    in the internal seqecreatesub function.
 
 
 ## =========

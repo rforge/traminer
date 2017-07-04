@@ -1,19 +1,27 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-7 [2017-07-03] (Development version)}{
-  \subsection{Bug fixes}{
-   \itemize{
+
+\section{Changes in version 2.1-7 [2017-07-04] (Development version)}{
+  \subsection{Changes in existing functions:}{
+    \itemize{
       \item
-      \code{seqpcplot()}: 
+      \code{alphabet()}: the get form now also applies to event sequences.
+    }
+  }
+
+  \subsection{Bug fixes}{
+    \itemize{
+      \item
+      \code{seqpcplot()}:
       Due to a change in the R \code{tapply} function, option \code{ltype="non-embeddable"} did no longer work.
       \item
-      \code{seqefsub()} with non-null \code{str.subseq} argument: 
+      \code{seqefsub()} with non-null \code{str.subseq} argument:
        multiple partial matches between events in \code{str.subseq} and the alphabet of events of
       the \code{eseq} event sequence object crashed the R session. Fixed by a change
       in the internal \code{seqecreatesub} function.
-   }
-}
+    }
+  }
 }
 
 \section{Changes in version 2.0-6 [2017-06-17]}{
