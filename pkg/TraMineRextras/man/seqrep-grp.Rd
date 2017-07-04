@@ -8,7 +8,8 @@ Finding representative sets by group and their quality statistics.
 This function determines representative sequences by group and returns the representatives by group and/or the quality statistics of the representative sets. The function is a wrapper for the TraMineR \code{\link{seqrep}} function.
 }
 \usage{
-seqrep.grp(seqdata, group = NULL, diss = NULL, ret = "stat", with.missing = FALSE, mdis, ...)
+seqrep.grp(seqdata, group = NULL, diss = NULL, ret = "stat", 
+    with.missing = FALSE, mdis, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,9 +23,10 @@ seqrep.grp(seqdata, group = NULL, diss = NULL, ret = "stat", with.missing = FALS
         dissimilarity matrix. If \code{NULL} the \dQuote{LCS} dissimilarity matrix is computed.
         }
   \item{ret}{
-        What should be returned? One of \code{"stat"} (default), \code{"rep"} or \code{"both"}.   }
-  \item{with.missing}
-    {Logical. When \code{diss = NULL}. Are there missing values in the sequences? Default is \code{FALSE}.}
+        What should be returned? One of \code{"stat"} (default), \code{"rep"} or \code{"both"}.
+        }
+  \item{with.missing}{
+        Logical. When \code{diss = NULL}. Are there missing values in the sequences? Default is \code{FALSE}. }
   \item{mdis}{Deprecated. Use \code{diss} instead.}
   \item{...}{
         additional arguments passed to \code{\link{seqrep}} .
