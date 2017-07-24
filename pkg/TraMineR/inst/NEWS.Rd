@@ -2,11 +2,16 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-7 [2017-07-04] (Development version)}{
+\section{Changes in version 2.1-7 [2017-07-24] (Development version)}{
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
       \code{alphabet()}: the get form now also applies to event sequences.
+      \item
+      \code{seqdecomp()}: the \code{miss} argument can now also be a vector, e.g. \code{miss = c("*", "\%")}
+      \item
+      \code{seqformat()} has a new \code{right} argument to be used with 
+      \code{to = 'SPELL'}. The default \code{right = 'DEL'} suppresses the end spells of missing values. Set \code{right = NA} to keep the end spells of missing values.
     }
   }
 
@@ -18,8 +23,11 @@
       \item
       \code{seqefsub()} with non-null \code{str.subseq} argument:
        multiple partial matches between events in \code{str.subseq} and the alphabet of events of
-      the \code{eseq} event sequence object crashed the R session. Fixed by a change
-      in the internal \code{seqecreatesub} function.
+      the \code{eseq} event sequence object crashed the R session. Fixed by a change in the internal \code{seqecreatesub} function.
+      \item
+      \code{seqformat()}: \code{to="TSE"} and \code{to="SPELL"} produced errors or unexpected results in presence of missing and/or void states. Now, when \code{to = "SPELL"}, the missing and void codes are both converted to \code{NA} before conversion while they are kept as is when \code{to = "TSE"}.
+      \item
+      \code{seqetm()} produced an error in presence of void elements.
     }
   }
 }

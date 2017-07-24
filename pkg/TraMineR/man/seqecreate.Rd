@@ -23,7 +23,7 @@ seqecreate(data = NULL, id = NULL,timestamp = NULL, event = NULL,
   \item{id}{The sequence 'id' (integer) column when data are provided in TSE format (ignored if \code{data} argument is provided).}
   \item{timestamp}{The event 'timestamp' (double) column when data are provided in TSE format, i.e., the time at which events occur (ignored if \code{data} argument is provided).}
   \item{event}{The 'event' column when data are provided in TSE format, i.e., the events occurring at the specified time stamps  (ignored if \code{data} argument is provided).}
-  \item{end.event}{If specified this event serves as a flag for the end of observation time (total length of event sequences).}
+  \item{end.event}{If specified this event indicates the end of observation time (total length of event sequences) when it is not followed by any other valid event. The event is ignored when occurring in between two valid events.}
   \item{tevent}{Either a transition matrix or a method to generate events from state sequences (see \code{\link{seqetm}}). Used only when \code{data} is a state sequence object.}
   \item{use.labels}{If \code{TRUE}, transitions names are built from long state labels rather than from the short state names of the alphabet.}
   \item{weighted}{If \code{TRUE} and \code{data} is a state sequence object, use the weights specified in \code{data} (see \code{\link{seqdef}})}
