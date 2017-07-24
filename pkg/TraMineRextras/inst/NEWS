@@ -1,16 +1,17 @@
-                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-07-04]
+                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-07-24]
 
 Changes in existing functions
     o   STS_to_SPELL(): Deleted. Converting to the "SPELL" format is now a
         feature of seqformat() in TraMineR 2.0-6+.
-    o   seqrep.grp(): Added argument 'with.missing' to allow computing 
-        the default distances (when diss = NULL) for sequences with 
+    o   seqrep.grp(): Added argument 'with.missing' to allow computing
+        the default distances (when diss = NULL) for sequences with
         missing values.
 
 Misc
     o   Replaced deprecated argument names in example of seqrep.grp().
-    o   Now imports from RColorBrewer, survival, and cluster instead of 
+    o   Now imports from RColorBrewer, survival, and cluster instead of
         depending on those packages.
+    o   ini.c file.
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.0 [2017-05-13]
