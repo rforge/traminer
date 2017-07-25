@@ -2,7 +2,7 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-7 [2017-07-24] (Development version)}{
+\section{Changes in version 2.1-7 [2017-07-25] (Development version)}{
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
@@ -28,6 +28,12 @@
       \code{seqformat()}: \code{to="TSE"} and \code{to="SPELL"} produced errors or unexpected results in presence of missing and/or void states. Now, when \code{to = "SPELL"}, the missing and void codes are both converted to \code{NA} before conversion while they are kept as is when \code{to = "TSE"}.
       \item
       \code{seqetm()} produced an error in presence of void elements.
+    }
+  }
+  \subsection{Misc:}{
+    \itemize{
+      \item
+      Documentation of \code{seqformat()} and \code{seqecreate()}: added examples of the handling of missings in conversion into TSE and SPELL format.
     }
   }
 }

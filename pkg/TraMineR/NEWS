@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-7 [2017-07-24] (Development version)
+Version 2.1-7 [2017-07-25] (Development version)
 
 Changes in existing functions:
   - alphabet(): the get form now also applies to event sequences.
@@ -23,6 +23,10 @@ Bug fixes:
     to = "SPELL", the missing and void codes are both converted 
     to NA before conversion while they are kept as is when to = "TSE".
   - seqetm() produced an error in presence of void elements.
+
+Misc:
+  - Documentation of seqformat() and seqecreate(): added examples 
+    of the handling of missings in conversion into TSE and SPELL format.
 
 
 ## =========

@@ -285,8 +285,8 @@ seqformat(data, var = NULL, from, to, compress = FALSE, nrep = NULL, tevent,
   \emph{Advances in Data Management}, Springer, 2009, 223, 155-175.
 }
 \author{
-  Alexis Gabadinho, Pierre-Alexandre Fonta, Nicolas S. Müller, Matthias Studer
-  (and Gilbert Ritschard for the help page).
+  Alexis Gabadinho, Pierre-Alexandre Fonta, Nicolas S. Müller, Matthias Studer,
+  and Gilbert Ritschard.
 }
 \seealso{\code{\link{seqdef}}}
 \examples{
@@ -353,5 +353,30 @@ bf.sts <- seqformat(bfspell20, from = "SPELL", to = "STS",
   limit = 16)
 names(bf.sts) <- paste0("a", 15:30)
 head(bf.sts)
+
+
+## ==================================
+## Examples for TSE and SPELL output 
+## in presence of missing values 
+## ==================================
+
+data(ex1) ## STS data with missing values
+## creating the state sequence object with by default
+## the end missings coded as void ('%')
+sqex1 <- seqdef(ex1[,1:13])
+as.matrix(sqex1)
+
+## Creating state-event transition matrices
+ttrans <- seqetm(sqex1, method='transition')
+tstate <- seqetm(sqex1, method='state')
+
+## Converting into time stamped events 
+seqformat(sqex1, from = "STS", to = "TSE", tevent = ttrans)
+seqformat(sqex1, from = "STS", to = "TSE", tevent = tstate)
+
+## Converting into vertical spell data
+seqformat(sqex1, from = "STS", to = "SPELL", with.missing=TRUE)
+seqformat(sqex1, from = "STS", to = "SPELL", with.missing=TRUE, right=NA)
+seqformat(sqex1, from = "STS", to = "SPELL", with.missing=FALSE)
 }
 \keyword{Data handling}
