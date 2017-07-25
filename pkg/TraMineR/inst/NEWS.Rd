@@ -12,6 +12,8 @@
       \item
       \code{seqformat()} has a new \code{right} argument to be used with 
       \code{to = 'SPELL'}. The default \code{right = 'DEL'} suppresses the end spells of missing values. Set \code{right = NA} to keep the end spells of missing values.
+      \item
+      \code{seqdef()} now rises an error message when \code{void} is not a character different from \code{left}, \code{gaps}, and \code{right}.
     }
   }
 
