@@ -11,6 +11,7 @@ Misc
     o   Replaced deprecated argument names in example of seqrep.grp().
     o   Now imports from RColorBrewer, survival, and cluster instead of
         depending on those packages.
+    o   Suppressed unused import from combinat.
     o   ini.c file.
 
 

@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.1 [2017-07-24] (Development version)}{
+\section{Changes in version 0.5.1 [2017-08-04] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
@@ -18,6 +18,8 @@
       Replaced deprecated argument names in example of \code{seqrep.grp()}.
       \item
       Now imports from RColorBrewer, survival and cluster instead of depending on those packages.
+      \item
+      Suppressed unused import from combinat.
       \item
       \code{init.c} file.
     }
