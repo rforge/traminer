@@ -1,4 +1,4 @@
-                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-07-24]
+                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-08-04]
 
 Changes in existing functions
     o   STS_to_SPELL(): Deleted. Converting to the "SPELL" format is now a
