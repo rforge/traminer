@@ -2,15 +2,16 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-7 [2017-07-25] (Development version)}{
+\section{Changes in version 2.1-7 [2017-08-05] (Development version)}{
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
       \code{alphabet()}: the get form now also applies to event sequences.
+      In addition, an error is now raised when the argument is not a state sequence object, an event sequence object, or a probabilistic suffix tree (see the PST package for the latter).
       \item
       \code{seqdecomp()}: the \code{miss} argument can now also be a vector, e.g. \code{miss = c("*", "\%")}
       \item
-      \code{seqformat()} has a new \code{right} argument to be used with 
+      \code{seqformat()} has a new \code{right} argument to be used with
       \code{to = 'SPELL'}. The default \code{right = 'DEL'} suppresses the end spells of missing values. Set \code{right = NA} to keep the end spells of missing values.
       \item
       \code{seqdef()} now rises an error message when \code{void} is not a character different from \code{left}, \code{gaps}, and \code{right}.

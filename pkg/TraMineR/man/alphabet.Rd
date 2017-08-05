@@ -15,7 +15,7 @@ alphabet(seqdata)
 alphabet(seqdata) <- value
 }
 \arguments{
-  \item{seqdata}{a state sequence object as defined with the \code{\link{seqdef}} function or an event sequence object as defined with \code{\link{seqecreate}}.}
+  \item{seqdata}{a state sequence object as defined with the \code{\link{seqdef}} function or, for the get form only, an event sequence object as defined with \code{\link{seqecreate}}, or a probabilistic suffix tree generated with the PST package.}
  \item{value}{For state sequences only. Vector of characters of the same length as the vector returned by the \code{alphabet} function, i.e. one label for each state in the alphabet.}
  }
 \value{For \sQuote{\code{alphabet}} a character vector containing the alphabet.
