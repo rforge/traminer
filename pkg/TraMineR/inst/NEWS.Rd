@@ -2,7 +2,7 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-7 [2017-08-05] (Development version)}{
+\section{Changes in version 2.1-7 [2017-08-06] (Development version)}{
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
@@ -15,6 +15,8 @@
       \code{to = 'SPELL'}. The default \code{right = 'DEL'} suppresses the end spells of missing values. Set \code{right = NA} to keep the end spells of missing values.
       \item
       \code{seqdef()} now rises an error message when \code{void} is not a character different from \code{left}, \code{gaps}, and \code{right}.
+      \item
+      \code{seqtrate()} gains a new argument \code{count}. When \code{count = TRUE}, the function     returns counts of transitions instead of transition probabilities.
     }
   }
 
