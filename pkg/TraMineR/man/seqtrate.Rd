@@ -18,7 +18,7 @@ seqtrate(seqdata, sel.states = NULL, time.varying = FALSE, weighted = TRUE,
   \item{weighted}{Logical. If \code{TRUE}, compute transition rates using weights specified in \code{seqdata}.}
   \item{lag}{Integer. Time between the two states considered to compute transition rates (one by default).}
   \item{with.missing}{Logical. If \code{FALSE} (default value), returned transition rates ignore missing values.}
-  \item{count}{Logical. Should counts of transition be returned instead of transition probabilities. Default is \code{FALSE}.
+  \item{count}{Logical. Should counts of transition be returned instead of transition probabilities. Default is \code{FALSE}.}
   \item{statl}{Deprecated. Use \code{sel.states} instead.}
 }
 
