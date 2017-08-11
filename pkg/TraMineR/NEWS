@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-7 [2017-08-06] (Development version)
+Version 2.1-7 [2017-08-11] (Development version)
 
 Changes in existing functions:
   - alphabet(): the get form now also applies to event sequences.
@@ -14,8 +14,8 @@ Changes in existing functions:
     end spells of missing values.
   - seqdef() now rises an error message when 'void' is not a character
     different from 'left', 'gaps', and 'right'.
-  - seqtrate() gains a new argument 'count'. When 'count = TRUE', 
-    the function returns counts of transitions instead of transition 
+  - seqtrate() gains a new argument 'count'. When 'count = TRUE',
+    the function returns counts of transitions instead of transition
     probabilities.
 
 Bug fixes:
@@ -30,6 +30,8 @@ Bug fixes:
     to = "SPELL", the missing and void codes are both converted
     to NA before conversion while they are kept as is when to = "TSE".
   - seqetm() produced an error in presence of void elements.
+  - An error occurred in the internal \code{implicativestat} function 
+    when a same subsequences was present in all sequences.
 
 Misc:
   - Documentation of seqformat() and seqecreate(): added examples
