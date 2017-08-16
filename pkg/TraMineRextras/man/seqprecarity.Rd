@@ -12,7 +12,7 @@ The precarity index returned by the function \code{seqprecarity} is a modified c
 }
 
 \usage{
-seqprecarity(seqdata, correction=NULL, otto=.2,
+seqprecarity(seqdata, correction=NULL, otto=.2, a=1, b=1.2,
     state.order=alphabet(seqdata), state.equiv=NULL, ...)
 
 seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
@@ -21,11 +21,15 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 }
 
 \arguments{
-  \item{seqdata}{a state sequence object (class \code{stslist}) as returned by the \code{\link{seqdef}} function.}
+  \item{seqdata}{a state sequence object (class \code{stslist}) as returned by the \code{\link[TraMineR]{seqdef}} function.}
 
-  \item{correction}{Vector of correction factor values. If \code{NULL}, the correction factors are automatically computed by means of the \code{seqprecorr} function.}
+  \item{correction}{Vector of correction factor values. If \code{NULL}, the correction factors are computed by means of the \code{seqprecorr} function.}
 
   \item{otto}{Scalar in the range [0,1]. Trade-off weight between the precarity level of the initial state and the corrected complexity. Default is \code{otto=.2}.}
+      
+  \item{a}{Non negative real value. Exponent weight of the complexity. Default is 1.}
+
+  \item{b}{Non negative real value. Exponent weight of the correction factor. Default is 1.2. }
 
   \item{state.order}{Vector of short state labels defining the order of the states. First the less precarious (most positive) state and then the other states in increasing precariousness order. States of the alphabet that are not included here define the non-comparable states.}
 

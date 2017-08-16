@@ -1,4 +1,4 @@
-seqprecarity <- function(seqdata, correction=NULL, otto=.2, a=1, b=1, state.order=alphabet(seqdata), state.equiv=NULL, ...){
+seqprecarity <- function(seqdata, correction=NULL, otto=.2, a=1, b=1.2, state.order=alphabet(seqdata), state.equiv=NULL, ...){
 
   if (is.null(correction)){
     correction <- 1 + seqprecorr(seqdata, state.order=state.order, state.equiv=state.equiv, ...)

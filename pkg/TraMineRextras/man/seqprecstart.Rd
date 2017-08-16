@@ -10,7 +10,7 @@ Determines the initial state precarity level from the state ordering. (See detai
 }
 
 \usage{
-seqprecstart(seqdata, state.order=alphabet(seqdata), state.equiv=NULL))
+seqprecstart(seqdata, state.order=alphabet(seqdata), state.equiv=NULL)
 }
 
 \arguments{
