@@ -1,5 +1,12 @@
 ## =========
-Version 2.1-7 [2017-08-11] (Development version)
+Version 2.1-8 [2017-08-15] (Development version)
+
+Misc:
+  - No changes.
+
+
+## =========
+Version 2.0-7 [2017-08-15] 
 
 Changes in existing functions:
   - alphabet(): the get form now also applies to event sequences.
@@ -30,8 +37,8 @@ Bug fixes:
     to = "SPELL", the missing and void codes are both converted
     to NA before conversion while they are kept as is when to = "TSE".
   - seqetm() produced an error in presence of void elements.
-  - An error occurred in the internal \code{implicativestat} function 
-    when a same subsequences was present in all sequences.
+  - An error occurred in the internal \code{implicativestat} function
+    when a same condition subsequence was present in all subsequences.
 
 Misc:
   - Documentation of seqformat() and seqecreate(): added examples

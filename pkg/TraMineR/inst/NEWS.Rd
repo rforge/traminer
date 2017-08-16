@@ -2,7 +2,18 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-7 [2017-08-11] (Development version)}{
+\section{Changes in version 2.1-8 [2017-08-15] (Development version)}{
+
+  \subsection{Misc:}{
+    \itemize{
+      \item
+      No changes.
+    }
+  }
+}
+
+
+\section{Changes in version 2.0-7 [2017-08-15]}{
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
@@ -16,7 +27,7 @@
       \item
       \code{seqdef()} now rises an error message when \code{void} is not a character different from \code{left}, \code{gaps}, and \code{right}.
       \item
-      \code{seqtrate()} gains a new argument \code{count}. When \code{count = TRUE}, the function     returns counts of transitions instead of transition probabilities.
+      \code{seqtrate()} gains a new argument \code{count}. When \code{count = TRUE}, the function returns counts of transitions instead of transition probabilities.
     }
   }
 
@@ -34,7 +45,7 @@
       \item
       \code{seqetm()} produced an error in presence of void elements.
       \item
-      An error occurred in the internal \code{implicativestat} function when a same subsequences was present in all sequences.
+      An error occurred in the internal \code{implicativestat} function when a same condition subsequence was present in all subsequences.
     }
   }
   \subsection{Misc:}{
