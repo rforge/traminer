@@ -1,4 +1,16 @@
-                CHANGES IN TraMineRextras VERSION 0.5.1 [2017-08-03]
+                CHANGES IN TraMineRextras VERSION 0.5.2 [2017-08-16] (Development version)
+
+New functions
+    o   seqprecarity(): computes the sequence precarity index from 
+        a provided partial state order. The index is a
+        corrected complexity index. See documentation page.
+    o   seqprecorr(): determines the correction factor used by
+        seqprecarity().
+    o   seqprecstart(): determines the starting precarity level 
+        of the sequence from the partial state order.
+
+
+                CHANGES IN TraMineRextras VERSION 0.4.1 [2017-08-16]
 
 Changes in existing functions
     o   STS_to_SPELL(): Deleted. Converting to the "SPELL" format is now a

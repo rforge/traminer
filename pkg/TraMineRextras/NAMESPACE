@@ -36,7 +36,10 @@ export(
     seqentrans,
     seqemlt,
     seqimplic,
-    seqtabstocc
+    seqtabstocc,
+    seqprecarity,
+    seqprecorr,
+    seqprecstart
 )
 
 ## emlt methods

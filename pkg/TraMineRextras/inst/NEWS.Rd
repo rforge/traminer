@@ -1,7 +1,25 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.1 [2017-08-03] (Development version)}{
+\section{Changes in version 0.5.2 [2017-08-16] (Development version)}{
+  \subsection{New functions}{
+    \itemize{
+      \item
+      \code{seqprecarity()}: computes the sequence precarity index from
+      a provided partial state order. The index is a
+      corrected complexity index. See documentation page.
+      \item
+      \code{seqprecorr()}: determines the correction factor used by
+        \code{seqprecarity()}.
+      \item
+      \code{seqprecstart()}: determines the starting precarity level
+        of the sequence from the partial state order.
+    }
+  }
+
+}
+
+\section{Changes in version 0.4.1 [2017-08-16]}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
