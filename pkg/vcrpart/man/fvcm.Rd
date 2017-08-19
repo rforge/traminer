@@ -18,19 +18,24 @@
 
 fvcm(..., control = fvcm_control())
 
-fvcm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
-             mtry = 5, alpha = 1.0, mindev = 0.0, verbose = TRUE, ...)
+fvcm_control(maxstep = 10, minsize = 10,
+             folds = folds_control("subsampling", K = 100),
+             mtry = 5, sctest = FALSE, alpha = 1.0,
+             mindev = 0.0, verbose = TRUE, ...)
 
 fvcolmm(..., family = cumulative(), control = fvcolmm_control())
 
-fvcolmm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
-                mtry = 5, alpha = 1.0, minsize = 50, 
+fvcolmm_control(maxstep = 10, minsize = 20, 
+                folds = folds_control("subsampling", K = 100),
+                mtry = 5, sctest = TRUE, alpha = 1.0,  
                 nimpute = 1, verbose = TRUE, ...)
 
 fvcglm(..., family, control = fvcglm_control())
 
-fvcglm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
-               mtry = 5, mindev = 0, verbose = TRUE, ...)
+fvcglm_control(maxstep = 10, minsize = 10,
+               folds = folds_control("subsampling", K = 100),
+               mtry = 5, mindev = 0,
+               verbose = TRUE, ...)
 }
 
 \arguments{
@@ -39,7 +44,10 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
     \command{\link{tvcm}}. This includes at least the arguments
     \code{formula}, \code{data} and \code{family}, see examples below. For
     \command{\link{fvcm_control}} further control arguments to be passed
-    to \command{\link{tvcm_control}}.}       
+    to \command{\link{tvcm_control}}. For
+    \command{\link{fvcolmm_control}} and
+    \command{\link{fvcglm_control}} further control arguments to be passed
+    to \command{\link{fvcm_control}}}.       
   \item{control}{a list of control parameters as produced by
     \command{\link{fvcm_control}}.} 
   \item{family}{the model family, e.g., \command{\link{binomial}} or 
@@ -50,7 +58,10 @@ fvcglm_control(maxstep = 10, folds = folds_control("subsampling", K = 100),
     as created by \command{\link{folds_control}}.}
   \item{mtry}{positive integer scalar. The number of combinations of
     partitions, nodes and variables to be randomly sampled as candidates
-    in each iteration.} 
+    in each iteration.}
+  \item{sctest}{logical scalar. Defines whether coefficient constancy
+    tests should be used for the variable and node selection in each
+    iteration.}
   \item{mindev, alpha}{these parameters are merely specified to
     disable the default stopping rules for \command{\link{tvcm}}. See
     also \command{\link{tvcm_control}} for details.}
@@ -120,7 +131,7 @@ data(vcrpart_3)
 
 ## setting parameters
 control <-
-  fvcm_control(maxstep = 3, minsize = 10,
+  fvcm_control(maxstep = 3, 
                folds = folds_control("subsampling", K = 5, 0.5, seed = 3))
 
 ## fitting the forest

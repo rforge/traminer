@@ -228,7 +228,6 @@ plot(cv)
 ## prune model with estimated 'cp'
 model.p <- prune(model, cp = cv$cp.hat)
 
-
 ## backtrack pruning
 prunepath(model.p, steps = 1:3)
 

@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2016-02-16
+## Date:            2017-08-19
 ##
 ## Description:
 ## Plot functions for 'tvcm' objects.
@@ -18,6 +18,7 @@
 ## panel_empty:     grapcon generator for empty terminal node plots
 ##
 ## Last modifications:
+## 2017-08-18: improve warnings
 ## 2016-02-16: modified titles for 'panel_coef'.
 ## 2016-02-08: add warning in cases 'conf.int = TRUE' in 'panel_coef'.
 ## 2014-09-08: replace 'do.call' by 'eval'
@@ -60,11 +61,11 @@ plot.tvcm <- function(x, type = c("default", "coef",
     } else if (type == "cv") {
         
         if (missing(main)) main <- NULL
-    if (is.null(x$info$cv)) {
-        warning("no information on cross validation.")
-    } else {
-        plot(x$info$cv, main = main, ...)
-    }
+        if (is.null(x$info$cv)) {
+            warning("no information on cross validation.")
+        } else {
+            plot(x$info$cv, main = main, ...)
+        }
         
     } else {
         
@@ -103,40 +104,47 @@ plot.tvcm <- function(x, type = c("default", "coef",
                        },
                    "coef" = panel_coef,
                    "simple" = panel_empty)
-        tp_args <- if ("tp_args" %in% names(list(...))) {
-            list(...)$tp_args
-        } else {
-            list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
-        }
+        tp_args <-
+            if ("tp_args" %in% names(list(...))) {
+                list(...)$tp_args
+            } else {
+                list(...)[names(list(...)) %in% names(formals(tp_fun))[-1]]
+            }
         tp_args$part <- part
         tp_args$gp <- gp
         
         ## inner panel
-        inner_panel <- if ("inner_panel" %in% names(list(...))) {
-            list(...)$inner_panel
-        } else {
-            switch(type,
-                   "default" = node_inner,
-                   "coef" = node_inner,
-                   "simple" = node_inner)
-        }
-        ip_args <- if ("ip_args" %in% names(list(...))) {
-            list(...)$ip_args
-        } else {
-            list(...)[names(list(...)) %in% names(formals(inner_panel))[-1]]
-        }
+        inner_panel <-
+            if ("inner_panel" %in% names(list(...))) {
+                list(...)$inner_panel
+            } else {
+                switch(type,
+                       "default" = node_inner,
+                       "coef" = node_inner,
+                       "simple" = node_inner)
+            }
+        ip_args <-
+            if ("ip_args" %in% names(list(...))) {
+                list(...)$ip_args
+            } else {
+                list(...)[names(list(...)) %in%
+                          names(formals(inner_panel))[-1]]
+            }
         
         ## edge panel
-        edge_panel <- if ("edge_panel" %in% names(list(...))) {
-            list(...)$edge_panel
-        } else {
-            edge_default
-        }
-        ep_args <- if ("ep_args" %in% names(list(...))) {
-            list(...)$ep_args
-        } else {
-            list(...)[names(list(...)) %in% names(formals(edge_panel))[-1]]
-        }
+        edge_panel <-
+            if ("edge_panel" %in% names(list(...))) {
+                list(...)$edge_panel
+            } else {
+                edge_default
+            }
+        ep_args <-
+            if ("ep_args" %in% names(list(...))) {
+                list(...)$ep_args
+            } else {
+                list(...)[names(list(...)) %in%
+                          names(formals(edge_panel))[-1]]
+            }
         if ("justmin" %in% names(formals(edge_panel)) &&
             !"justmin" %in% names(ep_args)) ep_args$justmin <- 5
         
@@ -177,114 +185,119 @@ plot.tvcm <- function(x, type = c("default", "coef",
         }
     }
 }
-                    
+
 
 panel_partdep <- function(object, parm = NULL,
                           var = NULL, ask = NULL,
                           prob = NULL, neval = 50, add = FALSE,
                           etalab = c("int", "char", "eta"), ...) {
-
-  ## set and check 'parm'
-  allParm <- unique(unlist(tvcm_get_vcparm(object)))
-  if (is.null(parm)) parm <- allParm
-  if (!all(parm %in% allParm))
-    warnings("some 'parm' were not recognized.")
-  parm <- intersect(parm, allParm)
-  if (length(parm) == 0L) stop("no valid 'parm'.")
-  stopifnot(is.null(ask) | is.logical(ask) && length(ask) == 1L)
-  stopifnot(is.null(prob) | (is.numeric(prob) && length(prob) == 1L))
-  stopifnot(prob > 0 & prob <= 1)
-  stopifnot(is.numeric(neval) && length(eval) == 1L && neval > 0)
-  stopifnot(is.logical(add) && length(add) == 1L)
-  etalab <- match.arg(etalab)
-  
-  ## labels for coefficients
-  termLabs <- parm
-  if (object$info$fit == "olmm") 
-    termLabs <- olmm_rename(parm, levels(object$info$model$y),
-                            object$info$family, etalab)
-  
-  ## set and check 'var'
-  data <- object$data
-  allVars <- colnames(data)
-  if (is.null(var)) var <- allVars[1L]
-  if (!all(var %in% allVars))
-    warnings("some variables in 'var' were not recognized.")
-  var <- intersect(var, allVars)
-  if (length(var) == 0L) stop("no valid variables in 'var'.")
-  
-  ## set defaults
-  if (is.null(ask))
-    ask <- ifelse(length(parm) * length(var) == 1L, FALSE, TRUE)
-  
-  ## dotlist
-  dotList <- list(...)
-
-  ## get value spaces
-  space <- vcrpart_value_space(data, neval)
-
-  if (ask) {
-    oask <- devAskNewPage(TRUE)
-    on.exit(devAskNewPage(oask))
-  }
-
-  for (i in 1:length(var)) {
-
-    z <- space[[var[i]]]
-
-    ## draw a random subsample to save time
-    if (is.null(prob)) {
-      if (length(z) * nrow(data) > 10000) {
-        probi <- 10000 / (length(z) * nrow(data))
-      } else {
-        probi <- 1.0
-      }
-    } else {
-      probi <- prob
-    }
-    tmp <- if (probi < 1) { data[tvcm_folds(object, folds_control(K = 1L, type = "subsampling", prob = probi)) == 1L, , drop = FALSE] } else { data }
-
-    newdata <- NULL
-    for (j in 1:length(z)) newdata <- rbind(newdata, tmp)
-    newdata[, var[i]] <- rep(z, each = nrow(tmp))
-    beta <- predict(object, newdata = newdata, type = "coef")
-    parm <- intersect(parm, colnames(beta))
     
-    ## for each coefficients ...
-    for (j in 1:length(parm)) {
-
-      ## .. compute the expectation of beta_i at a value z_j
-      ## over the distribution  of z_-j
-      betaj <- tapply(beta[, parm[j]], newdata[, var[i]], mean)
-
-      ## define arguments for plot or points call
-      ylab <-
-        paste("coef(", termLabs[j], "|", var[i], ")", sep = "")
-
-      if (is.numeric(z)) {
-        call <- appendDefArgs(dotList, list(type = "s"))
-        call <- appendDefArgs(list(x = z, y = betaj), call)
-      } else {
-        call <- dotList
-        call <- appendDefArgs(list(x = as.integer(z), y = betaj,
-                                            type = "b"), call)
-        if (!add) call <- appendDefArgs(call, list(axes = FALSE))
-      }
-      
-      call <- appendDefArgs(call, list(xlab = var[i], ylab = ylab))
-      call <- append(list(name = as.name(ifelse(add, "points", "plot.default"))), call)
-      mode(call) <- "call"
-      
-      ## call plot or points
-      eval(call)
-      if (!add && is.factor(z) && !"axes" %in% names(list(...)) &&
-          !call$axes) {
-        box()
-        axis(1, 1:nlevels(z), levels(z))
-        axis(2)
-      }
+    ## set and check 'parm'
+    allParm <- unique(unlist(tvcm_get_vcparm(object)))
+    if (is.null(parm)) parm <- allParm
+    if (!all(parm %in% allParm))
+        warning("the parameters: " ,
+                paste("'", setdiff(parm, allParm), "'", collapse = ", "),
+                " in 'parm' were not recognized.")
+    parm <- intersect(parm, allParm)
+    if (length(parm) == 0L) stop("no valid 'parm'.")
+    stopifnot(is.null(ask) | is.logical(ask) && length(ask) == 1L)
+    stopifnot(is.null(prob) | (is.numeric(prob) && length(prob) == 1L))
+    stopifnot(prob > 0 & prob <= 1)
+    stopifnot(is.numeric(neval) && length(eval) == 1L && neval > 0)
+    stopifnot(is.logical(add) && length(add) == 1L)
+    etalab <- match.arg(etalab)
+    
+    ## labels for coefficients
+    termLabs <- parm
+    if (object$info$fit == "olmm") 
+        termLabs <- olmm_rename(parm, levels(object$info$model$y),
+                                object$info$family, etalab)
+  
+    ## set and check 'var'
+    data <- object$data
+    allVars <- colnames(data)
+    if (is.null(var)) var <- allVars[1L]
+    if (!all(var %in% allVars))
+        warning("the variables: ",
+                paste("'", setdiff(var, allVars), "'", collapse = ", "),
+                " in 'var' were not recognized.")
+    var <- intersect(var, allVars)
+    if (length(var) == 0L) stop("no valid variables in 'var'.")
+    
+    ## set defaults
+    if (is.null(ask))
+        ask <- ifelse(length(parm) * length(var) == 1L, FALSE, TRUE)
+    
+    ## dotlist
+    dotList <- list(...)
+    
+    ## get value spaces
+    space <- vcrpart_value_space(data, neval)
+    
+    if (ask) {
+        oask <- devAskNewPage(TRUE)
+        on.exit(devAskNewPage(oask))
     }
-  }
+    
+    for (i in 1:length(var)) {
+        
+        z <- space[[var[i]]]
+        
+        ## draw a random subsample to save time
+        if (is.null(prob)) {
+            if (length(z) * nrow(data) > 10000) {
+                probi <- 10000 / (length(z) * nrow(data))
+            } else {
+                probi <- 1.0
+            }
+        } else {
+            probi <- prob
+        }
+        tmp <- if (probi < 1) { data[tvcm_folds(object, folds_control(K = 1L, type = "subsampling", prob = probi)) == 1L, , drop = FALSE] } else { data }
+
+        newdata <- NULL
+        for (j in 1:length(z)) newdata <- rbind(newdata, tmp)
+        newdata[, var[i]] <- rep(z, each = nrow(tmp))
+        beta <- predict(object, newdata = newdata, type = "coef")
+        parm <- intersect(parm, colnames(beta))
+        
+        ## for each coefficients ...
+        for (j in 1:length(parm)) {
+            
+            ## .. compute the expectation of beta_i at a value z_j
+            ## over the distribution  of z_-j
+            betaj <- tapply(beta[, parm[j]], newdata[, var[i]], mean)
+            
+            ## define arguments for plot or points call
+            ylab <-
+                paste("coef(", termLabs[j], "|", var[i], ")", sep = "")
+            
+            if (is.numeric(z)) {
+                call <- appendDefArgs(dotList, list(type = "s"))
+                call <- appendDefArgs(list(x = z, y = betaj), call)
+            } else {
+                call <- dotList
+                call <- appendDefArgs(list(x = as.integer(z), y = betaj,
+                                           type = "b"), call)
+                if (!add) call <- appendDefArgs(call, list(axes = FALSE))
+            }
+            
+            call <- appendDefArgs(call, list(xlab = var[i], ylab = ylab))
+            call <- append(list(
+                name = as.name(ifelse(add, "points", "plot.default"))), call)
+            mode(call) <- "call"
+            
+            ## call plot or points
+            eval(call)
+            if (!add && is.factor(z) && !"axes" %in% names(list(...)) &&
+                !call$axes) {
+                box()
+                axis(1, 1:nlevels(z), levels(z))
+                axis(2)
+            }
+        }
+    }
 }
 
 

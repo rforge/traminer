@@ -3,6 +3,7 @@ useDynLib(vcrpart, .registration = TRUE)
 import("methods", "partykit")
 
 ## Exported methods for which generics exist
+importFrom("formula.tools", "lhs", "rhs")
 importFrom("graphics", "plot", "axis", "box", "matplot", "par", "segments")
 importFrom("grDevices", "axisTicks", "col2rgb", "colorRamp",
            "devAskNewPage", "grey", "rgb")
@@ -14,6 +15,7 @@ importFrom("grid", "gpar", "unit", "unit.c", "convertHeight", "convertWidth",
            "depth", "grid.xaxis", "grid.yaxis", "grid.newpage", "arrow")
 importFrom("stats",
            "AIC", "BIC", "anova", "coef", "coefficients", "deviance",
+           "drop.terms",
            "extractAIC", "fitted", "formula", "getCall", "logLik",
            "model.frame", "model.matrix", "nobs", "predict", "resid",
            "residuals", "simulate", "terms", "update", "vcov", "weights",
@@ -137,10 +139,8 @@ S3method(fitted, tvcm)
 S3method(formula, tvcm)
 S3method(getCall, tvcm)
 S3method(logLik, tvcm)
-S3method(model.frame, tvcm)
 S3method(nobs, tvcm)
 S3method(neglogLik2, tvcm)
-S3method(model.frame, tvcm)
 S3method(oobloss, tvcm)
 S3method(plot, tvcm)
 S3method(predict, tvcm)

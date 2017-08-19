@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2016-02-16
+## Date:            2017-08-19
 ##
 ## Description:
 ## S3 methods for tvcm objects
@@ -18,7 +18,6 @@
 ## formula:
 ## getCall:             extract original call
 ## logLik:              extract log Likelihood
-## model.frame:         extract the total model frame including model
 ##                      and partitioning variables
 ## nobs:                extract the number of observations
 ## predict:             predict responses (see prediction of 'olmm' class)
@@ -31,6 +30,7 @@
 ## width:               width of trees
 ## 
 ## Modifications:
+## 2017-08-17: delete model.frame method
 ## 2016-02-16: changed titles for varying coefficients in 'tvcm_print'.
 ## 2016-01-10: changed 'neglokLik2.tvcm' to allow for subsets
 ## 2015-08-21: implemented changes to 'tvcm_formula' in 'prune.tvcm'.
@@ -72,80 +72,84 @@ extract.tvcm <- function(object, what = c("control", "model",
                                    "coef", "sd", "var"),
                          steps = NULL, ...) {
   
-  what <- match.arg(what)
-  splitpath <- object$info$splitpath
-  if (length(splitpath) > 0 && is.null(steps))
-    steps <- seq(1L, object$info$nstep)
-  rval <- NULL
-  sctest <- object$info$control$sctest
-  
-  if (what == "control") {
-
-    return(object$info$control)
+    what <- match.arg(what)
+    splitpath <- object$info$splitpath
+    if (length(splitpath) > 0 && is.null(steps))
+        steps <- seq(1L, object$info$nstep)
+    rval <- NULL
+    sctest <- object$info$control$sctest
     
-  } else if (what == "sctest" && sctest) {
-    
-    rval <- lapply(splitpath[steps], function(x) x$sctest)
-    return(rval)
-    
-  } else if (what == "devgrid" && !is.null(splitpath)) {
-    
-    rval <- lapply(splitpath[steps], function(x) x$grid)
-    return(rval)
-
-  } else if (what == "cv") {
-    if (is.null(object$info$cv)) {
-      warning("no information on cross-validation")
-    } else {
-      return(object$info$cv)
+    if (what == "control") {
+        
+        return(object$info$control)
+        
+    } else if (what == "sctest" && sctest) {
+        
+        rval <- lapply(splitpath[steps], function(x) x$sctest)
+        return(rval)
+        
+    } else if (what == "devgrid" && !is.null(splitpath)) {
+        
+        rval <- lapply(splitpath[steps], function(x) x$grid)
+        return(rval)
+        
+    } else if (what == "cv") {
+        if (is.null(object$info$cv)) {
+            warning("no information on cross-validation")
+        } else {
+            return(object$info$cv)
+        }
+        
+    } else if (what == "model") {
+        
+        return(object$info$model)
+        
+    } else if (what == "selected") {
+        
+        rval <-
+            lapply(object$info$node,
+                   function(node) {
+                       if (depth(node) > 0L) {
+                           ids <- setdiff(nodeids(node),
+                                          nodeids(node, terminal = TRUE))
+                           rval <- unlist(
+                               nodeapply(node, ids,
+                                         function(node) node$split$varid))
+                           if (length(rval) > 0L)
+                               rval <- unique(colnames(object$data)[rval])
+                       } else {
+                           rval <- NULL
+                       }
+                       return(rval)
+                   })
+        return(rval)
+        
+    } else if (sctest && what == "p.value" && !is.null(splitpath)) {
+        
+        rval <- unlist(sapply(splitpath[steps],
+                              function(x) {
+                                  if (is.null(x$sctest)) return(NA)
+                                  rval <- na.omit(unlist(x$sctest))
+                                  if (length(rval) == 0) return(NA)
+                                  return(min(rval, na.rm = TRUE))
+                              }))
+        return(rval)
+        
+    } else if (what %in% c("coef", "sd", "var")) {
+        
+        return(tvcm_get_estimates(object, what = what, ...))   
+        
+    } else if (what == "nodes") {
+        
+        return(object$info$node)
+        
     }
-    
-  } else if (what == "model") {
-    
-    return(object$info$model)
-    
-  } else if (what == "selected") {
-
-    rval <-
-      lapply(object$info$node,
-             function(node) {
-               if (depth(node) > 0L) {
-                 ids <- setdiff(nodeids(node), nodeids(node, terminal = TRUE))
-                 rval <- unlist(nodeapply(node, ids, function(node) node$split$varid))
-                 if (length(rval) > 0L) rval <- unique(colnames(object$data)[rval])
-               } else {
-                 rval <- NULL
-               }
-               return(rval)
-             })
     return(rval)
-    
-  } else if (sctest && what == "p.value" && !is.null(splitpath)) {
-    
-    rval <- unlist(sapply(splitpath[steps],
-                          function(x) {
-                            if (is.null(x$sctest)) return(NA)
-                            rval <- na.omit(unlist(x$sctest))
-                            if (length(rval) == 0) return(NA)
-                            return(min(rval, na.rm = TRUE))
-                          }))
-    return(rval)
-    
-  } else if (what %in% c("coef", "sd", "var")) {
-
-    return(tvcm_get_estimates(object, what = what, ...))   
-
-  } else if (what == "nodes") {
-
-    return(object$info$node)
-    
-  }
-  return(rval)
 }
 
 
 extractAIC.tvcm <- function(fit, scale, k = 2, ...) {
-  extractAIC(extract(fit, "model"), scale, k, ...)
+    extractAIC(extract(fit, "model"), scale, k, ...)
 }
 
 
@@ -159,15 +163,7 @@ getCall.tvcm <- function(x, ...) return(x$info$call)
 
 
 logLik.tvcm <- function(object, ...)
-  return(logLik(extract(object, "model")))
-
-
-model.frame.tvcm <- function(formula, ...) {
-  rval <- cbind(model.frame(formula$info$model), formula$data)
-  attr(rval, "terms") <- attr(formula$data, "terms")
-  attr(rval, "na.action") <- attr(formula$data, "na.action")
-  return(rval)
-}
+    return(logLik(extract(object, "model")))
 
 
 neglogLik2.tvcm <- function(object, ...)
@@ -179,95 +175,129 @@ nobs.tvcm <- function(object, ...) nobs(extract(object, "model"), ...)
 
 predict.tvcm <- function(object, newdata = NULL,
                          type = c("link", "response", "prob", "class",
-                           "node", "coef", "ranef"),
+                                  "node", "coef", "ranef"),
                          ranef = FALSE, na.action = na.pass, ...) {
-
-  ## match type
-  type <- match.arg(type)
-  if (type == "prob") type = "response"
-  
-  ## resolve conflicts with the 'ranef' argument
-  if (!is.null(newdata) && is.logical(ranef) && ranef)
-    stop("'ranef' should be 'FALSE' or a 'matrix' if 'newdata' is not 'NULL'.")
-  if (type == "ranef" & (!is.logical(ranef) | is.logical(ranef) && ranef))
-    stop("for 'type = 'ranef'' the argument 'ranef' must be 'FALSE'.")
-  if (type == "ranef" & !is.null(newdata))
-    stop("prediction for random effect for 'newdata' is not implemented.")
     
-  if (type == "ranef") return(ranef(object$info$model, ...))
-  
-  ## the terminal node identifiers
-  ids <- lapply(object$info$node, nodeids, terminal = TRUE)
-  
-  ## substitute 'newdata' by learning sample
-  if (is.null(newdata)) newdata <- model.frame(object)
-
-  ## extract node ids
-  fitted <- as.data.frame(tvcm_get_node(object, newdata, formList = object$info$formula))
-  newdata[, names(fitted)] <- fitted
-
-  ## return fitted node ids
-  if (type == "node") {
-
-    ## return fitted nodes
-    return(fitted)
+    ## match type
+    type <- match.arg(type)
+    if (type == "prob") type = "response"
     
-  } else if (type == "coef") {
-      
-    ## extract individual effects
-    what <- list(...)$what
-    if (is.null(what)) what <- "coef"
-    coef <- extract(object, what)
-    fe <- vc <- re <- NULL
+    ## resolve conflicts with the 'ranef' argument
+    if (!is.null(newdata) && is.logical(ranef) && ranef)
+        stop("'ranef' should be 'FALSE' or a 'matrix' if 'newdata' is not ",
+             "'NULL'.")
+    if (type == "ranef" & (!is.logical(ranef) | is.logical(ranef) && ranef))
+        stop("for 'type = 'ranef'' the argument 'ranef' must be 'FALSE'.")
+    if (type == "ranef" & !is.null(newdata))
+        stop("prediction for random effect for 'newdata' is not ",
+             "implemented.")
     
-    if (length(coef$fe) > 0L)
-      fe <- matrix(coef$fe, nrow = nrow(fitted),
-                   ncol = length(coef$fe), byrow = TRUE,
-                   dimnames = list(rownames(fitted), names(coef$fe)))
+    if (type == "ranef") return(ranef(object$info$model, ...))
+    
+    ## the terminal node identifiers
+    ids <- lapply(object$info$node, nodeids, terminal = TRUE)
+    
+    ## substitute 'newdata' by learning sample
+    if (is.null(newdata)) {
 
-    if (!is.null(coef$vc)) {
-      for (pid in 1:length(coef$vc)) {
-        if (ncol(coef$vc[[pid]]) > 0L) {
-          vcPid <- lapply(fitted[, pid], function(x) coef$vc[[pid]][as.character(x), ])
-          vcPid <- matrix(unlist(vcPid), nrow = nrow(fitted), byrow = TRUE)
-          rownames(vcPid) <- rownames(fitted)
-          colnames(vcPid) <- colnames(coef$vc[[pid]])
-          vc <- cbind(vc, vcPid)
+        newdata <- object$info$data
+
+    } else {
+        
+        ## check levels of 'newdata'
+        Terms <- delete.response(terms(object$info$data))
+        dropT <- which(!(attr(Terms, "term.labels") %in% colnames(newdata)))
+        if (length(dropT) > 0) Terms <- drop.terms(Terms, dropT)
+        xlevels <- .getXlevels(attr(object$info$data, "terms"),
+                               object$info$data)
+        xlevels <- xlevels[names(xlevels) %in%  all.vars(Terms)]
+        if (object$info$fit == "olmm") {
+            xlevels <- xlevels[names(xlevels) !=
+                               object$info$model$subjectName]
         }
-      }
+        
+        newdata <-
+            as.data.frame(model.frame(
+                Terms, newdata,
+                na.action = na.action,
+                xlev = xlevels))
+        if (!is.null(cl <- attr(Terms, "dataClasses")))
+            .checkMFClasses(cl, newdata)
     }
     
-    if (length(coef$re) > 0L)
-      re <- matrix(coef$re, nrow = nrow(fitted),
-                   ncol = length(coef$re), byrow = TRUE,
-                   dimnames = list(rownames(fitted), names(coef$re)))
+    ## extract node ids
+    fitted <- as.data.frame(
+        tvcm_get_node(object, newdata, formList = object$info$formula))
+    newdata[, names(fitted)] <- fitted
     
-    rval <- cbind(fe, vc)
-    terms <- unique(colnames(rval))
-    rval <-
-      sapply(terms, function(x)
-          rowSums(rval[, colnames(rval) == x, drop = FALSE], na.rm = TRUE))
+    ## return fitted node ids
+    if (type == "node") {
+        
+        ## return fitted nodes
+        return(fitted)
+        
+    } else if (type == "coef") {
+        
+        ## extract individual effects
+        what <- list(...)$what
+        if (is.null(what)) what <- "coef"
+        coef <- extract(object, what)
+        fe <- vc <- re <- NULL
+        
+        if (length(coef$fe) > 0L)
+            fe <- matrix(coef$fe, nrow = nrow(fitted),
+                         ncol = length(coef$fe), byrow = TRUE,
+                         dimnames = list(rownames(fitted), names(coef$fe)))
 
-    vcparm <- unique(unlist(tvcm_get_vcparm(object)))
-    parm <- union(colnames(rval), vcparm)
-    if (length(misC <- setdiff(parm, colnames(rval))) > 0L) {
-        cn <- c(colnames(rval), misC)
-        rval <- cbind(rval, matrix(0, nrow(rval), length(misC)))
-        colnames(rval) <- cn
+        if (!is.null(coef$vc)) {
+            for (pid in 1:length(coef$vc)) {
+                if (ncol(coef$vc[[pid]]) > 0L) {
+                    vcPid <- lapply(fitted[, pid],
+                                    function(x)
+                                        coef$vc[[pid]][as.character(x), ])
+                    vcPid <- matrix(
+                        unlist(vcPid), nrow = nrow(fitted), byrow = TRUE)
+                    rownames(vcPid) <- rownames(fitted)
+                    colnames(vcPid) <- colnames(coef$vc[[pid]])
+                    vc <- cbind(vc, vcPid)
+                }
+            }
+        }
+        
+        if (length(coef$re) > 0L)
+            re <- matrix(coef$re, nrow = nrow(fitted),
+                         ncol = length(coef$re), byrow = TRUE,
+                         dimnames = list(rownames(fitted), names(coef$re)))
+    
+        rval <- cbind(fe, vc)
+        terms <- unique(colnames(rval))
+        rval <-
+            sapply(terms, function(x)
+                rowSums(rval[, colnames(rval) == x, drop = FALSE],
+                        na.rm = TRUE))
+        
+        vcparm <- unique(unlist(tvcm_get_vcparm(object)))
+        parm <- union(colnames(rval), vcparm)
+        if (length(misC <- setdiff(parm, colnames(rval))) > 0L) {
+            cn <- c(colnames(rval), misC)
+            rval <- cbind(rval, matrix(0, nrow(rval), length(misC)))
+            colnames(rval) <- cn
+        }
+        
+        rval <- cbind(rval, re)
+        
+        rownames(rval) <- rownames(fitted)
+        
+        return(rval)
+    } else {
+        
+        ## call predict of fitting function
+        
+        return(predict(object$info$model, newdata = newdata,
+                       type = type, ranef = ranef,
+                       na.action = na.action, ...))
     }
-    
-    rval <- cbind(rval, re)
-    
-    rownames(rval) <- rownames(fitted)
-    
-    return(rval)
-  } else {
-
-    ## call predict of fitting function
-    return(predict(object$info$model, newdata = newdata, type = type,
-                   ranef = ranef, na.action = na.action, ...))
-  }
-  return(fitted)
+    return(fitted)
 }
 
 
@@ -377,263 +407,291 @@ print.tvcm <- function(x, ...)
 
 prune.tvcm <- function(tree, cp = NULL, alpha = NULL, maxstep = NULL,
                        terminal = NULL, original = FALSE, ...) {
-
-  mc <- match.call()
-
-  ## checking arguments  
-  tunepar <- c(!is.null(cp),
-               !is.null(alpha),
-               !is.null(maxstep),
-               !is.null(terminal))
-
-  if (sum(tunepar) < 1L) stop("no tuning parameter specified.")
-  if (sum(tunepar) > 1L) stop("only one tuning parameter is allowed.")
-  
-  tunepar <- c("cp", "alpha", "maxstep", "terminal")[tunepar]
-  
-  if (tunepar == "cp") {
-    stopifnot(is.numeric(cp) && length(cp) == 1L)
-
-  } else if (tunepar == "alpha") {
-    if (!tree$info$control$sctest) {
-      warning("'alpha' is not a tuning parameter for 'tree'.")
-      alpha <- NULL
-    }
-    stopifnot(is.numeric(alpha) && length(alpha) == 1L &&
-              alpha >= 0.0 && alpha <= 1.0)
-
-  } else if (tunepar == "maxstep") {   
-    stopifnot(is.numeric(maxstep) && length(maxstep) == 1L &&
-              maxstep >= 0L)
     
-  } else if (tunepar == "terminal") {
-    errMess <- paste("'terminal' must be a list with ",
-                     length(tree$info$node), "elements.")
-    if (!is.list(terminal)) {
-      if (is.numeric(terminal) && length(tree$info$node) == 1L) {
-        terminal <- list(terminal)
-      } else {
-        stop(errMess)
-      }
-    }
-    if (is.list(terminal)) {
-      if (length(terminal) != length(tree$info$node))
-        stop(errMess)
-      if (!all(sapply(terminal, function(x) is.null(x) | is.numeric(x))))
-        stop("the elements of 'terminal' must be 'NULL' or 'numeric'")
-      terminal <- lapply(terminal, as.integer)
-    }
-  }
-
-  refit <- function(tree) {
-
-    ## extract new formula
-    env <- environment()
-    formList <- tree$info$formula
-    vcRoot <- sapply(tree$info$node, width) == 1L
-    ff <- tvcm_formula(formList, vcRoot, tree$info$family, env)
+    mc <- match.call()
     
-    ## overwrite node predictors
-    data <- model.frame(tree)
-    data[, paste("Node", LETTERS[seq_along(tree$info$node)], sep = "")] <-
-      tvcm_get_node(tree, tree$data, TRUE, tree$fitted[,"(weights)"], formList)
+    ## checking arguments  
+    tunepar <- c(!is.null(cp),
+                 !is.null(alpha),
+                 !is.null(maxstep),
+                 !is.null(terminal))
     
-    ## refit model
-    call <- list(name = as.name(tree$info$fit),
-                 formula = quote(ff$full),
-                 data = quote(data),
-                 family = quote(tree$info$family),
-                 weights = tree$fitted[,"(weights)"])
-    call[names(tree$info$dotargs)] <- tree$info$dotargs
-    mode(call) <- "call"
-    tree$info$model <- suppressWarnings(try(eval(call), TRUE))
+    if (sum(tunepar) < 1L) stop("no tuning parameter specified.")
+    if (sum(tunepar) > 1L) stop("only one tuning parameter is allowed.")
     
-    ## check if the refitting failed
-    if (inherits(tree$info$model, "try-error"))
-      stop("tree model fitting failed.")
+    tunepar <- c("cp", "alpha", "maxstep", "terminal")[tunepar]
     
-    ## heavy terms
-    if (inherits(tree$info$model, "glm")) {
-      attr(attr(tree$info$model$model, "terms"), ".Environment") <- NULL
-      environment(tree$info$model$formula) <- NULL
-      attr(tree$info$model$terms, ".Environment") <- NULL
-    }
-    
-    ## update control
-    tree$info$control <-
-      tvcm_grow_setcontrol(tree$info$control, tree$info$model, formList, vcRoot)
-    
-    return(tree)
-  }
-  
-  ## get the original tree
-  if (original && !identical(tree$info$node, tree$info$grownode)) {
-    tree$node <- tree$info$grownode[[1L]]
-    tree$info$node <- tree$info$grownode
-    tree <- refit(tree)         
-  }
-  
-  if (tunepar %in% c("alpha", "maxstep", "terminal")) {
-    
-    ## prune the tree structure
-    node <- tvcm_prune_node(tree, alpha, maxstep, terminal)
-    
-    ## refit the model if something has changed
-    if (!identical(node, tree$info$node)) {
-      
-      ## attach nodes
-      tree$node <- node[[1L]]
-      tree$info$node <- node
-      
-      ## refit the model
-      tree <- refit(tree)     
-    }
-    
-  } else if (tunepar == "cp") {
-    
-    ## prune as long as there remain 'weak' links   
-    run <- 1L; step <- 0L;
-    cols <- c("part", "node", "loss", "npar", "nsplit", "dev")
-    evalcols <- c("loss", "npar", "nsplit")
-    prunepath <- list()
-    
-    while (run > 0) {
-      
-      run <- 0 ; step <- step + 1L;
-      ncollapse <- NULL
-      
-      ids <- lapply(tree$info$node, function(node) {
-        setdiff(nodeids(node), nodeids(node, terminal = TRUE))
-      })
-      
-      ids00 <- lapply(seq_along(tree$info$node),
-                      function(pid) {
-                        unlist(nodeapply(tree$info$node[[pid]], ids[[pid]],
-                                         function(node) node$info$id$original))
-                      })
-      
-      ## 'call' to evaluate the collapses        
-      prStatCall <- list(name = as.name(tree$info$control$papply),
-                         X = quote(subs),
-                         FUN = quote(prStat))
-      prStatCall[names(tree$info$control$papply.args)] <-
-        tree$info$control$papply.args
-      mode(prStatCall) <- "call"
-      
-      ntab <- matrix(, length(unlist(ids)), length(cols))
-      colnames(ntab) <- cols
-      ntab[, "part"] <- rep(seq_along(tree$info$node), sapply(ids, length))
-      ntab[, "node"] <- unlist(ids)
-      ntab[, "loss"] <- rep.int(Inf, length(unlist(ids)))
-      
-      if (nrow(ntab) > 0L) {
+    if (tunepar == "cp") {
+        stopifnot(is.numeric(cp) && length(cp) == 1L)
         
-        if (step > 1L) {
-          
-          ## search for the parents of the previously selecte node
-          spart <- otab[ocollapse, "part"]
-          snode <- otab[ocollapse, "node"]
-          root <- 1L
-          npath <- c(root); opath <- c(root);
-          while (root != snode) {
-            nkids <-
-              unlist(nodeapply(tree$info$node[[spart]], root,
-                               function(node)
-                               sapply(node$kids, function(kids) kids$id)))
-            okids <- unlist(nodeapply(tree$info$node[[spart]], nkids,
+    } else if (tunepar == "alpha") {
+        if (!tree$info$control$sctest) {
+            warning("'alpha' is not a tuning parameter for 'tree'.")
+            alpha <- NULL
+        }
+        stopifnot(is.numeric(alpha) && length(alpha) == 1L &&
+                  alpha >= 0.0 && alpha <= 1.0)
+        
+    } else if (tunepar == "maxstep") {   
+        stopifnot(is.numeric(maxstep) && length(maxstep) == 1L &&
+                  maxstep >= 0L)
+        
+    } else if (tunepar == "terminal") {
+        errMess <- paste("'terminal' must be a list with ",
+                         length(tree$info$node), "elements.")
+        if (!is.list(terminal)) {
+            if (is.numeric(terminal) && length(tree$info$node) == 1L) {
+                terminal <- list(terminal)
+            } else {
+                stop(errMess)
+            }
+        }
+        if (is.list(terminal)) {
+            if (length(terminal) != length(tree$info$node))
+                stop(errMess)
+            if (!all(sapply(terminal, function(x) is.null(x) |
+                                                  is.numeric(x))))
+                stop("the elements of 'terminal' must be 'NULL' or ",
+                     "'numeric'")
+            terminal <- lapply(terminal, as.integer)
+        }
+    }
+    
+    refit <- function(tree) {
+        
+        ## extract new formula
+        env <- environment()
+        formList <- tree$info$formula
+        vcRoot <- sapply(tree$info$node, width) == 1L
+        ff <- tvcm_formula(formList, vcRoot, tree$info$family, env)
+        
+        ## overwrite node predictors
+        data <- tree$info$data
+        data[,
+             paste("Node", LETTERS[seq_along(tree$info$node)], sep = "")] <-
+            tvcm_get_node(tree, tree$data, TRUE,
+                          tree$fitted[,"(weights)"], formList)
+        
+        ## refit model
+        call <- list(name = as.name(tree$info$fit),
+                     formula = quote(ff$full),
+                     data = quote(data),
+                     family = quote(tree$info$family),
+                     weights = tree$fitted[,"(weights)"])
+        call[names(tree$info$dotargs)] <- tree$info$dotargs
+        mode(call) <- "call"
+        tree$info$model <- suppressWarnings(try(eval(call), TRUE))
+        
+        ## check if the refitting failed
+        if (inherits(tree$info$model, "try-error"))
+            stop("tree model fitting failed.")
+        
+        ## heavy terms
+        if (inherits(tree$info$model, "glm")) {
+            attr(attr(tree$info$model$model, "terms"), ".Environment") <-
+                NULL
+            environment(tree$info$model$formula) <- NULL
+            attr(tree$info$model$terms, ".Environment") <- NULL
+        }
+        
+        ## update control
+        tree$info$control <-
+            tvcm_grow_setcontrol(tree$info$control,
+                                 tree$info$model, formList, vcRoot)
+        
+        return(tree)
+    }
+    
+    ## get the original tree
+    if (original && !identical(tree$info$node, tree$info$grownode)) {
+        tree$node <- tree$info$grownode[[1L]]
+        tree$info$node <- tree$info$grownode
+        tree <- refit(tree)         
+    }
+    
+    if (tunepar %in% c("alpha", "maxstep", "terminal")) {
+        
+        ## prune the tree structure
+        node <- tvcm_prune_node(tree, alpha, maxstep, terminal)
+        
+        ## refit the model if something has changed
+        if (!identical(node, tree$info$node)) {
+            
+            ## attach nodes
+            tree$node <- node[[1L]]
+            tree$info$node <- node
+            
+            ## refit the model
+            tree <- refit(tree)     
+        }
+        
+    } else if (tunepar == "cp") {
+        
+        ## prune as long as there remain 'weak' links   
+        run <- 1L; step <- 0L;
+        cols <- c("part", "node", "loss", "npar", "nsplit", "dev")
+        evalcols <- c("loss", "npar", "nsplit")
+        prunepath <- list()
+        
+        while (run > 0) {
+            
+            run <- 0 ; step <- step + 1L;
+            ncollapse <- NULL
+            
+            ids <- lapply(tree$info$node, function(node) {
+                setdiff(nodeids(node), nodeids(node, terminal = TRUE))
+            })
+            
+            ids00 <- lapply(seq_along(tree$info$node),
+                            function(pid) {
+                                unlist(
+                                    nodeapply(tree$info$node[[pid]],
+                                              ids[[pid]],
+                                              function(node)
+                                                  node$info$id$original))
+                            })
+            
+            ## 'call' to evaluate the collapses        
+            prStatCall <- list(name = as.name(tree$info$control$papply),
+                               X = quote(subs),
+                               FUN = quote(prStat))
+            prStatCall[names(tree$info$control$papply.args)] <-
+                tree$info$control$papply.args
+            mode(prStatCall) <- "call"
+            
+            ntab <- matrix(, length(unlist(ids)), length(cols))
+            colnames(ntab) <- cols
+            ntab[, "part"] <-
+                rep(seq_along(tree$info$node), sapply(ids, length))
+            ntab[, "node"] <- unlist(ids)
+            ntab[, "loss"] <- rep.int(Inf, length(unlist(ids)))
+            
+            if (nrow(ntab) > 0L) {
+                
+                if (step > 1L) {
+                    
+                    ## search for the parents of the previously selecte node
+                    spart <- otab[ocollapse, "part"]
+                    snode <- otab[ocollapse, "node"]
+                    root <- 1L
+                    npath <- c(root); opath <- c(root);
+                    while (root != snode) {
+                        nkids <-
+                            unlist(nodeapply(
+                                tree$info$node[[spart]],
+                                root,
+                                function(node)
+                                    sapply(node$kids,
+                                           function(kids) kids$id)))
+                        okids <- unlist(
+                            nodeapply(tree$info$node[[spart]], nkids,
                                       function(node) node$info$id$last))
-            kidkids <- nodeapply(tree$info$node[[spart]], nkids, nodeids)
-            kid <- sapply(kidkids, function(x) snode %in% x)
-            root <- nkids[kid]
-            if (root != snode) {
-              npath <- c(npath, nkids[kid])
-              opath <- c(opath, okids[kid])
+                        kidkids <- nodeapply(
+                            tree$info$node[[spart]], nkids, nodeids)
+                        kid <- sapply(kidkids, function(x) snode %in% x)
+                        root <- nkids[kid]
+                        if (root != snode) {
+                            npath <- c(npath, nkids[kid])
+                            opath <- c(opath, okids[kid])
+                        }
+                    }
+                    
+                    ## insert results of parent models
+                    ntab[ntab[, "node"] %in% npath & ntab[, "part"] ==
+                         spart, evalcols] <-
+                        otab[otab[, "node"] %in% opath & otab[, "part"] ==
+                             spart, evalcols]
+                }
             }
-          }
-          
-          ## insert results of parent models
-          ntab[ntab[, "node"] %in% npath & ntab[, "part"] == spart, evalcols] <-
-            otab[otab[, "node"] %in% opath & otab[, "part"] == spart, evalcols]
-        }
-      }
-      
-      loss0 <- tree$info$control$lossfun(tree)
-      npar0 <- extractAIC(tree)[1L]
-      nsplit0 <- sum(sapply(tree$info$node, width) - 1L)
-      
-      subs <- which(is.infinite(ntab[, "loss"]))
-      if (length(subs) > 0L) {
-        
-        ## re-estimate all models which collapse each on inner node
-        prStat <- function(i) {
-          term <- lapply(seq_along(tree$info$node),
-                         function(pid) {
-                           if (pid == ntab[i, "part"]) return(ntab[i, "node"])
-                           return(NULL)
-                         })
-          prTree <- try(prune(tree, terminal = term, papply = lapply), TRUE)
-          if (!inherits(prTree, "try-error"))
-            return(c(prTree$info$control$lossfun(prTree),
-                     extractAIC(prTree$info$model)[1L],
-                     sum(sapply(prTree$info$node, width) - 1L)))
-          return(c(Inf, NA, NA))
-        }
-        stat <- eval(prStatCall)
-        ntab[subs, evalcols] <- t(sapply(stat, function(x) x))
-      }
-      
-      if (nrow(ntab) > 0L) {
-        if (any(ntab[, "loss"] < Inf)) {
-          
-          ## minimum dfsplit such that the smaller model improves the fit
-          ntab[, "dev"] <-
-            (ntab[, "loss"] - loss0) /
-              (tvcm_complexity(npar0, tree$info$control$dfpar,
-                               nsplit0, tree$info$control$dfsplit) -
-               tvcm_complexity(ntab[, "npar"], tree$info$control$dfpar,
-                               ntab[, "nsplit"], tree$info$control$dfsplit))
-          
-          ## prune selected inner node
-          if (any(ntab[, "dev"] <= cp)) {
-            ncollapse <- which(!is.na(ntab[, "dev"]) &
-                               !is.nan(ntab[, "dev"]) &
-                               ntab[, "dev"] == min(ntab[, "dev"]))
-            if (length(ncollapse) > 1L) ncollapse <- sample(ncollapse, 1L)
-            if (length(ncollapse) > 0L) {
-              term <- lapply(seq_along(tree$info$node),
-                             function(pid) {
-                               if (pid == ntab[ncollapse, "part"])
-                                 return(ntab[ncollapse, "node"])
-                               return(NULL)
-                             })
-              tree <- prune(tree, terminal = term)
-              run <- 1
+            
+            loss0 <- tree$info$control$lossfun(tree)
+            npar0 <- extractAIC(tree)[1L]
+            nsplit0 <- sum(sapply(tree$info$node, width) - 1L)
+            
+            subs <- which(is.infinite(ntab[, "loss"]))
+            if (length(subs) > 0L) {
+                
+                ## re-estimate all models which collapse each on inner node
+                prStat <- function(i) {
+                    term <- lapply(
+                        seq_along(tree$info$node),
+                        function(pid) {
+                            if (pid == ntab[i, "part"])
+                                return(ntab[i, "node"])
+                            return(NULL)
+                        })
+                    prTree <- try(prune(tree, terminal = term,
+                                        papply = lapply), TRUE)
+                    if (!inherits(prTree, "try-error"))
+                        return(c(prTree$info$control$lossfun(prTree),
+                                 extractAIC(prTree$info$model)[1L],
+                                 sum(sapply(prTree$info$node, width) - 1L)))
+                    return(c(Inf, NA, NA))
+                }
+                stat <- eval(prStatCall)
+                ntab[subs, evalcols] <- t(sapply(stat, function(x) x))
             }
-          }
-          otab <- ntab
-          ocollapse <- ncollapse
-          
-        } else {
-          stop("fitting of nested models failed.")
+            
+            if (nrow(ntab) > 0L) {
+                if (any(ntab[, "loss"] < Inf)) {
+                    
+                    ## minimum dfsplit such that the smaller model
+                    ## improves the fit
+                    ntab[, "dev"] <-
+                        (ntab[, "loss"] - loss0) /
+                        (tvcm_complexity(
+                            npar0, tree$info$control$dfpar,
+                            nsplit0, tree$info$control$dfsplit) -
+                         tvcm_complexity(
+                             ntab[, "npar"], tree$info$control$dfpar,
+                             ntab[, "nsplit"], tree$info$control$dfsplit))
+                    
+                    ## prune selected inner node
+                    if (any(ntab[, "dev"] <= cp)) {
+                        ncollapse <- which(!is.na(ntab[, "dev"]) &
+                                           !is.nan(ntab[, "dev"]) &
+                                           ntab[, "dev"] ==
+                                           min(ntab[, "dev"]))
+                        if (length(ncollapse) > 1L)
+                            ncollapse <- sample(ncollapse, 1L)
+                        if (length(ncollapse) > 0L) {
+                            term <- lapply(
+                                seq_along(tree$info$node),
+                                function(pid) {
+                                    if (pid == ntab[ncollapse, "part"])
+                                        return(ntab[ncollapse, "node"])
+                                    return(NULL)
+                                })
+                            tree <- prune(tree, terminal = term)
+                            run <- 1
+                        }
+                    }
+                    otab <- ntab
+                    ocollapse <- ncollapse
+                    
+                } else {
+                    stop("fitting of nested models failed.")
+                }
+            }
+            
+            ## create a 'data.frame' for the 'prunepath' method
+            
+            tab <- matrix(c(NA, NA, loss0, npar0, nsplit0, NA),
+                          ncol = length(cols),
+                          dimnames = list("<none>", cols))
+            if (nrow(ntab) > 0L) {
+                ntab[, "node"] <- unlist(ids00)
+                rownames(ntab) <-
+                    seq(1L, nrow(ntab), length.out = nrow(ntab))
+                tab <- rbind(tab, ntab)
+            }
+            prunepath[[step]] <- list(step = step, tab = tab)
         }
-      }
-      
-      ## create a 'data.frame' for the 'prunepath' method
-      
-      tab <- matrix(c(NA, NA, loss0, npar0, nsplit0, NA),
-                    ncol = length(cols), dimnames = list("<none>", cols))
-      if (nrow(ntab) > 0L) {
-        ntab[, "node"] <- unlist(ids00)
-        rownames(ntab) <- seq(1L, nrow(ntab), length.out = nrow(ntab))
-        tab <- rbind(tab, ntab)
-      }
-      prunepath[[step]] <- list(step = step, tab = tab)
+        tree$info$prunepath <- prunepath
     }
-    tree$info$prunepath <- prunepath
-  }
-  
-  ## return pruned model  
-  return(tree)
+    
+    ## return pruned model  
+    return(tree)
 }
 
 

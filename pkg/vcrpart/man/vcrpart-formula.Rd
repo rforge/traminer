@@ -36,7 +36,8 @@ ge(formula)
   \item{\ldots}{the names of variables that moderate (i.e. modify) the
     effects of the variables specified in \code{by}, separated by
     commas. It is also possibly to assign a vector that contains the
-    variable names as characters.}  
+    variable names as characters. Note that operators like
+    \code{factor(x)} are not allowed.}  
   \item{by}{a formula of predictors the effects of which are moderated
     by the variables in \code{\ldots}. See \command{\link{tvcm}} and the
     examples below. Note that the \code{by} variable must be numeric and
@@ -60,7 +61,7 @@ ge(formula)
   below and on the documentation pages of the fitting functions.
   
   For all of \command{\link{fvcm}}, \command{\link{tvcm}} and
-  \command{\link{olmm}}, Variables which are not defined with one of
+  \command{\link{olmm}}, variables which are not defined with one of
   \command{\link{fe}}, \command{\link{vc}} and \command{\link{re}} are
   treated as fixed effects. Intercepts can be dropped from the model by
   the \code{intercept} argument. The terms \command{\link{ce}}
@@ -68,11 +69,37 @@ ge(formula)
   proportional odds effect) are designed for the function
   \command{\link{olmm}}. Notice that \command{\link{tvcm}} may changes,
   for internal reasons, the order of the terms in the specified
-  formula. At present, the term \code{"."}, which is generally use to
-  extract all variables of the data, is ignored. On the other hand,
+  formula. Note that you can put multiple terms within
+  \command{\link{fe}}, \command{\link{ge}} and \command{\link{ce}} terms
+  (e.g., \code{fe(ce(x1 + x2 + ge(x3 + x4))}).
+
+  At present, the term \code{"."}, which is often use to extract all
+  variables of the data, is ignored. As an alternative,
   \command{\link{vc}} interprets character vectors, assigned as unnamed
   arguments, as lists of variables of moderators to be extracted from
-  \code{data}. 
+  \code{data}. See the examples below.
+
+  Default for intercepts in \command{\link{fe}} terms is \code{intercept
+    = TRUE}, or \code{intercept = "ce"} for models fitted with
+  \command{\link{olmm}}. This means that an intercept is automatically
+  attached. Alternatives are \code{intercept = FALSE}, which is equal to
+  \code{intercept = "none"}, and \code{intercept = "ge"}, which yields a
+  global-effect intercept for models fitted with \command{\link{olmm}}.
+  
+  Default for intercepts in \command{\link{vc}} is to introduce an
+  intercept if the \code{by} argument is ignored, otherwise no intercept
+  is introduced. Specifically, if input is specified for the \code{by}
+  argument, then  \code{intercept = TRUE}, or \code{intercept = "ce"}
+  for models fitted by \command{\link{olmm}}. Alternatives are
+  \code{intercept = FALSE}, which is equal to \code{intercept = "none"},
+  and \code{intercept = "ge"}, which yields a global-effect varying
+  intercept. 
+
+  Default for intercepts in \command{\link{re}} is \code{intercept =
+  TRUE}, which is equal to \code{intercept = "ge"}. \code{intercept =
+  FALSE} is equal to \code{intercept = "none"}. For category-specific
+  random intercepts, use \code{intercept = "ge"}. See
+  \command{\link{olmm}}. 
 }
 
 \seealso{\command{\link{tvcm}}, \command{\link{fvcm}},
@@ -97,6 +124,10 @@ formula <- y ~ x1 + vc(z1, z2, by = x2 + x3, intercept = TRUE)
 ## 'x2' and 'x3' to model their effects as functions of 'z1' and 'z2'.
 
 formula <- y ~ x1 + vc(z1, z2, by = x2) + vc(z1, z2, by = x3)
+
+## As an alternative to '.' you can define variables in a vector
+vars <- c("x1", "x2", "x3")
+formula <- y ~ x1 + vc(vars, by = x2) + vc(vars, by = x3)
 }
 
 \author{Reto Buergin}

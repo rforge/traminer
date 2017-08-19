@@ -1,10 +1,20 @@
 Changes in Version 0.4-3
 
+    o    Improve documentation for formulas
+    
+    o    The 'data' slot of 'tvcm' object newly includes several
+         variables used for fitting. These data are cleaned with
+	 respect to missing values, but no transformations are applied.
+
     o    In 'fvcolmm_control' the 'alpha' argument has mistakingly been
          ignored. Bug fix.
 
-    o    'fvcolmm_control' gives a warning if the arguments 'prune' and
-         'cv' are passed, because they are disabled
+    o    Added new warnings for 'tvcglm_control'.
+
+    o    Bug fix: for 'tvcglm_control' and 'tvcolmm_control' the '...'
+         arguments have previously been ignored.
+
+    o    added default for 'minsize' to 'fvcm_control' and 'fvcglm_control'. 
 
     o    Add new argument 'fitargs' to 'tvcm'. Allows to pass arguments for
          the fitting function in 'tvcm' and 'fvcm'. This was possible before
@@ -14,6 +24,8 @@ Changes in Version 0.4-3
     o    Improve the help of 'vcpart-formula'.
 
     o    fixed an unnecessary error case in 'tvcm_folds'.
+
+    o    add check for the response variable in 'olmm'
 
 Changes in Version 0.4-2
 
@@ -49,7 +61,8 @@ Changes in Version 0.4-1
          or 'tvcolmm'. 'by' variables of 'vc' terms without splits are not
          anymore assigned to fixed i.e. main effects. 
 
-    o    Corrected internal bug of 'predict.fvcm'. Except for 'type = "coef"',
+    o    Corrected internal bug of 'predict.fvcm'. Except for
+         'type = "coef"',
          and models with 'family = gaussian()' or 'family = cumulative()',
          predictions gave wrong results. Sorry.
 
@@ -189,9 +202,9 @@ Changes in Version 0.2-1
 
     o    The default splitting criterion of 'tvcm' was changed from 
          (old) coefficient constancy tests combined with greedy loss 
-         minimization to (new) exhaustive greedy loss minimization. Splitting 
-         based on the (old) requires to set the argument 'sctest = TRUE' in 
-         'tvcm_control'.
+         minimization to (new) exhaustive greedy loss minimization.
+	 Splitting based on the (old) requires to set the
+	 argument 'sctest = TRUE' in 'tvcm_control'.
 
      o	 The greedy loss reduction minimization stage of 'tvcm' does now 
          fixate coefficients which are not splitted at the estimates of 

@@ -154,6 +154,10 @@ data(vcrpart_2)
 control <- fvcglm_control(mtry = 1L, minsize = 5, maxstep = 3,
                           folds_control("subsampling", K = 3, 0.75))
 
+control <- fvcm_control(mtry = 1L, minsize = 5, maxstep = 3,
+                        folds_control("subsampling", K = 3, 0.75),
+                        papply = lapply)
+
 model.2 <- fvcglm(y ~ -1  + vc(z1, z2, by = x1, intercept = TRUE) + x2,
                   data = vcrpart_2,
                   family = gaussian(), subset = 1:50,control = control)

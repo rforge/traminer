@@ -45,8 +45,8 @@ tvcm_control(minsize = 30, mindev = ifelse(sctest, 0.0, 2.0),
   \item{maxdepth}{integer (vector). The maximum depth of the partition(s).} 
   \item{lossfun}{a function to extract the training error, typically
     minus two times the negative log likelihood of the fitted model (see
-    \command{\link{neglogLik2}}). Is currently ignored if a \code{glm} model is
-    fitted and \code{fast = TRUE}.}  
+    \command{\link{neglogLik2}}). Is currently ignored if a \code{glm}
+    model is fitted and \code{fast = TRUE}.}  
   \item{ooblossfun}{a loss function that defines how to compute the
     validation error during cross-validation. The function will be
     assigned to the \code{fun} argument of \command{\link{oobloss}}.}

@@ -108,11 +108,11 @@ olmm(formula, data, family = cumulative(),
   function will use \command{\link{ge}} terms. Notice that this default
   does not necessarily yield interpretable outputs. For example, for the
   \command{\link{baseline}} model you may use only \command{\link{ce}}
-  terms, and you have to specifiy this manually. For
-  \command{\link{cumulative}} models it is at present not possible to
-  specifiy \command{\link{ce}} for the random effects component because
-  the internal, unconstraint integration would yield unusable predictor
-  values. 
+  terms, which must be specified manually manually. See the example
+  below. For \command{\link{cumulative}} models at present it is not
+  possible to specifiy \command{\link{ce}} for the random effects
+  component because the internal, unconstraint integration would
+  yield unusable predictor values. 
 }
 
 \value{\command{\link{olmm}} returns an object of class

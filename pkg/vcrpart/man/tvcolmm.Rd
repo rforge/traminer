@@ -21,11 +21,11 @@ tvcolmm(formula, data, family = cumulative(),
         weights, subset, offset, na.action = na.omit, 
         control = tvcolmm_control(), ...)
 
-tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
-                maxnomsplit = 5, maxordsplit = 9,
+tvcolmm_control(sctest = TRUE, alpha = 0.05, bonferroni = TRUE,
+                minsize = 50, maxnomsplit = 5, maxordsplit = 9,
                 maxnumsplit = 9, fast = TRUE,
                 trim = 0.1, estfun.args = list(), nimpute = 5,
-                seed = NULL, ...)
+                seed = NULL, maxstep = 1e3, verbose = FALSE, ...)
 }
 
 \arguments{
@@ -57,7 +57,11 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
     listwise deletion, i.e., observations with missings on any variable
     are dropped. See \command{\link{na.action}}.}
   \item{control}{a list with control parameters as returned by
-    \command{\link{tvcolmm_control}}.}
+    \command{\link{tvcolmm_control}}, or by \command{\link{tvcm_control}}
+    for advanced users.}
+  \item{sctest}{logical scalar. Defines whether coefficient constancy
+    tests should be used for the variable and node selection in each
+    iteration.}
   \item{alpha}{numeric significance threshold between 0 and 1. A node is
     splitted when the smallest (possibly Bonferroni-corrected) \eqn{p}
     value for any coefficient constancy test in the current step falls
@@ -83,6 +87,10 @@ tvcolmm_control(alpha = 0.05, bonferroni = TRUE, minsize = 50,
     iteration. See details.}
   \item{seed}{an integer specifying which seed should be set at the
     beginning.}
+  \item{maxstep}{integer. The maximum number of iterations i.e. number
+    of splits to be processed.}  
+  \item{verbose}{logical. Should information about the fitting process
+    be printed to the screen?}
   \item{\ldots}{additional arguments passed to the fitting function
     \code{fit} or to \command{\link{tvcm_control}}.}  
 }

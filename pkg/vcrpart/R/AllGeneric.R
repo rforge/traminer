@@ -51,3 +51,5 @@ prunepath <- function(tree, ...) UseMethod("prunepath")
 ranefCov <- function(object, ...) UseMethod("ranefCov")
 
 splitpath <- function(tree, ...) UseMethod("splitpath")
+
+

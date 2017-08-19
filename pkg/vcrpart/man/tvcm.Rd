@@ -74,15 +74,18 @@ tvcm(formula, data, fit, family,
 \value{An object of class \command{\link{tvcm}}. The
     \command{\link{tvcm}} class itself is based on the
     \command{\link{party}} class of the \pkg{partykit} package. The most
-    important slots are: \item{node}{an object of class
-    \command{\link{partynode}}.} \item{data}{a (potentially empty)
-    \command{\link{data.frame}}.} \item{fitted}{an optional
-    \command{\link{data.frame}} with \code{nrow(data)} rows and
-    containing at least the fitted terminal node identifiers as element
-    \code{(fitted)}. In addition, weights may be contained as element
-    \code{(weights)} and responses as \code{(response)}.}
-    \item{info}{additional information including\code{control} and
-    \code{model}.} 
+    important slots are:
+
+    \item{node}{an object of class \command{\link{partynode}}.}
+    \item{data}{a \command{\link{data.frame}}. The model frame with all
+      variables for partitioning.}
+    \item{fitted}{an optional \command{\link{data.frame}} containing at
+      least the fitted terminal node identifiers as element
+      \code{(fitted)}. In addition, weights may be contained as element
+      \code{(weights)} and responses as \code{(response)}.} 
+    \item{info}{additional information including \code{control},
+      \code{model} and \code{data} (all untransformed data, without
+      missings).} 
 }
 
 \references{
@@ -126,7 +129,7 @@ poverty$EduHigh <- 1 * (poverty$Edu == "high")
 model.Pov <-
   tvcm(Poor ~ -1 +  vc(CivStat) + vc(CivStat, by = EduHigh) + NChild, 
          family = binomial(), data = poverty, subset = 1:200,
-         control = tvcm_control(verbose = TRUE, 
+         control = tvcm_control(verbose = TRUE, papply = "lapply",
            folds = folds_control(K = 1, type = "subsampling", seed = 7)))
 
 ## diagnosis

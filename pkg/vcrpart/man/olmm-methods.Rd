@@ -97,7 +97,7 @@
   \command{\link{anova}} implements log-likelihood ratio tests for model  
   comparisons, based on the marginal likelihood. At the time being, 
   at least two models must be assigned.
-
+  
   \command{\link{neglogLik2}} is the marginal maximum likelihood of the
   fitted model times minus 2. 
 
