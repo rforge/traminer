@@ -53,13 +53,13 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
 \details{The precarity index of a sequence \eqn{x} is based on the complexity index  (\cite{Gabadinho et al., 2010}) \eqn{c(x)} (See the \code{\link[TraMineR]{seqici}} function from \pkg{TraMineR}) and is defined as
 
- \deqn{prec(x) = \lambda a(x_1) + (1-\lambda) (1 + q(x)) c(x)}{prec(x) = lambda * a(x_1) + (1 - lambda)*(1 + q(x))*c(x)}
+ \deqn{prec(x) = \lambda a(x_1) + (1-\lambda) (1 + q(x))^\beta c(x)^\alpha}{prec(x) = lambda * a(x_1) + (1 - lambda)*(1 + q(x))^b*c(x)^a}
 
-where \eqn{a(x_1)} is the level of precarity of the starting state in sequence \eqn{x}, \eqn{q(x)} is the weighted proportion of negative transitions (or, with a negative sign, of the positive transitions) in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) serves to trade-off the importance of the precarity of the starting state and the corrected complexity index.
+where \eqn{a(x_1)} is the level of precarity of the starting state in sequence \eqn{x}, \eqn{q(x)} is the weighted proportion of negative transitions (or, with a negative sign, of the positive transitions) in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) serves to trade-off the importance of the precarity of the starting state and the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
-The weights \eqn{q(x)} can be obtained separately by means of the function \code{seqprecorr}. The type of probabilities used to determine the transition weights can be controlled with \code{tr.type}. Likewise, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties.
+The weighted proportion of negative transitions \eqn{q(x)} can be obtained separately by means of the function \code{seqprecorr}. The type of probabilities used to determine the transition weights can be controlled with \code{tr.type}. Likewise, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties.
 
-When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean starting precarity level is assigned to each state of the class.
+When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean starting precarity level is assigned to each state of the class (see \code{\link{seqprecstart}}).
 
 As for non-comparable states (those not listed on the \code{state.order} argument), the transition to or from such states is ignored and they all receive the mean level (.5) as starting precarity.
 
