@@ -26,7 +26,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
   \item{correction}{Vector of correction factor values. If \code{NULL}, the correction factors are computed by means of the \code{seqprecorr} function.}
 
   \item{otto}{Scalar in the range [0,1]. Trade-off weight between the precarity level of the initial state and the corrected complexity. Default is \code{otto=.2}.}
-      
+
   \item{a}{Non negative real value. Exponent weight of the complexity. Default is 1.}
 
   \item{b}{Non negative real value. Exponent weight of the correction factor. Default is 1.2. }
@@ -55,7 +55,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
  \deqn{prec(x) = \lambda a(x_1) + (1-\lambda) (1 + q(x))^\beta c(x)^\alpha}{prec(x) = lambda * a(x_1) + (1 - lambda)*(1 + q(x))^b*c(x)^a}
 
-where \eqn{a(x_1)} is the level of precarity of the starting state in sequence \eqn{x}, \eqn{q(x)} is the weighted proportion of negative transitions (or, with a negative sign, of the positive transitions) in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) serves to trade-off the importance of the precarity of the starting state and the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
+where \eqn{a(x_1)} is the level of precarity of the starting state in sequence \eqn{x}, \eqn{q(x)} is the weighted proportion of negative transitions (or, with a negative sign, of the positive transitions) in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the precarity of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
 The weighted proportion of negative transitions \eqn{q(x)} can be obtained separately by means of the function \code{seqprecorr}. The type of probabilities used to determine the transition weights can be controlled with \code{tr.type}. Likewise, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties.
 
@@ -69,10 +69,10 @@ As for non-comparable states (those not listed on the \code{state.order} argumen
 
 \value{
 
-For \code{seqprecarity}, a vector with the precarity index of each sequence. The returned vector has an attribute \code{stprec} that contains the state precarity level used at the starting position.
+For \code{seqprecarity}, a vector with the value of the precarity index for each sequence. The returned vector has an attribute \code{stprec} that contains the state precarity level used at the starting position.
 
 
-For \code{seqprecorr}, the vector of the weighted proportion \eqn{q(x)} with as additional attributes: \code{tr} the used transition probabilities; \code{signs} the transitions signs; \code{state.noncomp} the non-comparable states; and \code{state.order} the used state order.
+For \code{seqprecorr}, the vector of the weighted proportions \eqn{q(x)} with as additional attributes: \code{tr} the used transition probabilities; \code{signs} the transitions signs; \code{state.noncomp} the non-comparable states; and \code{state.order} the used state order.
 
 
 }
@@ -82,7 +82,7 @@ For \code{seqprecorr}, the vector of the weighted proportion \eqn{q(x)} with as 
 }
 
 \references{
-Ritschard, G., Bussi, M., and O'Reilly, J. (forthcoming), "An index of precarity for 
+Ritschard, G., Bussi, M., and O'Reilly, J. (forthcoming), "An index of precarity for
 measuring early employment insecurity", in G. Ritschard, and M. Studer, \emph{Sequence Analysis and Related Approaches: Innovative Methods and Applications}, Series Life Course Research and Social Policies, Springer.
 
 Gabadinho, A., Ritschard, G., Studer, M. and Müller, N.S. (2010), "Indice de complexité pour le tri et la comparaison de séquences catégorielles", In Extraction et gestion des connaissances (EGC 2010), \emph{Revue des nouvelles technologies de l'information RNTI}. Vol. E-19, pp. 61-66.
