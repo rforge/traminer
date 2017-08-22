@@ -73,8 +73,8 @@ The functions can then easily retrieve this information to ensure presentation h
 \usepackage{rotating}
 \usepackage{varioref}
 \usepackage{array}
-\usepackage{subfigure}
-\usepackage{afterpage}
+%\usepackage{subfigure}
+%\usepackage{afterpage}
 
 \usepackage[svgnames]{xcolor}
 

@@ -2,12 +2,17 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-8 [2017-08-15] (Development version)}{
+\section{Changes in version 2.1-8 [2017-08-22] (Development version)}{
 
   \subsection{Misc:}{
     \itemize{
       \item
-      No changes.
+      Vignette: Suppressed the loading of two unused LaTeX packages
+      (subfigure and afterpage) that prevented the vignette to be built
+      under OSX.
+      \item
+      Declare use of C++11 for log1p: SystemRequirements: C++11 declaration
+      in \code{DESCRIPTION} and an \code{include <math.h>} in \code{NMSdistance.cpp}
     }
   }
 }
