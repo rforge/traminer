@@ -111,6 +111,10 @@ fvcglm_control(maxstep = 10, minsize = 10,
 
   Hastie, T., R. Tibshirani and J. Friedman (2001). \emph{The Elements
     of Statistical Learning} (2 ed.). New York, USA: Springer-Verlag.
+
+  Buergin, R. A. (2015). Tree-based methods for moderated regression
+  with application to longitudinal data. PhD thesis. University of
+  Geneva. 
 }
 
 \seealso{\command{\link{fvcm-methods}}, \command{\link{tvcm}}, 

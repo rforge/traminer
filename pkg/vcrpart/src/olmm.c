@@ -123,10 +123,10 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   double *newPar = REAL(par);
  
   /* slots of 'x' to modify */
-  SEXP fixefR = duplicate(getListElement(x, "fixef")),
-    vecRanefCholFacR = duplicate(getListElement(x, "ranefCholFac")),
-    coefficientsR = duplicate(getListElement(x, "coefficients")),
-    ranefElMatR = duplicate(getListElement(x, "ranefElMat"));
+  SEXP fixefR = PROTECT(duplicate(getListElement(x, "fixef"))),
+    vecRanefCholFacR =PROTECT(duplicate(getListElement(x, "ranefCholFac"))),
+    coefficientsR = PROTECT(duplicate(getListElement(x, "coefficients"))),
+    ranefElMatR = PROTECT(duplicate(getListElement(x, "ranefElMat")));
   
   double *fixef = REAL(fixefR), /* used slots */
     *vecRanefCholFac = REAL(vecRanefCholFacR),
@@ -178,7 +178,7 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   SET_VECTOR_ELT(rvalR, 2, coefficientsR);
   SET_VECTOR_ELT(rvalR, 3, ranefElMatR);
   
-  UNPROTECT(1);
+  UNPROTECT(5);
   return rvalR;
 }
 

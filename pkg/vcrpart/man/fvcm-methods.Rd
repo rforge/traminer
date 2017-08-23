@@ -113,9 +113,6 @@ model.1 <-
 ## estimating the out of bag loss
 suppressWarnings(oobloss(model.1))
 
-## plotting the trees
-plot(model.1, "coef")
-
 ## predicting responses and varying coefficients for subject '27'
 subs <- vcrpart_1$id == "27"
 
@@ -151,12 +148,8 @@ data(vcrpart_2)
 
 ## fit and analyse the model
 
-control <- fvcglm_control(mtry = 1L, minsize = 5, maxstep = 3,
-                          folds_control("subsampling", K = 3, 0.75))
-
 control <- fvcm_control(mtry = 1L, minsize = 5, maxstep = 3,
-                        folds_control("subsampling", K = 3, 0.75),
-                        papply = lapply)
+                        folds_control("subsampling", K = 3, 0.75))
 
 model.2 <- fvcglm(y ~ -1  + vc(z1, z2, by = x1, intercept = TRUE) + x2,
                   data = vcrpart_2,
@@ -164,10 +157,6 @@ model.2 <- fvcglm(y ~ -1  + vc(z1, z2, by = x1, intercept = TRUE) + x2,
 
 ## estimating the out of bag loss
 suppressWarnings(oobloss(model.2))
-
-## plotting
-plot(model.2, "coef", tnex = 2)
-plot(model.2, "partdep", var = "z1")
 
 ## predict the coefficient for individual cases
 predict(model.2, vcrpart_2[91:100, ], "coef")

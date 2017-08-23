@@ -183,6 +183,8 @@ predict.tvcm <- function(object, newdata = NULL,
     if (type == "prob") type = "response"
     
     ## resolve conflicts with the 'ranef' argument
+    if (!is.null(newdata) && !is.data.frame(newdata))
+        stop("'newdata' must be a 'data.frame'")
     if (!is.null(newdata) && is.logical(ranef) && ranef)
         stop("'ranef' should be 'FALSE' or a 'matrix' if 'newdata' is not ",
              "'NULL'.")
@@ -283,12 +285,11 @@ predict.tvcm <- function(object, newdata = NULL,
             rval <- cbind(rval, matrix(0, nrow(rval), length(misC)))
             colnames(rval) <- cn
         }
-        
         rval <- cbind(rval, re)
         
-        rownames(rval) <- rownames(fitted)
-        
+        rownames(rval) <- rownames(fitted)     
         return(rval)
+        
     } else {
         
         ## call predict of fitting function

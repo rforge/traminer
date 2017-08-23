@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2017-08-19
+## Date:            2017-08-21
 ##
 ## Description:
 ## Workhorse functions for the 'tvcm' function.
@@ -51,6 +51,9 @@
 ## tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##
 ## Last modifications:
+## 2017-08-21: - rename arguments for 'tvcm_get_terms'.
+##             - bug fix for 'tvcm_get_estimates' for situations where
+##               'fe' terms include factor variables or operators
 ## 2017-08-19: improve tvcm_formula.
 ## 2017-08-17: - set model.frame in 'tvcm_get_node' for splitting variables
 ##             - delete model.frame.tvcm calls
@@ -1248,8 +1251,8 @@ tvcm_grow_sctest <- function(model, nodes, where, partid, nodeid, varid,
             names = dimnames(scores)[[2L]],
             ids = lapply(nodes, function(node)
                 nodeids(node, terminal = TRUE)),
-            parm = control$parm,
-            fixed = NULL)
+            vcParms = control$parm,
+            feParms = NULL)
     ## note: fixed is set to 'NULL' for the case where a variable that is at
     ## the same time a fixed i.e. main effect and a 'by' variable in a 'vc'
     ## term without split is not dropped (which is meaningful for the 'coef'
@@ -2199,8 +2202,10 @@ tvcm_get_node <- function(object, newdata, setContrasts = FALSE, weights,
 ##'
 ##' @param names character vector. Names of coefficients of the
 ##'    current model.
-##' @param ids   character vector. Names of the current nodes.
-##' @param parm  the 'control$parm' slot
+##' @param ids character vector. Names of the current nodes.
+##' @param vcTerms list. the 'control$parm' slot.
+##' @param feTerms list. list with elements 'ce' and 'ge' of
+##'    fixed effects terms.
 ##'
 ##' @return A list with slots
 ##'    names:     the original coefficient names.
@@ -2211,24 +2216,26 @@ tvcm_get_node <- function(object, newdata, setContrasts = FALSE, weights,
 ##'    node:      the node to which a coefficient belongs to.
 ##'    partition: the partition to which a coefficients
 ##'               belongs to.
-tvcm_get_terms <- function(names, ids, parm, fixed = NULL) {
-
-    ## modify 'parm':    
+tvcm_get_terms <- function(names, ids, vcParms, feParms = NULL) {
+    
+    ## modify 'vcParms':    
     ## modification 1: remove 'by' variables of 'vc' terms
-    ## without splits in cases a corresponding fixed i.e. main effect
+    ## without splits in cases a corresponding feParms i.e. main effect
     ## is specified for the same variable.
-    if (!is.null(fixed))
-        parm <- lapply(parm, lapply, function(x) setdiff(x, unlist(fixed)))
+    if (!is.null(feParms)) 
+        vcParms <- lapply(vcParms, lapply, function(x)
+            setdiff(x, unlist(feParms)))
+    
     ## modification 2: remove duplicated variables that
     ## appear as 'by' variables in multiple 'vc' terms without splits
     ## By definition, such 'by' variables are assigned to the
     ## corresponding first 'vc' term.
-    if (any(subs <- duplicated(unlist(parm)))) {
-        doubles <- unique(unlist(parm)[subs])
+    if (any(subs <- duplicated(unlist(vcParms)))) {
+        doubles <- unique(unlist(vcParms)[subs])
         for (i in seq_along(doubles)) {
-            first <- which(sapply(parm, function(x)
+            first <- which(sapply(vcParms, function(x)
                 doubles[i] %in% unlist(x)))[1L]
-            parm <- lapply(parm[-first], lapply, function(x)
+            vcParms <- lapply(vcParms[-first], lapply, function(x)
                 setdiff(x, doubles[i]))
         }
     }
@@ -2236,8 +2243,8 @@ tvcm_get_terms <- function(names, ids, parm, fixed = NULL) {
     ## change 'names' if no split was applied in some node
     if (any(unlist(ids) == 1L)) {
         getNames <- function(x) {           
-            if (!x %in% unlist(parm)) return(x)
-            pid <- which(sapply(parm, function(p) x %in% unlist(p)))
+            if (!x %in% unlist(vcParms)) return(x)
+            pid <- which(sapply(vcParms, function(p) x %in% unlist(p)))
             if (grepl("(Intercept)", x))
                 return(gsub("(Intercept)", paste0("Node", LETTERS[pid], 1),
                             x, fixed = TRUE))
@@ -2294,7 +2301,7 @@ tvcm_get_terms <- function(names, ids, parm, fixed = NULL) {
 
 
 ## --------------------------------------------------------- #
-##' Extracts the names of the predictors on 'vc' terms
+##' Extracts the names of the predictors on 'vc' terms. 
 ##' 
 ##' @param object a 'tvcm' object.
 ##'
@@ -2375,17 +2382,20 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
     
     ## ids of terminal nodes of tree structures
     ids <- lapply(object$info$node, nodeids, terminal = TRUE)
-
     
-    ## the 'vc' terms that should exist in theory
-    vcVars <- lapply(object$info$formula$vc, function(x) {
-        rval <- lapply(x$eta, function(x) attr(terms(x), "term.labels"))
+    ## the 'vc' terms that should exist in theory (without 'Node' in name)
+    ## !!! works only because 'by' variables cannot be 'factors'
+    vcTerms <- lapply(object$info$formula$vc, function(x) {
+        ## get terms from 'full' formulas
+        rval <- lapply(x$eta, function(eta) attr(terms(eta), "term.labels"))
+        ## add 'Eta' term for 'olmm' models
         if (length(rval$ce) > 0 && inherits(model$family, "family.olmm")) {
             rval$ce <-
                 paste0("Eta", rep(1:model$dims["nEta"],
                                   each = length(rval$ce)),
                        ":", rep(rval$ce, model$dims["nEta"]))
         }
+        ## remove 'Node' term and return
         return(lapply(rval, function(x) {
             x <- strsplit(x, ":")
             return(lapply(x, function(x) {
@@ -2395,12 +2405,30 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
         }))
     })
     
-    ## get fixed i.e. main effects
-    feTerms <- lapply(object$info$formula$fe$eta,
+    ## the 'fe' parameters that should exist in theory
+    feParm <- lapply(object$info$formula$fe$eta,
                       function(x) attr(terms(x), "term.labels"))
+    for (j in names(feParm)) {
+        if (length(feParm[[j]]) > 0L) {
+            type <- paste("fe", j, sep = "-")
+            X <- suppressWarnings(model.matrix(model, which = type)) # warnings contrasts
+            assign <- attr(X, "assign")
+            subs <- which(attr(terms(model, type), "term.labels") %in% feParm[[j]])
+            feParm[[j]] <- colnames(X)[assign %in% subs]
+        }
+    }
+    if (object$info$formula$fe$intercept != "none") {
+        feParm[[object$info$formula$fe$intercept]] <-
+            c("(Intercept)", feParm[[object$info$formula$fe$intercept]])
+    }   
+    if (length(feParm$ce) > 0 && inherits(model$family, "family.olmm")) {
+        feParm$ce <-
+            paste0("Eta", rep(1:model$dims["nEta"], each = length(feParm$ce)),
+                   ":", rep(feParm$ce, model$dims["nEta"]))
+    }
     
     ## the terms for which estimates for 'type' (really) exist
-    termsE <- tvcm_get_terms(names(estimates), ids, control$parm, feTerms)
+    termsE <- tvcm_get_terms(names(estimates), ids, control$parm, feParm)
     
     ## restricted coefficients
     if (any(termsE$type == "fe"))
@@ -2417,8 +2445,8 @@ tvcm_get_estimates <- function(object, what = c("coef", "sd", "var"), ...) {
             
             nnodes <- length(ids[[pid]]) # number of nodes
             rval$vc[[pid]] <-
-                matrix(, nnodes, length(unlist(vcVars[[pid]])),
-                       dimnames = list(ids[[pid]], unlist(vcVars[[pid]])))
+                matrix(, nnodes, length(unlist(vcTerms[[pid]])),
+                       dimnames = list(ids[[pid]], unlist(vcTerms[[pid]])))
             
             ## fill the matrix
             vcTermsE <-

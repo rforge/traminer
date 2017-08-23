@@ -116,18 +116,18 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
     otherwise stop.
   }
 
-  The penalty \code{cp} is generally unknown and is estimated adaptively from 
-  the data. The \command{\link{cvloss}} function implements the cross-validation 
-  method to do this. \command{\link{cvloss}} repeats for each fold the following 
-  steps
+  The penalty \code{cp} is generally unknown and is estimated adaptively
+  from the data. The \command{\link{cvloss}} function implements the
+  cross-validation method to do this. \command{\link{cvloss}} repeats
+  for each fold the following steps
  
   \enumerate{
-  \item fit a new model with \command{\link{tvcm}} based on the training data of 
-    the fold. 
+  \item fit a new model with \command{\link{tvcm}} based on the training
+  data of the fold. 
   \item prune the new model for increasing \code{cp}. Compute for each 
-    \code{cp} the average validation error.
+  \code{cp} the average validation error.
   }
-
+  
   Doing so yields for each fold a sequence of values for \code{cp} and
   a sequence of average validation errors. These sequences are then
   combined to a finer grid and the average validation error is averaged 
@@ -157,13 +157,14 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   returns an object for which a \code{print} and a \code{plot} generic is
   provided.  
   
-  \command{\link{oobloss}} can be used to estimate the total prediction error 
-  for validation data (the \code{newdata} argument). By default, the loss is 
-  defined as the sum of deviance residuals, see the return value \code{dev.resids} 
-  of \command{\link{family}} resp. \command{\link{family.olmm}}. Otherwise, the 
-  loss function can be defined manually by the argument \code{fun}, see the 
-  examples below. In general the sum of deviance residual is equal the sum of 
-  the -2 log-likelihood errors. A special case is the gaussian family, where 
+  \command{\link{oobloss}} can be used to estimate the total prediction
+  error for validation data (the \code{newdata} argument). By default,
+  the loss is defined as the sum of deviance residuals, see the return
+  value \code{dev.resids} of \command{\link{family}}
+  resp. \command{\link{family.olmm}}. Otherwise, the loss function can
+  be defined manually by the argument \code{fun}, see the examples
+  below. In general the sum of deviance residual is equal the sum of the
+  -2 log-likelihood errors. A special case is the gaussian family, where  
   the deviance residuals are computed as \eqn{\sum_{i=1}^N w_i (y_i-\mu)^2}, 
   that is, the deviance residuals ignore the term \eqn{log 2\pi\sigma^2}. 
   Therefore, the sum of deviance residuals for the gaussian model (and 
@@ -196,7 +197,11 @@ folds_control(type = c("kfold", "subsampling", "bootstrap"),
   \emph{Classification and Regression Trees}. New York, USA: Wadsworth. 
 
   Hastie, T., R. Tibshirani and J. Friedman (2001). \emph{The Elements
-  of Statistical Learning} (2 ed.). New York, USA: Springer-Verlag.
+    of Statistical Learning} (2 ed.). New York, USA: Springer-Verlag.
+  
+  Buergin, R. and G. Ritschard (2017), Coefficient-Wise Tree-Based
+  Varying Coefficient Regression with vcrpart. \emph{Journal of
+  Statistical Software}, \bold{80}(6), 1--33.
 }
 
 \seealso{

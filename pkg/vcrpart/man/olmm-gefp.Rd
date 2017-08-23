@@ -120,10 +120,10 @@ gefp.olmm(object, scores = NULL, order.by = NULL, subset = NULL,
   Zeileis A., Hornik K. (2007), Generalized M-Fluctuation Tests for
   Parameter Instability, \emph{Statistica Neerlandica}, \bold{61}(4),
   488--508. 
-  
-  Buergin R. and Ritschard G. (2015a), Tree-Based Varying Coefficient 
+
+  Buergin R. and Ritschard G. (2015), Tree-Based Varying Coefficient 
   Regression for Longitudinal Ordinal Responses. \emph{Computational
-  Statistics & Data Analysis}. Forthcoming.
+    Statistics & Data Analysis}, \bold{86}, 65--80.
 }
 
 \author{Reto Buergin}

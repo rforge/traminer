@@ -101,13 +101,18 @@ tvcm(formula, data, fit, family,
   for Recursive Partytioning in R. In \emph{Working Papers in Economics
   and Statistics, Research Platform Empirical and Experimental
   Economics}, Number 2014-10. Universitaet Innsbruck.
-  
-  Buergin R. and G. Ritschard (2015a), Tree-Based Varying Coefficient
+
+  Buergin R. and Ritschard G. (2015), Tree-Based Varying Coefficient 
   Regression for Longitudinal Ordinal Responses. \emph{Computational
-  Statistics & Data Analysis}. Forthcoming. 
+    Statistics & Data Analysis}, \bold{86}, 65--80.
+
+  Buergin, R. A. (2015b). Tree-based methods for moderated regression
+  with application to longitudinal data. PhD thesis. University of
+  Geneva. 
   
-  Buergin R. and G. Ritschard (2015b), Coefficient-Wise Tree-Based
-  Varying Coefficient Regression with vcrpart. Article in progress.
+  Buergin, R. and G. Ritschard (2017), Coefficient-Wise Tree-Based
+  Varying Coefficient Regression with vcrpart. \emph{Journal of
+  Statistical Software}, \bold{80}(6), 1--33.
 }
 
 \seealso{\command{\link{tvcolmm}}, \command{\link{tvcglm}},

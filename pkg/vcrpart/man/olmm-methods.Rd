@@ -131,11 +131,11 @@
   USA: Cambridge Series in Statistical and Probabilistic Mathematics. 
   
   Li, C. and B. E. Sheperd (2012). A New Residual for Ordinal
-  Outcomes, \emph{Biometrika}, \bold{99}(2), 437-480.
+  Outcomes, \emph{Biometrika}, \bold{99}(2), 437--480.
 
-  Bates, D., M. Maechler, B. M. Bolker and S. Walker (2014). lme4: 
-  Linear Mixed-Effects Models Using Eigen and S4. Submitted to 
-  \emph{Journal of Statistical Software}.
+  Bates, D., M. Maechler, B. M. Bolker and S. Walker (2015). Fitting
+  Linear Mixed-Effects Models Using lme4, \emph{Journal of Statistical
+  Software}, \bold{67}(1), 1--48.
 }
 
 \seealso{\command{\link{olmm}}, \command{\link{predict.olmm}},

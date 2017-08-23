@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2017-08-19
+## Date:            2017-08-21
 ##
 ## Description:
 ## Random forests and bagging for the 'tvcm' algorithm.
@@ -22,7 +22,11 @@
 ## - implement variable importance measures
 ##
 ## Last modifications:
-## 2017-07-19:  - add default for 'minsize' to 'fvcm_control' and
+## 2017-08-21:  - bug fix predict.fvcm: order columns of predicted
+##                coefficients before multiplying them with the
+##                model matrix. This cause errors for example if
+##                'fvcm' models include 'fe' terms.
+## 2017-08-19:  - add default for 'minsize' to 'fvcm_control' and
 ##                'tvcglm_control'.
 ##               - allow for '...' in 'fvcolmm_control' and 'fvcglm_control'
 ## 2017-07-17: - implement changes due to the new data handling in
@@ -318,7 +322,7 @@ predict.fvcm <- function(object, newdata = NULL,
     if (type == "prob") type = "response"
     
     ## check newdata
-    if (!is.null(newdata) && !class(newdata) == "data.frame")
+    if (!is.null(newdata) && !is.data.frame(newdata))
         stop("'newdata' must be a 'data.frame'.")
     
     ## resolve conflicts with the 'ranef' argument
@@ -353,11 +357,12 @@ predict.fvcm <- function(object, newdata = NULL,
     if (is.null(newdata)) newdata <- md
     
     ## set oob folds for option 'oob'
-    folds <- if (oob) {
-                 object$info$folds
-             } else {
-                 matrix(1L, nrow(newdata), length(object$info$forest))
-             }
+    folds <-
+        if (oob) {
+            object$info$folds
+        } else {
+            matrix(1L, nrow(newdata), length(object$info$forest))
+        }
   
     ## get formulas
     formList <- object$info$formula
@@ -444,7 +449,7 @@ predict.fvcm <- function(object, newdata = NULL,
         coefi <- predict(object, newdata = newdata, type = "coef", ranef = FALSE, na.action = na.pass, ...)
         if (!is.matrix(coefi)) coefi <- matrix(coefi, nrow = nrow(newdata))
         
-        ## acount for skipped categories
+        ## count for skipped categories
         if (object$info$fit == "olmm" && ncol(coefi) < ncol(coef)) {        
             subsiCols <- table(md[folds[, i] > 0, yName]) > 0L
             subsiCols <- subsiCols[-length(subsiCols)]
@@ -480,9 +485,33 @@ predict.fvcm <- function(object, newdata = NULL,
     }
     
     if (verbose) cat(" OK\n")
-    
+
+    ## average the predictors
     coef <- coef / count
     coef[apply(count, 1, function(x) any(x == 0)), ] <- NA
+    
+    ## ## check if any 'count == 0' and omit
+    ## coefNA <- apply(count, 1, function(x) any(x == 0))
+    ## if (any(coefNA)) {
+    ##     if (type == "coef") {
+    ##         warning("prediction failed for the following rows of 'newdata':",
+    ##                 paste(which(coefNA), collapse = ", "), ".")
+    ##         coef[coefNA, ] <- NA
+    ##     } else {
+    ##         warning("prediction failed for the following rows of 'newdata':",
+    ##                 paste(which(coefNA), collapse = ", "), ". Omit.")
+    ##         coef <- coef[-which(coefNA), , drop = FALSE]
+    ##         newdata <- coef[-which(coefNA), , drop = FALSE]
+    ##     }
+    ## }
+    
+    ## order the columns of coef (2017-11-12, problem that order of columns from
+    ## 'predict.tvcm' is not consistent)
+    if (length(setdiff(names(coef(dummymodel)), colnames(coef))) > 0 |
+        length(setdiff(colnames(coef), names(coef(dummymodel)))) > 0)
+        stop("ups. This shouldn't happen. Please contact the author of this package and ",
+             "indicate to have problems with 'fvcm.predict'.")
+    coef <- coef[, match(names(coef(dummymodel)), colnames(coef)), drop = FALSE]       
     
     ## ------------------------------------------------------- #
     ## Step 2: predict the linear predictor for each observation
@@ -490,7 +519,7 @@ predict.fvcm <- function(object, newdata = NULL,
     
     if (type == "coef") return(na.action(coef))
     
-    ## create a model matrix 'X'
+    ## create a model matrix 'X' (formList = formulas of root form)
     if (object$info$fit == "olmm") {
         X <- olmm_merge_mm(
             model.matrix(
@@ -503,6 +532,8 @@ predict.fvcm <- function(object, newdata = NULL,
     } else {
         X <- model.matrix(terms(rootForm), newdata, dummymodel$contrasts)
     }
+
+    
     
     ## compute the linear predictor 'eta' based on 'coef' and 'X'
     if (object$info$fit == "olmm") {

@@ -1,6 +1,10 @@
-Changes in Version 0.4-3
+Changes in Version 1.0-0
 
-    o    Improve documentation for formulas
+    o    Added vignette.
+    
+    o    Update references.
+    
+    o    Improve documentation for formulas.
     
     o    The 'data' slot of 'tvcm' object newly includes several
          variables used for fitting. These data are cleaned with
@@ -25,7 +29,11 @@ Changes in Version 0.4-3
 
     o    fixed an unnecessary error case in 'tvcm_folds'.
 
-    o    add check for the response variable in 'olmm'
+    o    add check for the response variable in 'olmm'.
+
+    o    bug fix for 'predict.fvcm'.
+
+    o    bug fix in for internal C function 'olmm_setPar'.
 
 Changes in Version 0.4-2
 

@@ -10,8 +10,9 @@
   reform on fertility and postbirth labor market careers. The data originate 
   from the Austrian Social Security Database (ASSD) and where prepared by 
   Lalive and Zweimueller (2009). The sample includes 6'180 women giving a 
-  childbirth (the first birth recorded in the ASSD data) between June and July 
-  1990 and were eligible to benefit from the parental leave program.}  
+  childbirth (the first birth recorded in the ASSD data) between June
+  and July 1990 and were eligible to benefit from the parental leave
+  program.}   
 
 \usage{data(PL)}
 

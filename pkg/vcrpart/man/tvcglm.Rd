@@ -8,7 +8,7 @@
 
 \description{The \command{\link{tvcglm}} function implements the
   tree-based varying coefficient regression algorithm for generalized
-  linear models introduced by Buergin and Ritschard (2015b). The
+  linear models introduced by Buergin and Ritschard (2017). The
   algorithm approximates varying coefficients by piecewise constant
   functions using recursive partitioning, i.e., it estimates the
   selected coefficients individually by strata of the value space of
@@ -150,9 +150,10 @@ tvcglm_control(minsize = 30, mindev = 2.0,
   Wang, J. C., Hastie, T. (2014), Boosted Varying-Coefficient
   Regression Models for Product Demand Prediction, \emph{Journal of
     Computational and Graphical Statistics}, \bold{23}(2), 361-382. 
-  
-  Buergin R. and G. Ritschard (2015b). Coefficient-Wise Tree-Based
-  Varying Coefficient Regression with vcrpart. Article in progress.
+
+  Buergin, R. and G. Ritschard (2017), Coefficient-Wise Tree-Based
+  Varying Coefficient Regression with vcrpart. \emph{Journal of
+    Statistical Software}, \bold{80}(6), 1--33.
 }
 
 \seealso{\command{\link{tvcm_control}}, \command{\link{tvcm-methods}},
@@ -171,7 +172,7 @@ tvcglm_control(minsize = 30, mindev = 2.0,
 ## effect of 'CivStat' and a second that accounts for the moderation of
 ## 'CivStat' on the relation between 'EduHigh' and 'Poor'. We use here
 ## the 2-stage procedure with a partitioning- and a pruning stage as
-## described in Buergin and Ritschard (2014b). 
+## described in Buergin and Ritschard (2017). 
 ## ------------------------------------------------------------------- #
 
 data(poverty)

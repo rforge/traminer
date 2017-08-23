@@ -77,8 +77,9 @@
   progress and inequalities of ageing over the past 30 years in
   Switzerland. \emph{Archives of Gerontology and Geriatrics}.  
   
-  Gabriel, R., M. Oris, M. Studer and M. Baeriswyl (2014). The
-  Persistance of Social Stratification? Article in progress.
+  Gabriel, R., M. Oris, M. Studer and M. Baeriswyl (2015). The
+  Persistance of Social Stratification? \emph{Swiss Journal of
+  Sociology}, \bold{41}(3), 465--487.
 } 
 
 \keyword{datasets}
