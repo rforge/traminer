@@ -5,8 +5,8 @@ Misc:
   - Vignette: Suppressed the loading of two unused LaTeX packages 
     (subfigure and afterpage) that prevented the vignette to be built
     under OSX.
-  - Declare use C++11 for log1p: SystemRequirements: C++11 declaration 
-    in DESCRIPTION and an include <math.h> in NMSdistance.cpp  
+  - Declaring use of C++11 for log1p: 'SystemRequirements: C++11' 
+    declaration in DESCRIPTION and math.h header in NMSdistance.cpp.  
 
 
 

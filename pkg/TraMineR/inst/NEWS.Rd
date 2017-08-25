@@ -11,8 +11,8 @@
       (subfigure and afterpage) that prevented the vignette to be built
       under OSX.
       \item
-      Declare use of C++11 for log1p: SystemRequirements: C++11 declaration
-      in \code{DESCRIPTION} and an \code{include <math.h>} in \code{NMSdistance.cpp}
+      Declaring use of C++11 for log1p: \code{SystemRequirements: C++11} declaration
+      in \code{DESCRIPTION} and \code{math.h} header in \code{NMSdistance.cpp}
     }
   }
 }
