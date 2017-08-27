@@ -143,12 +143,15 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   const double zero = 0.0, one = 1.0; /* for matrix manipulations */
   
   /* overwrite coefficients slot */
-  Memcpy(coefficients, newPar, nPar);
-
+  for (int i = 0; i < nPar; i++)
+    coefficients[i] = newPar[i];
+  
   /* overwrite fixed effect parameter slot */
   for (int i = 0; i < nEta; i++) {
-    Memcpy(fixef + i * pEta, newPar + i * pCe, pCe);
-    Memcpy(fixef + i * pEta + pCe, newPar + pCe*nEta, pGe);
+    for (int j = 0; j < pCe; j++)
+      fixef[i * pEta + j] = newPar[i * pCe + j];
+    for (int j = 0; j < pGe; j++)
+      fixef[i * pEta + pCe + j] = newPar[pCe * nEta + j];
   }
 
   /* set predictor-invariant fixed effects of adjacent-category model 
@@ -163,9 +166,12 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   }
 
   /* overwrite (cholesky decompositioned) random effect parameters */
-  double *vRanefCholFac = Memcpy(Alloca(lenVRanefCholFac, double), 
-				 newPar + p, lenVRanefCholFac);
-
+  double *vRanefCholFac = Alloca(lenVRanefCholFac, double);
+  R_CheckStack();
+  
+  for (int i = 0; i < lenVRanefCholFac; i++)
+    vRanefCholFac[i] = newPar[p + i];
+  
   F77_CALL(dgemv)("T", /* multiply with l. t. elimination matrix */ 
 		  &lenVRanefCholFac, &lenVecRanefCholFac,
   		  &one, ranefElMat, 
@@ -177,7 +183,7 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   SET_VECTOR_ELT(rvalR, 1, vecRanefCholFacR);
   SET_VECTOR_ELT(rvalR, 2, coefficientsR);
   SET_VECTOR_ELT(rvalR, 3, ranefElMatR);
-  
+
   UNPROTECT(5);
   return rvalR;
 }
@@ -201,7 +207,8 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   /* get subject slot */  
   int *subject =
     INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
-
+  R_CheckStack();
+  
   /* integer valued slots */
   int *dims = DIMS_SLOT(x);
 
@@ -231,9 +238,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     *score_sbj = REAL(score_sbjR),
     *score = REAL(scoreR),
     *info = REAL(infoR);
-    
-  R_CheckStack();
-  
+      
   /* set constants (dimensions of vectors etc.) */
   const int n = dims[n_POS], N = dims[N_POS], 
     p = dims[p_POS], pEta = dims[pEta_POS],
@@ -249,9 +254,8 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  /* double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP));xs */ 
   R_CheckStack();
-
+  
   /* variables for matrix operations etc. */
   int i1 = 1, tmpJ, subsTmp; 
   double one = 1.0, zero = 0.0, 
@@ -354,8 +358,10 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 
     /* ranefVec (vector) to ranef (matrix) */
     for (int i = 0; i < nEta; i++) {
-      Memcpy(ranef + i * qEta, ranefVec + i * qCe, qCe);
-      Memcpy(ranef + i*qEta + qCe, ranefVec + qCe*nEta, qGe);
+      for (int j = 0; j < qCe; j++)
+      	ranef[i * qEta + j] = ranefVec[i * qCe + j];
+      for (int j = 0; j < qGe; j++)
+      	ranef[i * qEta + qCe + j] = ranefVec[qCe * nEta + j];
     }
 
     /* set predictor-invariant random effects of adjacent-category models 
@@ -614,7 +620,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   if (numHess == 0) {
  
     AllocVal(info, nPar * nPar, zero); /* reset info matrix*/
-    double *hDerVec = Alloca(nPar, double), hInv2;
+    double *hDerVec = Alloca(nPar, double),
+      hInv2;
+    R_CheckStack();
     
     for (int i = 0; i < N; i++) {    
       hInv2 = - weights_sbj[i] / (logLik_sbj[i] * logLik_sbj[i]);
@@ -692,8 +700,10 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 SEXP olmm_update_u(SEXP x) {
   
   /* get subject slot */  
-  int *subject = INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
-
+  int *subject =
+    INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
+  R_CheckStack();
+  
   /* integer valued slots */
   int *dims = DIMS_SLOT(x);
 
@@ -722,7 +732,6 @@ SEXP olmm_update_u(SEXP x) {
 
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  /* double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); */ 
   R_CheckStack();
 
   /* variables for matrix operations */
@@ -764,7 +773,8 @@ SEXP olmm_update_u(SEXP x) {
     *ranef = Alloca(q, double),
     *logLikCond_obs = Calloc(n, double),
     *logLikCond_sbj = Calloc(N, double);
-
+  R_CheckStack();
+  
   for (int k = 0; k < nQP; k++) {
     
     /* clear temporary objects */
@@ -785,8 +795,10 @@ SEXP olmm_update_u(SEXP x) {
 
     /* ranefVec (vector) to ranef (matrix) */
     for (int i = 0; i < nEta; i++) {
-      Memcpy(ranef + i * qEta, ranefVec + i * qCe, qCe);
-      Memcpy(ranef + i*qEta + qCe, ranefVec + qCe*nEta, qGe);
+      for (int j = 0; j < qCe; j++)
+      	ranef[i * qEta + j] = ranefVec[i * qCe + j];
+      for (int j = 0; j < qGe; j++)
+      	ranef[i * qEta + qCe + j] = ranefVec[qCe * nEta + j];
     }
     
     /* set predictor-invariant random effects of adjacent-category model 
@@ -860,9 +872,7 @@ SEXP olmm_update_u(SEXP x) {
   if (family == 1) Free(etaCLM);
   if (family == 1) Free(etaRanefCLM);
   if ((family == 2) | (family == 3)) Free(sumBL);
-
-  UNPROTECT(1);
-  
+  UNPROTECT(1);  
   return uR;
 }
 
@@ -938,8 +948,10 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
 
     /* ranefVec (vector) to ranef (matrix) */
     for (int i = 0; i < nEta; i++) {
-      Memcpy(ranef + i * qEta, ranefVec + i * qCe, qCe);
-      Memcpy(ranef + i*qEta + qCe, ranefVec + qCe*nEta, qGe);
+      for (int j = 0; j < qCe; j++)
+      	ranef[i * qEta + j] = ranefVec[i * qCe + j];
+      for (int j = 0; j < qGe; j++)
+      	ranef[i * qEta + qCe + j] = ranefVec[qCe * nEta + j];
     }
 
     /* set predictor-invariant random effects of adjacent-category models 
@@ -987,6 +999,7 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
     
     gq_weight = 1; /* reset integration weight */
   }
+  
   Free(etaRanef);
   Free(predCond);  
   UNPROTECT(1); 
@@ -1006,8 +1019,10 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   const int rnNew = INTEGER(nNew)[0];
   
   /* get subject slot */
-  int *subject = INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
-    
+  int *subject =
+    INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
+  R_CheckStack();
+  
   /* integer valued slots */
   int *dims = DIMS_SLOT(x);
 
@@ -1015,7 +1030,6 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   double *ranefCholFac = RANEFCHOLFAC_SLOT(x),
     *ghw = GHW_SLOT(x), *ghx = GHX_SLOT(x), *eta = ETA_SLOT(x),
     *W = W_SLOT(x), *logLik_sbj = LOGLIKSBJ_SLOT(x);
-  R_CheckStack();
 
   /* set constants (dimensions of vectors etc.) */
   const int q = dims[q_POS], qEta = dims[qEta_POS], 
@@ -1026,7 +1040,6 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  /* double *yD = REAL(coerceVector(getListElement(x, "y"), REALSXP)); */ 
   R_CheckStack();
 
   /* variables for matrix operations etc. */
@@ -1065,9 +1078,12 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
 
     /* ranefVec (vector) to ranef (matrix) */
     for (int i = 0; i < nEta; i++) {
-      Memcpy(ranef + i * qEta, ranefVec + i * qCe, qCe);
-      Memcpy(ranef + i*qEta + qCe, ranefVec + qCe*nEta, qGe);
+      for (int j = 0; j < qCe; j++)
+      	ranef[i * qEta + j] = ranefVec[i * qCe + j];
+      for (int j = 0; j < qGe; j++)
+      	ranef[i * qEta + qCe + j] = ranefVec[qCe * nEta + j];
     }
+
 
     /* set predictor-invariant random effects of adjacent-category models 
        to use the Likelihood of the baseline-category model */

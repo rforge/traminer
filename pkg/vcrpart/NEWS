@@ -1,3 +1,11 @@
+Changes in Version 1.0-1
+
+    o   Replaced 'memcpy' calls in C-code with 'for' loops because they
+        were used for small objects.
+
+    o   Improve R-Code for 'alloca' calls (adding 'R_CheckStack()'
+        after calls)
+
 Changes in Version 1.0-0
 
     o    Added vignette.
