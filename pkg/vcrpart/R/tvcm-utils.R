@@ -51,6 +51,8 @@
 ## tvcm_grow_splitpath:      creates a 'splitpath.tvcm' object
 ##
 ## Last modifications:
+## 2017-10-16: add argument 'singular.ok' for 'glm.doNotFit', see mail
+##             of Martin Maechler, 2017-09-30
 ## 2017-08-21: - rename arguments for 'tvcm_get_terms'.
 ##             - bug fix for 'tvcm_get_estimates' for situations where
 ##               'fe' terms include factor variables or operators
@@ -574,7 +576,8 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
 glm.doNotFit <- function(x, y, weights = NULL, start = NULL,
                          etastart = NULL,
                          mustart = NULL, offset = NULL, family = gaussian(),
-                         control = list(), intercept = TRUE) {
+                         control = list(), intercept = TRUE,
+                         singular.ok = TRUE) {
     coefficients <- rep.int(0, NCOL(x))
     names(coefficients) <- colnames(x)
     if (is.null(weights)) weights <- rep.int(1.0, NROW(x))

@@ -1,5 +1,8 @@
 Changes in Version 1.0-1
 
+    o   Internal modification for the 'singular.ok' argument of future
+        R versions.
+
     o   Replaced 'memcpy' calls in C-code with 'for' loops because they
         were used for small objects.
 
