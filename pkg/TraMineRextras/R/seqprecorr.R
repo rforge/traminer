@@ -3,11 +3,12 @@
 ## =====================================
 
 seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NULL,
-      tr.type="TRATEDSS", weight.type="ADD", penalized="BOTH", with.missing=FALSE, norm=FALSE) {
+      tr.type="TRATEDSS", weight.type="ADD", penalized="BOTH", with.missing=FALSE) {
 
   ## weight.type == "ADD"  : additive, i.e. 1-tr
   ##             == "INV"  : inverse, i.e. 1/tr
   ##             == "LOGINV"  : log inverse, i.e. log(1/tr)
+  ##             == "NO"   : no weight, i.e., unique weight of 1
 
   ## tr.type == "FREQ"     : overall frequency of the transition
   ## tr.type == "TRATEDSS" : transition prob in DSS sequences
@@ -20,16 +21,16 @@ seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NUL
 	if (!inherits(seqdata,"stslist"))
 		stop("data is NOT a sequence object, see seqdef function to create one")
 
-  if (!(weight.type %in% c('ADD','INV','LOGINV',FALSE)))
+  if (!(weight.type %in% c('ADD','INV','LOGINV','NO',FALSE)))
     stop("bad weight.type argument")
 
   if (!(tr.type %in% c('FREQ','TRATE','TRATEDSS')))
     stop("bad tr.type argument")
 
-  if (!(penalized %in% c('NEG','POS','BOTH','NO',FALSE,TRUE)))
+  if (!(penalized %in% c('NEG','POS','BOTH',TRUE)))
     stop("bad penalized argument")
   if (is.logical(penalized)){
-    if(penalized) penalized<-'BOTH' else penalized<-'NO'
+    if(penalized) penalized<-'BOTH' ##else penalized<-'NO'
   }
 
   ## Checking that listed states are in alphabet
@@ -161,10 +162,9 @@ seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NUL
 	    tr <- seqtrate(seqdata)
 	  }
 	
-
   	ord <- match(state.order.plus,alphabet(seqdata))
   	ordo <- match(alphabet(seqdata),state.order.plus)
-  	
+
   	tr <- tr[ord,ord]
 
   	if (penalized=="NEG"){
@@ -195,12 +195,12 @@ seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NUL
   	  signs[inoncomp,] <- 0
   	}
 	}	
-	else {
+	else { ## should not occur
 	  signs <- signs + 1
 	}
 	
 	eps <- .000001
-	if (pweight) {
+	if (pweight) { ## lacks a definition of tr for pweight=="NO" or FALSE?
 		if (weight.type == "ADD") {
 		  tr <- 1 - tr
 		}
@@ -211,44 +211,47 @@ seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NUL
 		  tr <- log((1 + eps)/(tr + eps))
 		}
   	tr <- tr/tr[1,1] ## normalize by diagonal value
-  	
-  	dss.num <- TraMineR:::seqasnum(dss)+1
-		transw <- matrix(0, nrow=nbseq, ncol=1)
-		rownames(transw) <- rownames(seqdata)
-		transnegw <- transw
-		prop.transnegw <- transw
-		
-		## sum of transition weights in the sequence
-		for (i in 1:nbseq) {
-			if (dssl[i]>1) {
-				for (j in 2:dssl[i]) {
-				  transw[i] <- transw[i] + tr[dss.num[i,j-1], dss.num[i,j]]
-				  transnegw[i] <- transnegw[i] + tr[dss.num[i,j-1], dss.num[i,j]] * signs[dss.num[i,j-1], dss.num[i,j]]
-				  if(transw[i]>0){
-				    prop.transnegw[i] <- transnegw[i]/transw[i]
-				  }
-				  ## else prop.transnegw[i] <- 1
-				}
+  }
+  else {
+    tr[] <- 1L ## if pweight==FALSE
+  }	
+	dss.num <- TraMineR:::seqasnum(dss)+1
+	transw <- matrix(0, nrow=nbseq, ncol=1)
+	rownames(transw) <- rownames(seqdata)
+	transnegw <- transw
+	prop.transnegw <- transw
+	
+	## sum of transition weights in the sequence
+	for (i in 1:nbseq) {
+		if (dssl[i]>1) {
+			for (j in 2:dssl[i]) {
+			  transw[i] <- transw[i] + tr[dss.num[i,j-1], dss.num[i,j]]
+			  transnegw[i] <- transnegw[i] + tr[dss.num[i,j-1], dss.num[i,j]] * signs[dss.num[i,j-1], dss.num[i,j]]
+			  if(transw[i]>0){
+			    prop.transnegw[i] <- transnegw[i]/transw[i]
+			  }
+			  ## else prop.transnegw[i] <- 1
 			}
-		  ## else prop.transnegw[i] <- 1 ## we leave it at 0
 		}
+	  ## else prop.transnegw[i] <- 1 ## we leave it at 0
 	}
-	else {
-		transw <- dssl-1
-		if (any(dssl==0)) {
-			transw[dssl==0] <- 0
-		}
-		tr <- NULL
-	}
+	#}
+	#else {
+	#	transw <- dssl-1
+	#	if (any(dssl==0)) {
+	#		transw[dssl==0] <- 0
+	#	}
+	#	tr <- NULL
+	#}
 
 ## tentative normalization. Needs more checking
-		if (norm) {
-		seql <- seqlength(seqdata)
-		transw <- transw/(seql-1)
-		if (any(seql==1)) {
-			transw[seql==1] <- 0
-		}
-	}
+#		if (norm) {
+#		seql <- seqlength(seqdata)
+#		transw <- transw/(seql-1)
+#		if (any(seql==1)) {
+#			transw[seql==1] <- 0
+#		}
+#	}
 
 	
 	dimnames(signs) <- dimnames(tr)

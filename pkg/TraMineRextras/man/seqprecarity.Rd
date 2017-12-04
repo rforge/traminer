@@ -17,19 +17,19 @@ seqprecarity(seqdata, correction=NULL, otto=.2, a=1, b=1.2,
 
 seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
     tr.type="TRATEDSS", weight.type="ADD", penalized="BOTH",
-    with.missing=FALSE, norm=FALSE)
+    with.missing=FALSE)
 }
 
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by the \code{\link[TraMineR]{seqdef}} function.}
 
-  \item{correction}{Vector of correction factor values. If \code{NULL}, the correction factors are computed by means of the \code{seqprecorr} function.}
+  \item{correction}{Vector of non-negative correction factor values. If \code{NULL}, the correction factors are computed by means of the \code{seqprecorr} function.}
 
   \item{otto}{Scalar in the range [0,1]. Trade-off weight between the precarity level of the initial state and the corrected complexity. Default is \code{otto=.2}.}
 
-  \item{a}{Non negative real value. Exponent weight of the complexity. Default is 1.}
+  \item{a}{Non-negative real value. Exponent weight of the complexity. Default is 1.}
 
-  \item{b}{Non negative real value. Exponent weight of the correction factor. Default is 1.2. }
+  \item{b}{Non-negative real value. Exponent weight of the correction factor. Default is 1.2. }
 
   \item{state.order}{Vector of short state labels defining the order of the states. First the less precarious (most positive) state and then the other states in increasing precariousness order. States of the alphabet that are not included here define the non-comparable states.}
 
@@ -37,15 +37,15 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{tr.type}{One of \code{'FREQ'}, \code{'TRATE'}, or \code{'TRATEDSS'} (default). Type of transition probabilities used for deriving the weights: \code{'FREQ'} overall frequency of the transitions, \code{'TRATE'} transition probabilities, and \code{'TRATEDSS'} transition probabilites in the DSS sequences.}
 
-  \item{weight.type}{One of \code{'ADD'} (default), \code{'INV'}, or \code{'LOGINV'}. How weights are derived from the transition probabilities: \code{'ADD'} additive (1-p), \code{'INV'} inverse (1/p), and \code{'LOGINV'} log of inverse.}
+  \item{weight.type}{One of \code{'ADD'} (default), \code{'INV'}, \code{'LOGINV'}, or \code{'NO'}. How weights are derived from the transition probabilities: \code{'ADD'} additive (1-p), \code{'INV'} inverse (1/p), and \code{'LOGINV'} log of inverse. When \code{'NO'}, weights do not account for the transition probabilities.}
 
   \item{penalized}{One of \code{'BOTH'} (default), \code{'NEG'}, \code{'POS'}, or \code{'NO'}. What should be penalized or rewarded? \code{'NEG'} only negative transitions, \code{POS} only positive transitions (with negative penalization), \code{'BOTH'} penalize negative transitions and reward positive ones, \code{NO} no penalization. Can also be logical with \code{TRUE} equivalent to \code{'BOTH'} and \code{FALSE} equivalent to \code{'NO'}.}
 
   \item{with.missing}{Logical. Should the missing state be considered as an element of the alphabet?
     }
 
-  \item{norm}{Logical. Should the weights be normalized by the maximal number of transitions.
-      Not a true normalization because, depending on the transition weights, their sum in a sequence can exceed the number of transitions.}
+%  \item{norm}{Logical. Should the weights be normalized by the maximal number of transitions.
+%      Not a true normalization because, depending on the transition weights, their sum in a sequence can exceed the number of transitions.}
 
   \item{...}{Arguments passed to \code{seqprecorr}}
 }
