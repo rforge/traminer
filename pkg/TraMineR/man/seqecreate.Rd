@@ -37,6 +37,9 @@ seqecreate(data = NULL, id = NULL,timestamp = NULL, event = NULL,
  \code{\link{seqelength}} for information about length (observation time) of event sequences,
  \code{\link{seqdef}} to create a state sequence object.
 }
+\references{
+  Ritschard, G., Bürgin, R., and Studer, M. (2014), "Exploratory Mining of Life Event Histories", In McArdle, J.J. & Ritschard, G. (eds) \emph{Contemporary Issues in Exploratory Data Mining in the Behavioral Sciences}. Series: Quantitative Methodology, pp. 221-253. New York: Routledge.
+}
 \examples{
 ##Starting with states sequences
 ##Loading data

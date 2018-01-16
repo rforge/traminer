@@ -2,7 +2,16 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-8 [2017-08-22] (Development version)}{
+\section{Changes in version 2.1-8 [2018-01-16] (Development version)}{
+
+  \subsection{Changes in existing functions:}{
+    \itemize{
+      \item
+      \code{seqcost()}: argument \code{miss.cost.fixed} is now \code{NULL} by 
+      default and will be set as \code{FALSE} when \code{method = "INDELS"} or 
+      \code{"INDELSLOG"}, and as \code{TRUE} otherwise.
+    }
+  } 
 
   \subsection{Misc:}{
     \itemize{

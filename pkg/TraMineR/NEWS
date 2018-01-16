@@ -1,12 +1,17 @@
 ## =========
-Version 2.1-8 [2017-08-22] (Development version)
+Version 2.1-8 [2018-01-16] (Development version)
+
+Changes in existing functions:
+  - seqcost()}: argument 'miss.cost.fixed' is now NULL by
+      default and will be set as FALSE when method = "INDELS" or
+      "INDELSLOG", and as TRUE otherwise.
 
 Misc:
-  - Vignette: Suppressed the loading of two unused LaTeX packages 
+  - Vignette: Suppressed the loading of two unused LaTeX packages
     (subfigure and afterpage) that prevented the vignette to be built
     under OSX.
-  - Declaring use of C++11 for log1p: 'SystemRequirements: C++11' 
-    declaration in DESCRIPTION and math.h header in NMSdistance.cpp.  
+  - Declaring use of C++11 for log1p: 'SystemRequirements: C++11'
+    declaration in DESCRIPTION and math.h header in NMSdistance.cpp.
 
 
 
