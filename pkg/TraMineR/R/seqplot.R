@@ -16,14 +16,51 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 	## Storing original optional arguments list
 	oolist <- list(...)
 
-	## ==============================
-	## Preparing if group is not null
-	## ==============================
+  	if ("sortv" %in% names(oolist)) {sortv <- oolist[["sortv"]]}
+  	if ("diss" %in% names(oolist)) {
+      diss <- oolist[["diss"]]
+    }
+  	else if ("dist.matrix" %in% names(oolist)) {
+      diss <- oolist[["dist.matrix"]]
+      oolist[["diss"]] <- diss
+    } # FIXME dist.matrix is deprecated
+
 
         if (type == "pc") { # modification of Reto Bürgin 16.08.2012
           oolist <- append(oolist, list(group = group, rows = rows, cols = cols))
           group <- NULL
         }
+
+
+  if (type == "r") { # stuff moved here by GR 17.01.2018
+		if (! "diss" %in% names(oolist)  && ! "dist.matrix" %in% names(oolist)){
+      if (! "method" %in% names(oolist)){
+			  stop("For type = 'r', you must provide a distance matrix or a method to compute it", call.=FALSE)
+      } else {
+        #msg("seqplot calls seqdist")
+        oolist[["seqdata"]] <- seqdata
+        dlist <- names(formals(seqdist))
+        diss <- do.call(seqdist, args = oolist[names(oolist) %in% dlist])
+        oolist[["diss"]] <- diss
+        # removing seqdist args
+        oolist <- oolist[!(names(oolist) %in% dlist[dlist != "weighted"])]
+      }
+    }
+		else {
+			if (inherits(diss, "dist")) {
+      				diss <- dist2matrix(diss)
+			}
+    }
+    ## Setting unique Max theoretical distance for all groups
+		if (!"dmax" %in% names(oolist)) {
+			dmax <- max(diss)
+			oolist <- c(oolist,list(dmax=dmax))
+		}
+  }
+
+	## ==============================
+	## Preparing if group is not null
+	## ==============================
 
 	if (!is.null(group)) {
           group <- group(group)
@@ -43,7 +80,7 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
             main <- paste(main,"-",levels(group))
           else
             main <- levels(group)
-	} else {
+	} else { # single group
           nplot <- 1
           gindex <- vector("list",1)
           gindex[[1]] <- 1:nrow(seqdata)
@@ -70,7 +107,7 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 		lout <- TraMineR.setlayout(nplot, rows, cols, with.legend, axes, legend.prop)
 	  	layout(lout$laymat, heights=lout$heights, widths=lout$widths)
 
-		## Axis should be plotted or not ?
+		## Should axis be plotted or not ?
 		xaxis <- 1:nplot==lout$axisp
 
 		legpos <- lout$legpos
@@ -81,15 +118,12 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 		legpos <- NULL
 	}
 
-	## =======
-	## Ploting
-	## =======
+	## ========
+	## Plotting
+	## ========
 	for (np in 1:nplot) {
 		## Storing ... arguments in a list
 		olist <- oolist
-		if ("sortv" %in% names(olist)) {sortv <- olist[["sortv"]]}
-		if ("diss" %in% names(olist)) {diss <- olist[["diss"]]}
-		else if ("dist.matrix" %in% names(olist)) { diss <- olist[["dist.matrix"]] } # FIXME dist.matrix is deprecated
 
 		plist <- list(main=main[np], cpal=cpal, missing.color=missing.color,
 			ylab=ylab, yaxis=yaxis, xaxis=xaxis[np],
@@ -149,30 +183,19 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 			plist <- plist[!names(plist) %in% "yaxis"]
 
 			## Selecting distances according to group
-			# FIXME dist.matrix is deprecated
-			if (! "diss" %in% names(olist)  && ! "dist.matrix" %in% names(olist))
-				stop("You must provide a distance matrix", call.=FALSE)
-			else {
-				if (inherits(diss, "dist")) {
-        				diss <- dist2matrix(diss)
-				}
+			# fixed for deprecated dist.matrix
 
-				olist[["diss"]] <- diss[gindex[[np]],gindex[[np]]]
+			olist[["diss"]] <- diss[gindex[[np]],gindex[[np]]]
 
-				## Max theoretical distance for the scale
-				if (!"dmax" %in% names(olist)) {
-					dmax <- max(diss)
-					olist <- c(olist,list(dmax=dmax))
-				}
-			}
+    # FIXME dist.matrix is deprecated
+    olist <- olist[names(olist) != "dist.matrix"]
 
-                      # FIXME dist.matrix is deprecated
-                      olist <- olist[names(olist) != "dist.matrix"]
-                      } else if (type == "pc") { # modification of Reto Bürgin 16.08.2012
+    }
+    else if (type == "pc") { # modification of Reto Bürgin 16.08.2012
 
-                        plist$main <- main
+                        plist[["main"]] <- main
                         olist <- c(olist, plist)
-                        olist$plot <- FALSE
+                        olist[["plot"]] <- FALSE
                         f <- seqpcplot
                         olist <- olist[names(olist) %in% names(formals(f))]
                         plist <- list()
@@ -199,6 +222,7 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 		match.args <- names(olist) %in% flist
 		fargs <- olist[match.args]
 		fargs <- c(list(seqdata=subdata), fargs)
+    #msg(paste("do.call(",f, fargs,")"))
 		res <- do.call(f, args=fargs)
 
 		olist <- olist[!match.args]

@@ -75,7 +75,8 @@ export(
   TraMineRInternalSeqeage,
   TraMineRInternalSeqgbar,
   TraMineRInternalSplitInit,
-  TraMineRInternalWeightedInertiaDist)
+  TraMineRInternalWeightedInertiaDist,
+  TraMineRInternalCheckArgs)
 
 ## stslist methods
 S3method(summary, stslist)

@@ -4,6 +4,7 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL, cex = 1, lwd = 1/4,
   alphabet = NULL, missing = "auto", order.align = "first", main = NULL,
   xlab = NULL, ylab = NULL, xaxis = TRUE, yaxis = TRUE, axes = "all",
   xtlab = NULL, cex.lab = 1, rows = NA, cols = NA, plot = TRUE, seed = NULL,
+  weighted = TRUE,
   title, cex.plot, ...) {
 
   checkargs(alist(main = title, cex.lab = cex.plot))
@@ -21,6 +22,7 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL, cex = 1, lwd = 1/4,
                     axes = axes, xtlab = xtlab,
                     cex.lab = cex.lab,
                     rows = rows, cols = cols, plot = plot, seed = seed,
+                    weighted = weighted,
                     ...)
 
 }
@@ -45,6 +47,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
                               xaxis = TRUE, yaxis = TRUE, axes = "all",
                               cex.lab = 1, rows = NA, cols = NA,
                               plot = TRUE, seed = NULL, add = FALSE,
+                              weighted = TRUE,
                               verbose = FALSE, ...) {
 
   if (!"seqpcplot" %in% class(seqdata)) {
@@ -62,7 +65,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     }
 
     if (!(order.align %in% c("first", "last", "time"))) {
-      stop("[!] invalid lcourse input")
+      stop("[!] invalid order.align input")
     }
 
     if (is.null(lorder)) {
@@ -238,7 +241,7 @@ seqpcplot_private <- function(seqdata, weights = NULL, group,
     names(group) <- levels(id)
 
     ## construct/ convert weights variable
-    if (!is.null(weights)) {
+    if (!is.null(weights) & weighted) { ## GR 18.1.18 added  the weighted condition
       if (!is.numeric(weights)) stop("[!] weights are not numeric")
       if (min(weights, na.rm = TRUE) < 0) stop("[!] negative weights")
       if (length(weights) != nlevels(id) &&

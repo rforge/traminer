@@ -23,6 +23,7 @@ seqpcplot(seqdata, group = NULL, weights = NULL, cex = 1, lwd = 1/4,
   missing = "auto", order.align = "first", main = NULL, xlab = NULL,
   ylab = NULL, xaxis = TRUE, yaxis = TRUE, axes = "all", xtlab = NULL,
   cex.lab = 1, rows = NA, cols = NA, plot = TRUE, seed = NULL,
+  weighted = TRUE, 
   title, cex.plot, ...)
 
 seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
@@ -40,7 +41,8 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
     different membership value.}
 
   \item{weights}{a numeric vector of weights of length equal the number
-  of sequences. Overrides weights in the \code{seqdata} object.}
+    of sequences. When \code{NULL}, the \code{weights} are taken from 
+    the \code{seqdata} object.}
 
   \item{cex}{Plotting text and symbols magnification. See \code{\link{par}}.}
 
@@ -108,12 +110,15 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
 
   \item{seed}{integer. Start seed value.}
 
+  \item{weighted}{logical. Should weights be accounted for. Default is \code{TRUE}.}
+
   \item{method}{character string. Defines the filtering
      function. Available are \code{"minfreq"}, \code{"cumfreq"} and
      \code{"linear"}.}
 
   \item{level}{numeric scalar between 0 and 1. The frequency threshold
     for the filtering methods \code{"minfreq"} and \code{"cumfreq"}.}
+
   \item{title}{Deprecated. Use \code{main} instead.}
   \item{cex.plot}{Deprecated. Use \code{cex.lab} instead.}
   \item{...}{arguments to be passed to other methods, such as graphical

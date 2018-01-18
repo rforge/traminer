@@ -3,8 +3,15 @@ Version 2.1-8 [2018-01-16] (Development version)
 
 Changes in existing functions:
   - seqcost()}: argument 'miss.cost.fixed' is now NULL by
-      default and will be set as FALSE when method = "INDELS" or
-      "INDELSLOG", and as TRUE otherwise.
+    default and will be set as FALSE when method = "INDELS" or
+    "INDELSLOG", and as TRUE otherwise.
+  - seqpcplot(): new logical 'weighted' argument to control
+    whether weights should be used or not.
+
+Bug fixes:
+  - seqrplot() and seqplot(..., type="r", ...): the method and
+    other related arguments for computing the diss matrix when 
+    the later was not provided was not recognized.
 
 Misc:
   - Vignette: Suppressed the loading of two unused LaTeX packages
@@ -12,6 +19,7 @@ Misc:
     under OSX.
   - Declaring use of C++11 for log1p: 'SystemRequirements: C++11'
     declaration in DESCRIPTION and math.h header in NMSdistance.cpp.
+  - Internal checkargs() function made public as TraMineRInternalCheckArgs()
 
 
 
