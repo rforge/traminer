@@ -4,10 +4,13 @@ seqpcplot <- function(seqdata, group = NULL, weights = NULL, cex = 1, lwd = 1/4,
   alphabet = NULL, missing = "auto", order.align = "first", main = NULL,
   xlab = NULL, ylab = NULL, xaxis = TRUE, yaxis = TRUE, axes = "all",
   xtlab = NULL, cex.lab = 1, rows = NA, cols = NA, plot = TRUE, seed = NULL,
-  weighted = TRUE,
+  weighted = TRUE, with.missing = TRUE,
   title, cex.plot, ...) {
 
-  checkargs(alist(main = title, cex.lab = cex.plot))
+  TraMineR.check.depr.args(alist(main = title, cex.lab = cex.plot))
+
+  if (!with.missing & missing != "hide") missing <- "hide"
+  if (with.missing & missing == "hide") missing <- "auto"
 
   seqpcplot_private(seqdata = seqdata, group = group, weights = weights,
                     cex = cex, lwd = lwd, cpal = cpal,

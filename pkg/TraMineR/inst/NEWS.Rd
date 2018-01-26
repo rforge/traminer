@@ -2,26 +2,29 @@
 \title{NEWS file for the TraMineR package}
 
 
-\section{Changes in version 2.1-8 [2018-01-16] (Development version)}{
+\section{Changes in version 2.1-8 [2018-01-26] (Development version)}{
 
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
-      \code{seqcost()}: argument \code{miss.cost.fixed} is now \code{NULL} by 
-      default and will be set as \code{FALSE} when \code{method = "INDELS"} or 
+      \code{seqcost()}: argument \code{miss.cost.fixed} is now \code{NULL} by
+      default and will be set as \code{FALSE} when \code{method = "INDELS"} or
       \code{"INDELSLOG"}, and as \code{TRUE} otherwise.
       \item
       \code{seqpcplot()}: new logical \code{weighted} argument to control
       whether weights should be used or not.
     }
   }
-  
+
   \subsection{Bug fixes:}{
     \itemize{
       \item
-      \code{seqrplot()} and \code{seqplot(..., type="r", ...)}: the \code{method} 
-      and other related arguments for computing the \code{diss} matrix when the 
+      \code{seqrplot()} and \code{seqplot(..., type="r", ...)}: the \code{method}
+      and other related arguments for computing the \code{diss} matrix when the
       later was not provided was not recognized.
+      \item
+      \code{seqplot()}: Fixed some unused argument issues.
+      arguments.
     }
   }
 
@@ -35,7 +38,8 @@
       Declaring use of C++11 for log1p: \code{SystemRequirements: C++11} declaration
       in \code{DESCRIPTION} and \code{math.h} header in \code{NMSdistance.cpp}
       \item
-      Internal \code{checkargs()} function made public as \code{TraMineRInternalCheckArgs()}
+      Internal function \code{checkargs()} renamed as \code{TraMineR.check.depr.args()}
+      and made public for use in \code{TraMineRextras}.
     }
   }
 }

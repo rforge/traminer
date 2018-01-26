@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-8 [2018-01-16] (Development version)
+Version 2.1-8 [2018-01-26] (Development version)
 
 Changes in existing functions:
   - seqcost()}: argument 'miss.cost.fixed' is now NULL by
@@ -10,8 +10,9 @@ Changes in existing functions:
 
 Bug fixes:
   - seqrplot() and seqplot(..., type="r", ...): the method and
-    other related arguments for computing the diss matrix when 
+    other related arguments for computing the diss matrix when
     the later was not provided was not recognized.
+  - seqplot(): Fixed some unused argument issues.
 
 Misc:
   - Vignette: Suppressed the loading of two unused LaTeX packages
@@ -19,7 +20,8 @@ Misc:
     under OSX.
   - Declaring use of C++11 for log1p: 'SystemRequirements: C++11'
     declaration in DESCRIPTION and math.h header in NMSdistance.cpp.
-  - Internal checkargs() function made public as TraMineRInternalCheckArgs()
+  - Internal function checkargs() renamed as TraMineR.check.depr.args() 
+    and made public for use in TraMineRextras.
 
 
 

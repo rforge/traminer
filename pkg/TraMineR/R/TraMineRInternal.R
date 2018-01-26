@@ -25,7 +25,3 @@ TraMineRInternalSeqgbar <- function(...){
 TraMineRInternalWeightedInertiaDist <- function(diss, diss.size, is.dist, individuals, sweights, var) {
   return(.Call(C_tmrWeightedInertiaDist, diss, diss.size, is.dist, individuals, sweights, var))
 }
-
-TraMineRInternalCheckArgs <- function(...){
-  return(checkargs(...))
-}

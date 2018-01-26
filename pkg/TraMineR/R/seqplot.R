@@ -8,15 +8,17 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
   use.layout = (!is.null(group) | with.legend != FALSE), legend.prop = NA,
   rows = NA, cols = NA, title, cex.plot, withlegend, ...) {
 
-  checkargs(alist(main = title, cex.axis = cex.plot, with.legend = withlegend))
+  TraMineR.check.depr.args(alist(main = title, cex.axis = cex.plot, with.legend = withlegend))
 
 	if (!inherits(seqdata,"stslist"))
-		stop(call.=FALSE, "seqplot: data is not a sequence object, use seqdef function to create one")
+		stop(call.=FALSE, "seqplot: data is not a state sequence object, use seqdef function to create one")
 
 	## Storing original optional arguments list
 	oolist <- list(...)
 
   	if ("sortv" %in% names(oolist)) {sortv <- oolist[["sortv"]]}
+
+    diss <- NULL
   	if ("diss" %in% names(oolist)) {
       diss <- oolist[["diss"]]
     }
@@ -26,14 +28,13 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
     } # FIXME dist.matrix is deprecated
 
 
-        if (type == "pc") { # modification of Reto Bürgin 16.08.2012
-          oolist <- append(oolist, list(group = group, rows = rows, cols = cols))
-          group <- NULL
-        }
-
+  if (type == "pc") { # modification of Reto Bürgin 16.08.2012
+    oolist <- append(oolist, list(group = group, rows = rows, cols = cols))
+    group <- NULL
+  }
 
   if (type == "r") { # stuff moved here by GR 17.01.2018
-		if (! "diss" %in% names(oolist)  && ! "dist.matrix" %in% names(oolist)){
+		if (is.null(diss)) {## (! "diss" %in% names(oolist)  && ! "dist.matrix" %in% names(oolist))){
       if (! "method" %in% names(oolist)){
 			  stop("For type = 'r', you must provide a distance matrix or a method to compute it", call.=FALSE)
       } else {
@@ -46,17 +47,19 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
         oolist <- oolist[!(names(oolist) %in% dlist[dlist != "weighted"])]
       }
     }
-		else {
+		#else { ## GR: should also be checked on the seqdist outcome
 			if (inherits(diss, "dist")) {
       				diss <- dist2matrix(diss)
 			}
-    }
+    #}
     ## Setting unique Max theoretical distance for all groups
 		if (!"dmax" %in% names(oolist)) {
 			dmax <- max(diss)
 			oolist <- c(oolist,list(dmax=dmax))
 		}
   }
+
+
 
 	## ==============================
 	## Preparing if group is not null
@@ -226,6 +229,11 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 		res <- do.call(f, args=fargs)
 
 		olist <- olist[!match.args]
+    ## suppress non plot arguments if necessary
+    olist <- olist[!names(olist) %in% c("with.missing")]
+    if (!(type %in% c("i","I"))) olist <- olist[!(names(olist) %in% c("sortv","weighted"))]
+    if (type != "r") olist <- olist[!(names(olist) %in% c("dmax","stats"))]
+
 		plist <- c(list(x=res), plist, olist)
 		do.call(plot, args=plist)
 	}

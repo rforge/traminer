@@ -1,5 +1,5 @@
 \name{TraMineRInternal}
-\alias{TraMineRInternalCheckArgs}
+%%\alias{TraMineRInternalCheckArgs}
 \alias{TraMineRInternalLayout}
 \alias{TraMineRInternalLegend}
 \alias{TraMineRInternalNodeInit}
@@ -11,12 +11,12 @@
 \title{Access to TraMineR internal functions}
 \description{
   Functions allowing other packages to access some TraMineR internal functions.
-  Corresponding functions are respectively \code{checkargs}, \code{TraMineR.setlayout},
+  Corresponding functions are respectively \code{TraMineR.setlayout},
   \code{TraMineR.Legend}, \code{DTNInit}, \code{seqeage}, \code{seqgbar},
   \code{DTNsplit}, and \code{tmrWeightedInertiaDist}. For experts only.
 }
 \usage{
-TraMineRInternalCheckArgs(...)
+%%TraMineRInternalCheckArgs(...)
 TraMineRInternalLayout(...)
 TraMineRInternalLegend(...)
 TraMineRInternalNodeInit(...)
