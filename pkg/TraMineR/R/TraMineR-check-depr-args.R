@@ -62,3 +62,7 @@ TraMineR.check.depr.args <- function(arg.pairs) {
     }
   }
 }
+
+######### For backward compatibility: used by TraMineRextras v 4.1
+
+checkargs <- TraMineR.check.depr.args
