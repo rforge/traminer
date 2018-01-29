@@ -83,7 +83,7 @@ For \code{seqprecorr}, the vector of the weighted proportions \eqn{q(x)} with as
 
 \references{
 Ritschard, G., Bussi, M., and O'Reilly, J. (forthcoming), "An index of precarity for
-measuring early employment insecurity", in G. Ritschard, and M. Studer, \emph{Sequence Analysis and Related Approaches: Innovative Methods and Applications}, Series Life Course Research and Social Policies, Springer.
+measuring early employment insecurity", in G. Ritschard, and M. Studer, \emph{Sequence Analysis and Related Approaches: Innovative Methods and Applications}, Series Life Course Research and Social Policies, Cham: Springer.
 
 Gabadinho, A., Ritschard, G., Studer, M. and Müller, N.S. (2010), "Indice de complexité pour le tri et la comparaison de séquences catégorielles", In Extraction et gestion des connaissances (EGC 2010), \emph{Revue des nouvelles technologies de l'information RNTI}. Vol. E-19, pp. 61-66.
 
