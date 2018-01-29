@@ -1,8 +1,17 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
+\section{Changes in version 2.0-9 [2018-01-29] (Development version)}{
 
-\section{Changes in version 2.1-8 [2018-01-26] (Development version)}{
+  \subsection{Misc:}{
+    \itemize{
+      \item
+      No change.
+    }  
+  }
+}
+
+\section{Changes in version 2.0-8 [2018-01-26]}{
 
   \subsection{Changes in existing functions:}{
     \itemize{
@@ -24,7 +33,6 @@
       later was not provided was not recognized.
       \item
       \code{seqplot()}: Fixed some unused argument issues.
-      arguments.
     }
   }
 

@@ -1,5 +1,11 @@
 ## =========
-Version 2.1-8 [2018-01-26] (Development version)
+Version 2.1-9 [2018-01-29] (Development version)
+
+Misc:
+  - No changes.
+
+## =========
+Version 2.0-8 [2018-01-26] 
 
 Changes in existing functions:
   - seqcost()}: argument 'miss.cost.fixed' is now NULL by
