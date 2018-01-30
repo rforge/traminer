@@ -96,21 +96,23 @@ biofam.seq <- seqdef(biofam[,10:25], alphabet=0:7, states=biofam.short, labels=b
 biofam$wwii <- factor(biofam$birthyr > 1945, 
   labels=c("Born Before End of Word War II","Born After Word War II"))
 
-
-
 ## ==============================
 ## Plots of state survival curves 
 ## ==============================
 
 seqsplot(biofam.seq) ## all states, no group
-seqsplot(biofam.seq, group=biofam$wwii) ## all states for each group
-seqsplot(biofam.seq, group=biofam$wwii, per.state=TRUE) ## groups for each state
+seqsplot(biofam.seq, group=biofam$wwii, lwd=2) ## all states for each group
+seqsplot(biofam.seq, group=biofam$wwii, per.state=TRUE, lwd=2) ## groups for each state
 
 ## For a selection of states only
 
-seqsplot(biofam.seq, group=biofam$wwii, per.state=FALSE, state= c('LM','LMC'))
-seqsplot(biofam.seq, group=biofam$wwii, per.state=TRUE, state= c('LM','LMC'))
-
+seqsplot(biofam.seq, group=biofam$wwii, which.states= c('LM'), lwd=2)
+## changing default color
+seqsplot(biofam.seq, group=biofam$wwii, which.states= c('LM'), 
+  cpal="orange", lwd=2)
+seqsplot(biofam.seq, group=biofam$wwii, which.states= c('LM','LMC'), 
+  cpal=c("orange","brown"), lwd=2) 
+seqsplot(biofam.seq, group=biofam$wwii, which.states= c('LM','LMC'), per.state=TRUE)
 }
 
 \author{Gilbert Ritschard (based on TraMineR seqplot function)}

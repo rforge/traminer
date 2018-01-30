@@ -17,51 +17,8 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
 
 	## Storing original optional arguments list
 	oolist <- list(...)
-     if ("per.state" %in% names(oolist))
-      per.state <- oolist[["per.state"]]
-     else
-      per.state <- FALSE
-
-     obs.states <- seqstatl(seqdata)
-     sel.states <- which(alphabet(seqdata) %in% obs.states)
-     if ("state" %in% names(oolist))
-        message("'state' argument will be ignored")
-        ##   which.states <- oolist[["state"]]
-
-      if (is.null(which.states)) {
-        which.states <- alphabet(seqdata)[sel.states]
-      }
-      #else {
-        sel.obs.states <- sel.states
-        good.states <- which(which.states %in% obs.states)
-        if (length(good.states) > 0){
-          sel.states <- which(alphabet(seqdata) %in% which.states[good.states])
-          sel.states <- sel.states[sel.states %in% sel.obs.states]
-        }
-        else
-          sel.states <- vector() # empty vector of length 0
-        if (length(sel.states) > 0 & length(which.states) - length(good.states) > 0){
-          badstates <- paste(which.states[-good.states],sep=" ", collapse=" ")
-          message("!! Unvalid or unobserved state(s): ", badstates)
-        }
-      #}
-
-
-     #}
-
-     if (length(sel.states) < 1)
-        stop(call.=FALSE, "Only unvalid or unobserved selected states!")
-     oolist[["state"]] <- which.states[good.states]
-     if (!per.state){
-          cpal <- cpal(seqdata)[sel.states]
-          ltext <- attr(seqdata,"labels")[sel.states]
-     }
-
 
   ## Specific preparation for surv plot
-
-  if (type == "s") {
-
 
      ## survfit accepts a subset argument to produce the survival curves for a subset
      ## this will be used for each group value when a separate plot is desired for each
@@ -75,26 +32,66 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
      ## We set in that case the alphabet as group variable and need a special handling to
      ## draw the curves by group in a same plot.
 
-	## ===============================
-	## Defing group when group is null
-	## ===============================
+  per.state <- FALSE
+  if (type == "s") {
+
+       if ("per.state" %in% names(oolist))
+          per.state <- oolist[["per.state"]]
+
+       obs.states <- seqstatl(seqdata)
+       sel.states <- which(alphabet(seqdata) %in% obs.states)
+       if ("state" %in% names(oolist))
+          message("'state' argument will be ignored")
+          ##   which.states <- oolist[["state"]]
+
+        if (is.null(which.states)) {
+          which.states <- alphabet(seqdata)[sel.states]
+        }
+        sel.obs.states <- sel.states
+        good.states <- which(which.states %in% obs.states)
+        if (length(good.states) > 0){
+          sel.states <- which(alphabet(seqdata) %in% which.states[good.states])
+          sel.states <- sel.states[sel.states %in% sel.obs.states]
+        }
+        else
+          sel.states <- vector() # empty vector of length 0
+        if (length(sel.states) > 0 & length(which.states) - length(good.states) > 0){
+          badstates <- paste(which.states[-good.states],sep=" ", collapse=" ")
+          message("[!!] Unvalid or unobserved state(s): ", badstates)
+        }
+
+       if (length(sel.states) < 1)
+          stop(call.=FALSE, "Only unvalid or unobserved selected states!")
+       oolist[["state"]] <- which.states[good.states]
+       if (!per.state){
+            if (is.null(cpal))
+              cpal <- cpal(seqdata)[sel.states]
+            if (is.null(ltext))
+              ltext <- attr(seqdata,"labels")[sel.states]
+       }
+  }
+
+	## ========================================
+	## Defing a single group when group is null
+	## ========================================
 
   if (is.null(group)) group <- factor(rep("Unique group",nrow(seqdata)))
 
 
-     if (per.state) {
+   if (per.state) {
 
-       group.ori <- group
-       ## we specify the levels to keep them in same order as in orginal alphabet
-       group <- factor(alphabet(seqdata)[sel.states], levels = alphabet(seqdata)[sel.states])
+     group.ori <- group
+     ## we specify the levels to keep them in same order as in orginal alphabet
+     group <- factor(alphabet(seqdata)[sel.states], levels = alphabet(seqdata)[sel.states])
 
-       if (is.null(group.ori)) group.ori <- factor("All cases")
-       else group.ori <- factor(group.ori)
+     if (is.null(group.ori)) group.ori <- factor("All cases")
+     else group.ori <- factor(group.ori)
 
-       ##if(!is.null(group.ori)){
-       levels.num <- nlevels(group.ori)
-         ## We use Dark2 from brewer.pal, which has 8 colors
-         ## Moreover, min n for brewer.pal is 3
+     ##if(!is.null(group.ori)){
+     levels.num <- nlevels(group.ori)
+     if (is.null(cpal)){
+       ## We use Dark2 from brewer.pal, which has 8 colors
+       ## Moreover, min n for brewer.pal is 3
        cpal.grp <-
             if (levels.num < 2) {
               brewer.pal(3, "Dark2")[3]
@@ -106,22 +103,52 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
               message(" [!] too many groups (> 8), no automatic color palette assignation")
               NULL
             }
+     }
+     else {
+      cpal.grp <- cpal
+     }
+     if (is.null(ltext)){
         if (levels.num >0) ltext.grp <- levels(group.ori)
         else ltext.grp <- "All cases"
-       ##}
      }
-  }
+     else {
+      ltext.grp <- ltext
+     }
+     ##}
+   }
+   else { # per.state == FALSE
+
+     group <- TraMineR:::group(group)
+     levels.num <- nlevels(group)
+
+     if (is.null(cpal)){
+       ## We use Dark2 from brewer.pal, which has 8 colors
+       ## Moreover, min n for brewer.pal is 3
+       cpal <-
+            if (levels.num < 2) {
+              brewer.pal(3, "Dark2")[3]
+            } else if (levels.num == 2) {
+              brewer.pal(3, "Dark2")[-3]
+            } else if (levels.num < 9) {
+              brewer.pal(levels.num, "Dark2")
+            } else {
+              message(" [!] too many groups (> 8), no automatic color palette assignation")
+              NULL
+            }
+     }
+     if (is.null(ltext)){
+        if (levels.num >0) ltext.grp <- levels(group.ori)
+        else ltext.grp <- "All cases"
+     }
+   }
 
 
 
-	## if (!is.null(group)) {
-      if (!per.state) group <- TraMineR:::group(group)
-
-      ## Check length
+      ## Check length when !per.state
       if (length(group)!=nrow(seqdata) & !per.state)
         stop(call.=FALSE, "group must contain one value for each row in the sequence object")
 
-      nplot <- length(levels(group))
+      nplot <- nlevels(group)
       gindex <- vector("list",nplot)
 
       for (s in 1:nplot){
