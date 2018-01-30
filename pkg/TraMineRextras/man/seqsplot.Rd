@@ -22,7 +22,7 @@ seqsplot(seqdata, group = NULL, main = NULL, cpal = NULL,
 
     \item{main}{Character string. Title for the graphic. Default is \code{NULL}.}
 
-    \item{cpal}{Vector. Color palette used for the states or the groups when \code{per.state=TRUE} is given along the \code{...} list. Default is \code{NULL}, in which case the \code{cpal} attribute of the \code{seqdata} sequence object is used (see \code{\link{seqdef}}) or default colors are assigned to groups when \code{per.state=TRUE}. If user specified, a vector of colors of length and order corresponding to \code{alphabet(seqdata)} or, if for groups, the number of levels of the group variable.}
+    \item{cpal}{Vector. Color palette used for the states or the groups when \code{per.state=TRUE} is given along the \code{...} list. Default is \code{NULL}, in which case the \code{cpal} attribute of the \code{seqdata} sequence object is used (see \code{\link{seqdef}}) or the default colors assigned to groups when \code{type="s"} and \code{per.state=TRUE}. If user specified, a vector of colors of length and order corresponding to \code{alphabet(seqdata)} or, if for groups, the number of levels of the group variable.}
 
     \item{missing.color}{Color for representing missing values inside the sequences. By default, this color is taken from the \code{missing.color} attribute of \code{seqdata}.}
 
@@ -38,7 +38,7 @@ seqsplot(seqdata, group = NULL, main = NULL, cpal = NULL,
 
   \item{with.legend}{Character string or logical. Defines if and where the legend of the state colors is plotted. The default value \code{"auto"} sets the position of the legend automatically. Other possible value is \code{"right"}. Obsolete value \code{TRUE} is equivalent to \code{"auto"}.}
 
-  \item{ltext}{Vector of character strings of length and order corresponding to  \code{alphabet(seqdata)}. Optional description of the states to appear in the legend. If unspecified, the \code{label} attribute of the \code{seqdata} sequence object is used (see \code{\link{seqdef}}).}
+  \item{ltext}{Vector of character strings of length and order corresponding to  \code{alphabet(seqdata)} or, when for groups, to the levels of the group variable. Optional description for the color legend. If unspecified, the \code{label} attribute of the \code{seqdata} sequence object is used (see \code{\link{seqdef}}) or, when for groups, the levels of the group variable.}
 
   \item{cex.legend}{Real. Legend magnification. See \code{\link{legend}}.}
 

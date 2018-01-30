@@ -93,13 +93,14 @@ Gabadinho, A., Ritschard, G., Studer, M. and Müller, N.S. (2010), "Indice de co
 ## Defining a sequence object with columns 13 to 24
 ## in the 'actcal' example data set
 data(actcal)
+actcal <- actcal[1:200,] ## Here, only a subset
 actcal.seq <- seqdef(actcal[,13:24])
 
 ## precarity using the original state order
 prec <- seqprecarity(actcal.seq)
 ici <- seqici(actcal.seq) ## complexity
 
-seqn <- seqformat(actcal.seq, to="SPS", compressed=TRUE)
+seqn <- seqformat(actcal.seq, to="SPS", compress=TRUE)
 tab <- data.frame(seqn,ici,prec)
 names(tab) <- c("seq","ici","prec")
 head(tab)
@@ -114,6 +115,14 @@ prec3 <- seqprecarity(actcal.seq, state.order=c("A","B","D"), state.equiv=list(c
 tab <- cbind(tab,prec3)
 names(tab)[ncol(tab)] <- "prec3"
 head(tab)
+
+## Extracting transition-based weights
+tr.weights <- seqprecorr(actcal.seq, state.order=c("A","B","D"), state.equiv=list(c('A','B')))
+## weights for correction factor
+corr.w <- 1 + tr.weights
+## number of non neutral correction weights
+length(corr.w[corr.w != 1])
+
 
 }
 

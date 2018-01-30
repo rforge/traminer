@@ -14,13 +14,7 @@
     An object of class \code{stslist.surv} as produced by the
     \code{\link{seqsurv}} function.
   }
-  \item{cpal}{
-    Alternative color palette to be used for the states. If user specified and 
-    \code{x} was obtained with \code{per.state = FALSE}, a vector
-    of colors with number of elements equal to the number of states in the
-    alphabet. When \code{per.state = TRUE} was used, a vector of with colors for the
-    the groups. When \code{cpal = NULL}, the default colors assigned to the \code{cpal}
-    attribute of \code{x} are used.
+  \item{cpal}{Vector of colors. Alternative color palette to be used for the drawn lines. The vector should be of length equal to the number of drawn survival curves, i.e., the number of selected states or number of groups when \code{x} was obtained with \code{per.state=TRUE}. When \code{cpal=NULL}, the default colors assigned to the \code{cpal} attribute of \code{x} are used.
   }
   \item{ylab}{
     An optional label for the y axis. If set to \code{NA}, no label is drawn.
@@ -29,14 +23,14 @@
   \item{yaxis}{Logical. Should the y-axis be plotted. Default is \code{TRUE}.}
   
   \item{xtstep}{
-    Optional interval at which the tick-marks and labels of the x-axis are
+    Optional interval at which the tick-marks of the x-axis are
     displayed. For example, with \code{xtstep = 3} a tick-mark is drawn at
     position 1, 4, 7, etc... The display of the corresponding labels depends on
     the available space and is dealt with automatically. If unspecified, the
     \code{xtstep} attribute of the \code{x} object is used.
   }
   \item{cex.axis}{
-    Expansion factor for setting the size of the font for the axis labels and
+    Expansion factor for the font size of the axis labels and
     names. The default value is 1. Values lesser than 1 will reduce the size of
     the font, values greater than 1 will increase the size.
   }
@@ -67,7 +61,7 @@
 %\note{
 %  FIXME (Matthias).
 %}
-\author{Matthias Studer, Pierre-Alexandre Fonta}
+\author{Matthias Studer, Gilbert Ritschard, Pierre-Alexandre Fonta}
 
 \seealso{
   \code{\link{seqsurv}}, \code{\link{seqsplot}}, \code{\link[survival]{survfit}}.

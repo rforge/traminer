@@ -39,7 +39,7 @@ seqsurv(seqdata, groups = NULL, per.state = FALSE, state = NULL,
 %\note{
 %  FIXME (Matthias).
 %}
-\author{Matthias Studer, Pierre-Alexandre Fonta, Gilbert Ritschard}
+\author{Matthias Studer, Gilbert Ritschard, Pierre-Alexandre Fonta}
 \seealso{
   \code{\link{plot.stslist.surv}} for basic plots of \emph{stslist.surv} objects
   and \code{\link{seqsplot}} for more elaborated plots.%%(\code{\link{seqplot}} with \code{type = "s"})
