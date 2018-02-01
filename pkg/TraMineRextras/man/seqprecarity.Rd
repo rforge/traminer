@@ -8,7 +8,7 @@
 \title{Precarity index}
 
 \description{
-The precarity index returned by the function \code{seqprecarity} is a modified complexity index that takes account of the ordinal order (possibly only partial order) of the states and data-driven correction factors derived from the overall frequencies of the transitions occurring in the sequence. The transition-based weights of the sequences can be extracted per se by means of the function \code{seqprecorr}. (See details.)
+The precarity index returned by the function \code{seqprecarity} is a modified complexity index that takes account of the ordinal order (possibly only partial order) of the states and data-driven correction factors derived from the overall frequencies of the transitions occurring in the sequence. The signed proportions (transition-based weighted proportions of negative transitions) used for the correction factor can be extracted per se by means of the function \code{seqprecorr}. (See details.)
 }
 
 \usage{
@@ -111,17 +111,19 @@ tab <- cbind(tab,prec2)
 names(tab)[ncol(tab)] <- "prec2"
 
 ## and letting C be non-comparable
-prec3 <- seqprecarity(actcal.seq, state.order=c("A","B","D"), state.equiv=list(c('A','B')))
+prec3 <- seqprecarity(actcal.seq, state.order=c("A","B","D"), 
+  state.equiv=list(c('A','B')))
 tab <- cbind(tab,prec3)
 names(tab)[ncol(tab)] <- "prec3"
 head(tab)
 
-## Extracting transition-based weights
-tr.weights <- seqprecorr(actcal.seq, state.order=c("A","B","D"), state.equiv=list(c('A','B')))
-## weights for correction factor
-corr.w <- 1 + tr.weights
-## number of non neutral correction weights
-length(corr.w[corr.w != 1])
+## Extracting the q(x) used for the correction factor (1-q(x))
+q <- seqprecorr(actcal.seq, state.order=c("A","B","D"), 
+  state.equiv=list(c('A','B')))
+## correction factor
+corr.f <- 1 + q
+## number of non neutral correction factors
+length(corr.f[corr.f != 1])
 
 
 }

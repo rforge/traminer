@@ -1,7 +1,16 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.2 [2018-01-29] (Development version)}{
+\section{Changes in version 0.5.3 [2018-02-01] (Development version)}{
+  \subsection{Misc}{
+    \itemize{
+      \item
+      No changes.
+    }
+  }
+}
+
+\section{Changes in version 0.4.2 [2018-02-01]}{
   \subsection{New functions}{
     \itemize{
       \item
@@ -39,7 +48,7 @@
       \code{seqtabstocc())}: label synchronization issues.
     }
   }
-  
+
   \subsection{Misc}{
     \itemize{
       \item
