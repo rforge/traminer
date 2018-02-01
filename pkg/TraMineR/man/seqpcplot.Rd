@@ -41,7 +41,7 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
     different membership value.}
 
   \item{weights}{a numeric vector of weights of length equal the number
-    of sequences. When \code{NULL}, the \code{weights} are taken from 
+    of sequences. When \code{NULL}, the \code{weights} are taken from
     the \code{seqdata} object.}
 
   \item{cex}{Plotting text and symbols magnification. See \code{\link{par}}.}
@@ -82,9 +82,9 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
     displayed. Available are \code{"auto"}, \code{"show"} and
     \code{"hide"}. If \code{"auto"}, the plot will show missings only if
     present. \code{"hide"} will fade out missings and \code{"show"} will
-    always show missings.} If \code{with.missing} is set as \code{FALSE},
+    always show missings. If \code{with.missing=FALSE},
     \code{missing} is turned into \code{"hide"}. If \code{with.missing=TRUE}
-    and \code{missing="hide"}, \code{missing} is turned into \code{"auto"}.
+    and \code{missing="hide"}, \code{missing} is turned into \code{"auto"}.}
 
   \item{order.align}{Aligning method. For aligning on order positions use either \code{"first"} (default) or
   \code{"last"}. Option \code{"first"} numbers the positions from the beginning
