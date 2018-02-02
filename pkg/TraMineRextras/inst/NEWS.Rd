@@ -1,11 +1,11 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.3 [2018-02-01] (Development version)}{
+\section{Changes in version 0.5.3 [2018-02-02] (Development version)}{
   \subsection{Misc}{
     \itemize{
-      \item
-      No changes.
+      \item{Function \code{seqeordplot()} suppressed. It is superseded by the
+       function \code{seqpcplot()} of the TraMineR package.}
     }
   }
 }
@@ -122,8 +122,8 @@
 \section{Changes in version 0.2.6 [2017-03-01]}{
 \subsection{Misc}{
   \itemize{
-    \item{Function ctplot() suppressed. It is superseded by the
-       function seqpcplot() of the TraMineR package.}
+    \item{Function \code{ctplot()} suppressed. It is superseded by the
+       function \code{seqpcplot()} of the TraMineR package.}
     \item{C++ routines are now registered.}
 }} }
 
