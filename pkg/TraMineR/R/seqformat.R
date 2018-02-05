@@ -97,10 +97,10 @@ seqformat <- function(data, var = NULL, from, to, compress = FALSE, nrep = NULL,
     if (!is.null(pvar)) {
       checkindexes(pvar)
       if (!is.data.frame(pdata))
-        msg.stop("'pdata' must be a data frame to use 'pvar'")
+        msg.warn0("'pvar' ignored because 'pdata' is not a data frame")
     } else {
       if (is.data.frame(pdata))
-        msg.stop("'pvar' must be specified when 'pdata' is a data frame")
+        msg.stop("'pvar' required when 'pdata' is a data frame")
     }
   }
 
@@ -119,7 +119,7 @@ seqformat <- function(data, var = NULL, from, to, compress = FALSE, nrep = NULL,
     if (from != "SPELL") {
       if (missing(id)) {
         uids <- NULL
-        msg.warn("'id' set to NULL as it is not specified (backward compatibility TraMineR 1.8)")
+        msg.warn("'id' set to NULL as it is not specified (backward compatibility with TraMineR 1.8)")
       } else if (is.null(id)) {
         uids <- NULL
       } else if (!is.null(id)) {
@@ -167,10 +167,10 @@ seqformat <- function(data, var = NULL, from, to, compress = FALSE, nrep = NULL,
     if (is.compressed && is.null(stsep)) {
       stsep.auto <- seqfcheck(mseqdata)
       if (! stsep.auto %in% c("-", ":")) {
-        msg.stop("'stsep' must be specified as it is not '-' or ':'")
+        msg.stop("'stsep' must be specified as it is neither '-' nor ':'")
       } else {
         stsep <- stsep.auto
-        msg0("setting 'stsep' to \"", stsep, "\" (autodetected)")
+        msg0("setting 'stsep' as \"", stsep, "\" (autodetected)")
       }
     }
 

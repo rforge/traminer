@@ -1,13 +1,27 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.0-9 [2018-01-29] (Development version)}{
+\section{Changes in version 2.1-9 [2018-02-05] (Development version)}{
 
-  \subsection{Misc:}{
+  \subsection{Changes in existing functions:}{
     \itemize{
       \item
-      No change.
-    }  
+      \code{seqformat()}:
+      \itemize{
+        \item
+        For \code{from = "SPELL"} and \code{process = FALSE}, \code{pdata = "auto"} is now equivalent to \code{NULL} instead of raising an error. Also, using argument \code{pvar} with \code{pdata = NULL} now raises a warning instead of an error and \code{pvar} is simply ignored.
+        \item
+        For \code{from = "SPELL"} an error is raised when columns referred to
+        by \code{begin} and \code{end} are of class "Date".
+        Integer values are expected.
+        \item
+        When \code{from = "SPELL"} or \code{to = "SPELL"}, an error is raised 
+        when the birth year column of \code{pdata} is of class "Date". 
+        Integer values are expected.
+      }
+
+
+    }
   }
 }
 
