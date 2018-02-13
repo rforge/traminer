@@ -5,19 +5,6 @@
 #include <R_ext/Lapack.h>
 #include <R_ext/BLAS.h>
 
-#ifdef __GNUC__
-# undef alloca
-# define alloca(x) __builtin_alloca((x))
-#else
-/* this is necessary (and sufficient) for Solaris 10: */
-# ifdef __sun
-#  include <alloca.h>
-# endif
-#endif
-
-/* allocate n elements of type t */
-#define Alloca(n, t)  (t *) alloca( (size_t) ( (n) * sizeof(t) ) )
-
 /* set array values to zero */
 #define AllocVal(x, n, v) {int _I_, _SZ_ = (n); for(_I_ = 0; _I_ < _SZ_; _I_++) (x)[_I_] = (v);}
 
@@ -113,8 +100,10 @@ double olmm_GLink(double x, int link) {
  * ---------------------------------------------------------
  */
 
-SEXP olmm_setPar(SEXP x, SEXP par) {
+SEXP olmm_setPar(SEXP x, SEXP par) {  
 
+  const void *vmax;
+  
   /* list with the results */
   SEXP rvalR = PROTECT(allocVector(VECSXP, 4));
 
@@ -148,8 +137,9 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   
   /* overwrite fixed effect parameter slot */
   for (int i = 0; i < nEta; i++) {
-    for (int j = 0; j < pCe; j++)
+    for (int j = 0; j < pCe; j++) {
       fixef[i * pEta + j] = newPar[i * pCe + j];
+    }
     for (int j = 0; j < pGe; j++)
       fixef[i * pEta + pCe + j] = newPar[pCe * nEta + j];
   }
@@ -166,8 +156,9 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   }
 
   /* overwrite (cholesky decompositioned) random effect parameters */
-  double *vRanefCholFac = Alloca(lenVRanefCholFac, double);
-  R_CheckStack();
+  vmax = vmaxget();
+  double *vRanefCholFac = (double *)
+    R_alloc(lenVRanefCholFac, sizeof(double));
   
   for (int i = 0; i < lenVRanefCholFac; i++)
     vRanefCholFac[i] = newPar[p + i];
@@ -185,6 +176,7 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
   SET_VECTOR_ELT(rvalR, 3, ranefElMatR);
 
   UNPROTECT(5);
+  vmaxset(vmax);
   return rvalR;
 }
 
@@ -199,7 +191,10 @@ SEXP olmm_setPar(SEXP x, SEXP par) {
  * ---------------------------------------------------------
  */
 
+
 SEXP olmm_update_marg(SEXP x, SEXP par) {
+
+  const void *vmax;
   
   /* list with the results (the modified slots) */
   SEXP rvalR = PROTECT(allocVector(VECSXP, 11));
@@ -207,7 +202,6 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   /* get subject slot */  
   int *subject =
     INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
-  R_CheckStack();
   
   /* integer valued slots */
   int *dims = DIMS_SLOT(x);
@@ -251,10 +245,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     numGrad = dims[numGrad_POS],
     numHess = dims[numHess_POS],
     lenVecRanefCholFac = q * q, lenVRanefCholFac = q * (q + 1) / 2;
-
+  
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  R_CheckStack();
   
   /* variables for matrix operations etc. */
   int i1 = 1, tmpJ, subsTmp; 
@@ -263,22 +256,23 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     logLikCond_modified;
       
   /* define internal objects */
+  vmax = vmaxget();
   double *etaCLM = (double*) NULL,
     *etaRanefCLM = (double*) NULL,
     *sumBL = (double*) NULL,
     *etaRanef = Calloc(n * nEta, double),
-    *gq_nodes = Alloca(q, double),
-    *ranefVec = Alloca(q, double),
-    *ranef = Alloca(qEta * nEta, double),
+    *gq_nodes = (double *) R_alloc(q, sizeof(double)),
+    *ranefVec = (double *) R_alloc(q, sizeof(double)),
+    *ranef = (double *) R_alloc(qEta * nEta, sizeof(double)),
     *logLikCond_obs = Calloc(n, double),
     *logLikCond_sbj = Calloc(N, double),
-    *scoreCondVar = Alloca(nEta, double),
-    *vecRanefTerm = Alloca(lenVecRanefCholFac, double),
-    *vRanefTerm = Alloca(lenVRanefCholFac, double),
-    *etaTmp = Alloca(nEta, double),
+    *scoreCondVar = (double *) R_alloc(family == 1 ? 2 : nEta,
+				       sizeof(double)),
+    *vecRanefTerm = (double *) R_alloc(lenVecRanefCholFac, sizeof(double)),
+    *vRanefTerm = (double *) R_alloc(lenVRanefCholFac, sizeof(double)),
+    *etaTmp = (double *) R_alloc(nEta, sizeof(double)),
     *scoreCond_obs = (double*) NULL,
     *scoreCond_sbj = (double*) NULL;
-  R_CheckStack();
 
   if (numGrad == 0) {
     scoreCond_obs = Calloc(n * nPar, double);
@@ -286,7 +280,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   }
 
   AllocVal(etaRanef, n * nEta, zero);
-  
+
   /* update parameters */
   SEXP newParList = PROTECT(olmm_setPar(x, par));
   
@@ -308,7 +302,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     etaRanefCLM = Calloc(n * 2 , double);
     for (int i = 0; i < n; i++) {
       etaCLM[i] /* lower */
-	= yI[i] > 1 ? eta[n * (yI[i] - 2) + i] : -DBL_MAX; 
+	= yI[i] > 1 ? eta[n * (yI[i] - 2) + i] : -DBL_MAX;  
       etaCLM[i + n] = /* upper */
 	yI[i] < J ? eta[n * (yI[i] - 1) + i] : DBL_MAX;
     }
@@ -317,8 +311,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     sumBL = Calloc(n, double);
     break;
   }
-  R_CheckStack();
-
+  
   /* initializations */
   logLik[0] = 0;
   AllocVal(logLik_sbj, N, zero);
@@ -329,9 +322,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
     AllocVal(score_sbj, N * nPar, zero);
     AllocVal(score_obs, n * nPar, zero);
   }
-
-  /* Gauss-Hermite quadrature */
   
+  /* Gauss-Hermite quadrature */
+
   for (int k = 0; k < nQP; k++) {
     
     /* clear temporary objects */
@@ -358,10 +351,10 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 
     /* ranefVec (vector) to ranef (matrix) */
     for (int i = 0; i < nEta; i++) {
-      for (int j = 0; j < qCe; j++)
+      for (int j = 0; j < qCe; j++) 
       	ranef[i * qEta + j] = ranefVec[i * qCe + j];
-      for (int j = 0; j < qGe; j++)
-      	ranef[i * qEta + qCe + j] = ranefVec[qCe * nEta + j];
+      for (int j = 0; j < qGe; j++) 
+	ranef[i * qEta + qCe + j] = ranefVec[qCe * nEta + j];
     }
 
     /* set predictor-invariant random effects of adjacent-category models 
@@ -395,7 +388,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
       
       switch (family) {
       case 1: /* cumulative link model */
-	logLikCond_obs[i] = 
+	logLikCond_obs[i] =
 	  log(olmm_GLink(etaCLM[n + i] + etaRanefCLM[n + i], link) - 
 	      olmm_GLink(etaCLM[i] + etaRanefCLM[i], link));
 	logLikCond_sbj[subject[i]-1] += logLikCond_obs[i];
@@ -457,22 +450,22 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	switch (family) {
 	case 1: 
 	  if (yI[i] < J) { /* score on upper concerned effects */
-	    scoreCondVar[2] = 
+	    scoreCondVar[1] = 
 	      olmm_gLink(etaCLM[n + i] + etaRanefCLM[n + i], link) / 
 	      exp(logLikCond_modified);
 
 	    for (int j = 0; j < pCe; j++)
 	      scoreCond_obs[n * (pCe*(yI[i]-1) + j) + i] +=
-		scoreCondVar[2] * X[n * j + i];
+		scoreCondVar[1] * X[n * j + i];
 	  }	    
 	  if (yI[i] > 1) { /* score on lower effects */
-	    scoreCondVar[1] = 
+	    scoreCondVar[0] = 
 	      -olmm_gLink(etaCLM[i] + etaRanefCLM[i], link) / 
 	      exp(logLikCond_modified);
 
 	    for (int j = 0; j < pCe; j++) {
 	      scoreCond_obs[n * (pCe * (yI[i]-2) + j) + i] +=
-		scoreCondVar[1] * X[n * j + i];
+		scoreCondVar[0] * X[n * j + i];
 	    }
 	  }
 	  break;
@@ -547,11 +540,11 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
 	      case 1: 
 		if ((yI[i] < J) & (yI[i] == tmpJ)) {
 		  scoreCond_obs[n * (p + subsTmp) + i] +=
-		    scoreCondVar[2] * vRanefTerm[subsTmp];
+		    scoreCondVar[1] * vRanefTerm[subsTmp];
 		}
 		if ((yI[i] > 1) & (yI[i] == tmpJ)) {
 		  scoreCond_obs[n * (p + subsTmp) + i] += 
-		    scoreCondVar[1] * vRanefTerm[subsTmp];
+		    scoreCondVar[0] * vRanefTerm[subsTmp];
 		}
 		break;
 	      case 2: case 3: 
@@ -620,9 +613,8 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   if (numHess == 0) {
  
     AllocVal(info, nPar * nPar, zero); /* reset info matrix*/
-    double *hDerVec = Alloca(nPar, double),
+    double *hDerVec = (double *) R_alloc(nPar, sizeof(double)),
       hInv2;
-    R_CheckStack();
     
     for (int i = 0; i < N; i++) {    
       hInv2 = - weights_sbj[i] / (logLik_sbj[i] * logLik_sbj[i]);
@@ -633,7 +625,7 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   }
 
   /* finish score function calculations ........ */
-  
+    
   if (numGrad == 0) {
 
     for (int i = 0; i < n; i++)
@@ -682,8 +674,9 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
   SET_STRING_ELT(names, 9, mkChar("score"));
   SET_STRING_ELT(names, 10, mkChar("info"));
   setAttrib(rvalR, R_NamesSymbol, names);
-  
+    
   UNPROTECT(10);
+  vmaxset(vmax);
   return rvalR;
 }
 
@@ -698,11 +691,12 @@ SEXP olmm_update_marg(SEXP x, SEXP par) {
  */
 
 SEXP olmm_update_u(SEXP x) {
+
+  const void *vmax;
   
   /* get subject slot */  
   int *subject =
     INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
-  R_CheckStack();
   
   /* integer valued slots */
   int *dims = DIMS_SLOT(x);
@@ -720,8 +714,6 @@ SEXP olmm_update_u(SEXP x) {
   /* create a pointer to copy of random effect slot */
   double *u = REAL(uR);
     
-  R_CheckStack();
-
   /* set constants (dimensions of vectors etc.) */
   const int n = dims[n_POS], N = dims[N_POS], 
     q = dims[q_POS], qEta = dims[qEta_POS], 
@@ -732,20 +724,19 @@ SEXP olmm_update_u(SEXP x) {
 
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  R_CheckStack();
 
   /* variables for matrix operations */
   int i1 = 1; 
   double one = 1.0, zero = 0.0;
-
+  
   /* define internal vectors */
+  vmax = vmaxget();
   double *etaCLM = (double*) NULL,
     *etaRanefCLM = (double*) NULL,
     *sumBL = (double*) NULL,
     *etaRanef = Calloc(n * nEta, double),
-    *ranefVec = Alloca(q, double);
-  R_CheckStack();
-
+    *ranefVec = (double*) R_alloc(q, sizeof(double));
+    
   AllocVal(etaRanef, n * nEta, zero);
 
   switch (family) {
@@ -755,7 +746,7 @@ SEXP olmm_update_u(SEXP x) {
     for (int i = 0; i < n; i++) {
       etaCLM[i] /* lower */
 	= yI[i] > 1 ? eta[n * (yI[i] - 2) + i] : -DBL_MAX; 
-      etaCLM[i + n] = /* upper */
+      etaCLM[n + i] = /* upper */
 	yI[i] < J ? eta[n * (yI[i] - 1) + i] : DBL_MAX;
     }
     break;
@@ -763,20 +754,19 @@ SEXP olmm_update_u(SEXP x) {
     sumBL = Calloc(n, double);
     break;
   }
-  R_CheckStack();
 
   AllocVal(u, N * q, zero);
-
+    
   /* Gauss-Hermite quadrature */
 
-  double *gq_nodes = Alloca(q, double), gq_weight = 1,
-    *ranef = Alloca(q, double),
+  double *gq_nodes = (double *) R_alloc(q, sizeof(double)),
+    gq_weight = 1,
+    *ranef = (double *) R_alloc(qEta * nEta, sizeof(double)), 
     *logLikCond_obs = Calloc(n, double),
     *logLikCond_sbj = Calloc(N, double);
-  R_CheckStack();
-  
-  for (int k = 0; k < nQP; k++) {
     
+  for (int k = 0; k < nQP; k++) {
+
     /* clear temporary objects */
     AllocVal(logLikCond_obs, n, zero);
     AllocVal(logLikCond_sbj, N, zero);
@@ -788,19 +778,25 @@ SEXP olmm_update_u(SEXP x) {
       gq_weight *= ghw[nQP * i + k];
     }
     gq_weight = log(gq_weight);
-
+    
     /* multiply ranefCholFac with actual nodes */
     F77_CALL(dgemv)("N", &q, &q, &one, ranefCholFac, &q, 
 		    gq_nodes, &i1, &zero, ranefVec, &i1);
-
+    
     /* ranefVec (vector) to ranef (matrix) */
     for (int i = 0; i < nEta; i++) {
-      for (int j = 0; j < qCe; j++)
+      for (int j = 0; j < qCe; j++) {
+	if (i * qEta + j >= qEta * nEta) error("overflow"); //
+      	if (i * qCe + j >= q) error("overflow"); //
       	ranef[i * qEta + j] = ranefVec[i * qCe + j];
-      for (int j = 0; j < qGe; j++)
+      }
+      for (int j = 0; j < qGe; j++) {
+	if (i * qEta + qCe + j >= qEta * nEta) error("overflow"); //
+	if (qCe * nEta + j > q) error("overflow"); //
       	ranef[i * qEta + qCe + j] = ranefVec[qCe * nEta + j];
+      }
     }
-    
+
     /* set predictor-invariant random effects of adjacent-category model 
        to use the Likelihood of the baseline-category model */
     if (family == 3) {
@@ -815,7 +811,7 @@ SEXP olmm_update_u(SEXP x) {
     /* compute contribution of random effects to linear predictor */
     F77_CALL(dgemm)("N", "N", &n, &nEta, &qEta, &one, W, &n, 
 		    ranef, &qEta, &zero, etaRanef, &n);
- 
+
     /* use etaRanefCLM to accelerate computations */
     if (family == 1) {
       for (int i = 0; i < n; i++) {
@@ -825,7 +821,7 @@ SEXP olmm_update_u(SEXP x) {
 	  yI[i] < J ? etaRanef[n * (yI[i] - 1) + i] : DBL_MAX;
       }
     }
-        
+
     for (int i = 0; i < n; i++) {     
 
       /* approximate log-Likelihood */
@@ -842,7 +838,7 @@ SEXP olmm_update_u(SEXP x) {
 	  sumBL[i] += exp(eta[i + j * n] + etaRanef[i + j * n]);
 	logLikCond_obs[i] = -log(1.0 + sumBL[i]);
 	if (yI[i] < J)
-	  logLikCond_obs[i] += eta[i + n * (yI[i] - 1)] + 
+	  logLikCond_obs[i] += eta[i + n * (yI[i] - 1)] +
 	    etaRanef[i + n * (yI[i] - 1)];
 	logLikCond_sbj[subject[i]-1] += logLikCond_obs[i];
 	break;
@@ -866,13 +862,15 @@ SEXP olmm_update_u(SEXP x) {
     }
   }
 
+
   Free(etaRanef);
   Free(logLikCond_obs);
   Free(logLikCond_sbj);
   if (family == 1) Free(etaCLM);
   if (family == 1) Free(etaRanefCLM);
   if ((family == 2) | (family == 3)) Free(sumBL);
-  UNPROTECT(1);  
+  UNPROTECT(1);
+  vmaxset(vmax);
   return uR;
 }
 
@@ -894,6 +892,8 @@ SEXP olmm_update_u(SEXP x) {
 
 SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
 
+  const void *vmax;
+   
   /* duplicate input matrix */
   SEXP rvalR = PROTECT(duplicate(pred));
   double *rval = REAL(rvalR);
@@ -907,7 +907,6 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
   /* numeric valued objects */
   double *ranefCholFac = RANEFCHOLFAC_SLOT(x),
     *ghw = GHW_SLOT(x), *ghx = GHX_SLOT(x);
-  R_CheckStack();
 
   /* set constants (dimensions of vectors etc.) */
   const int q = dims[q_POS], qEta = dims[qEta_POS], 
@@ -922,12 +921,12 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
     gq_weight = 1, sumBL = 0.0;
 
   /* define internal objects */
+  vmax = vmaxget();
   double *etaRanef = Calloc(rn * nEta, double),
-    *gq_nodes = Alloca(q, double),
+    *gq_nodes = (double *) R_alloc(q, sizeof(double)),
     *predCond = Calloc(rn * J, double),
-    *ranefVec = Alloca(q, double),
-    *ranef = Alloca(qEta * nEta, double);
-  R_CheckStack();
+    *ranefVec = (double *) R_alloc(q, sizeof(double)),
+    *ranef = (double *) R_alloc(qEta * nEta, sizeof(double));
   
   AllocVal(rval, rn * J, zero);
 
@@ -1001,8 +1000,9 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
   }
   
   Free(etaRanef);
-  Free(predCond);  
-  UNPROTECT(1); 
+  Free(predCond);
+  UNPROTECT(1);
+  vmaxset(vmax);
   return rvalR;
 }
 
@@ -1010,6 +1010,8 @@ SEXP olmm_pred_marg(SEXP x, SEXP eta, SEXP W, SEXP n, SEXP pred) {
 SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew, 
 		       SEXP nNew, SEXP pred) {
 
+  const void *vmax;
+  
   /* duplicate input matrix */
   SEXP rvalR = PROTECT(duplicate(pred));
   double *rval = REAL(rvalR);
@@ -1021,7 +1023,6 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   /* get subject slot */
   int *subject =
     INTEGER(coerceVector(getListElement(x, "subject"), INTSXP));
-  R_CheckStack();
   
   /* integer valued slots */
   int *dims = DIMS_SLOT(x);
@@ -1040,7 +1041,6 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   
   /* get response variable */
   int *yI = INTEGER(coerceVector(getListElement(x, "y"), INTSXP));
-  R_CheckStack();
 
   /* variables for matrix operations etc. */
   int i1 = 1;
@@ -1049,14 +1049,14 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
     logLikCond_obs, lTmp;
   
   /* define internal objects */
+  vmax = vmaxget();
   double *etaRanefNew = Calloc(rnNew * nEta, double),
     *etaRanef = Calloc(n * nEta, double),
     *logLikCond_sbj = Calloc(rnNew, double),
-    *gq_nodes = Alloca(q, double),
+    *gq_nodes = (double *) R_alloc(q, sizeof(double)),
     *predCond = Calloc(rnNew * J, double),
-    *ranefVec = Alloca(q, double),
-    *ranef = Alloca(qEta * nEta, double);
-  R_CheckStack();
+    *ranefVec = (double *) R_alloc(q, sizeof(double)),
+    *ranef = (double *) R_alloc(qEta * nEta, sizeof(double));
   
   AllocVal(rval, rnNew * J, zero);
 
@@ -1176,6 +1176,7 @@ SEXP olmm_pred_margNew(SEXP x, SEXP etaNew, SEXP WNew, SEXP subjectNew,
   Free(etaRanef);
   Free(etaRanefNew);
   Free(predCond);
-  UNPROTECT(1); 
+  UNPROTECT(1);
+  vmaxset(vmax);
   return rvalR;
 }

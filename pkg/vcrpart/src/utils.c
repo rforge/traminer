@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <Rmath.h>
 
+
 /**
  * ---------------------------------------------------------
  * Duplicate an R object

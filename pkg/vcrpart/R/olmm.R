@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:       Reto Buergin
 ## E-Mail:       rbuergin@gmx.ch
-## Date:         2017-08-19
+## Date:         2018-02-13
 ##
 ## References:
 ## ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
@@ -14,7 +14,9 @@
 ##
 ##
 ## Modifications:
-## 2917-08-19: - Add check for the left-hand of the formula.
+## 2018-02-13: Few minor modification when exploring for the memory
+##             overflow problem
+## 2017-08-19: - Add check for the left-hand of the formula.
 ##             - Remove data from 'olmm' output
 ## 2017-08-13: Also return the data in the 'olmm' output object.
 ## 2017-08-11: In 'olmm' replace 'inVar <- all.vars(...)' by
@@ -519,6 +521,7 @@ olmm <- function(formula, data, family = cumulative(),
             cat("\n")
         
         ## extract the function for fitting the model
+        
         FUN <- object$optim$fit
         subs <- which(names(object$optim) == "fit")
         object$optim <- object$optim[-subs]

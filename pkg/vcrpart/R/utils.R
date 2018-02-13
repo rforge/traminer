@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2017-08-19
+## Date:            2018-02-04
 ##
 ## Description:
 ## General utility functions for the 'vcrpart' package.

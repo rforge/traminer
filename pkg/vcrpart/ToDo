@@ -10,4 +10,12 @@
 - variable importance measures
 - there seems to be a problem with vcrpart_formula with 'terms' call: for example
   terms(diabetes ~ vc(z1,z2,x) + vc(z1,z2,by=x), specials = types, keep.order = TRUE)
-  drops the second term!!!
+   drops the second term!!!
+
+- see the mail of Thomas Kalibera
+- if no response available the message
+   'Error in str(data.LONG2) : object 'data.LONG2' not found'
+   appers
+- note that the '/' operator does not work in formulas
+- improve C code
+- deal with empty target categories in olmm

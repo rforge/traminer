@@ -268,6 +268,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         vcRoot <- sapply(nodeid, length) == 1L
         ff <- tvcm_formula(formList, vcRoot, family,
                            environment(formList$original))
+
         model <- try(tvcm_grow_fit(mcall))
         
         if (inherits(model, "try-error")) stop(model)
@@ -397,7 +398,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
                                           model, nodes, where, partData,
                                           control, mcall, formList, step),
                        silent = TRUE)
-            
+
             ## handling stops
             if (inherits(dev, "try-error")) {
                 run <- 0L
@@ -430,6 +431,7 @@ tvcm_grow <- function(object, subset = NULL, weights = NULL) {
         if (run > 0L)
             nodes <- tvcm_grow_splitnode(nodes, where, dev, partData,
                                          step, weights)
+        
 
         if (run > 0L)
             splits <- tvcm_setsplits_splitnode(
@@ -616,8 +618,9 @@ tvcm_grow_fit <- function(mcall, doFit = TRUE) {
             mcall$method <- glm.doNotFit # skips glm.fit
         } 
     }
-    
+
     ## fit model
+    ## gc()
     object <- suppressWarnings(eval(mcall, env))
     
     ## return error if fitting failed
@@ -728,6 +731,7 @@ tvcm_grow_update <- function(object, control, subs = NULL) {
         optim <- optim[-subs]
         
         ## run optimization
+        ## gc()
         output <- try(suppressWarnings(do.call(FUN, optim)), TRUE)
         
         ## check optimized model 
@@ -1612,7 +1616,6 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
                         cp <- cp[subs,, drop = FALSE]
                         
                         if (nrow(cp) > 0L) {
-                            
                             ## employ exhaustive search
                             st <- apply(
                                 cp, 1, tvcm_exsearch_dev, 
@@ -1625,7 +1628,6 @@ tvcm_grow_exsearch <- function(splits, partid, nodeid, varid,
                                 where = where, partData = partData,
                                 control = control, loss0 = loss0,
                                 mfName = mfName)
-                            
                             if (is.matrix(st))
                                 st <- t(st) else st <- matrix(st, ncol = 1L)
                             splits[[pid]][[nid]][[vid]][[2L]][subs] <-

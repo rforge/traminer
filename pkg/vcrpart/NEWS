@@ -1,3 +1,11 @@
+Changes in Version 1.0-2
+
+    o   Replace in C-code 'alloca' memory allocations by 'R_alloc' to
+        avoid memory allocation problems, including using 'vmaxget' and
+	'vmaxset'.
+
+    o   Improved two bugs concerning memory overflow.
+    
 Changes in Version 1.0-1
 
     o   Internal modification for the 'singular.ok' argument of future
