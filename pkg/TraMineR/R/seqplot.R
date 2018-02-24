@@ -34,6 +34,12 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
   }
 
   if (type == "r") { # stuff moved here by GR 17.01.2018
+    ## For type="r" each group should have at least 2 cases
+    grp <- group
+    if (is.null(grp)) grp <- rep(1,nrow(seqdata))
+    if (any(xtabs( ~ group(grp)) < 2))
+      stop("For type = 'r', each group must have 2 or more cases. At least one group has only 1.", call.=FALSE)
+
 		if (is.null(diss)) {## (! "diss" %in% names(oolist)  && ! "dist.matrix" %in% names(oolist))){
       if (! "method" %in% names(oolist)){
 			  stop("For type = 'r', you must provide a distance matrix or a method to compute it", call.=FALSE)

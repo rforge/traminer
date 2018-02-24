@@ -15,11 +15,13 @@
         by \code{begin} and \code{end} are of class "Date".
         Integer values are expected.
         \item
-        When \code{from = "SPELL"} or \code{to = "SPELL"}, an error is raised 
-        when the birth year column of \code{pdata} is of class "Date". 
+        When \code{from = "SPELL"} or \code{to = "SPELL"}, an error is raised
+        when the birth year column of \code{pdata} is of class "Date".
         Integer values are expected.
       }
-
+      \item
+      \code{seqplot()}: for \code{type = "r"} (\code{seqrplot}), an error is raised when 
+      a group has less than two cases.
 
     }
   }

@@ -2,17 +2,19 @@
 Version 2.1-9 [2018-02-05] (Development version)
 
 Changes in existing functions:
-  - seqformat(): 
-    - For 'from = "SPELL"' and 'process = FALSE', 
-      'pdata = "auto"' is now equivalent to NULL instead of 
-      raising an error. Also, using argument 'pvar' with 
+  - seqformat():
+    - For 'from = "SPELL"' and 'process = FALSE',
+      'pdata = "auto"' is now equivalent to NULL instead of
+      raising an error. Also, using argument 'pvar' with
       'pdata = NULL' now raises a warning instead of
       an error and 'pvar' is simply ignored.
-    - For 'from = "SPELL"', an error is raised when columns 
+    - For 'from = "SPELL"', an error is raised when columns
       referred to by 'begin' and 'end' are of class "Date".
-    - When 'from = "SPELL"' or 'to = "SPELL"', an error is 
-      raised when the birth year column of pdata is of 
+    - When 'from = "SPELL"' or 'to = "SPELL"', an error is
+      raised when the birth year column of pdata is of
       class "Date". Integer values are expected.
+  - seqplot(): for type "r" (seqrplot), an error is raised 
+      when a group has less than two cases.
 
 ## =========
 Version 2.0-8 [2018-01-26]
