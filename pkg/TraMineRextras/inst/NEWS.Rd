@@ -1,7 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.3 [2018-02-02] (Development version)}{
+\section{Changes in version 0.5.3 [2018-02-25] (Development version)}{
+  \subsection{Changes in existing functions}{
+    \itemize{
+      \item
+      \code{seqrep.grp()}: an error is raised when one of the groups has less than two cases.
+    }
+  }
   \subsection{Misc}{
     \itemize{
       \item{Function \code{seqeordplot()} suppressed. It is superseded by the
