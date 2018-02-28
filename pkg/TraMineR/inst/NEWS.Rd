@@ -20,9 +20,17 @@
         Integer values are expected.
       }
       \item
-      \code{seqplot()}: for \code{type = "r"} (\code{seqrplot}), an error is raised when 
+      \code{seqplot()}: for \code{type = "r"} (\code{seqrplot}), an error is raised when
       a group has less than two cases.
 
+    }
+  }
+  \subsection{Bug fixes:}{
+    \itemize{
+      \item
+      \code{seqformat()}: An unneeded warning was raised when data
+        was a matrix with a single string element.
+      
     }
   }
 }

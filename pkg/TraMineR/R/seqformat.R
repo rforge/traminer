@@ -13,7 +13,7 @@ seqformat <- function(data, var = NULL, from, to, compress = FALSE, nrep = NULL,
 
   #### Check arguments with deprecated values ####
 
-  if (is.a.string(data)) {
+  if (is.a.string(data) & !is.matrix(data)) {
     data <- as.matrix(data)
     msg.warn("'data' as a string is deprecated, use as.matrix() to convert it")
   }

@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-9 [2018-02-05] (Development version)
+Version 2.1-9 [2018-02-28] (Development version)
 
 Changes in existing functions:
   - seqformat():
@@ -16,6 +16,10 @@ Changes in existing functions:
   - seqplot(): for type "r" (seqrplot), an error is raised 
       when a group has less than two cases.
 
+Bug fixes:
+  - seqformat(): An unneeded warning was raised when data 
+      was a matrix with a single string element.
+  
 ## =========
 Version 2.0-8 [2018-01-26]
 
