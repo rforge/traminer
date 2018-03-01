@@ -27,14 +27,15 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 			sf <- seqfcheck(seqdata)
 			if (sf %in% c("-",":")) seqdata <- seqdecomp(seqdata,sep=sf)
 			else if (sf=="-X")
-				message(" [!] found '-' character in states codes, not recommended")
+				message(" [!] found '-' character in state codes, not recommended")
 		}
 		else {
 			seqdata <- seqdecomp(seqdata,sep=stsep)
 		}
 	}
 	else if (informat %in% c("SPS","SPELL")) {
-		seqdata <- seqformat(seqdata, from = informat, to = "STS", stsep = stsep, ...)
+		seqdata <- seqformat(seqdata, from = informat, to = "STS", stsep = stsep, missing = missing, ...)
+    missing <- NA  ## seqformat replaces missings with NA
 		## if (is.null(cnames)) cnames <- colnames(seqdata)
 	}
 

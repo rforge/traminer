@@ -202,8 +202,8 @@ seqformat <- function(data, var = NULL, from, to, compress = FALSE, nrep = NULL,
     SPELL = SPELL_to_STS(seqdata, id, begin, end, status, process, pdata, pvar,
       limit, overwrite, fillblanks, tmin, tmax))
   # Note: In mseqdata, 'nr' and 'void' codes are unchanged
-  # Note: SPS_to_STS() insert neither 'nr' nor 'void' codes
-  # Note: SPELL_to_STS() insert neither 'nr' nor 'void' codes
+  # Note: SPS_to_STS() inserts neither 'nr' nor 'void' codes
+  # Note: SPELL_to_STS() inserts neither 'nr' nor 'void' codes
   # TODO SPELL_to_STS() uses NA as 'void' code
 
   nseqs.in <- nrow(msts)

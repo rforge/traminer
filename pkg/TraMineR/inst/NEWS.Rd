@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-9 [2018-02-05] (Development version)}{
+\section{Changes in version 2.1-9 [2018-03-01] (Development version)}{
 
   \subsection{Changes in existing functions:}{
     \itemize{
@@ -30,6 +30,10 @@
       \item
       \code{seqformat()}: An unneeded warning was raised when data
         was a matrix with a single string element.
+
+      \item
+      \code{seqdef()}: Bad handling of \code{missing} argument when 
+      \code{informat = "SPS"} or \code{"SPELL"}.
       
     }
   }
