@@ -63,6 +63,7 @@ seqformat <- function(data, var = NULL, from, to, compress = FALSE, nrep = NULL,
     checkindexes(var)
 
   # missing
+  #missing <- as.character(missing)
   if (!is.a.string(missing[1]))
     msg.stop.na("missing")
 

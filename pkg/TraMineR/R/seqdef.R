@@ -34,6 +34,7 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 		}
 	}
 	else if (informat %in% c("SPS","SPELL")) {
+    if (is.na(missing)) missing <- "_!NA!_"  ## NA causes an error in seqformat
 		seqdata <- seqformat(seqdata, from = informat, to = "STS", stsep = stsep, missing = missing, ...)
     missing <- NA  ## seqformat replaces missings with NA
 		## if (is.null(cnames)) cnames <- colnames(seqdata)

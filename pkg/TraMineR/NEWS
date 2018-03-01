@@ -63,7 +63,7 @@ Changes in existing functions:
     to = 'SPELL'. The default right = 'DEL' suppresses the
     end spells of missing values. Set right = NA to keep the
     end spells of missing values.
-  - seqdef() now rises an error message when 'void' is not a character
+  - seqdef() now raises an error message when 'void' is not a character
     different from 'left', 'gaps', and 'right'.
   - seqtrate() gains a new argument 'count'. When 'count = TRUE',
     the function returns counts of transitions instead of transition
