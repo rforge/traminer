@@ -1,5 +1,6 @@
 #'@keywords internal
-trmatplot.array <- function (d, seed = NULL, rowconstraint = TRUE, order= NULL,
+trmatplot.array <- function (d, seed = NULL, 
+													rowconstraint = TRUE, morder = 1,
 													cspal = NULL, cpal = NULL, title = NULL,
                 	       	xlab =  NULL, ylab = NULL, ylim = NULL, 
 													xtlab = NULL, ytlab = NULL,
@@ -22,7 +23,8 @@ trmatplot.array <- function (d, seed = NULL, rowconstraint = TRUE, order= NULL,
  # d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
 	d <- as.matrix (d) 
 
-  trmatplot.default ( d = d, rowconstraint = rowconstraint, seed = seed,
+  trmatplot.default ( d = d, seed = seed, 
+											rowconstraint = rowconstraint, morder = morder,
 											cspal = cspal, cpal = cpal, title = title, 
 											xlab = xlab, ylab = ylab, ylim = ylim, 
 											xtlab = xtlab, ytlab = ytlab,

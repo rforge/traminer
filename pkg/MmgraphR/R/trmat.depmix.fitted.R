@@ -8,7 +8,7 @@ trmat <- function ( d ) {
 		
     for ( j in 1 : M ) {
 		
-      Mat [ i, j ] <- ( attributes ( fm ) $ transition [[ i ]] )@ parameters $ coefficients [ j ]
+      Mat [ i, j ] <- ( attributes ( d ) $ transition [[ i ]] )@ parameters $ coefficients [ j ]
 			
     } 
 

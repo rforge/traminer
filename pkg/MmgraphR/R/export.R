@@ -1,6 +1,6 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Pauline (Poulcheria) Adamopoulou, padamopo@gmail.com
-##' Date:            2014-12-03
+##' Date:            2018-05-01
 ##'
 ##' Description:
 ##' Additional functions that may be exported

@@ -1,5 +1,6 @@
 #'@keywords internal
-trmatplot.depmix.fitted <- function (d, rowconstraint = TRUE, seed = NULL, 
+trmatplot.depmix.fitted <- function (d, seed = NULL, 
+													rowconstraint = TRUE, morder = 1,
 													cspal = NULL, cpal = NULL, title = NULL,
                 	       	xlab =  NULL, ylab = NULL, ylim = NULL, 
 													xtlab = NULL, ytlab = NULL,
@@ -13,7 +14,8 @@ trmatplot.depmix.fitted <- function (d, rowconstraint = TRUE, seed = NULL,
 
   d <- trmat.depmix.fitted ( d )
  
-   trmatplot.default ( d = d, rowconstraint = rowconstraint, seed = seed,
+   trmatplot.default ( d = d, seed = seed, 
+											rowconstraint = rowconstraint, morder = morder,
 											cspal = cspal, cpal = cpal, title = title, 
 											xlab = xlab, ylab = ylab, ylim = ylim, 
 											xtlab = xtlab, ytlab = ytlab,

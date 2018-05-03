@@ -10,7 +10,7 @@ A coordinate plot which maps each element in the probability transition matrix a
 \usage{
 ## S3 method for classes 'matrix', 'array' and 'depmix.fitted'
 
-trmatplot ( d, rowconstraint = TRUE, seed = NULL,
+trmatplot ( d, seed = NULL, rowconstraint = TRUE, morder = 1,
 cspal = NULL, cpal = NULL, title = NULL, 
 xlab = NULL, ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL,
 pfilter = NULL, shade.col = "grey80", num = 1, 
@@ -21,9 +21,11 @@ verbose = FALSE, ...)
 
 	\item{d}{Object to be plotted of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, or \command{\link[depmixS4]{depmix.fitted}}. A transition matrix of probabilities. See Details.}
 
+	\item{seed}{A single value, interpreted as an integer, or \code{NULL} (default). See Details.}
+
 	\item{rowconstraint}{Logical. Checks if the row constraint is satisfied, i.e. the sum of each row of the transition probability matrix equals one. Default is \code{TRUE}.}
 
-	\item{seed}{A single value, interpreted as an integer, or \code{NULL} (default). See Details.}
+	\item{morder}{Numeric. The order of the probability transition matrix, \code{d}, to be plotted. Default is 1.}
 
 	\item{cspal}{A color palette that can be specified as one of: \code{"dynamic", "harmonic", "cold", "warm", "heat", "terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes.}
 
@@ -164,7 +166,7 @@ trmatplot(trmat, seed = 2, pfilter = "tmin", num = 10 )
 trmatplot(trmat, seed = 2, filter = list(type = "sequence", value = "(1)-(4)"))
 }
 \author{
-Poulcheria Adamopoulou
+Pauline Poulcheria Adamopoulou
 }
 \references{
 	Buergin, R. and G. Ritschard (2014), "A decorated parallel coordinate plot for categorical longitudinal data", \emph{The American Statistician}. Vol. 68(2), pp. 98-103.

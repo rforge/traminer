@@ -1,5 +1,6 @@
 export(trmatplot, march.Dcmm.trmatplot)
 import("TraMineR", "colorspace")
+importFrom(march, march.dataset.loadFromDataFrame)
 #importFrom(TraMineR,seqdef)
 #importFrom(TraMineR,seqpcplot)
 #importFrom(colorspace,rainbow_hcl)

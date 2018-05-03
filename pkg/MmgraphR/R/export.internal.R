@@ -1,13 +1,13 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Pauline (Poulcheria) Adamopoulou, padamopo@gmail.com
-##' Date:            2014-12-03
+##' Date:            2018-05-02
 ##'
 ##' Description:
 ##' Internal functions exported by main functions
 ##'
 ##'
 ##'	Contents:
-##'	depmix.fitted.trmat	: extract the  probability transition matrix
+##'	trmat.depmix.fitted	: extract the  probability transition matrix
 ##'												from an object of class 'depmix.fitted'
 ##'	ismax	:					is maximum
 ##'	ismin	:					is minimum
@@ -22,7 +22,7 @@
 ##' -------------------------------------------------------- #
 
 ##
-# depmix.fitted.trmat
+# trmat.depmix.fitted
 ##
 trmat.depmix.fitted <- function ( d ) {
 	
@@ -34,7 +34,7 @@ trmat.depmix.fitted <- function ( d ) {
 		
     for ( j in 1 : M ) {
 		
-      Mat [ i, j ] <- ( attributes ( fm ) $ transition [[ i ]] )@ parameters $ coefficients [ j ]
+      Mat [ i, j ] <- ( attributes ( d ) $ transition [[ i ]] )@ parameters $ coefficients [ j ]
 			
     } 
 

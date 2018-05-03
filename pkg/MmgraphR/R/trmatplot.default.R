@@ -1,5 +1,6 @@
 #'@keywords internal
-trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
+trmatplot.default <- function (d, seed = NULL, 
+											rowconstraint = TRUE, morder= 1,
 											cspal = NULL, cpal = NULL, title = NULL,
                       xlab =  NULL, ylab = NULL, ylim = NULL, 
 											xtlab = NULL, ytlab = NULL,
@@ -27,9 +28,9 @@ trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
 	## matrix
   if ( is.matrix ( d ) ) {
     
-    if ( order == 1 & ! identical ( nrow ( d ) , ncol ( d ) ) ) {
+    if ( morder == 1 & ! identical ( nrow ( d ) , ncol ( d ) ) ) {
       
-      stop ( "[!] if of order one, the transition probability matrix must be square, nrow = ncol" ) 
+      stop ( "[!] if morder is set to equal 1, the transition probability matrix must be square, nrow = ncol" ) 
       
     }
     
@@ -60,9 +61,9 @@ trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
 	}
 	
  	##
-	## order
-	if ( ! is.null ( order ) & ! is.numeric ( order ) ) {
-			stop ("[!] order must be numeric")
+	## morder
+	if ( ! is.null ( morder ) & ! is.numeric ( morder ) ) {
+			stop ("[!] morder must be numeric")
 	}
   
 	##
@@ -131,7 +132,7 @@ trmatplot.default <- function (d, seed = NULL, rowconstraint = TRUE, order= 1,
   
  	M <- dim ( d ) [ 2 ]
     
- 	l <- order 
+ 	l <- morder 
     
 	w <- d
  

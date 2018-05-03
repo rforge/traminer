@@ -1,7 +1,7 @@
 ##'--------------------------------------------------------- #
 ##' Author:          Pauline (Poulcheria) Adamopoulou
 ##' E-Mail:          padamopo@gmail.com
-##' Date:            2014-11-07
+##' Date:            2018-05-02
 ##'
 ##' Description:				New generics for exported methods
 ##' 
@@ -11,11 +11,12 @@
 ##'											probability transition matrix		
 ##'
 ##' Last modifications:
+##' 2018-05-02: include argument morder in 'trmatplot'
 ##' 2014-12-05: include all arguments in 'trmatplot' 
 ##' 2014-11-07: added 'trmatplot' generic
 ##'--------------------------------------------------------- #
 
-trmatplot <- function( d, rowconstraint = TRUE, seed = NULL,
+trmatplot <- function( d, seed = NULL, rowconstraint = TRUE, morder = 1,
 											cspal = NULL, cpal = NULL, title = NULL,
                       xlab =  NULL, ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL,
 											pfilter = NULL, shade.col = "grey80", num = 1,

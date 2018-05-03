@@ -1,12 +1,12 @@
 ##' -------------------------------------------------------- #
 ##' Author:          Pauline (Poulcheria) Adamopoulou, padamopo@gmail.com
-##' Date:            2014-11-24
+##' Date:            2018-05-02
 ##'
 ##' Description:
-##' Unexported functions imported from other packages
+##' Unexported functions within other packages imported here 
 ##'
 ##' References:
-##' march:      https://r-forge.r-project.org/projects/march/
+##' march:      https://cran.r-project.org/package=march
 ##'
 ##' Contents:
 ##' march:                       march.dcmm.h.compactA
