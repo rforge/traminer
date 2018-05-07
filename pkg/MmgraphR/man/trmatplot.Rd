@@ -6,7 +6,7 @@
 \alias{trmatplot.hmm}
 \title{Transition Matrix Plot}
 \description{
-A coordinate plot which maps each element in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to emphasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, or \command{\link[seqHMM]{hmm}}.
+A coordinate plot which maps each element in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to emphasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, or \code{hmm} which is the output of either \command{\link[seqHMM]{build_hmm}} or \command{\link[seqHMM]{build_mm}}.
 }
 \usage{
 ## S3 method for classes 'matrix', 'array', 'depmix.fitted', and 'hmm'
@@ -20,7 +20,7 @@ verbose = FALSE, ...)
 }
 \arguments{
 
-	\item{d}{Object to be plotted of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, or \command{\link[seqHMM]{hmm}}. A transition matrix of probabilities. See Details.}
+	\item{d}{Object to be plotted of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, or \code{hmm}. A transition matrix of probabilities. See Details.}
 
 	\item{seed}{A single value, interpreted as an integer, or \code{NULL} (default). See Details.}
 
@@ -66,7 +66,7 @@ verbose = FALSE, ...)
 
 \details{
 
-The object \code{d} to be plotted, is a probability matrix which, when of class \command{\link[base]{matrix}} or \command{\link[base]{array}}, can be user defined. Alternatively, if the probability transition matrix is the output packages \pkg{msm}, \pkg{HiddenMarkov} and \pkg{HMM}, it is of class \command{\link[base]{matrix}}. A probability matrix obtained using the package \pkg{depmixS4} is embedded in an object of class \command{\link[depmixS4]{depmix.fitted}}, whereas a probability matrix obtained using the package \pkg{seqHMM} is embedded in an object of class \command{\link[seqHMM]{hmm}}. Objects of classes \command{\link[depmixS4]{depmix.fitted}} and \command{\link[seqHMM]{hmm}} are also accepted.
+The object \code{d} to be plotted, is a probability matrix which, when of class \command{\link[base]{matrix}} or \command{\link[base]{array}}, can be user defined. Alternatively, if the probability transition matrix is the output packages \pkg{msm}, \pkg{HiddenMarkov} and \pkg{HMM}, it is of class \command{\link[base]{matrix}}. A probability matrix obtained using the package \pkg{depmixS4} is embedded in an object of class \command{\link[depmixS4]{depmix.fitted}}. A probability matrix obtained using the  \pkg{seqHMM} functions \command{\link[seqHMM]{build_hmm}} or \command{\link[seqHMM]{build_mm}} is embedded in an object of class \code{hmm}. Thus, objects of classes \command{\link[depmixS4]{depmix.fitted}} and \code{hmm} are also accepted.
 
 Setting a \code{seed} allows the graphic to be replicated.
 

@@ -381,7 +381,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
   
   # hide.col
   
-  if ( ! is.null ( filter ) & ! is.null ( hide.col ) ){
+  if ( ! is.null ( pfilter ) & ! is.null ( hide.col ) ){
     
     hd.col <- hide.col
     
