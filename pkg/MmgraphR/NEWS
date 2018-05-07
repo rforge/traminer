@@ -1,3 +1,6 @@
+07.05.2018
+° method trmatplot now exported for ojects of class "hmm"
+
 03.05.2018
 ° Version 0.2 now on R-forge
 ° Updating files MmgraphR-package.Rd, DESCRIPTION, and NEWS

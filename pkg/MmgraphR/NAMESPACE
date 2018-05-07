@@ -19,6 +19,9 @@ S3method(trmatplot, default)
 #Export method "trmatplot" for class "depmix.fitted"
 S3method(trmatplot, depmix.fitted)
 
+#Export method "trmatplot" for class "hmm"
+S3method(trmatplot, hmm)
+
 #Export method "trmatplot" for class "array"
 S3method(trmatplot, array)
 
