@@ -1,6 +1,6 @@
 # renamed from trmatplot.march.Dcmm b/c implies S3 method (impossible since march isn't on CRAN)
 march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1, 
-                       	cspal = NULL, cpal = NULL, title = NULL,
+                       	cspal = NULL, cpal = NULL, main = NULL,
                       	xlab =  NULL, ylab = NULL, ylim = NULL, 
 												xtlab = NULL, ytlab = NULL,
 												pfilter = NULL,                       	
@@ -9,7 +9,9 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
                        	hide.col = NULL,
                        	lorder = NULL,
 												plot = TRUE,
-                       	verbose = FALSE, ...){
+                       	verbose = FALSE, title,...){
+
+  TraMineR.check.depr.args ( alist ( main = title ) )
 
 	###
   ### Check Arguments
@@ -272,7 +274,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
   
   # TITLE
   
-  if ( is.null ( title ) ) {
+  if ( is.null ( main ) ) {
 
 		if ( type == "hidden" ) {
       
@@ -294,9 +296,9 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
     
   }
   
-  else if ( ! is.null ( title ) ) {
+  else if ( ! is.null ( main ) ) {
     
-    ttl <- title
+    ttl <- main
     
   }
   
@@ -419,7 +421,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
   }
 
 	#	seqpcplot	
-	a <- seqpcplot ( seqdata = s, title = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
+	a <- seqpcplot ( seqdata = s, main = ttl, ylab = ylb, xlab = xlb, hide.col = hide.col, lorder = lordr,
          order.align="time", ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose, plot = FALSE, ...) 
 
 	# ytlab

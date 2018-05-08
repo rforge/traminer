@@ -1,7 +1,7 @@
 #'@keywords internal
 trmatplot.hmm <- function (d, seed = NULL, 
 													rowconstraint = TRUE, morder = 1,
-													cspal = NULL, cpal = NULL, title = NULL,
+													cspal = NULL, cpal = NULL, main = NULL,
                 	       	xlab =  NULL, ylab = NULL, ylim = NULL, 
 													xtlab = NULL, ytlab = NULL,
                       		pfilter = NULL,
@@ -10,13 +10,15 @@ trmatplot.hmm <- function (d, seed = NULL,
                        		hide.col = NULL,
                        		lorder = NULL,
 													plot = TRUE,
-                       		verbose = FALSE, ...){
+                       		verbose = FALSE, title, ...){
+
+	TraMineR.check.depr.args ( alist ( main = title ) )
 
   d <- d $ transition_probs
  
    trmatplot.default ( d = d, seed = seed, 
 											rowconstraint = rowconstraint, morder = morder,
-											cspal = cspal, cpal = cpal, title = title, 
+											cspal = cspal, cpal = cpal, main = main, 
 											xlab = xlab, ylab = ylab, ylim = ylim, 
 											xtlab = xtlab, ytlab = ytlab,
                       pfilter = pfilter,

@@ -12,11 +12,11 @@ A coordinate plot which maps each element in the probability transition matrix a
 ## S3 method for classes 'matrix', 'array', 'depmix.fitted', and 'hmm'
 
 trmatplot ( d, seed = NULL, rowconstraint = TRUE, morder = 1,
-cspal = NULL, cpal = NULL, title = NULL, 
+cspal = NULL, cpal = NULL, main = NULL, 
 xlab = NULL, ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL,
 pfilter = NULL, shade.col = "grey80", num = 1, 
 hide.col = NULL, lorder = NULL, plot = TRUE, 
-verbose = FALSE, ...)
+verbose = FALSE, title, ...)
 }
 \arguments{
 
@@ -32,7 +32,7 @@ verbose = FALSE, ...)
 
 	\item{cpal}{Color palette vector when coloring probability sequences. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
 
-	\item{title}{Title for the graphic. Default is \emph{Probability Transition Matrix}.}
+	\item{main}{Title for the graphic. Default is \emph{Probability Transition Matrix}.}
 
 	\item{xlab}{Label for the x axis. Default is \emph{Time}.}
 
@@ -57,6 +57,8 @@ verbose = FALSE, ...)
 	\item{plot}{Logical. Should the object be plotted. Default is \code{TRUE}.}
 
 	\item{verbose}{Logical. Reports extra information on progress. Default is \code{FALSE}.}
+
+	\item{title}{Deprecated. Use \code{main} instead.}
 
 	\item{...}{Additional arguments, such as graphical parameters, to be passed on. See \command{\link[graphics]{par}} and \command{\link[TraMineR]{seqpcplot}}.}
 }

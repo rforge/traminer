@@ -1,7 +1,7 @@
 #'@keywords internal
 trmatplot.array <- function (d, seed = NULL, 
 													rowconstraint = TRUE, morder = 1,
-													cspal = NULL, cpal = NULL, title = NULL,
+													cspal = NULL, cpal = NULL, main = NULL,
                 	       	xlab =  NULL, ylab = NULL, ylim = NULL, 
 													xtlab = NULL, ytlab = NULL,
                       		pfilter = NULL,
@@ -10,7 +10,7 @@ trmatplot.array <- function (d, seed = NULL,
                        		hide.col = NULL,
                        		lorder = NULL,
 													plot = TRUE,
-                       		verbose = FALSE, ...){
+                       		verbose = FALSE, title, ...){
 
 	##CHECK
   # M by M matrix
@@ -21,11 +21,14 @@ trmatplot.array <- function (d, seed = NULL,
 
 
  # d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
-	d <- as.matrix (d) 
 
+	TraMineR.check.depr.args ( alist ( main = title ) )
+	
+	d <- as.matrix (d) 
+	
   trmatplot.default ( d = d, seed = seed, 
 											rowconstraint = rowconstraint, morder = morder,
-											cspal = cspal, cpal = cpal, title = title, 
+											cspal = cspal, cpal = cpal, main = main, 
 											xlab = xlab, ylab = ylab, ylim = ylim, 
 											xtlab = xtlab, ytlab = ytlab,
                       pfilter = pfilter,
@@ -34,6 +37,6 @@ trmatplot.array <- function (d, seed = NULL,
                       hide.col = hide.col,
                       lorder = lorder,
 											plot = plot,
-                      verbose = verbose, ... )
+                      verbose = verbose, title, ... )
 
 }
