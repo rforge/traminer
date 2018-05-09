@@ -9,9 +9,8 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
                        	hide.col = NULL,
                        	lorder = NULL,
 												plot = TRUE,
-                       	verbose = FALSE, title,...){
+                       	verbose = FALSE, ...){
 
-  TraMineR.check.depr.args ( alist ( main = title ) )
 
 	###
   ### Check Arguments

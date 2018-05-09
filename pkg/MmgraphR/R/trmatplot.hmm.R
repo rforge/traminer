@@ -10,9 +10,8 @@ trmatplot.hmm <- function (d, seed = NULL,
                        		hide.col = NULL,
                        		lorder = NULL,
 													plot = TRUE,
-                       		verbose = FALSE, title, ...){
+                       		verbose = FALSE, ...){
 
-	TraMineR.check.depr.args ( alist ( main = title ) )
 
   d <- d $ transition_probs
  

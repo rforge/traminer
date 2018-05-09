@@ -1,3 +1,6 @@
+08.05.2018
+° 'title' argument is deprecated, so functions + documentation updated for 'main' argument
+
 07.05.2018
 ° method trmatplot now exported for ojects of class "hmm"
 

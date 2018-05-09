@@ -10,7 +10,7 @@ trmatplot.array <- function (d, seed = NULL,
                        		hide.col = NULL,
                        		lorder = NULL,
 													plot = TRUE,
-                       		verbose = FALSE, title, ...){
+                       		verbose = FALSE, ...){
 
 	##CHECK
   # M by M matrix
@@ -22,7 +22,6 @@ trmatplot.array <- function (d, seed = NULL,
 
  # d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
 
-	TraMineR.check.depr.args ( alist ( main = title ) )
 	
 	d <- as.matrix (d) 
 	

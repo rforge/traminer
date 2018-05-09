@@ -15,7 +15,7 @@ march.Dcmm.trmatplot ( d, seed = NULL, type = "hidden", hstate = 1,
 cspal = NULL, cpal = NULL, main = NULL, xlab = NULL,
 ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL, 
 pfilter = NULL, shade.col = "grey80", num = 1, hide.col = NULL, 
-lorder = NULL, plot = TRUE, verbose = FALSE, title, ...)
+lorder = NULL, plot = TRUE, verbose = FALSE, ...)
 }
 \arguments{
 	\item{d}{Object to be plotted. A \code{march.Dcmm} object.}
@@ -26,7 +26,7 @@ lorder = NULL, plot = TRUE, verbose = FALSE, title, ...)
 
 	\item{hstate}{Numeric. Valid when \code{type = "visible"}. Specifies from which hidden state the (visible) probability transition matrix should be plotted. Default \code{hstate = 1}.}
 
-	\item{cspal}{A color palette that can be specified as one of: \code{"dynamic", "harmonic", "cold", "warm", "heat", "terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes. See Examples in \command{\link{trmatplot}}.
+	\item{cspal}{A color palette that can be specified as one of:  \code{"dynamic"}, \code{"harmonic"}, \code{"cold"}, \code{"warm", "heat"}, \code{"terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes. See Examples in \command{\link{trmatplot}}.
 }
 
 	\item{cpal}{Color palette vector when coloring probability sequences. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
@@ -43,7 +43,7 @@ lorder = NULL, plot = TRUE, verbose = FALSE, title, ...)
 
 	\item{ytlab}{Labels for the y axis ticks.}
 
-	\item{pfilter}{Probability filter. Can be specified as one of \code{"tmax", "tmin", "smax", "smin"}. See Details.}
+	\item{pfilter}{Probability filter. Can be specified as one of  \code{"tmax"}, \code{"tmin"}, \code{"smax"}, \code{"smin"}. See Details.}
 
 	\item{shade.col}{The color for sequences shaded out using the \code{pfilter} argument. Default is \code{"grey80"}. See Details.}
 
@@ -56,8 +56,6 @@ lorder = NULL, plot = TRUE, verbose = FALSE, title, ...)
 	\item{plot}{Logical. Should the object be plotted. Default is \code{TRUE}.}
 	
 	\item{verbose}{Logical. Reports extra information on progress. Default is \code{FALSE}.}
-
-	\item{title}{Deprecated. Use \code{main} instead.}
 
 	\item{...}{Additional arguments, such as graphical parameters, to be passed on. See \command{\link[graphics]{par}} and \command{\link[TraMineR]{seqpcplot}}.}
 }

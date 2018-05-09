@@ -10,9 +10,8 @@ trmatplot.depmix.fitted <- function (d, seed = NULL,
                        		hide.col = NULL,
                        		lorder = NULL,
 													plot = TRUE,
-                       		verbose = FALSE, title, ...){
+                       		verbose = FALSE, ...){
 
-	TraMineR.check.depr.args ( alist ( main = title ) )
 
   d <- trmat.depmix.fitted ( d )
  
