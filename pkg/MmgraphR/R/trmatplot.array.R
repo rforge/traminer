@@ -36,6 +36,6 @@ trmatplot.array <- function (d, seed = NULL,
                       hide.col = hide.col,
                       lorder = lorder,
 											plot = plot,
-                      verbose = verbose, title, ... )
+                      verbose = verbose, ... )
 
 }
