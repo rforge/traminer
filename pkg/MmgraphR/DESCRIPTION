@@ -10,7 +10,7 @@ Authors@R: c( person("Pauline (Poulcheria)", "Adamopoulou", role = c("aut",
     person ("Reto", "Buergin", role = c("ctb"), email = "rbuergin@gmx.ch"))
 Maintainer: Pauline (Poulcheria) Adamopoulou <padamopo@gmail.com>
 Description: Produces parallel coordinate plots of probability transition matrices from Markov, hidden Markov, and mixture transition distribution models.
-Depends: R(>= 3.4.4), TraMineR, colorspace
+Depends: R(>= 3.2.2), TraMineR, colorspace
 Imports: march
 License: GPL(>= 2)
 LazyData: true
