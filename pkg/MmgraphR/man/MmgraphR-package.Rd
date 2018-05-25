@@ -14,18 +14,12 @@ Additional functionalities of MmgraphR include probability filters that can easi
 \tabular{ll}{
 Package: \tab MmgraphR\cr
 Version: \tab 0.2\cr
-Date: \tab 2018-05-03\cr
+Date: \tab 2018-05-25\cr
 Depends: \tab R (>= 3.1.1), TraMineR, colorspace\cr
 License: \tab GPL (>= 2)\cr
 LazyData: \tab true\cr
 URL: \tab https://r-forge.r-project.org/R/?group_id=743\cr
 Encoding: \tab latin1\cr
-}
-Index:
-\preformatted{
-MmgraphR-package        Graphing for Markov, Hidden Markov, and Mixture Transition Distribution Models
-trmatplot               parallel coordinate plot for a probability transition matrix
-march.Dcmm.trmatplot		parallel coordinate plot for a march.Dcmm object
 }
 }
 \author{
@@ -47,38 +41,38 @@ Maintainer: Pauline (Poulcheria) Adamopoulou <padamopo@gmail.com>
 ## Plotting a probability transition matrix
 ###########################################
 
-trmat<-matrix( c (0.1, 0.05, 0.05, 0.80,
+trMat<-matrix( c (0.1, 0.05, 0.05, 0.80,
                   0.06, 0.02, 0.03, 0.89,
                   0.03, 0.01, 0.01, 0.95,
                   0, 0, 0, 1), nrow = 4, ncol = 4, byrow = TRUE)
 
-trmatplot(trmat)
+trmatplot(trMat)
 
 #--- Setting a seed so that the graphic can be replicated
 
-trmatplot(trmat, seed = 2)
+trmatplot(trMat, seed = 2)
 
 # cspal: ready-to-use color palettes using colorspace
 #####################################################
 
 #--- Color palette "dynamic"
 
-trmatplot(trmat, seed = 2, cspal = "dynamic")
+trmatplot(trMat, seed = 2, cspal = "dynamic")
 
 #--- Color palette "harmonic"
 
-trmatplot(trmat, seed = 2, cspal = "harmonic")
+trmatplot(trMat, seed = 2, cspal = "harmonic")
 
 ## pfilter: Filtering out most (or least) probable sequences
 ############################################################
 
 #--- The most probable sequence given a state
 
-trmatplot(trmat, seed = 2, pfilter = "smax")
+trmatplot(trMat, seed = 2, pfilter = "smax")
 
 #--- The ten least probable sequences
 
-trmatplot(trmat, seed = 2, pfilter = "tmin", num = 10 )
+trmatplot(trMat, seed = 2, pfilter = "tmin", num = 10 )
 }
 \seealso{
 	\command{\link{trmatplot}},  

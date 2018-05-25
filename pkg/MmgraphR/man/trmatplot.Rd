@@ -28,9 +28,9 @@ verbose = FALSE, ...)
 
 	\item{morder}{Numeric. The order of the probability transition matrix, \code{d}, to be plotted. Default is 1.}
 
-	\item{cspal}{A color palette that can be specified as one of: \code{"dynamic"}, \code{"harmonic"}, \code{"cold"}, \code{"warm", "heat"}, \code{"terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes.}
+	\item{cspal}{A color palette that can be specified as one of: \code{"dynamic"}, \code{"harmonic"}, \code{"cold"}, \code{"warm"}, \code{"heat"}, or \code{"terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
 
-	\item{cpal}{Color palette vector when coloring probability sequences. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
+	\item{cpal}{Color palette vector when coloring probability sequences. Cannot specify both \code{cspal} and \code{cpal}.}
 
 	\item{main}{Title for the graphic. Default is \emph{Probability Transition Matrix}.}
 
@@ -94,20 +94,20 @@ The four options for \code{pfilter} are described below, and are illustrated in 
 # Plotting a probability transition matrix
 ##########################################
 
-trmat<-matrix( c (0.1, 0.05, 0.05, 0.80,
+trMat<-matrix( c (0.1, 0.05, 0.05, 0.80,
                   0.06, 0.02, 0.03, 0.89,
                   0.03, 0.01, 0.01, 0.95,
                   0, 0, 0, 1), nrow = 4, ncol = 4, byrow = TRUE)
 
-trmatplot(trmat)
+trmatplot(trMat)
 
 #--- Setting a seed so that the graphic can be replicated
 
-trmatplot(trmat, seed = 2)
+trmatplot(trMat, seed = 2)
 
 #--- Adjusting line width
 
-trmatplot(trmat, seed = 2, lwd = 0.8)
+trmatplot(trMat, seed = 2, lwd = 0.8)
 
 
 ###########################################################
@@ -116,27 +116,27 @@ trmatplot(trmat, seed = 2, lwd = 0.8)
 
 #--- Color palette "dynamic"
 
-trmatplot(trmat, seed = 2, cspal = "dynamic")
+trmatplot(trMat, seed = 2, cspal = "dynamic")
 
 #--- Color palette "harmonic"
 
-trmatplot(trmat, seed = 2, cspal = "harmonic")
+trmatplot(trMat, seed = 2, cspal = "harmonic")
 
 #--- Color palette "cold"
 
-trmatplot(trmat, seed = 2, cspal = "cold")
+trmatplot(trMat, seed = 2, cspal = "cold")
 
 #--- Color palette "warm"
 
-trmatplot(trmat, seed = 2, cspal = "warm")
+trmatplot(trMat, seed = 2, cspal = "warm")
 
 #--- Color palette "heat"
 
-trmatplot(trmat, seed = 2, cspal = "heat")
+trmatplot(trMat, seed = 2, cspal = "heat")
 
 #--- Color palette "terrain"
 
-trmatplot(trmat, seed = 2, cspal = "terrain")
+trmatplot(trMat, seed = 2, cspal = "terrain")
 
 ###########################################################
 # pfilter: Filtering out most (or least) probable sequences
@@ -144,19 +144,19 @@ trmatplot(trmat, seed = 2, cspal = "terrain")
 
 #--- The most probable sequence given a state
 
-trmatplot(trmat, seed = 2, pfilter = "smax")
+trmatplot(trMat, seed = 2, pfilter = "smax")
 
 #--- The least probable sequence given a state
 
-trmatplot(trmat, seed = 2, pfilter = "smin")
+trmatplot(trMat, seed = 2, pfilter = "smin")
 
 #--- The two most probable sequnces
 
-trmatplot(trmat, seed = 2, pfilter = "tmax", num = 2 )
+trmatplot(trMat, seed = 2, pfilter = "tmax", num = 2 )
 
 #--- The ten least probable sequences
 
-trmatplot(trmat, seed = 2, pfilter = "tmin", num = 10 )
+trmatplot(trMat, seed = 2, pfilter = "tmin", num = 10 )
 
 ######################################################
 # filter: Highlighting a specific sequence of interest
@@ -164,7 +164,7 @@ trmatplot(trmat, seed = 2, pfilter = "tmin", num = 10 )
 
 #--- Highlight the probability that a sequence is initially in state 1 and then in state 4
 
-trmatplot(trmat, seed = 2, filter = list(type = "sequence", value = "(1)-(4)"))
+trmatplot(trMat, seed = 2, filter = list(type = "sequence", value = "(1)-(4)"))
 }
 \author{
 Pauline Poulcheria Adamopoulou
