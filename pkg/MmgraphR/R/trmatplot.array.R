@@ -23,7 +23,7 @@ trmatplot.array <- function (d, seed = NULL,
  # d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
 
 	
-	d <- as.matrix (d) 
+	d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ), byrow = TRUE)
 	
   trmatplot.default ( d = d, seed = seed, 
 											rowconstraint = rowconstraint, morder = morder,
