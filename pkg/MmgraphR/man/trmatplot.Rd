@@ -26,7 +26,7 @@ verbose = FALSE, ...)
 
 	\item{rowconstraint}{Logical. Checks if the row constraint is satisfied, i.e. the sum of each row of the transition probability matrix equals one. Default is \code{TRUE}.}
 
-	\item{morder}{Numeric. The order of the probability transition matrix, \code{d}, to be plotted. Default is 1.}
+	\item{morder}{Numeric. The order of the probability transition matrix, \code{d}, to be plotted. Default is 1. See Details.}
 
 	\item{cspal}{A color palette that can be specified as one of: \code{"dynamic"}, \code{"harmonic"}, \code{"cold"}, \code{"warm"}, \code{"heat"}, or \code{"terrain"}. The \command{\link[colorspace]{rainbow_hcl}}, \command{\link[colorspace]{heat_hcl}}, and \command{\link[colorspace]{terrain_hcl}} commands are used to generate color palettes. The \command{\link[colorspace]{rainbow_hcl}} command is used to generate  a color palette if none is specified.}
 
@@ -70,6 +70,8 @@ The object \code{d} to be plotted, is a probability matrix which, when of class 
 
 Setting a \code{seed} allows the graphic to be replicated.
 
+If \code{morder > 1}, in other words, the order of the probability transition matrix \code{d} is of order greater than one, then \code{d} must be specified in reduced form. Structural zeroes are not accepted.
+
 The \code{pfilter} argument serves to highlight probability sequences that are either most probable while shading out those that are less probable in \code{shade.col} and vice-versa.
 The four options for \code{pfilter} are described below, and are illustrated in Examples.
 \describe{
@@ -109,6 +111,14 @@ trmatplot(trMat, seed = 2)
 
 trmatplot(trMat, seed = 2, lwd = 0.8)
 
+#--- Defining a second order probability transition matrix as an array
+trMatArray <- ( array( c (
+									0.30, 0.70,
+                  0.65, 0.35, 
+									0.05, 0.95,
+                  0.99, 0.01), dim = c( 1, 2 , 4)) )
+
+trmatplot (trMatArray, seed = 4, morder = 2, lwd = 0.5)
 
 ###########################################################
 # cspal: ready-to-use color palettes using colorspace
@@ -175,7 +185,6 @@ Pauline Poulcheria Adamopoulou
 	Zeileis, A.; Hornik, K. and P. Murrell (2009), "Escaping RGBland: Selecting Colors for Statistical Graphics", \emph{Computational Statistics & Data Analysis}. Vol. 53, pp. 3259-3270.
 }
 \seealso{
-	\command{\link{march.Dcmm.trmatplot}}, 
 	\command{\link[TraMineR]{seqpcplot}}, 
 	\command{\link[graphics]{par}}.
 }
