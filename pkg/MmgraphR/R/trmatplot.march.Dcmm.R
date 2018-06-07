@@ -237,7 +237,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
   
   else if ( ! is.null ( pfilter ) & pfilter == "smin" ) {
     
-    predat <- ismin ( M , l , dt = predat)
+    predat <- is.min ( M , l , dt = predat)
     
     predat <- smin ( M , l , dt = predat , shade.col )
     
@@ -245,7 +245,7 @@ march.Dcmm.trmatplot <- function (d, seed = NULL, type = "hidden", hstate = 1,
   
   else if ( ! is.null ( pfilter ) & pfilter == "smax" ) {
     
-    predat <- ismax ( M , l , dt = predat)
+    predat <- is.max ( M , l , dt = predat)
     
     predat <- smax ( M , l , dt = predat , shade.col )
     

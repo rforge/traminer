@@ -2,7 +2,7 @@ Package: MmgraphR
 Type: Package
 Title: Graphing for Markov, Hidden Markov, and Mixture Transition Distribution Models
 Version: 0.2
-Date: 2018-06-04
+Date: 2018-06-05
 Authors@R: c( person("Pauline (Poulcheria)", "Adamopoulou", role = c("aut",
     "cre", "cph"), email = "padamopo@gmail.com"), person("Gilbert",
     "Ritschard", role = c("ths"), email = "gilbert.ritschard@unige.ch"), person

@@ -1,14 +1,17 @@
 ##'--------------------------------------------------------- #
 ##' Author:          Pauline (Poulcheria) Adamopoulou
 ##' E-Mail:          padamopo@gmail.com
-##' Date:            2018-05-08
+##' Date:            2018-06-05
 ##'
 ##' Description:				New generics for exported methods
 ##' 
 ##'
 ##' Overview:
-##' trmatplot:          parallel coordinate plot for a
-##'											probability transition matrix		
+##' trmatplot:          	parallel coordinate plot for a
+##'												probability transition matrix	
+##'	
+##'	trmat.depmix.fitted:	extract the probability transition matrix
+##'												from an object of class 'depmix.fitted'
 ##'
 ##' Last modifications:
 ##' 2018-05-08: include argument clustername for objects of class mhmm
@@ -18,7 +21,7 @@
 ##' 2014-11-07: added 'trmatplot' generic
 ##'--------------------------------------------------------- #
 
-trmatplot <- function( d, seed = NULL, rowconstraint = TRUE, morder = 1,
+trmatplot <- function(d, seed = NULL, rowconstraint = TRUE, morder = 1,
 											cspal = NULL, cpal = NULL, main = NULL,
                       xlab =  NULL, ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL,
 											pfilter = NULL, shade.col = "grey80", num = 1,
@@ -27,4 +30,4 @@ trmatplot <- function( d, seed = NULL, rowconstraint = TRUE, morder = 1,
 ##
 # depmix.fitted.trmat
 ##
-trmat.depmix.fitted <- function ( d ) UseMethod("trmat")
+trmat.depmix.fitted <- function(d) UseMethod("trmat")

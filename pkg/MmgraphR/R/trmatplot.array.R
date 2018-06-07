@@ -1,5 +1,5 @@
 #'@keywords internal
-trmatplot.array <- function (d, seed = NULL, 
+trmatplot.array <- function(d, seed = NULL, 
 													rowconstraint = TRUE, morder = 1,
 													cspal = NULL, cpal = NULL, main = NULL,
                 	       	xlab =  NULL, ylab = NULL, ylim = NULL, 
@@ -12,30 +12,25 @@ trmatplot.array <- function (d, seed = NULL,
 													plot = TRUE,
                        		verbose = FALSE, ...){
 
-	##CHECK
-  # M by M matrix
-#	if ( dim ( d ) [ 1 ] == dim ( d ) [ 2 ] )
-  # M by M^l matrix
+	## ----------------------CHECK
+  ## M by M^l matrix
+	if (ncol(d) ^ morder != length(as.numeric(d)) / ncol(d)) {
+		stop("[!] check that 'morder' (the order of the probability transition matrix) is correctly specified")
+	}
 
-#	if ( as.integer ( log ( dim(array, base= 2))==(log(8,base=2))
-
-
- # d <- matrix ( d, nrow = ( dim ( d )[ 1 ] ), ncol = ( dim ( d )[ 2 ] ))
-
+	## ----------------------PREPARE
+	d <- matrix(as.numeric(d), nrow = ncol(d)^morder, ncol = ncol(d), byrow = TRUE)
 	
-	d <- matrix (as.numeric (d), nrow = ncol (d)^morder, ncol = ncol(d), byrow = TRUE)
-	
-  trmatplot.default ( d = d, seed = seed, 
-											rowconstraint = rowconstraint, morder = morder,
-											cspal = cspal, cpal = cpal, main = main, 
-											xlab = xlab, ylab = ylab, ylim = ylim, 
-											xtlab = xtlab, ytlab = ytlab,
-                      pfilter = pfilter,
-                      shade.col = shade.col,
-                      num = num,
-                      hide.col = hide.col,
-                      lorder = lorder,
-											plot = plot,
-                      verbose = verbose, ... )
-
+  trmatplot.default(d = d, seed = seed, 
+										rowconstraint = rowconstraint, morder = morder,
+										cspal = cspal, cpal = cpal, main = main, 
+										xlab = xlab, ylab = ylab, ylim = ylim, 
+										xtlab = xtlab, ytlab = ytlab,
+                    pfilter = pfilter,
+                    shade.col = shade.col,
+                    num = num,
+                    hide.col = hide.col,
+                    lorder = lorder,
+										plot = plot,
+                    verbose = verbose, ...)
 }
