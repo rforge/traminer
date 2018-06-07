@@ -12,7 +12,7 @@ trmatplot.default <- function(d, seed = NULL,
 											plot = TRUE,
                       verbose = FALSE, ...) {
   if (verbose)
-  	cat(" [>] check arguments\n")
+  	cat(" [>] initial argument check\n")
 
 	##
 	## class  
@@ -77,7 +77,7 @@ trmatplot.default <- function(d, seed = NULL,
     }
   }
 	##
-	## pfilter 
+	## pfilter num
 	if (!is.null(pfilter)) {
 		if (!(pfilter %in% c("smax", "smin", "tmax", "tmin"))) {
 			stop("[!] pfilter must be specified as one of: smax, smin, tmax or tmin")
@@ -106,106 +106,101 @@ trmatplot.default <- function(d, seed = NULL,
   if (is.null(cpal)) {
     if (is.null(cspal)) {
       cpl <- rainbow_hcl(M, c = 80, l = 65, start = 0, end = 360 * (M - 1) / M) # cite: colorspace:::rainbow_hcl
-    } else if (!is.null(cspal) & cspal == "dynamic") {
-			cpl <- rainbow_hcl(M, c = 80, l = 60, start = 120, end = 390) # cite: colorspace:::rainbow_hcl 
-    } else if (!is.null(cspal) & cspal == "harmonic") {
-      cpl <- rainbow_hcl(M , c = 80, l = 60, start = 60, end = 240) # cite: colorspace:::rainbow_hcl    
-    } else if (!is.null(cspal) & cspal == "cold") {
-      cpl <- rainbow_hcl(M, c = 80, l = 60, start = 270, end = 150) # cite: colorspace:::rainbow_hcl
-    } else if (!is.null(cspal) & cspal == "warm") {
-			cpl <-rainbow_hcl(M, c = 80, l = 60, start = 90, end = -30) # cite: colorspace:::rainbow_hcl
-    } else if (!is.null(cspal) & cspal == "heat") {
-      cpl <- heat_hcl(M, h = c(0, 90), c. = c(100, 100), l = 50, power = c(1/M, 1))  # cite: colorspace:::heat_hcl
-    } else if (!is.null(cspal) & cspal == "terrain") {
-			cpl <- terrain_hcl(M, h = c(130, 0), c = c(100, 30), l = 50, power = c(1/M, 1)) # cite: colorspace:::terrain_hcl
-    }
-  } else {
-    cpl <- cpal
-  }
+    } else {
+			if (cspal == "dynamic") { 
+				cpl <- rainbow_hcl(M, c = 80, l = 60, start = 120, end = 390) # cite: colorspace:::rainbow_hcl 
+    	} else if (cspal == "harmonic") {
+    	  cpl <- rainbow_hcl(M , c = 80, l = 60, start = 60, end = 240) # cite: colorspace:::rainbow_hcl    
+    	} else if (cspal == "cold") {
+     		cpl <- rainbow_hcl(M, c = 80, l = 60, start = 270, end = 150) # cite: colorspace:::rainbow_hcl
+    	} else if (cspal == "warm") {
+				cpl <-rainbow_hcl(M, c = 80, l = 60, start = 90, end = -30) # cite: colorspace:::rainbow_hcl
+    	} else if (cspal == "heat") {
+     		cpl <- heat_hcl(M, h = c(0, 90), c. = c(100, 100), l = 50, power = c(1/M, 1))  # cite: colorspace:::heat_hcl
+    	} else if (cspal == "terrain") {
+				cpl <- terrain_hcl(M, h = c(130, 0), c = c(100, 30), l = 50, power = c(1/M, 1)) # cite: colorspace:::terrain_hcl
+    	}
+		}
+	} else {
+	  cpl <- cpal
+	}
   
   ch <- rep(c(cpl), M ^ (l - 1), each = M) # color from first time period
-  
   #ch <- rep( c(cpl), M ^ (l)) # color from last time period
-  
   predat <- data.frame(w = w, ch = ch, s = st)
-  
   predat <- predat[order(predat$s), ] # order by seq name, i.e. state
   
   if (is.null(pfilter)) {
     predat <- predat
-  } else if (!is.null(pfilter) & pfilter == "smin") {
-    predat <- is.min(M, l, dt = predat)
-    predat <- smin(M, l, dt = predat, shade.col)
-  } else if (!is.null(pfilter) & pfilter == "smax") {
-    predat <- is.max(M, l, dt = predat)
-    predat <- smax(M, l, dt = predat, shade.col)
-  } else if (!is.null(pfilter) & pfilter == "tmax") {
-    predat <- tmax(M, l, dt = predat, shade.col, num = num)
-  } else if (!is.null(pfilter) & pfilter == "tmin") {
-    predat <- tmin(M, l, dt = predat, shade.col, num = num)
-  }
+  } else {
+		if (pfilter == "smin") {
+    	predat <- is.min(M, l, dt = predat)
+    	predat <- smin(M, l, dt = predat, shade.col)
+  	} else if (pfilter == "smax") {
+    	predat <- is.max(M, l, dt = predat)
+    	predat <- smax(M, l, dt = predat, shade.col)
+  	} else if (pfilter == "tmax") {
+    	predat <- tmax(M, l, dt = predat, shade.col, num = num)
+  	} else if (pfilter == "tmin") {
+    	predat <- tmin(M, l, dt = predat, shade.col, num = num)
+  	}
+	}
   
   dat <- data.frame(w = as.vector(predat$w),
                     ch = as.vector(predat$ch), 
                     s = as.vector( predat$s))
-  
   dat <- dat[order(dat$s), ] # order by seq name
-  
   dat <- dat[order(dat$w, decreasing = TRUE), ]
   
-  # TITLE
-  
-	if (is.null(main)) {
+  # main TITLE
+  if (is.null(main)) {
 		ttl <- "Probability Transition Matrix"
-	} else if (!is.null(main)) {
+	} else {
     ttl <- main
   }
   
-  
-  # title
-  
+  # xlab
   if (is.null(xlab)) {
     xlb <- "Time"
-  } else if (!is.null(xlab)) {
+  } else {
     xlb <- xlab
 	}
   
   # ylab
-  
-	if (is.null(ylab)) {
+  if (is.null(ylab)) {
 		ylb <- "States"
-	} else if (!is.null(ylab)) {
+	} else {
     ylb <- ylab
   }
   
   # ylim    
-  
-	if (is.null(ylim)) {
+  if (is.null(ylim)) {
 		ylm <- c(0.5, (M + 0.5))
-	} else if (!is.null(ylim)) {
+	} else {
 		ylm <- ylim
 	}
   
   
   # xtlab
-  
   if (is.null(xtlab)) {
     #xt <- c(0:(M-l))
     #xt <- c(c((-l):0)) # number backwards
     xt <- c(c(1:l)) # number forwards
     xt <- paste("t +", xt)
     xt <- c("t", xt) 
-  } else if (!is.null(xtlab)) {
+  } else {
 		xt <- xtlab
 	}
   # alphabet: labeling the y-axis ticks with the visible states (or why not even the hidden states?)
   # yt <-d @ y @ dictionary
-  # hide.col
+  
+	# hide.col
   if (!is.null (pfilter) & !is.null (hide.col)) {
 		hd.col <- hide.col
-	} else{
+	} else {
   	hide.col <- shade.col
   }
+
   # foreground / background
   if (!is.null(pfilter)) {
 		if (pfilter %in% c("smax", "tmax")) {
@@ -213,16 +208,16 @@ trmatplot.default <- function(d, seed = NULL,
     } else if (pfilter %in% c("smin", "tmin")) {
       lordr <- "background"
     }
-	} else if (is.null(pfilter)) {
+	} else {
 		lordr <- NULL
 	}
+
 	#	seqpcplot	
 	a <- seqpcplot(seqdata = s, main = ttl, ylab = ylb, xlab = xlb,
 									hide.col = hide.col, lorder = lordr, order.align = "time",
 									ylim = ylm, cpal= dat$ch, xtlab = xt, verbose = verbose,
 									plot = FALSE, ...) 
 	# ytlab
-
 	if (!is.null(ytlab)) {
 		a$ylevs <- ytlab
 	} else {
@@ -238,17 +233,18 @@ trmatplot.default <- function(d, seed = NULL,
 											num = num), class = "trmatplot")
 
 	#	aggregate list of arguments
-	rval <- structure(list(plot = a, trmatplot = b, seed = seed, verbose = verbose), 
-														class = "trmatplot")
+	rval <- structure(list(plot = a, 
+												 trmatplot = b,
+												 seed = seed,
+												 verbose = verbose), class = "trmatplot")
 
 	#	plot
-
 	if (plot == TRUE) {
-		plot (a)
+		plot(a)
 	} else {
-		return (rval)
+		return(rval)
 	}
 	
 	## DATA
-  invisible (rval)
+  invisible(rval)
 }
