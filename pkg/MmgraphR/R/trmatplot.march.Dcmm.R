@@ -5,7 +5,7 @@ march.Dcmm.trmatplot <- function(d, seed = NULL, type = "hidden", hstate = 1,
 												xtlab = NULL, ytlab = NULL,
 												pfilter = NULL,                       	
 												shade.col = "grey80",
-                       	num = 1,
+                       	num = NULL,
                        	hide.col = NULL,
                        	lorder = NULL,
 												plot = TRUE,
@@ -56,35 +56,54 @@ march.Dcmm.trmatplot <- function(d, seed = NULL, type = "hidden", hstate = 1,
 	##
   ## cspal  
   if (!is.null(cspal)) {
-		if (!cspal %in% c("dynamic", "harmonic", "cold", "warm", "heat", "terrain")) {
-			stop("[!] cspal must be specified as one of: dynamic, harmonic, cold, warm, heat, terrain")
+		if (length(cspal) > 1 | !cspal %in% c("dynamic", "harmonic", "cold", "warm", "heat", "terrain")) {
+			stop("[!] cspal is an argument of length one and must be specified as one of: dynamic, harmonic, cold, warm, heat, terrain")
     }
     if (!is.null(cpal)) {
       stop("[!] only one of cpal or cspal can be specified as non-null")
 		}
 	}
       
-  ##
-  ## pfilter
-
-  if (!is.null(pfilter)) {
-		if (!(pfilter %in% c("smax", "smin", "tmax", "tmin"))) {
-    	stop("[!] pfilter must be specified as one of: smax, smin, tmax or tmin")
-    }
-  	if (!is.numeric(num)) {
-    	stop("[!] num must be numeric")
-    }
-	  if (type == "visible" & !is.element(num, c(0:(d@y@K ^ (d@orderVC + 1))))) {
-			if (pfilter == "tmin" | pfilter == "tmax") {        
-    		stop("[!] num must be an element of the set of visible sequences")
-      }
+	##
+	## pfilter 
+	if (is.null(pfilter)) {
+		if (!is.null(num)) {
+			stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")	
 		}
-	  if (type == "hidden" & !is.element (num, c(0:(d@M ^ (d@orderHC + 1))))) {
-			if (pfilter == "tmin" | pfilter == "tmax") {
-	    	stop("[!] num must be an element of the set of hidden sequences")
+	} else { # !is.null(pfilter)
+		if (length(pfilter) > 1) {
+			stop("[!] pfilter is an argument of length one. If non-null pfilter must be specified one of: smax, smin, tmax or tmin")
+		} 
+		
+		if (!pfilter %in% c("smax", "smin", "tmax", "tmin")) {
+			stop("[!] pfilter must be specified as one of: smax, smin, tmax or tmin")
+		}
+		# num  
+		if (!pfilter %in% c("tmax", "tmin")) {
+			if (!is.null(num)) {
+				stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")		
+			}	
+		} else if (pfilter %in% c("tmax", "tmin")) {
+			if (is.null(num)) {
+				stop(paste("[!] num must be specified as a whole number, in this case between 1 and ", length(d) - 1, " when pfilter is specified as either tmax or tmin",sep = ""))
+			} else {
+				if (length(num) > 1 | !is.numeric(num)) {
+  				stop(paste("[!] num is a numeric argument of length one. num must specified as a whole number,in this case between 1 and ", length(d) - 1, " when pfilter is specified as either tmax or tmin", sep = ""))
+  			} 
+				if (type == "visible") {
+					if (is.null(num) | !is.element(num, c(0:(d@y@K ^ (d@orderVC + 1))))) {
+    				stop(paste("[!] num must be specified as a whole number, in this case, between 0 and ", d@y@K ^ (d@orderVC + 1), " when pfilter is specified as either tmax or tmin", sep = ""))
+					}
+				} else if (type == "hidden") {
+					if (is.null(num) | !is.element (num, c(0:(d@M ^ (d@orderHC + 1))))) {
+    				stop(paste("[!] num must be specified as a whole number, in this case, between 0 and ", d@M ^ (d@orderHC + 1), " when pfilter is specified as either tmax or tmin", sep = ""))
+					}
+				}
 			}
 		}
-	}
+	} 
+
+
 
 	###
   ### Create matrix

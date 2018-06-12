@@ -14,7 +14,7 @@ A coordinate plot which maps each element in the probability transition matrix a
 march.Dcmm.trmatplot ( d, seed = NULL, type = "hidden", hstate = 1,
 cspal = NULL, cpal = NULL, main = NULL, xlab = NULL,
 ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL, 
-pfilter = NULL, shade.col = "grey80", num = 1, hide.col = NULL, 
+pfilter = NULL, shade.col = "grey80", num = NULL, hide.col = NULL, 
 lorder = NULL, plot = TRUE, verbose = FALSE, ...)
 }
 \arguments{
@@ -47,7 +47,7 @@ lorder = NULL, plot = TRUE, verbose = FALSE, ...)
 
 	\item{shade.col}{The color for sequences shaded out using the \code{pfilter} argument. Default is \code{"grey80"}. See Details.}
 
-	\item{num}{Numeric. The number of sequences to be highlighted. Only applicable when using \code{pfilter="tmax"} or \code{pfilter="tmin"}. Default is 1.}
+	\item{num}{Numeric. The number of sequences to be highlighted, a whole number from 1 to \code{length(d) - 1}. Must be specified only  when using \code{pfilter="tmax"} or \code{pfilter="tmin"}. Default is NULL.}
 
 	\item{hide.col}{The color for sequences shaded out using the \code{filter} argument. Default is \code{"grey80"}. See Details.}
 

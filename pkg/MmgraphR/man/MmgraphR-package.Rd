@@ -14,7 +14,7 @@ Additional functionalities of MmgraphR include probability filters that can easi
 \tabular{ll}{
 Package: \tab MmgraphR\cr
 Version: \tab 0.2\cr
-Date: \tab 2018-06-05\cr
+Date: \tab 2018-06-12\cr
 Depends: \tab R (>= 3.1.1), TraMineR, colorspace\cr
 License: \tab GPL (>= 2)\cr
 LazyData: \tab true\cr
@@ -60,7 +60,9 @@ trMatArray <- ( array( c (
 									0.05, 0.95,
                   0.99, 0.01), dim = c( 1, 2 , 4)) )
 
-trmatplot (trMatArray, seed = 4, morder = 2, lwd = 0.5)
+#--- Plotting with user-defined colors
+
+trmatplot(trMatArray, seed = 3, morder = 2, cpal = c( "grey40", "grey70"))
 
 # cspal: ready-to-use color palettes using colorspace
 #####################################################

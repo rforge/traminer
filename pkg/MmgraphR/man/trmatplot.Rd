@@ -14,7 +14,7 @@ A coordinate plot which maps each element in the probability transition matrix a
 trmatplot ( d, seed = NULL, rowconstraint = TRUE, morder = 1,
 cspal = NULL, cpal = NULL, main = NULL, 
 xlab = NULL, ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL,
-pfilter = NULL, shade.col = "grey80", num = 1, 
+pfilter = NULL, shade.col = "grey80", num = NULL, 
 hide.col = NULL, lorder = NULL, plot = TRUE, 
 verbose = FALSE, ...)
 }
@@ -48,7 +48,7 @@ verbose = FALSE, ...)
 
 	\item{shade.col}{The color for sequences shaded out using the \code{pfilter} argument. Default is \code{"grey80"}. See Details.}
 
-	\item{num}{Numeric. The number of sequences to be highlighted. Only applicable when using \code{pfilter="tmax"} or \code{pfilter="tmin"}. Default is 1.}
+	\item{num}{Numeric. The number of sequences to be highlighted, a whole number from 1 to \code{length(d) - 1}. Must be specified only  when using \code{pfilter="tmax"} or \code{pfilter="tmin"}. Default is NULL.}
 
 	\item{hide.col}{The color for sequences shaded out using the \code{filter} argument. Default is \code{"grey80"}. See Details.}
 
@@ -112,13 +112,16 @@ trmatplot(trMat, seed = 2)
 trmatplot(trMat, seed = 2, lwd = 0.8)
 
 #--- Defining a second order probability transition matrix as an array
+
 trMatArray <- ( array( c (
 									0.30, 0.70,
                   0.65, 0.35, 
 									0.05, 0.95,
                   0.99, 0.01), dim = c( 1, 2 , 4)) )
 
-trmatplot (trMatArray, seed = 4, morder = 2, lwd = 0.5)
+#--- Plotting with user-defined colors
+
+trmatplot(trMatArray, seed = 3, morder = 2, cpal = c( "grey40", "grey70"))
 
 ###########################################################
 # cspal: ready-to-use color palettes using colorspace

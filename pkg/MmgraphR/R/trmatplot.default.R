@@ -6,7 +6,7 @@ trmatplot.default <- function(d, seed = NULL,
 											xtlab = NULL, ytlab = NULL,
                       pfilter = NULL,
                       shade.col = "grey80",
-                      num = 1,
+                      num = NULL,
                       hide.col = NULL,
                       lorder = NULL,
 											plot = TRUE,
@@ -25,8 +25,8 @@ trmatplot.default <- function(d, seed = NULL,
   if (is.matrix(d)) {
 
 		## morder  
-		if (is.null(morder)) {
-			stop("[!] morder must be numeric, a whole number equal or greater than one") 
+		if (is.null(morder) | length(morder) > 1) {
+			stop("[!] morder is an argument of length one. morder must be numeric, a whole number equal or greater than one") 
 		}	else {
 			if (morder < 1 || !is.wholenumber(morder)) {
 				stop("[!] morder must be numeric, a whole number equal or greater than one")
@@ -60,7 +60,9 @@ trmatplot.default <- function(d, seed = NULL,
 	##
 	## cspal
   if (!is.null(cspal)) {
-		if (!cspal %in% c("dynamic", "harmonic", "cold", "warm", "heat", "terrain")) {
+		if (length(cspal) > 1) {
+			stop("[!] cspal is an argument of length one. If non-null cspal must be specified one of: dynamic, harmonic, cold, warm, heat, terrain")
+		} else if (!cspal %in% c("dynamic", "harmonic", "cold", "warm", "heat", "terrain")) {
       stop("[!] cspal must be specified as one of: dynamic, harmonic, cold, warm, heat, terrain")
     }
   }
@@ -68,7 +70,7 @@ trmatplot.default <- function(d, seed = NULL,
 	## cpal    
   if (!is.null(cpal)) {
     if (is.matrix(d)) {
-      if (length(cpal) != dim(d)[1]) {
+      if (length(cpal) != ncol(d)) {
         stop("[!] number of colors in 'cpal' must equal number of states")
       }
     }
@@ -77,24 +79,41 @@ trmatplot.default <- function(d, seed = NULL,
     }
   }
 	##
-	## pfilter num
-	if (!is.null(pfilter)) {
-		if (!(pfilter %in% c("smax", "smin", "tmax", "tmin"))) {
+	## pfilter 
+	if (is.null(pfilter)) {
+		if (!is.null(num)) {
+			stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")	
+		}
+	} else { # !is.null(pfilter)
+		if (length(pfilter) > 1) {
+			stop("[!] pfilter is an argument of length one. If non-null pfilter must be specified one of: smax, smin, tmax or tmin")
+		} 
+		
+		if (!pfilter %in% c("smax", "smin", "tmax", "tmin")) {
 			stop("[!] pfilter must be specified as one of: smax, smin, tmax or tmin")
 		}
-		if (!is.numeric(num)) {
-  		stop("[!] num must be numeric")
-  	}
-    if (is.matrix(d)) {
-			if (!is.element(num, c(0:(dim(d)[1] * dim(d)[2]) - 1))) {
-				stop("[!] num must be an element of the set (0: matrix size-1)")
-      }
-    }
-	}
-  
+		# num  
+		if (!pfilter %in% c("tmax", "tmin")) {
+			if (!is.null(num)) {
+				stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")		
+			}	
+		} else if (pfilter %in% c("tmax", "tmin")) {
+			if (is.null(num)) {
+				stop(paste("[!] num must be specified as a whole number, in this case between 1 and ", length(d) - 1, " when pfilter is specified as either tmax or tmin",sep = ""))
+			} else {
+				if (length(num) > 1 | !is.numeric(num)) {
+  				stop(paste("[!] num is a numeric argument of length one. num must specified as a whole number,in this case between 1 and ", length(d) - 1, " when pfilter is specified as either tmax or tmin", sep = ""))
+  			} 
+				if (!is.element(num, c(0:(length(d) - 1)))) {
+				stop(paste("[!] num must be specified as a whole number, in this case between 1 and ", length(d) - 1, " when pfilter is specified as either tmax or tmin", sep = ""))
+				}
+			}
+		}
+	} 
+	 
   
  	set.seed(seed)
- 	M  <- dim(d)[2]  
+ 	M  <- ncol(d)  
  	l  <- morder 
 	w  <- d
  	p  <- paths(M, l)

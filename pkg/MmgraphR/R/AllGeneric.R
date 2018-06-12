@@ -24,7 +24,7 @@
 trmatplot <- function(d, seed = NULL, rowconstraint = TRUE, morder = 1,
 											cspal = NULL, cpal = NULL, main = NULL,
                       xlab =  NULL, ylab = NULL, ylim = NULL, xtlab = NULL, ytlab = NULL,
-											pfilter = NULL, shade.col = "grey80", num = 1,
+											pfilter = NULL, shade.col = "grey80", num = NULL,
                       hide.col = NULL, lorder = NULL, plot = TRUE, verbose = FALSE, ...) UseMethod("trmatplot")
 
 ##

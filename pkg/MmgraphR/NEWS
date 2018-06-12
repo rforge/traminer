@@ -1,3 +1,6 @@
+11.06.2018
+° improving code, assuring coherent error messages
+
 04.06.2018
 ° 'd' can be specified as a [reduced-form] higher order transition matrix, even when of class "array"
 
