@@ -137,7 +137,7 @@ trmatplot.default <- function(d, seed = NULL,
     	} else if (cspal == "heat") {
      		cpl <- heat_hcl(M, h = c(0, 90), c. = c(100, 100), l = 50, power = c(1/M, 1))  # cite: colorspace:::heat_hcl
     	} else if (cspal == "terrain") {
-				cpl <- terrain_hcl(M, h = c(130, 0), c = c(100, 30), l = 50, power = c(1/M, 1)) # cite: colorspace:::terrain_hcl
+				cpl <- terrain_hcl(M, h = c(130, 0), c. = c(100, 30), l = 50, power = c(1/M, 1)) # cite: colorspace:::terrain_hcl
     	}
 		}
 	} else {
