@@ -1,3 +1,9 @@
+18.06.2018
+° Ogier Maitre added to the list of contributing authors for his imported function 'march.dcmm.h.compactA' as per CRAN policies
+
+14.06.2018
+° changed terrain_hcl argument c to c. as per updated documentation of the colorspace package
+
 11.06.2018
 ° improving code, assuring coherent error messages
 
