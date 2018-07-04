@@ -1,8 +1,10 @@
 Package: WeightedCluster
-Version: 1.3-2
+Version: 1.3-4
 Date: 2017-06-20
 Title: Clustering of Weighted Data
 Authors@R:person("Matthias", "Studer", email = "matthias.studer@unige.ch", role = c("aut", "cre"))
+Author: Matthias Studer [aut, cre]
+Maintainer: Matthias Studer <matthias.studer@unige.ch>
 Depends: R (>= 3.0.0), TraMineR (>= 2.0-6), cluster
 Imports: utils, RColorBrewer
 Suggests: RUnit, knitr, isotone, vegan, lattice
