@@ -8,6 +8,12 @@
       \code{seqrep.grp()}: an error is raised when one of the groups has less than two cases.
     }
   }
+  \subsection{Bug fixes}{
+    \itemize{
+      \item{Function \code{seqgen.missing()} the number of left and right
+        elements to be turned into missings were inverted.}
+    }
+  }
   \subsection{Misc}{
     \itemize{
       \item{Function \code{seqeordplot()} suppressed. It is superseded by the
@@ -103,7 +109,7 @@
 \subsection{Bug Fixes}{
   \itemize{
     \item
-    \code{TSE_to_STS()}: The two last sequences were not converted.
+    \code{TSE_to_STS()}: The two last sequences were not converted and unexpected outcome in case of a single sequence.
     }
 }
 
