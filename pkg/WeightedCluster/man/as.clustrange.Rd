@@ -13,9 +13,12 @@ Build a clustrange object to compare different clustering solutions.
 }
 \usage{
 as.clustrange(object, diss, weights=NULL, R=1,  samplesize=NULL, ...)
-\method{as.clustrange}{twins}(object, diss, weights=NULL, R=1,  samplesize=NULL, ncluster=20, ...) 
-\method{as.clustrange}{hclust}(object, diss, weights=NULL, R=1,  samplesize=NULL, ncluster=20, ...) 
-\method{as.clustrange}{dtclust}(object, diss, weights=NULL, R=1,  samplesize=NULL, ncluster=20, labels = TRUE, ...)
+\method{as.clustrange}{twins}(object, diss, weights=NULL, R=1, samplesize=NULL, 
+		ncluster=20, ...) 
+\method{as.clustrange}{hclust}(object, diss, weights=NULL, R=1, samplesize=NULL, 
+		ncluster=20, ...) 
+\method{as.clustrange}{dtclust}(object, diss, weights=NULL, R=1, samplesize=NULL, 
+		ncluster=20, labels = TRUE, ...)
 \method{plot}{clustrange}(x, stat="noCH", legendpos="bottomright", 
     norm="none", withlegend=TRUE, lwd=1, col=NULL, ylab="Indicators", 
 	xlab="N clusters", conf.int=0.9, ci.method="none", ci.alpha=.3, line="t0", ...)

@@ -11,7 +11,12 @@ Monothetic clustering of state sequences
 Monothetic divisive clustering of the data using object properties. For state sequences object different set of properties are automoatically extracted.
 }
 \usage{
-seqpropclust(seqdata, diss, properties = c("state", "duration", "spell.age", "spell.dur", "transition", "pattern", "AFtransition", "AFpattern", "Complexity"), other.prop = NULL, prop.only = FALSE, pmin.support = 0.05, max.k = -1, with.missing = TRUE, R = 1, weight.permutation = "diss", min.size = 0.01, max.depth = 5, maxcluster = NULL, ...)
+seqpropclust(seqdata, diss, properties = c("state", "duration", "spell.age", 
+		"spell.dur", "transition", "pattern", "AFtransition", "AFpattern", "Complexity"),
+		other.prop = NULL, prop.only = FALSE, pmin.support = 0.05, max.k = -1, 
+		with.missing = TRUE, R = 1, weight.permutation = "diss", min.size = 0.01, 
+		max.depth = 5, maxcluster = NULL, ...)
+		
 wcPropertyClustering(diss, properties, maxcluster = NULL, ...)
 dtcut(st, k, labels = TRUE)
 }
@@ -52,4 +57,20 @@ Chavent M, Lechevallier Y, Briant O (2007). DIVCLUS-T: A monothetic divisive hie
 
 \seealso{
 \code{\link{as.clustrange}}, \code{\link{seqtreedisplay}}, \code{\link{disstree}}.
+}
+
+
+\examples{
+data(mvad)
+mvad.seq <- seqdef(mvad[1:100, 17:86])
+
+## COmpute distance using Hamming distance
+diss <- seqdist(mvad.seq, method="HAM")
+
+pclust <- seqpropclust(myseq, diss=diss, maxcluster=5, properties=c("state", "duration")) 
+
+## Run it to visualize the results
+##seqtreedisplay(pclust, type="d", border=NA, showdepth=TRUE)
+
+pclustqual <- as.clustrange(pclust, diss=diss, ncluster=5)
 }
