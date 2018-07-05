@@ -12,10 +12,10 @@ Monothetic divisive clustering of the data using object properties. For state se
 }
 \usage{
 seqpropclust(seqdata, diss, properties = c("state", "duration", "spell.age", 
-		"spell.dur", "transition", "pattern", "AFtransition", "AFpattern", "Complexity"),
-		other.prop = NULL, prop.only = FALSE, pmin.support = 0.05, max.k = -1, 
-		with.missing = TRUE, R = 1, weight.permutation = "diss", min.size = 0.01, 
-		max.depth = 5, maxcluster = NULL, ...)
+		"spell.dur", "transition", "pattern", "AFtransition", "AFpattern", 
+		"Complexity"), other.prop = NULL, prop.only = FALSE, pmin.support = 0.05, 
+		max.k = -1, with.missing = TRUE, R = 1, weight.permutation = "diss", 
+		min.size = 0.01, max.depth = 5, maxcluster = NULL, ...)
 		
 wcPropertyClustering(diss, properties, maxcluster = NULL, ...)
 dtcut(st, k, labels = TRUE)
@@ -67,7 +67,7 @@ mvad.seq <- seqdef(mvad[1:100, 17:86])
 ## COmpute distance using Hamming distance
 diss <- seqdist(mvad.seq, method="HAM")
 
-pclust <- seqpropclust(myseq, diss=diss, maxcluster=5, properties=c("state", "duration")) 
+pclust <- seqpropclust(mvad.seq , diss=diss, maxcluster=5, properties=c("state", "duration")) 
 
 ## Run it to visualize the results
 ##seqtreedisplay(pclust, type="d", border=NA, showdepth=TRUE)
