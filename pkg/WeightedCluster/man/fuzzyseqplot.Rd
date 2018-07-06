@@ -13,7 +13,7 @@ fuzzyseqplot(seqdata, group = NULL, membership.threashold = 0, type = "i",
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{seqdata}{
-	State sequence object created with the \code{\linke{seqdef}} function.
+	State sequence object created with the \code{\link{seqdef}} function.
 }
   \item{group}{
 	A fuzzy partition of the data, either as a membership matrix or as a \code{fanny} object.
@@ -32,7 +32,7 @@ Logical. Should the sequences be weighted by their membership strength in each g
   \item{\dots}{arguments to be passed to \code{\link{seqplot}}.}
 }
 \details{
-The dataset is augmented by repeating the sequence $s_i$ of individual $i$ $k$ times (i.e., once per cluster). We therefore have $k$ sequences for individual $i$, denoted as $s_{i1}\cdots s_{ik}$. These sequences are therefore weighted according to their membership degree $u_{i1}\cdots u_{ik}$. Hence, even if the same sequence were repeated $k$ times, its total weight sum to 1. An additional categorical covariate is created in this augmented dataset that  specifies the cluster (ranging from $1$ to $k$) of the associated membership degree. This weighting strategy allows us to use any tools available for weighted sequence data (see \code{\link{seqplot}}).
+The dataset is augmented by repeating the sequence $s_i$ of individual $i$ $k$ times (i.e., once per cluster). We therefore have $k$ sequences for individual $i$, denoted as $s_{i1}... s_{ik}$. These sequences are therefore weighted according to their membership degree $u_{i1}... u_{ik}$. Hence, even if the same sequence were repeated $k$ times, its total weight sum to 1. An additional categorical covariate is created in this augmented dataset that  specifies the cluster (ranging from $1$ to $k$) of the associated membership degree. This weighting strategy allows us to use any tools available for weighted sequence data (see \code{\link{seqplot}}).
 
 For index plots, we additionally suggest ordering the sequences according to membership degree by setting \code{sortv="membership"} (see example). The most typical sequence lies at the top of the subfigures, with a high membership degree; meanwhile, the bottom shows less-characteristic patterns. Restricting to sequences with the highest membership degree can be achieved with the \code{membership.treashold} argument. 
 
