@@ -8,7 +8,7 @@ membershipnames <- function(ff, seqdata){
 
 crispness <- function(ff, norm=TRUE){
 	if(inherits(ff, "fanny")){
-		ff <- group$membership
+		ff <- ff$membership
 	}
 	uu <- rowSums(ff^2)
 	if(norm){
