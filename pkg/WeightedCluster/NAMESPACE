@@ -10,6 +10,7 @@ export(
 as.clustrange,
 as.seqtree,
 dtcut,
+fuzzyseqplot,
 wcAggregateCases,
 wcClusterQuality,
 wcCmpCluster,
