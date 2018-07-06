@@ -38,7 +38,7 @@ For index plots, we additionally suggest ordering the sequences according to mem
 
 }
 \references{
-Studer, M. (2018). Divisive property-based and fuzzy clustering for sequence analysis. In G. Ritschard and M. Studer (Eds.), Sequence Analysis and Related Approaches: Innovative Methods and Applications, Life Course Research and Social Policies.
+Studer, M. (2018). Divisive property-based and fuzzy clustering for sequence analysis. In G. Ritschard and M. Studer (Eds.), \emph{Sequence Analysis and Related Approaches: Innovative Methods and Applications}, Life Course Research and Social Policies.
 }
 
 

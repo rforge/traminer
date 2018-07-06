@@ -49,9 +49,11 @@ Return a \code{seqpropclust} object, which is (in fact) a \code{distree} object.
 }
 \references{
 
-Studer, M. (2018). Divisive property-based and fuzzy clustering for sequence analysis. In G. Ritschard and M. Studer (Eds.), Sequence Analysis and Related Approaches: Innovative Methods and Applications, Life Course Research and Social Policies. Springer.
+Studer, M. (2018). Divisive property-based and fuzzy clustering for sequence analysis. In G. Ritschard and M. Studer (Eds.), \emph{Sequence Analysis and Related Approaches: Innovative Methods and Applications}, Life Course Research and Social Policies. Springer.
 
-Chavent M, Lechevallier Y, Briant O (2007). DIVCLUS-T: A monothetic divisive hierarchical clustering method. Computational Statistics & Data Analysis, 52(2), 687-701.
+Piccarreta R, Billari FC (2007). Clustering work and family trajectories by using a divisive algorithm. \emph{Journal of the Royal Statistical Society: Series A (Statistics in Society)}, 170(4), 1061-1078.
+
+Chavent M, Lechevallier Y, Briant O (2007). DIVCLUS-T: A monothetic divisive hierarchical clustering method. \emph{Computational Statistics & Data Analysis}, 52(2), 687-701.
 }
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
