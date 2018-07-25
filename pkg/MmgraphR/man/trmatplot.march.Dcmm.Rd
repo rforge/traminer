@@ -2,10 +2,10 @@
 \alias{march.Dcmm.trmatplot}
 \title{Transition Matrix Plot for march.Dcmm objects}
 \author{
-Pauline Poulcheria Adamopoulou
+Pauline Adamopoulou
 }
 \description{
-A coordinate plot which maps each element in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to emphasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is an object of class \code{march.Dcmm} which is the output of \code{march.dcmm.construct}.
+A coordinate plot which maps each element in the probability transition matrix (of any order) as a line, where each line is weighted by probability. Users can apply filters to emphasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is an object of class \code{march.Dcmm} which is the output of \code{march.dcmm.construct}.
 }
 
 \usage{

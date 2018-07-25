@@ -3,13 +3,16 @@
 \alias{trmatplot.default}
 \alias{trmatplot.array}
 \alias{trmatplot.depmix.fitted}
+\alias{trmatplot.dthmm}
 \alias{trmatplot.hmm}
+\alias{trmatplot.msm}
 \title{Transition Matrix Plot}
 \description{
-A coordinate plot which maps each element in the probability transition matrix as a line, where each line is weighted by probability. Users can apply filters to emphasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, or \code{hmm} which is the output of either \command{\link[seqHMM]{build_hmm}} or \command{\link[seqHMM]{build_mm}}.
+A parallel coordinate plot which maps each element in the probability transition matrix (of any order) as a line, where each line is weighted by probability. Users can apply filters to emphasize the most (or least) probable state sequences overall, or by initial state. Various color palettes using the Hue-Chroma-Luminance color scheme can be easily selected by the user. Input is either an object of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, or  a \command{\link[base]{list}} of class \command{\link[msm]{msm}}, \code{hmm} or of class \code{dthmm}.
 }
 \usage{
-## S3 method for classes 'matrix', 'array', 'depmix.fitted', and 'hmm'
+## S3 method for classes 'matrix', 'array', 
+## 'depmix.fitted', 'dthmm', 'hmm', and 'msm'
 
 trmatplot ( d, seed = NULL, rowconstraint = TRUE, morder = 1,
 cspal = NULL, cpal = NULL, main = NULL, 
@@ -20,7 +23,7 @@ verbose = FALSE, ...)
 }
 \arguments{
 
-	\item{d}{Object to be plotted of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, or \code{hmm}. A transition matrix of probabilities. See Details.}
+	\item{d}{Object to be plotted. A transition matrix of probabilities. Can be of any order. An object of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, \code{dthmm}, \code{hmm}, or \command{\link[msm]{msm}}. See Details.}
 
 	\item{seed}{A single value, interpreted as an integer, or \code{NULL} (default). See Details.}
 
@@ -65,8 +68,13 @@ verbose = FALSE, ...)
 }
 
 \details{
-
-The object \code{d} to be plotted, is a probability matrix which, when of class \command{\link[base]{matrix}} or \command{\link[base]{array}}, can be user defined. Alternatively, if the probability transition matrix is the output packages \pkg{msm}, \pkg{HiddenMarkov} and \pkg{HMM}, it is of class \command{\link[base]{matrix}}. A probability matrix obtained using the package \pkg{depmixS4} is embedded in an object of class \command{\link[depmixS4]{depmix.fitted}}. A probability matrix obtained using the  \pkg{seqHMM} functions \command{\link[seqHMM]{build_hmm}} or \command{\link[seqHMM]{build_mm}} is embedded in an object of class \code{hmm}. Thus, objects of classes \command{\link[depmixS4]{depmix.fitted}} and \code{hmm} are also accepted.
+The object \code{d} to be plotted, is a probability transition matrix that can be of class \command{\link[base]{matrix}}, \command{\link[base]{array}}, \command{\link[depmixS4]{depmix.fitted}}, \code{dthmm}, \code{hmm}, \code{msm}.
+If the probability transition matrix is the output of packages implemented using \code{S3} methods and classes, such as \pkg{msm}, \pkg{HiddenMarkov},  \pkg{HMM}, or \pkg{seqHMM} it is a \code{matrix} which is element of a \command{\link[base]{list}}. 
+More specifically, using the package \pkg{HMM}, the function \command{\link[HMM]{initHMM}} returns a \command{\link[base]{list}} containing the element \code{transProbs} with the probability transition matrix.
+Within the \pkg{HiddenMarkov}, \command{\link[HiddenMarkov]{dthmm}} returns a \command{\link[base]{list}} of class \code{dthmm} with the element \code{Pi} which is a probability transition matrix, either user-defined or estimated. 
+Similarly, the \pkg{seqHMM} functions \command{\link[seqHMM]{build_mm}} and \command{\link[seqHMM]{build_hmm}} return a \command{\link[base]{list}} of class \code{hmm} containing the element \code{transition_probs} with the estimated probability transition matrix.
+The package \pkg{msm} proposes the \command{\link[msm]{pmatrix.msm}} and \command{\link[msm]{pmatrix.piecewise.msm}} to extract the probability transition matrix from a fitted multi-state model (a \command{\link[base]{list}} of class \code{msm}), as returned by \command{\link[msm]{msm}}.
+In the case of \pkg{depmixS4}, which uses \code{S4} classes, a probability transition matrix may be obtained depending on the type of model computed using \command{\link[depmixS4]{depmix}} followed by \command{\link[depmixS4]{fit}} and is embedded in an object of class \command{\link[depmixS4]{depmix.fitted}}.
 
 Setting a \code{seed} allows the graphic to be replicated.
 
@@ -96,10 +104,10 @@ The four options for \code{pfilter} are described below, and are illustrated in 
 # Plotting a probability transition matrix
 ##########################################
 
-trMat<-matrix( c (0.1, 0.05, 0.05, 0.80,
-                  0.06, 0.02, 0.03, 0.89,
-                  0.03, 0.01, 0.01, 0.95,
-                  0, 0, 0, 1), nrow = 4, ncol = 4, byrow = TRUE)
+trMat<-matrix(c(0.1, 0.05, 0.05, 0.80,
+  0.06, 0.02, 0.03, 0.89,
+  0.03, 0.01, 0.01, 0.95,
+  0, 0, 0, 1), nrow = 4, ncol = 4, byrow = TRUE)
 
 trmatplot(trMat)
 
@@ -113,15 +121,15 @@ trmatplot(trMat, seed = 2, lwd = 0.8)
 
 #--- Defining a second order probability transition matrix as an array
 
-trMatArray <- ( array( c (
-									0.30, 0.70,
-                  0.65, 0.35, 
-									0.05, 0.95,
-                  0.99, 0.01), dim = c( 1, 2 , 4)) )
+trMatArray <- array(c(
+  0.30, 0.70,
+  0.65, 0.35, 
+  0.05, 0.95,
+  0.99, 0.01), dim = c(1, 2, 4))
 
 #--- Plotting with user-defined colors
 
-trmatplot(trMatArray, seed = 3, morder = 2, cpal = c( "grey40", "grey70"))
+trmatplot(trMatArray, seed = 3, morder = 2, cpal = c("grey40", "grey70"))
 
 ###########################################################
 # cspal: ready-to-use color palettes using colorspace
@@ -180,7 +188,7 @@ trmatplot(trMat, seed = 2, pfilter = "tmin", num = 10 )
 trmatplot(trMat, seed = 2, filter = list(type = "sequence", value = "(1)-(4)"))
 }
 \author{
-Pauline Poulcheria Adamopoulou
+Pauline Adamopoulou
 }
 \references{
 	Buergin, R. and G. Ritschard (2014), "A decorated parallel coordinate plot for categorical longitudinal data", \emph{The American Statistician}. Vol. 68(2), pp. 98-103.

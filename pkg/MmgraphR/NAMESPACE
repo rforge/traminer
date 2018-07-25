@@ -1,6 +1,7 @@
 export(trmatplot, march.Dcmm.trmatplot)
 import("TraMineR", "colorspace")
 importFrom(march, march.dataset.loadFromDataFrame)
+importFrom(msm, pmatrix.msm)
 #importFrom(TraMineR,seqdef)
 #importFrom(TraMineR,seqpcplot)
 #importFrom(colorspace,rainbow_hcl)
@@ -16,14 +17,20 @@ S3method(trmat, depmix.fitted)
 #Export method "trmatplot" for class "default"
 S3method(trmatplot, default)
 
+#Export method "trmatplot" for class "array"
+S3method(trmatplot, array)
+
 #Export method "trmatplot" for class "depmix.fitted"
 S3method(trmatplot, depmix.fitted)
+
+#Export method "trmatplot" for class "dthmm"
+S3method(trmatplot, dthmm)
 
 #Export method "trmatplot" for class "hmm"
 S3method(trmatplot, hmm)
 
-#Export method "trmatplot" for class "array"
-S3method(trmatplot, array)
+#Export method "trmatplot" for class "msm"
+S3method(trmatplot, msm)
 
 #Export method "trmatplot" for class "march.Dcmm"
-#s3method(trmatplot, march.Dcmm)
+#S3method(trmatplot, march.Dcmm)

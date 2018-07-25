@@ -1,5 +1,5 @@
 #'@keywords internal
-trmatplot.depmix.fitted <- function(d, seed = NULL, 
+trmatplot.msm <- function(d, seed = NULL, 
 													rowconstraint = TRUE, morder = 1,
 													cspal = NULL, cpal = NULL, main = NULL,
                 	       	xlab =  NULL, ylab = NULL, ylim = NULL, 
@@ -12,13 +12,13 @@ trmatplot.depmix.fitted <- function(d, seed = NULL,
 													plot = TRUE,
                        		verbose = FALSE, ...) {
 
-	## ----------------------CHECK
-  ## probability transition matrix within depmix.fitted object
-	if (!class(d@transition[[1]]@parameters$coefficients)=="numeric") {
-		stop("[!] ensure that the depmix.fitted object contains a probability transition matrix")
-	}
 	## ----------------------PREPARE
-	d <- trmat.depmix.fitted(d)
+	d <- pmatrix.msm(d)
+
+	## ----------------------
+	if (verbose) {
+		cat(" [>] extracting the probability transition matrix to be plotted using the default settings of the function msm::pmatrix.msm\n")
+	}
  
 	trmatplot.default(d = d, seed = seed, 
 										rowconstraint = rowconstraint, morder = morder,

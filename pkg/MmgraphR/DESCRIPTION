@@ -1,16 +1,17 @@
 Package: MmgraphR
 Type: Package
 Title: Graphing for Markov, Hidden Markov, and Mixture Transition Distribution Models
-Version: 0.2
-Date: 2018-06-22
-Authors@R: c( person("Pauline (Poulcheria)", "Adamopoulou", role = c("aut",
+Version: 0.3
+Date: 2018-07-23
+Authors@R: c( person("Pauline", "Adamopoulou", role = c("aut",
     "cre", "cph"), email = "padamopo@gmail.com"), person("Gilbert",
     "Ritschard", role = c("ths"), email = "gilbert.ritschard@unige.ch"), person
     ("Andre", "Berchtold", role = c("ths"), email = "andre.berchtold@unil.ch"),
     person ("Reto", "Buergin", role = c("ctb"), email = "rbuergin@gmx.ch"), person ("Ogier", "Maitre", role = c("ctb"), email = "ogier.maitre@epfl.ch"))
-Maintainer: Pauline (Poulcheria) Adamopoulou <padamopo@gmail.com>
+Maintainer: Pauline Adamopoulou <padamopo@gmail.com>
 Description: Produces parallel coordinate plots of probability transition matrices from Markov, hidden Markov, and mixture transition distribution models.
+URL: https://r-forge.r-project.org/scm/viewvc.php/pkg/MmgraphR/?root=traminer
 Depends: R(>= 3.1.1), TraMineR, colorspace
-Imports: march
+Imports: march, msm
 License: GPL(>= 2)
 LazyData: true

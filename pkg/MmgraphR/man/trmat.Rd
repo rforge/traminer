@@ -23,7 +23,7 @@ The function \code{trmat} extracts the probability transition matrix from a \com
 }
 
 \author{
-Pauline Poulcheria Adamopoulou
+Pauline Adamopoulou
 }
 \seealso{
 	\command{\link{trmatplot}},
