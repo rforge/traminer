@@ -6,6 +6,8 @@
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
+      \code{plot.stslist}, \code{plot.stslist.freq}, \code{plot.stslist.statd}, \code{plot.stslist.modst}, \code{plot.stslist.rep} (and \code{seqplot} with type \code{"i"}, \code{"I"}, \code{"f"}, \code{"d"}, \code{"Ht"}, \code{"ms"}, or \code{"r"}): new argument \code{tick.last} that when set as \code{TRUE} allows to enforce a tick mark at the last position on the x-axis. Has no effect when the last position is 1 + a multiple of \code{xtstep}.
+      \item
       \code{seqformat()}:
       \itemize{
         \item
@@ -32,9 +34,9 @@
         was a matrix with a single string element.
 
       \item
-      \code{seqdef()}: Bad handling of \code{missing} argument when 
+      \code{seqdef()}: Bad handling of \code{missing} argument when
       \code{informat = "SPS"} or \code{"SPELL"}.
-      
+
     }
   }
 }

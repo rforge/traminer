@@ -4,7 +4,7 @@
 
 plot.stslist.freq <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
   ylab = NULL, yaxis = TRUE, xaxis = TRUE, xtlab = NULL, xtstep = NULL,
-  cex.axis = 1, cex.plot, ...) {
+  tick.last = FALSE, cex.axis = 1, cex.plot, ...) {
 
   TraMineR.check.depr.args(alist(cex.axis = cex.plot))
 
@@ -67,6 +67,7 @@ plot.stslist.freq <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE
 	## Plotting the x axis
 	if (xaxis) {
 		tpos <- seq(1, seql, xtstep)
+    if (tick.last & tpos[length(tpos)] < seql) tpos <- c(tpos,seql)
 		axis(1, at=tpos-0.5, labels=xtlab[tpos], cex.axis=cex.axis)
 	}
 
@@ -112,4 +113,3 @@ plot.stslist.freq <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE
 			las=1,
 			cex.axis=cex.axis)
 }
-

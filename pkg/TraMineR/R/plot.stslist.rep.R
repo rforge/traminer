@@ -4,7 +4,7 @@
 
 plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
   dmax = NULL, stats = TRUE, ylab = NULL, xaxis = TRUE, xtlab = NULL,
-  xtstep = NULL, cex.with.axis = 1, cex.plot, ...) {
+  xtstep = NULL, tick.last = FALSE, cex.with.axis = 1, cex.plot, ...) {
 
   TraMineR.check.depr.args(alist(cex.with.axis = cex.plot))
 
@@ -95,6 +95,7 @@ plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
 	## Time axis for the sequence
 	if (xaxis) {
 		tpos <- seq(1,seql, xtstep)
+    if (tick.last & tpos[length(tpos)] < seql) tpos <- c(tpos,seql)
 
 		axis(1, at=tpos-0.5, labels=xtlab[tpos],
 			pos=-0.04,
@@ -185,4 +186,3 @@ plot.stslist.rep <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
 			cex=cex.with.axis)
 	}
 }
-

@@ -2,6 +2,13 @@
 Version 2.1-9 [2018-03-01] (Development version)
 
 Changes in existing functions:
+  - plot.stslist(), plot.stslist.freq(), plot.stslist.statd(), 
+    plot.stslist.modst(), plot.stslist.rep() (and seqplot() 
+    with type "i", "I", "f", "d", "Ht", "ms", or "r"): new 
+    argument 'tick.last' that when set as TRUE allows to 
+    enforce a tick mark at the last position on the x-axis. 
+    Has no effect when the last position is 
+    1 + a multiple of xtstep.
   - seqformat():
     - For 'from = "SPELL"' and 'process = FALSE',
       'pdata = "auto"' is now equivalent to NULL instead of
@@ -13,15 +20,15 @@ Changes in existing functions:
     - When 'from = "SPELL"' or 'to = "SPELL"', an error is
       raised when the birth year column of pdata is of
       class "Date". Integer values are expected.
-  - seqplot(): for type "r" (seqrplot), an error is raised 
+  - seqplot(): for type "r" (seqrplot), an error is raised
       when a group has less than two cases.
 
 Bug fixes:
-  - seqformat(): An unneeded warning was raised when data 
+  - seqformat(): An unneeded warning was raised when data
       was a matrix with a single string element.
   - seqdef(): Bad handling of 'missing' argument when
       informat = "SPS" or "SPELL".
-  
+
 ## =========
 Version 2.0-8 [2018-01-26]
 

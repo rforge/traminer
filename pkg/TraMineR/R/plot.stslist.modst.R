@@ -3,7 +3,8 @@
 ## =============================
 
 plot.stslist.modst <- function(x, cpal = NULL, ylab = NULL, yaxis = TRUE,
-  xaxis = TRUE, xtlab = NULL, xtstep = NULL, cex.axis = 1,  cex.plot, ...) {
+  xaxis = TRUE, xtlab = NULL, xtstep = NULL, tick.last = FALSE,
+  cex.axis = 1, cex.plot, ...) {
 
   TraMineR.check.depr.args(alist(cex.axis = cex.plot))
 
@@ -70,6 +71,7 @@ plot.stslist.modst <- function(x, cpal = NULL, ylab = NULL, yaxis = TRUE,
 	## Plotting the x axis
 	if (xaxis) {
 		tpos <- seq(1,seql, xtstep)
+    if (tick.last & tpos[length(tpos)] < seql) tpos <- c(tpos,seql)
 		axis(1, at=tpos-0.5, labels=xtlab[tpos], pos=-0.02,
 		# mgp=c(3,0.5,0),
 		cex.axis=cex.axis)
