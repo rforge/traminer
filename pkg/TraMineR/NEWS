@@ -1,13 +1,16 @@
 ## =========
-Version 2.1-9 [2018-03-01] (Development version)
+Version 2.1-9 [2018-08-14] (Development version)
 
 Changes in existing functions:
-  - plot.stslist(), plot.stslist.freq(), plot.stslist.statd(), 
-    plot.stslist.modst(), plot.stslist.rep() (and seqplot() 
-    with type "i", "I", "f", "d", "Ht", "ms", or "r"): new 
-    argument 'tick.last' that when set as TRUE allows to 
-    enforce a tick mark at the last position on the x-axis. 
-    Has no effect when the last position is 
+  - seqdef(): new argument 'tick.last' to set the 'tick.last' 
+    attribute of the state sequence object. Default is 
+    tick.last = FALSE to preserve the previous behavior.
+  - plot.stslist(), plot.stslist.freq(), plot.stslist.statd(),
+    plot.stslist.modst(), plot.stslist.rep() (i.e. also seqplot()
+    with type "i", "I", "f", "d", "Ht", "ms", or "r"), 
+    and plot.seqdiff(): new argument 'tick.last' that when 
+    set as TRUE enforces a tick mark at the last position on 
+    the time x-axis. Has no effect when the last position is
     1 + a multiple of xtstep.
   - seqformat():
     - For 'from = "SPELL"' and 'process = FALSE',

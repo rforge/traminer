@@ -7,7 +7,7 @@ Plot method for output produced by the seqmodst function, i.e objects of class s
 }
 \usage{
 \method{plot}{stslist.modst}(x, cpal = NULL, ylab = NULL, yaxis = TRUE,
-  xaxis = TRUE, xtlab = NULL, xtstep = NULL, tick.last = FALSE,
+  xaxis = TRUE, xtlab = NULL, xtstep = NULL, tick.last = NULL,
   cex.axis = 1, cex.plot, ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -24,7 +24,7 @@ Plot method for output produced by the seqmodst function, i.e objects of class s
 
   \item{xtstep}{optional interval at which the tick-marks and labels of the x-axis are displayed. For example, with xtstep=3 a tick-mark is drawn at position 1, 4, 7, etc... The display of the corresponding labels depends on the available space and is dealt with automatically. If unspecified, the \code{xtstep} attribute of the \code{x} object is used.}
 
-  \item{tick.last}{Logical. Should a tick mark be enforced at the last position on the x-axis?}
+  \item{tick.last}{Logical. Should a tick mark be enforced at the last position on the x-axis? If unspecified, the \code{tick.last} attribute of the \code{x} object is used.}
 
   \item{cex.axis}{Axis annotation magnification. See \code{\link{par}}.}
 

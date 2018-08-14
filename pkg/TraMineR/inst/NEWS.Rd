@@ -1,12 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-9 [2018-03-01] (Development version)}{
+\section{Changes in version 2.1-9 [2018-08-14] (Development version)}{
 
   \subsection{Changes in existing functions:}{
     \itemize{
       \item
-      \code{plot.stslist}, \code{plot.stslist.freq}, \code{plot.stslist.statd}, \code{plot.stslist.modst}, \code{plot.stslist.rep} (and \code{seqplot} with type \code{"i"}, \code{"I"}, \code{"f"}, \code{"d"}, \code{"Ht"}, \code{"ms"}, or \code{"r"}): new argument \code{tick.last} that when set as \code{TRUE} allows to enforce a tick mark at the last position on the x-axis. Has no effect when the last position is 1 + a multiple of \code{xtstep}.
+      \code{seqdef()}: new argument \code{tick.last} to set the \code{tick.last} attribute of the state sequence object. Default is \code{tick.last = FALSE} to preserve the previous behavior.
+      \item
+      \code{plot.stslist()}, \code{plot.stslist.freq()}, \code{plot.stslist.statd()}, \code{plot.stslist.modst()}, \code{plot.stslist.rep()} (i.e. also \code{seqplot} with type \code{"i"}, \code{"I"}, \code{"f"}, \code{"d"}, \code{"Ht"}, \code{"ms"}, or \code{"r"}), and \code{plot.seqdiff()}: new argument \code{tick.last} that when set as \code{TRUE} allows to enforce a tick mark at the last position on the time x-axis. Has no effect when the last position is 1 + a multiple of \code{xtstep}. Default is to use the \code{tick.last} attribute of the state sequence object.
       \item
       \code{seqformat()}:
       \itemize{

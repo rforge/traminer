@@ -4,7 +4,7 @@
 
 plot.stslist.freq <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE,
   ylab = NULL, yaxis = TRUE, xaxis = TRUE, xtlab = NULL, xtstep = NULL,
-  tick.last = FALSE, cex.axis = 1, cex.plot, ...) {
+  tick.last = NULL, cex.axis = 1, cex.plot, ...) {
 
   TraMineR.check.depr.args(alist(cex.axis = cex.plot))
 
@@ -22,6 +22,9 @@ plot.stslist.freq <- function(x, cpal = NULL, missing.color = NULL, pbarw = TRUE
 		if (!is.null(attr(x,"xtstep"))) {xtstep <- attr(x,"xtstep")}
 		## For sequence objects created with previous versions
 		else {xtstep <- 1}
+	}
+	if(is.null(tick.last)){
+		tick.last <- ifelse(!is.null(attr(x, "tick.last")), attr(x, "tick.last"), FALSE)
 	}
 
 	seql <- length(xtlab)

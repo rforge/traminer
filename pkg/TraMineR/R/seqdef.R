@@ -5,7 +5,8 @@
 seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	alphabet=NULL, states=NULL, id=NULL, weights=NULL, start=1,
 	left=NA, right="DEL", gaps=NA, missing=NA, void="%", nr="*",
-	cnames=NULL, xtstep=1, cpal=NULL, missing.color="darkgrey", labels=NULL, ...) {
+	cnames=NULL, xtstep=1, tick.last=FALSE, cpal=NULL, missing.color="darkgrey",
+  labels=NULL, ...) {
 
 	## Parameters
 	maxstatedisplay <- 12
@@ -235,6 +236,7 @@ seqdef <- function(data, var=NULL, informat="STS", stsep=NULL,
 	}
 
 	attr(seqdata,"xtstep") <- xtstep
+	attr(seqdata,"tick.last") <- tick.last
 
 	if (!is.null(id)) {
 		if (length(id)==1 && id=="auto") {

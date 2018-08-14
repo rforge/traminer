@@ -4,7 +4,7 @@
 
 plot.stslist <- function(x, idxs = NULL, weighted = TRUE, sortv = NULL,
   cpal = NULL, missing.color = NULL, ylab = NULL, yaxis = TRUE, xaxis = TRUE,
-  ytlab = NULL, ylas = 0, xtlab = NULL, xtstep = NULL, tick.last = FALSE,
+  ytlab = NULL, ylas = 0, xtlab = NULL, xtstep = NULL, tick.last = NULL,
   cex.axis = 1, tlim, cex.plot, ...) {
 
   TraMineR.check.depr.args(alist(idxs = tlim, cex.axis = cex.plot))
@@ -21,6 +21,9 @@ plot.stslist <- function(x, idxs = NULL, weighted = TRUE, sortv = NULL,
 		if (!is.null(attr(x,"xtstep"))) {xtstep <- attr(x,"xtstep")}
 		## For sequence objects created with previous versions
 		else {xtstep <- 1}
+	}
+	if(is.null(tick.last)){
+		tick.last <- ifelse(!is.null(attr(x, "tick.last")), attr(x, "tick.last"), FALSE)
 	}
 
 	## Range
