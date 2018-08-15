@@ -1,9 +1,11 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.3 [2018-02-25] (Development version)}{
+\section{Changes in version 0.5.3 [2018-08-15] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
+      \item
+      \code{plot.stslist.surv()}, \code{seqplot.tentrop()}, , \code{seqplot.tentrop.m()}, \code{plot.seqimplic()}, \code{print.seqimplic()}: new argument \code{tick.last} that when set as \code{TRUE} allows to enforce a tick mark at the last position on the time x-axis. Has no effect when the last position is 1 + a multiple of \code{xtstep}. Default is to use the \code{tick.last} attribute of the state sequence object.
       \item
       \code{seqrep.grp()}: an error is raised when one of the groups has less than two cases.
     }
