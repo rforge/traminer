@@ -17,6 +17,8 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 	oolist <- list(...)
 
   	if ("sortv" %in% names(oolist)) {sortv <- oolist[["sortv"]]}
+  	leg.ncol <- if ("ncol" %in% names(oolist)) { oolist[["ncol"]] } else { NULL }
+    oolist <- oolist[names(oolist) != "ncol"]
 
     diss <- NULL
   	if ("diss" %in% names(oolist)) {
@@ -266,7 +268,7 @@ seqplot <- function(seqdata, group = NULL, type = "i", main = NULL, cpal = NULL,
 		## nbstat <- nbstat+1
 		}
 
-		TraMineR.legend(legpos, ltext, cpal, cex=cex.legend, density=density, angle=angle)
+		TraMineR.legend(legpos, ltext, cpal, cex=cex.legend, density=density, angle=angle, leg.ncol=leg.ncol)
 	}
 
 	## Restoring graphical parameters

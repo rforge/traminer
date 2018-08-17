@@ -1,15 +1,17 @@
 ## =========
-Version 2.1-9 [2018-08-14] (Development version)
+Version 2.1-9 [2018-08-17] (Development version)
 
 Changes in existing functions:
-  - seqdef(): new argument 'tick.last' to set the 'tick.last' 
-    attribute of the state sequence object. Default is 
+  - seqsplot()} now supports the 'ncol' argument for controlling 
+    the number of columns in the color legend.
+  - seqdef(): new argument 'tick.last' to set the 'tick.last'
+    attribute of the state sequence object. Default is
     tick.last = FALSE to preserve the previous behavior.
   - plot.stslist(), plot.stslist.freq(), plot.stslist.statd(),
     plot.stslist.modst(), plot.stslist.rep() (i.e. also seqplot()
-    with type "i", "I", "f", "d", "Ht", "ms", or "r"), 
-    and plot.seqdiff(): new argument 'tick.last' that when 
-    set as TRUE enforces a tick mark at the last position on 
+    with type "i", "I", "f", "d", "Ht", "ms", or "r"),
+    and plot.seqdiff(): new argument 'tick.last' that when
+    set as TRUE enforces a tick mark at the last position on
     the time x-axis. Has no effect when the last position is
     1 + a multiple of xtstep.
   - seqformat():

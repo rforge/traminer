@@ -1,10 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-9 [2018-08-14] (Development version)}{
+\section{Changes in version 2.1-9 [2018-08-17] (Development version)}{
 
   \subsection{Changes in existing functions:}{
     \itemize{
+      \item
+      \code{seqplot()} now supports the \code{ncol} argument for controlling the number of columns in the color legend.
       \item
       \code{seqdef()}: new argument \code{tick.last} to set the \code{tick.last} attribute of the state sequence object. Default is \code{tick.last = FALSE} to preserve the previous behavior.
       \item
