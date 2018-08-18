@@ -76,15 +76,16 @@ The interest of sequence index plots has for instance been stressed by \cite{Sch
 ## Defining a sequence object with the data in columns 10 to 25
 ## (family status from age 15 to 30) in the biofam data set
 data(biofam)
+biofam <- biofam[500:600,] ## using a subsample only
 biofam.lab <- c("Parent", "Left", "Married", "Left+Marr",
-"Child", "Left+Child", "Left+Marr+Child", "Divorced")
+    "Child", "Left+Child", "Left+Marr+Child", "Divorced")
 biofam.seq <- seqdef(biofam, 10:25, labels=biofam.lab)
 
 ## Plot of the 10 most frequent sequences
 ## with bar width proportional to the frequency
 plot(biofam.seq)
 
-## Plotting the all data set
+## Plotting the whole data set
 ## with no borders
 plot(biofam.seq, idxs=0, space=0, border=NA)
 
