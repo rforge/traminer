@@ -303,8 +303,11 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
       ltext <- ltext.grp
     }
 
-		TraMineR:::TraMineR.legend(legpos, ltext, cpal, cex=cex.legend, density=density, angle=angle, leg.ncol=leg.ncol)
-
+    ## if (is.null(leg.ncol))  ## for backward compatibility
+    if (packageVersion("TraMineR") < '2.0.9')  ## for backward compatibility
+		  TraMineR:::TraMineR.legend(legpos, ltext, cpal, cex=cex.legend, density=density, angle=angle)
+    else
+		  TraMineR:::TraMineR.legend(legpos, ltext, cpal, cex=cex.legend, density=density, angle=angle, leg.ncol=leg.ncol)
 	}
 
 	## Restoring graphical parameters
