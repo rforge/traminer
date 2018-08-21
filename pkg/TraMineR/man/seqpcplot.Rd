@@ -156,23 +156,26 @@ seqpcfilter(method = c("minfreq", "cumfreq", "linear"), level = 0.05)
   Type \code{"function"}: colors the patterns depending on the values
   returned by a [0,1] valued function of the frequency x of the
   pattern. Three native functions can be used: \code{"minfreq"},
-  \code{"cumfreq"} and \code{"linear"}. Use \code{filter = list(type =
-  "function", value = "minfreq", level = 0.05)} to color patterns with a
-  support of at least 5\% (within group). Use\cr\code{filter = list(type
-    = "function", value = "cumfreq", level = 0.5)} to highlight the 50\% most
-  frequent patterns (within group). Or, use \code{filter = list(type =
-    "function", value = "linear")} to use a linear gradient for the
-  color intensity (the most most frequent trajectory obtains
+  \code{"cumfreq"} and \code{"linear"}. Use 
+  \code{filter = list(type = "function", value = "minfreq", level = 0.05)} 
+  to color patterns with a
+  support of at least 5\% (within group). Use
+  \cr\code{filter = list(type = "function", value = "cumfreq", level = 0.5)} 
+  to highlight the 50\% most
+  frequent patterns (within group). Or, use 
+  \code{filter = list(type="function", value="linear")} 
+  to use a linear gradient for the
+  color intensity (the most frequent trajectory gets
   100\% intensity). Other user-specified functions can be provided by
-  giving something like\cr\code{filter = list(type = "function", value =
-  function(x, arg1, arg2) {return(x / max(x) * arg1 / arg2)}, arg1 = 1,
-  arg2 = 1)}. This latter function adjusts gradually the color intensity
+  giving something like
+  \cr\code{filter = list(type="function", value=function(x, arg1, arg2) {return(x/max(x) * arg1/arg2)},}
+  \code{arg1 = 1, arg2 = 1)}. This latter function adjusts gradually the color intensity
   of patterns according to the frequency of the pattern.
 
   The function \code{seqpcfilter} is a convenience function for type
   \code{"function"}. The three examples above can be imitated by
-  \code{seqpcfilter("minfreq", 0.05)}, \code{seqpcfilter("cumfreq",
-    0.5)} and \code{seqpcfilter("linear")}.
+  \code{seqpcfilter("minfreq", 0.05)}, 
+  \code{seqpcfilter("cumfreq", 0.5)} and \code{seqpcfilter("linear")}.
 
   If a numeric scalar is assigned to \code{filter}, the \code{"minfreq"}
   filter is used.
