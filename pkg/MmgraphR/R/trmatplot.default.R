@@ -82,7 +82,7 @@ trmatplot.default <- function(d, seed = NULL,
 	## pfilter 
 	if (is.null(pfilter)) {
 		if (!is.null(num)) {
-			stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")	
+			stop("[!] num only needs to be specified when pfilter is specified as either tmax or tmin, otherwise leave as NULL (default)")	
 		}
 	} else { # !is.null(pfilter)
 		if (length(pfilter) > 1) {
@@ -95,7 +95,7 @@ trmatplot.default <- function(d, seed = NULL,
 		# num  
 		if (!pfilter %in% c("tmax", "tmin")) {
 			if (!is.null(num)) {
-				stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")		
+				stop("[!] num only needs to be specified when pfilter is specified as either tmax or tmin, otherwise leave as NULL (default)")		
 			}	
 		} else if (pfilter %in% c("tmax", "tmin")) {
 			if (is.null(num)) {
@@ -110,7 +110,13 @@ trmatplot.default <- function(d, seed = NULL,
 			}
 		}
 	} 
-	 
+	##
+	## lorder    
+  if (!is.null(lorder)) {
+    if (!lorder %in% c("background", "foreground")) {
+      stop("[!] lorder must be left as NULL (default) or specified as either background or foreground")
+    }
+  }	  
   
  	set.seed(seed)
  	M  <- ncol(d)  
@@ -120,6 +126,7 @@ trmatplot.default <- function(d, seed = NULL,
   w  <- matrix (t(w), ncol = 1)
   w  <- as.vector(w)
   s  <- suppressMessages(seqdef(p, weights = w))
+  p <- apply (p, c(1,2) , function (x) if (x < 10) paste0 (0, x) else x )
   st <- apply(p, 1, function(x) paste(x, collapse = "-"))
   
   if (is.null(cpal)) {
@@ -220,16 +227,16 @@ trmatplot.default <- function(d, seed = NULL,
   	hide.col <- shade.col
   }
 
-  # foreground / background
-  if (!is.null(pfilter)) {
-		if (pfilter %in% c("smax", "tmax")) {
-    	lordr <- "foreground"
+  # lorder: foreground / background
+  if (!is.null(pfilter) & is.null(lorder)) {
+	  if (pfilter %in% c("smax", "tmax")) {
+      lordr <- "foreground"
     } else if (pfilter %in% c("smin", "tmin")) {
       lordr <- "background"
     }
 	} else {
-		lordr <- NULL
-	}
+    lordr <- lorder
+  }
 
 	#	seqpcplot	
 	a <- seqpcplot(seqdata = s, main = ttl, ylab = ylb, xlab = xlb,

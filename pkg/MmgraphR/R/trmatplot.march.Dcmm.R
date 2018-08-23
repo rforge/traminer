@@ -68,7 +68,7 @@ march.Dcmm.trmatplot <- function(d, seed = NULL, type = "hidden", hstate = 1,
 	## pfilter 
 	if (is.null(pfilter)) {
 		if (!is.null(num)) {
-			stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")	
+			stop("[!] num only needs to be specified when pfilter is specified as either tmax or tmin, otherwise leave as NULL (default)")	
 		}
 	} else { # !is.null(pfilter)
 		if (length(pfilter) > 1) {
@@ -81,7 +81,7 @@ march.Dcmm.trmatplot <- function(d, seed = NULL, type = "hidden", hstate = 1,
 		# num  
 		if (!pfilter %in% c("tmax", "tmin")) {
 			if (!is.null(num)) {
-				stop("[!] num should be left as null. num only needs to be specified when pfilter is specified as either tmax or tmin")		
+				stop("[!] num only needs to be specified when pfilter is specified as either tmax or tmin, otherwise leave as NULL (default)")		
 			}	
 		} else if (pfilter %in% c("tmax", "tmin")) {
 			if (is.null(num)) {
@@ -102,7 +102,13 @@ march.Dcmm.trmatplot <- function(d, seed = NULL, type = "hidden", hstate = 1,
 			}
 		}
 	} 
-
+  ##
+	## lorder    
+  if (!is.null(lorder)) {
+    if (!lorder %in% c("background", "foreground")) {
+      stop("[!] lorder must be left as NULL (default) or specified as either background or foreground")
+    }
+  }	 
 
 
 	###
@@ -129,6 +135,7 @@ march.Dcmm.trmatplot <- function(d, seed = NULL, type = "hidden", hstate = 1,
   w <- matrix(t(w), ncol = 1)
   w <- as.vector(w)
   s <- suppressMessages(seqdef(p, weights = w))
+  p <- apply (p, c(1,2) , function (x) if (x < 10) paste0 (0, x) else x )
   st <- apply(p, 1, function(x) paste(x, collapse = "-"))
   
 	if (is.null(cpal)) {  
@@ -243,15 +250,16 @@ march.Dcmm.trmatplot <- function(d, seed = NULL, type = "hidden", hstate = 1,
   }
   
 	# foreground / background 
-  if (!is.null(pfilter)) {    
-    if (pfilter %in% c("smax", "tmax")) {      
+  # lorder: foreground / background
+  if (!is.null(pfilter) & is.null(lorder)) {
+	  if (pfilter %in% c("smax", "tmax")) {
       lordr <- "foreground"
-     } else if (pfilter %in% c ("smin", "tmin")) {
-      lordr<-"background"
+    } else if (pfilter %in% c("smin", "tmin")) {
+      lordr <- "background"
     }
-  } else {
-	  lordr <- lorder
-	}
+	} else {
+    lordr <- lorder
+  }
 
 	#	seqpcplot	
 	a <- seqpcplot(seqdata = s, main = ttl, ylab = ylb, xlab = xlb, 

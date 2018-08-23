@@ -15,8 +15,8 @@ The package is available through CRAN as well as R-forge, where it is developed.
 \details{
 \tabular{ll}{
 Package: \tab MmgraphR\cr
-Version: \tab 0.3\cr
-Date: \tab 2018-07-25\cr
+Version: \tab 0.3-1\cr
+Date: \tab 2018-08-23\cr
 Depends: \tab R (>= 3.1.1), TraMineR, colorspace\cr
 Imports: \tab march, msm\cr
 License: \tab GPL (>= 2)\cr

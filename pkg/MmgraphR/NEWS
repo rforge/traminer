@@ -1,4 +1,22 @@
+########
+Changes in version 0.3-1
+########
+
+Error Reporting for 'trmatplot':
+
+- 'lorder' if misspecified
+- 'num' if specified when should be left as NULL
+
+Bug Fixes for 'trmatplot':
+
+- 'pfilter = smax' and 'pfilter = smin' work correctly
+  when the number of states is >= 10
+- 'lorder' can be specified even if 'pfilter' is 
+  non-null and will not be overriden internally
+
+########
 Changes in version 0.3
+########
 
 - Method 'trmatplot' now exported for ojects of class
  'dthmm' and 'msm'.
@@ -13,9 +31,9 @@ Changes in version 0.3
 
 - Added README file.
 
-
-
+########
 Changes in version 0.2
+########
 
 - First CRAN release.
 
