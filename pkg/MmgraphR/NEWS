@@ -1,6 +1,4 @@
-########
-Changes in version 0.3-1
-########
+__Changes in version 0.3-1 _______________________________
 
 Error Reporting for 'trmatplot':
 
@@ -14,9 +12,7 @@ Bug Fixes for 'trmatplot':
 - 'lorder' can be specified even if 'pfilter' is 
   non-null and will not be overriden internally
 
-########
-Changes in version 0.3
-########
+__Changes in version 0.3 _________________________________
 
 - Method 'trmatplot' now exported for ojects of class
  'dthmm' and 'msm'.
@@ -31,9 +27,8 @@ Changes in version 0.3
 
 - Added README file.
 
-########
-Changes in version 0.2
-########
+
+__Changes in version 0.2 ___________________________________
 
 - First CRAN release.
 
