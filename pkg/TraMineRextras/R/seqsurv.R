@@ -19,6 +19,9 @@ seqsurv <- function(seqdata, groups = NULL, per.state = FALSE, state = NULL,
   seq.length <- seqlength(seqdata)
   spell$length <- seq.length[spell$id]
   spell$status <- spell$end != spell$length
+  ## GR states must be ordered according to the alphabet for color matches
+  stlev <- alphabet(seqdata)[alphabet(seqdata) %in% levels(spell$states)]
+  spell$states <- factor(spell$states, levels=stlev)
 
   if (is.null(state)) state <- alphabet(seqdata)
 

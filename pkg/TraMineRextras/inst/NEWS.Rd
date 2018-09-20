@@ -8,6 +8,14 @@
       No changes
     }
   }
+
+  \subsection{Bug fixes}{
+    \itemize{
+      \item
+      \code{seqsurv()}: levels of spell$states were not ordered conformably with the alphabet of the state sequence object, which caused \code{plot.ststlist.surv} to use wrong colors for the survival curves when \code{per.state=FALSE}.
+    }
+  }
+
 }
 
 
