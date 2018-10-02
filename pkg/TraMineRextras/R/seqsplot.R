@@ -126,25 +126,6 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
      group <- TraMineR:::group(group)
      levels.num <- nlevels(group)
 
-     if (is.null(cpal)){
-       ## We use Dark2 from brewer.pal, which has 8 colors
-       ## Moreover, min n for brewer.pal is 3
-       cpal <-
-            if (levels.num < 2) {
-              brewer.pal(3, "Dark2")[3]
-            } else if (levels.num == 2) {
-              brewer.pal(3, "Dark2")[-3]
-            } else if (levels.num < 9) {
-              brewer.pal(levels.num, "Dark2")
-            } else {
-              message(" [!] too many groups (> 8), no automatic color palette assignation")
-              NULL
-            }
-     }
-     if (is.null(ltext)){
-        if (levels.num >0) ltext.grp <- levels(group.ori)
-        else ltext.grp <- "All cases"
-     }
    }
 
 
@@ -238,6 +219,9 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
         #  olist[["groups"]] <- NULL
           ##olist[["per.state"]] <- FALSE
         #}
+      }
+      else { # per.state=FALSE
+        plist[["cpal"]] <- cpal[alphabet(subdata)[sel.states] %in% seqstatl(subdata)]
       }
     }
 		else
