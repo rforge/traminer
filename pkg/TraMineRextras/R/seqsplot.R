@@ -108,6 +108,7 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
               message(" [!] too many groups (> 8), no automatic color palette assignation")
               NULL
             }
+       cpal <- cpal.grp
      }
      else {
       cpal.grp <- cpal
@@ -213,12 +214,12 @@ seqsplot <- function(seqdata, group = NULL, main = NULL, cpal = NULL,
       if (per.state) {
         olist[["state"]] <- as.character(group[np])
         olist[["groups"]] <- group.ori
-        #if (levels.num > 1)
-        #  olist[["groups"]] <- group.ori
-        #else {
-        #  olist[["groups"]] <- NULL
-          ##olist[["per.state"]] <- FALSE
-        #}
+        ## Here, we check whether all groups have the considered state
+        lcpal <- vector()
+        for (g in 1:levels.num){
+          lcpal[g] <- (as.character(group[np]) %in% as.character(seqstatl(subdata[group.ori==levels(group.ori)[g],])))
+        }
+        plist[["cpal"]] <- cpal[lcpal]
       }
       else { # per.state=FALSE
         plist[["cpal"]] <- cpal[alphabet(subdata)[sel.states] %in% seqstatl(subdata)]

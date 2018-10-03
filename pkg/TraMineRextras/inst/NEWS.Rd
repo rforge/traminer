@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.4 [2018-10-02] (Development version)}{
+\section{Changes in version 0.5.4 [2018-10-03] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
@@ -13,7 +13,8 @@
     \itemize{
       \item
       \code{seqsurv()}: levels of spell$states were not ordered conformably with the alphabet of the state sequence object, which caused \code{plot.ststlist.surv} to use wrong colors for the survival curves when \code{per.state=FALSE}.
-      \code{seqsplot()}: color synchronization failed with \code{per.state=FALSE} when one of the states selected was unobserved in one of the groups.
+      \code{seqsplot()}: color synchronization failed when one of the states selected was unobserved in one of the groups.
+      \code{plot.stslist.surv()}: new \code{xlab} argument.
     }
   }
 

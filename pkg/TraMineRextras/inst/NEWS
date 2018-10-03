@@ -1,4 +1,4 @@
-                CHANGES IN TraMineRextras VERSION 0.5.4 [2018-10-02] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.4 [2018-10-03] (Development version)
 
 Changes in existing functions
     o   No changes.
@@ -8,8 +8,9 @@ Bug fixes
         with the alphabet of the state sequence object, which
         caused plot.ststlist.surv() to use wrong colors for the 
         survival curves when 'per.state=FALSE'.
-    o   seqsplot(): color synchronization failed with 'per.state=FALSE' 
-        when one of the states selected was unobserved in one of the groups.
+    o   seqsplot(): color synchronization failed when one of 
+        the states selected was unobserved in one of the groups.
+    o   plot.stslist.surv(): new 'xlab' argument.
 
 
 
