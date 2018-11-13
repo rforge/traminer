@@ -1,12 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-10 [2018-08-20] (Development version)}{
+\section{Changes in version 2.1-10 [2018-11-13] (Development version)}{
 
-  \subsection{Misc:}{
+  \subsection{Bug Fixes:}{
     \itemize{
       \item
-      No changes
+      \code{seqdist()}: when \code{refseq} was passed as a state sequence
+      object wrong results were sometimes returned.
     }
   }
 }
