@@ -1,13 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-10 [2018-11-13] (Development version)}{
+\section{Changes in version 2.1-10 [2018-11-15] (Development version)}{
 
   \subsection{Bug Fixes:}{
     \itemize{
       \item
       \code{seqdist()}: when \code{refseq} was passed as a state sequence
       object wrong results were sometimes returned.
+      \code{seqdist()}: CHI2 and EUCLID distances were computed using
+      counts instead of proportions.
     }
   }
 }

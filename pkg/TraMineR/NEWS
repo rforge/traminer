@@ -1,9 +1,11 @@
 ## =========
-Version 2.1-10 [2018-11-13] (Development version)
+Version 2.1-10 [2018-11-15] (Development version)
 
 Bug Fixes:
-  - seqdist(): when 'refseq' was passed as a state sequence 
+  - seqdist(): when 'refseq' was passed as a state sequence
     object wrong results were sometimes returned.
+  - seqdist(): CHI2 and EUCLID distances were computed using 
+    counts instead of proportions.
 
 ## =========
 Version 2.0-9 [2018-08-20]
