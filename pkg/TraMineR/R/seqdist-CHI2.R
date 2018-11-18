@@ -64,7 +64,7 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE, we
 		bseq <- seqdata[, bindice]
 		myrowSums <- function(x){
 			if(!is.null(ncol(x))){
-				return(weights*rowSums(x))
+				return(weights*rowSums(x, na.rm=TRUE))
 			}else{
 				return(weights*x)
 			}
@@ -72,9 +72,9 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE, we
 		for(i in 1:nalph){
 			mat[, i] <- myrowSums(bseq==alph[i])/blength
 		}
-    ndot <- colSums(mat) ##GR
+    ndot <- colSums(mat, na.rm=TRUE) ##GR
     mat <- rbind(mat,ndot) ## GR
-    mat <- mat/rowSums(mat)## GR
+    mat <- mat/rowSums(mat, na.rm=TRUE)## GR
 		return(mat)
 	}
 	allmat <- list()

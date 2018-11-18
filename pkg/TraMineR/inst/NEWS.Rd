@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-10 [2018-11-16] (Development version)}{
+\section{Changes in version 2.1-10 [2018-11-18] (Development version)}{
 
   \subsection{Bug Fixes:}{
     \itemize{
@@ -11,9 +11,17 @@
       \item
       \code{seqdist()}: CHI2 and EUCLID distances were computed using
       counts instead of proportions.
+      \code{seqdist()}: CHI2 and EUCLID bad behavior in presence of missings.
       \item
       Vignette: Fixed issue with updated \code{fancyvrb.sty}.
     }
+  }
+  \subsection{Misc.:}{
+     \itemize{
+       \item
+       Vignette: Error in formula for complexity index. 
+       Also, now DOI instead of link to JSS article.
+     } 
   }
 }
 
