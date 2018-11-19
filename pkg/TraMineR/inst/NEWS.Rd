@@ -1,7 +1,18 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-10 [2018-11-18] (Development version)}{
+\section{Changes in version 2.1-11 [2018-11-19] (Development version)}{
+
+  \subsection{Misc.:}{
+     \itemize{
+       \item
+       No changes.
+     }
+  }
+}
+
+
+\section{Changes in version 2.1-10 [2018-11-18]}{
 
   \subsection{Bug Fixes:}{
     \itemize{
@@ -11,6 +22,7 @@
       \item
       \code{seqdist()}: CHI2 and EUCLID distances were computed using
       counts instead of proportions.
+      \item
       \code{seqdist()}: CHI2 and EUCLID bad behavior in presence of missings.
       \item
       Vignette: Fixed issue with updated \code{fancyvrb.sty}.
