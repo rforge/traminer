@@ -1,11 +1,19 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.4 [2018-10-03] (Development version)}{
+\section{Changes in version 0.5.4 [2018-11-28] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
-      No changes
+      \code{seqprecarity()}, \code{seqprecorr()}, and \code{seqprecstart()}: Important
+        code cleaning.
+      \item
+      \code{seqprecarity()}, \code{seqprecorr()}: New argument \code{method} that
+        replaces \code{tr.type} to select the type of transition weights.
+        Two additional methods have been implemented, namely \code{'RANK'}
+        (for rank-based transition weights) and \code{'ONE'} for
+        non-weighted transitions. Also new argument \code{stprec} to allow
+        specifying rank values to be used by \code{method='RANK'}.
     }
   }
 
