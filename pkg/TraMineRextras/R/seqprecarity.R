@@ -4,11 +4,13 @@ seqprecarity <- function(seqdata, correction=NULL,
 
 	if (!inherits(seqdata,"stslist"))
 		stop(call.=FALSE, "seqprecarity: data is not a state sequence object, use seqdef function to create one")
-  if (!is.null(stprec) & length(stprec) != length(alphabet))
+  if (!is.null(stprec) && length(stprec) != length(alphabet(seqdata)))
     stop(call.=FALSE, "seqprecarity: length(stprec) should equal length(alphabet)")
 
   if(is.null(stprec)){
     stprec <- seqprecstart(seqdata, state.order=state.order, state.equiv=state.equiv)
+  } else {## normalize by maximum value and assign class mean value to members of equiv class
+    stprec <- seqprecstart(seqdata, state.order=state.order, state.equiv=state.equiv, stprec=stprec)
   }
 
   if (is.null(correction)){

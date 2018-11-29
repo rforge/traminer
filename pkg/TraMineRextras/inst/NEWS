@@ -1,14 +1,15 @@
-                CHANGES IN TraMineRextras VERSION 0.5.4 [2018-11-28] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.4 [2018-11-29] (Development version)
 
 Changes in existing functions
-    o   seqprecarity(), seqprecorr(), and seqprecstart(): Important 
-        code cleaning. 
-    o   seqprecarity(), seqprecorr(): New argument 'method' that 
-        replaces 'tr.type' to select the type of transition weights. 
-        Two additional methods have been implemented, namely 'RANK' 
-        (for rank-based transition weights) and 'ONE' for 
+    o   plot.stslist.surv(): new 'xlab' argument.
+    o   seqprecarity(), seqprecorr(), and seqprecstart(): Important
+        code cleaning.
+    o   seqprecarity(), seqprecorr(): New argument 'method' that
+        replaces 'tr.type' to select the type of transition weights.
+        Two additional methods have been implemented, namely 'RANK'
+        (for rank-based transition weights) and 'ONE' for
         non-weighted transitions. Also new argument 'stprec' to allow
-        specifying rank values to be used by method='RANK'. 
+        specifying rank values to be used by method='RANK'.
 
 Bug fixes
     o   seqsurv(): levels of spell$states were not ordered conformably
@@ -17,9 +18,10 @@ Bug fixes
         survival curves when 'per.state=FALSE'.
     o   seqsplot(): color synchronization failed when one of
         the states selected was unobserved in one of the groups.
-    o   plot.stslist.surv(): new 'xlab' argument.
     o   seqprecorr(): identification of non-comparable states did
         not work as expected.
+    o   seqprecstart(): did not work as expected when equiv class 
+        included incomparable states.
 
 
 

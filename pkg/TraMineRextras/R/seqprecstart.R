@@ -1,4 +1,4 @@
-seqprecstart <- function(seqdata, state.order=alphabet(seqdata), state.equiv=NULL) {
+seqprecstart <- function(seqdata, state.order=alphabet(seqdata), state.equiv=NULL, stprec=NULL) {
   ## cost of starting state
 
   state.order <- states.check(seqdata, state.order, state.equiv)
@@ -19,11 +19,14 @@ seqprecstart <- function(seqdata, state.order=alphabet(seqdata), state.equiv=NUL
   ord <- match(state.order.plus,alphabet(seqdata))
   ordo <- match(alphabet(seqdata),state.order.plus)
 
-  stprec <- seq(from=0, to=1, by=step)
-
-  ## assign mean cost to non ranked states
-  stprec <- c(stprec, rep(mean(stprec),length(state.noncomp)))
-  stprec <- stprec[ordo]
+  if(is.null(stprec)){
+    stprec <- seq(from=0, to=1, by=step)
+    ## assign mean cost to non ranked states
+    stprec <- c(stprec, rep(mean(stprec),length(state.noncomp)))
+    stprec <- stprec[ordo]
+  }
+  else ## user provided stprec
+    stprec <- stprec/max(stprec)
 
   ## assign the class mean cost to all states of a same equivalent class
   if(!is.null(state.equiv)){

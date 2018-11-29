@@ -32,7 +32,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{b}{Non-negative real value. Exponent weight of the correction factor. Default is 1.2. }
 
-  \item{stprec}{Vector of state precarity levels. If \code{NULL} the values are derived from the state order using \code{\link{seqprecstart}}.}
+  \item{stprec}{Vector of state precarity levels. If \code{NULL} the values are derived from the state order using \code{\link{seqprecstart}}. If not \code{NULL}, the values will be normalized by their maximum.}
 
   \item{state.order}{Vector of short state labels defining the order of the states. First the less precarious (most positive) state and then the other states in increasing precariousness order. States of the alphabet that are not included here (and are not equivalent to one of the listed state) define the non-comparable states.}
 

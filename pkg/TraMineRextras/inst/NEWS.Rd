@@ -1,9 +1,11 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.4 [2018-11-28] (Development version)}{
+\section{Changes in version 0.5.4 [2018-11-29] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
+      \item
+      \code{plot.stslist.surv()}: new \code{xlab} argument.
       \item
       \code{seqprecarity()}, \code{seqprecorr()}, and \code{seqprecstart()}: Important
         code cleaning.
@@ -21,8 +23,11 @@
     \itemize{
       \item
       \code{seqsurv()}: levels of spell$states were not ordered conformably with the alphabet of the state sequence object, which caused \code{plot.ststlist.surv} to use wrong colors for the survival curves when \code{per.state=FALSE}.
+      \item
       \code{seqsplot()}: color synchronization failed when one of the states selected was unobserved in one of the groups.
-      \code{plot.stslist.surv()}: new \code{xlab} argument.
+      \item
+      \code{seqprecstart()}: did not work as expected when equiv class included incomparable states. 
+      
     }
   }
 
