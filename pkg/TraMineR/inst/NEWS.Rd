@@ -1,12 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-11 [2018-11-19] (Development version)}{
+\section{Changes in version 2.1-11 [2018-12-10] (Development version)}{
 
-  \subsection{Misc.:}{
+  \subsection{Changes in existing functions}{
      \itemize{
        \item
-       No changes.
+       \code{seqdist()}. An error is raised when the number of unique sequences exceeds the maximal allowed.
      }
   }
 }
@@ -31,9 +31,9 @@
   \subsection{Misc.:}{
      \itemize{
        \item
-       Vignette: Error in formula for complexity index. 
+       Vignette: Error in formula for complexity index.
        Also, now DOI instead of link to JSS article.
-     } 
+     }
   }
 }
 

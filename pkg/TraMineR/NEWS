@@ -1,8 +1,9 @@
 ## =========
-Version 2.1-11 [2018-11-19] (Development version)
+Version 2.1-11 [2018-12-10] (Development version)
 
-Misc:
-  - No changes.
+Changes in existing functions:
+  - seqdist(). An error is raised when the number of 
+    unique sequences exceeds the maximal allowed.
 
 ## =========
 Version 2.1-10 [2018-11-18] (Development version)
@@ -16,7 +17,7 @@ Bug Fixes:
   - Vignette: Fixed issue with updated \code{fancyvrb.sty}.
 
 Misc:
-  - Vignette: Error in formula for complexity index. 
+  - Vignette: Error in formula for complexity index.
     Also, now DOI instead of link to JSS article.
 
 ## =========
