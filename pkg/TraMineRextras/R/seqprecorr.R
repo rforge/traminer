@@ -212,6 +212,8 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	  tr[inoncomp,] <- 0
 	}
 
+  diag(tr) <- 0
+
   	
 	transw <- matrix(0, nrow=nbseq, ncol=1)
 	rownames(transw) <- rownames(seqdata)

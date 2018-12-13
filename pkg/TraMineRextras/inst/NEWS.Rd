@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.4 [2018-12-01] (Development version)}{
+\section{Changes in version 0.5.4 [2018-12-13] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
@@ -15,7 +15,7 @@
         Two additional methods have been implemented, namely \code{'RANK'}
         (for rank-based transition weights) and \code{'ONE'} for
         non-weighted transitions. Also new argument \code{stprec} to allow
-        specifying rank values to be used by \code{method='RANK'}.
+        specifying rank values for \code{method='RANK'}.
     }
   }
 
@@ -26,8 +26,10 @@
       \item
       \code{seqsplot()}: color synchronization failed when one of the states selected was unobserved in one of the groups.
       \item
-      \code{seqprecstart()}: did not work as expected when equiv class included incomparable states. 
-      
+      \code{seqprecorr()}: identification of non-comparable states did not work as expected.
+      \item
+      \code{seqprecstart()}: did not work as expected when equiv class included incomparable states.
+
     }
   }
 
