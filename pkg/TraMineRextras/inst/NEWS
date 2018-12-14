@@ -1,4 +1,10 @@
-                CHANGES IN TraMineRextras VERSION 0.5.4 [2018-12-13] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.5 [2018-12-14] (Development version)
+
+Changes in existing functions
+    o   No changes.
+    
+    
+                CHANGES IN TraMineRextras VERSION 0.4.4 [2018-12-14]
 
 Changes in existing functions
     o   plot.stslist.surv(): new 'xlab' argument.
@@ -22,7 +28,6 @@ Bug fixes
         not work as expected.
     o   seqprecstart(): did not work as expected when equiv class
         included incomparable states.
-
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.3 [2018-08-22]
