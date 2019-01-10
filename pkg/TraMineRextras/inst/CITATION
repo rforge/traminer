@@ -31,7 +31,7 @@ citEntry(entry="article",
   textVersion="Studer, M., M\u00FCller, N.S., Ritschard, G. & Gabadinho, A. (2010), Classer, discriminer et visualiser des s\u00E9quences d'\u00E9v\u00E9nements, In Extraction et gestion des connaissances (EGC 2010), Revue des nouvelles technologies de l'information RNTI. Vol. E-19, pp. 37-48. "
 )
 citEntry(entry="incollection",
-  author = personList(p1, p5, p6),
+  author = personList(p1, p6, p7),
   title = "An Index of Precarity for Measuring Early Employment Insecurity",
   booktitle = "Sequence Analysis and Related Approaches: Innovative Methods and Applications",
   publisher = "Springer",
