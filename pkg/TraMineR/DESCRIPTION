@@ -1,15 +1,19 @@
 Package: TraMineR
 Version: 2.1-11
-Date: 2019-02-07
+Date: 2019-02-14
 Title: Trajectory Miner: a Toolbox for Exploring and Rendering Sequences
 Authors@R: c(
   person("Alexis", "Gabadinho", role = c("aut", "cph")),
-  person("Matthias", "Studer", role = c("aut", "cph")),
+  person("Matthias", "Studer",
+    role = c("aut", "cph"),
+    comment = c(ORCID = "0000-0002-6269-1412")),
   person("Nicolas", "Müller", role = "aut"),
   person("Reto", "Bürgin", role = "aut"),
   person("Pierre-Alexandre", "Fonta", role = "aut"),
-  person("Gilbert", "Ritschard", role = c("aut", "cre", "cph"),
-  email = "gilbert.ritschard@unige.ch"))
+  person("Gilbert", "Ritschard",
+    role = c("aut", "cre", "cph"),
+    email = "gilbert.ritschard@unige.ch",
+    comment = c(ORCID = "0000-0001-7776-0903")))
 Depends: R (>= 3.0.0)
 Imports: utils, RColorBrewer, boot, graphics, grDevices, stats, Hmisc, cluster
 Suggests: xtable

@@ -1,11 +1,13 @@
 ## =========
-Version 2.1-11 [2019-02-07] (Development version)
+Version 2.1-11 [2019-02-14] (Development version)
 
 Changes in existing functions:
-  - seqdef(). Speed improvement suggested by Jouni Helske. 
+  - seqdef(). Speed improvement suggested by Jouni Helske.
     Transparent for the user.
   - seqdist(). An error is raised when the number of
     unique sequences exceeds the maximal allowed.
+  - plot.ststlist.statd(). Now checks the 'type' argument and 
+    returns the values plotted.
 
 ## =========
 Version 2.1-10 [2018-11-18] (Development version)

@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-11 [2019-02-07] (Development version)}{
+\section{Changes in version 2.1-11 [2019-02-14] (Development version)}{
 
   \subsection{Changes in existing functions}{
      \itemize{
@@ -9,6 +9,7 @@
        \code{seqdef()}. Speed improvement suggested by Jouni Helske. Transparent for the user.
        \item
        \code{seqdist()}. An error is raised when the number of unique sequences exceeds the maximal allowed.
+       \code{plot.ststlist.statd()}. Now checks the \code{type} argument and returns the values plotted.
      }
   }
 }
