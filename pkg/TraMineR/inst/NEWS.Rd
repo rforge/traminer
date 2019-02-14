@@ -9,6 +9,7 @@
        \code{seqdef()}. Speed improvement suggested by Jouni Helske. Transparent for the user.
        \item
        \code{seqdist()}. An error is raised when the number of unique sequences exceeds the maximal allowed.
+       \item
        \code{plot.ststlist.statd()}. Now checks the \code{type} argument and returns the values plotted.
      }
   }
