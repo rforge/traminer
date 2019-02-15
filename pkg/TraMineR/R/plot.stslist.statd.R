@@ -89,6 +89,6 @@ plot.stslist.statd <- function(x, type = "d", cpal = NULL, ylab = NULL,
 	if (is.null(yaxis) || yaxis)
 		axis(2, cex.axis=cex.axis)
 
-  if (type == 'Ht') return(x$Entropy)
-  else return(x$Frequencies)
+  if (type == 'Ht') return(invisible(x$Entropy))
+  else return(invisible(x$Frequencies))
 }

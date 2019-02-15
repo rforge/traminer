@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-11 [2019-02-14] (Development version)
+Version 2.1-11 [2019-02-15] (Development version)
 
 Changes in existing functions:
   - seqdef(). Speed improvement suggested by Jouni Helske.
