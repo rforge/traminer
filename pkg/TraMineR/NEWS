@@ -6,8 +6,12 @@ Changes in existing functions:
     Transparent for the user.
   - seqdist(). An error is raised when the number of
     unique sequences exceeds the maximal allowed.
-  - plot.ststlist.statd(). Now checks the 'type' argument and 
+  - plot.ststlist.statd(). Now checks the 'type' argument and
     returns the values plotted.
+
+Bug Fixes:
+  - Warning about potential imbalanced PROTECT in relation
+    with TMRNumberFormat in the C++ code (eventseq.cpp).
 
 ## =========
 Version 2.1-10 [2018-11-18] (Development version)

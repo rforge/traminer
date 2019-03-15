@@ -13,6 +13,13 @@
        \code{plot.ststlist.statd()}. Now checks the \code{type} argument and returns the values plotted.
      }
   }
+  \subsection{Bug Fixes:}{
+    \itemize{
+      \item
+      Warning about potential imbalanced \code{PROTECT} in relation with \code{TMRNumberFormat} in the C++ code (eventseq.cpp).
+    }
+  }
+
 }
 
 
