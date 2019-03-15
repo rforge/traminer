@@ -14,7 +14,7 @@ Bug Fixes:
     with TMRNumberFormat in the C++ code (eventseq.cpp).
 
 ## =========
-Version 2.1-10 [2018-11-18] (Development version)
+Version 2.0-10 [2018-11-18] 
 
 Bug Fixes:
   - seqdist(): when 'refseq' was passed as a state sequence
