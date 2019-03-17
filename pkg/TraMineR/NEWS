@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-11 [2019-02-15] (Development version)
+Version 2.1-11 [2019-02-17] (Development version)
 
 Changes in existing functions:
   - seqdef(). Speed improvement suggested by Jouni Helske.
@@ -10,11 +10,13 @@ Changes in existing functions:
     returns the values plotted.
 
 Bug Fixes:
-  - Warning about potential imbalanced PROTECT in relation
+  - seqtab(), seqxtract(), checkcost(), SPELL_to_STS(). Issues
+    with length > 1 in coercion to logical.
+  - Warning about potential stack imbalanced PROTECT in relation
     with TMRNumberFormat in the C++ code (eventseq.cpp).
 
 ## =========
-Version 2.0-10 [2018-11-18] 
+Version 2.0-10 [2018-11-18]
 
 Bug Fixes:
   - seqdist(): when 'refseq' was passed as a state sequence

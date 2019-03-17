@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-11 [2019-03-15] (Development version)}{
+\section{Changes in version 2.1-11 [2019-03-17] (Development version)}{
 
   \subsection{Changes in existing functions}{
      \itemize{
@@ -16,7 +16,9 @@
   \subsection{Bug Fixes:}{
     \itemize{
       \item
-      Warning about potential imbalanced \code{PROTECT} in relation with \code{TMRNumberFormat} in the C++ code (eventseq.cpp).
+      \code{seqtab()}, \code{seqxtract(), checkcost(), SPELL_to_STS()}. Issues with \code{length > 1 in coercion to logical}.
+      \item
+      Warning about potential stack imbalanced \code{PROTECT} in relation with \code{TMRNumberFormat} in the C++ code (eventseq.cpp).
     }
   }
 
