@@ -1,11 +1,19 @@
 ## =========
-Version 2.1-12 [2019-02-18] (Development version)
+Version 2.1-12 [2019-03-22] (Development version)
 
 Misc.:
   - No changes
 
+
 ## =========
-Version 2.0-11 [2019-02-18]
+Version 2.0-11.1 [2019-03-22]
+
+Bug Fixes:
+  - eventseq.cpp: rchk message 'calling allocating function
+    Rf_asChar with argument allocated using TMRNumberFormat'.
+
+## =========
+Version 2.0-11 [2019-03-18]
 
 Changes in existing functions:
   - seqdef(). Speed improvement suggested by Jouni Helske.
