@@ -4,6 +4,8 @@
 
 \alias{seqprecarity}
 \alias{seqprecorr}
+\alias{print.seqprec}
+\alias{print.seqprecorr}
 
 \title{Precarity index}
 
@@ -12,9 +14,10 @@ The precarity index returned by the function \code{seqprecarity} is a modified c
 }
 
 \usage{
-seqprecarity(seqdata, correction=NULL, otto=.2, a=1, b=1.2, 
+seqprecarity(seqdata, correction=NULL, otto=.2, a=1, b=1.2,
     stprec=NULL, method="TRATEDSS",
-    state.order=alphabet(seqdata), state.equiv=NULL, ...)
+    state.order=alphabet(seqdata), state.equiv=NULL, 
+    with.missing=FALSE, ...)
 
 seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
     penalized="BOTH", method="TRATEDSS", weight.type="ADD", stprec=NULL,
@@ -32,7 +35,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{b}{Non-negative real value. Exponent weight of the correction factor. Default is 1.2. }
 
-  \item{stprec}{Vector of state precarity levels. If \code{NULL} the values are derived from the state order using \code{\link{seqprecstart}}. If not \code{NULL}, the values will be normalized by their maximum.}
+  \item{stprec}{Vector of state precarity degrees. If \code{NULL} the values are derived from the state order using \code{\link{seqprecstart}}. If not \code{NULL}, the values will be normalized by their maximum.}
 
   \item{state.order}{Vector of short state labels defining the order of the states. First the less precarious (most positive) state and then the other states in increasing precariousness order. States of the alphabet that are not included here (and are not equivalent to one of the listed state) define the non-comparable states.}
 
@@ -46,7 +49,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{with.missing}{Logical. Should the missing state be considered as an element of the alphabet?
     }
-    
+
   \item{tr.type}{Deprecated. Use \code{method} instead.}
 
 %  \item{norm}{Logical. Should the weights be normalized by the maximal number of transitions.
@@ -68,16 +71,17 @@ When equivalent classes are provided, the transitions between states of a same c
 
 As for non-comparable states (those not listed on the \code{state.order} argument and not equivalent to a listed state), the transition to or from such states is ignored and they all receive the mean value (.5) as state precarity level.
 
+When there are missing states in the sequences, set \code{with.missing = TRUE} to treat the missing state as an additional state. In that case the missing state will be considered as non-comparable unless you include the \code{nr} attribute of \code{seqdata} in \code{state.order} or \code{state.equiv}. With \code{with.missing = FALSE}, transitions to and from the missing state will just be ignored. However, when \code{with.missing = FALSE}, there will be no \code{stprec} value for the missing state and, as a result, the precarity value will be \code{NA} for sequences starting with a missing state. To drop these starting missing states, use \code{left='DEL'} in \code{\link{seqdef}} when defining the state sequence object.
 }
 
 
 
 \value{
 
-For \code{seqprecarity}, a vector with the value of the precarity index for each sequence. The returned vector has an attribute \code{stprec} that contains the state precarity level used at the starting position.
+For \code{seqprecarity}, an object of class \code{seqprec} with the value of the precarity index for each sequence. The returned object has an attribute \code{stprec} that contains the state precarity level used at the starting position. The associated print method (\code{print.seqprec}) prints the state precarity values without the additional attribute.
 
 
-For \code{seqprecorr}, the vector of the weighted proportions \eqn{q(x)} with as additional attributes: \code{tr} the used transition weights; \code{signs} the transitions signs; \code{state.noncomp} the non-comparable states; and \code{state.order} the used state order.
+For \code{seqprecorr}, an object of class \code{seqprecorr} with the weighted proportions \eqn{q(x)} and as additional attributes: \code{tr} the used transition weights; \code{signs} the transitions signs; \code{state.noncomp} the non-comparable states; and \code{state.order} the used state order. The associated print method (\code{print.seqprecorr}) prints \eqn{q(x)} values without the additional attributes.
 
 }
 
@@ -132,6 +136,15 @@ length(corr.f[corr.f != 1])
 
 ## Precarity with rank-based transition weights
 prec.rank <- seqprecarity(actcal.seq, method='RANK')
+
+## Precarity in presence of missing values:
+##  missing state treated as an additional state
+data(ex1)
+## by default right missings are dropped from the sequences
+s.ex1 <- seqdef(ex1[,1:13])
+seqprecarity(s.ex1, with.missing=TRUE)
+
+
 }
 
 \author{Gilbert Ritschard}

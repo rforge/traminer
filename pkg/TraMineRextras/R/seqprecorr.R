@@ -12,7 +12,8 @@ seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NUL
 		stop(" [!] seqdata is NOT a sequence object, see seqdef function to create one")
 
   if(is.null(stprec) && method=="RANK"){
-    stprec <- suppressMessages(seqprecstart(seqdata, state.order=state.order, state.equiv=state.equiv))
+    stprec <- suppressMessages(seqprecstart(seqdata, state.order=state.order,
+                        state.equiv=state.equiv, with.missing=with.missing))
   }
 
   if (is.logical(penalized)){
@@ -65,12 +66,14 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 		stop(" [!] penalized should be one of ", paste(method.names, collapse=", "))
 
   ## Checking that listed states are in alphabet
-  state.order <- states.check(seqdata, state.order, state.equiv)
+  state.order <- states.check(seqdata, state.order, state.equiv, with.missing=with.missing)
 	
 	###################################
 	## setting signs according to the rank order of the states
 
-	alph=length(alphabet(seqdata))
+	alphabet <- alphabet(seqdata)
+  if (with.missing) alphabet <- c(alphabet, attr(seqdata,"nr"))
+  alph=length(alphabet)
   tr <- matrix(1, nrow=alph, ncol=alph)
   diag(tr) <- 0
   signs <- matrix(0, nrow=alph, ncol=alph)
@@ -78,8 +81,8 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
   state.noncomp <- NULL
 	
   if (length(unique(state.order)) < alph){
-    inoncomp <- which(is.na(match(alphabet(seqdata),unique(state.order))))
-    state.noncomp <- alphabet(seqdata)[inoncomp]
+    inoncomp <- which(is.na(match(alphabet,unique(state.order))))
+    state.noncomp <- alphabet[inoncomp]
     message(" [>] Non ranked states: ", paste(state.noncomp, collapse=', '))
     state.order.plus <- c(state.order, state.noncomp)
   } else {
@@ -93,6 +96,7 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
   ## since transitions from incomparable state will be ignored
 
   seqdata.ori <- seqdata ## just in case we would need the original later
+  alphabet.ori <- alphabet
 
   ##print(seqdata)	
   ##ii <- as.matrix(which(seqdata=="I", arr.ind =TRUE))
@@ -133,6 +137,8 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
   dss <- seqdss(seqdata, with.missing=with.missing)
   dssl <- seqlength(dss)
   nbseq <- nrow(dss)
+  ##alphabet <- alphabet(seqdata)
+  ##if (with.missing) alphabet <- c(alphabet, attr(seqdata, "nr"))
 
 
 	##  default tr set above as 1s
@@ -141,14 +147,14 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
     ## Computing transition probabilities
 
 	  if (method == "FREQ") { ## default tr set above as 1s (no transition weight)
-	    tr <- suppressMessages(seqtrate(dss, count=TRUE))  ## Here we compute the counts of the transitions
+	    tr <- suppressMessages(seqtrate(dss, count=TRUE, with.missing=with.missing))  ## Here we compute the counts of the transitions
       tr <- tr / sum(tr) ## and now the proportion of each observed transition
 	  }
 	  else if (method == "TRATEDSS") {
-	    tr <- suppressMessages(seqtrate(dss))
+	    tr <- suppressMessages(seqtrate(dss, with.missing=with.missing))
 	  }
 	  else if (method == "TRATE") {
-	    tr <- suppressMessages(seqtrate(seqdata))
+	    tr <- suppressMessages(seqtrate(seqdata, with.missing=with.missing))
 	  }
 
 	  ## Computing transition weights from transition probabilities
@@ -169,13 +175,13 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
   else if (method == "RANK"){
       for (j in 1:length(stprec))
         tr[,j] <- abs(stprec - stprec[j])
-      rownames(tr) <- colnames(tr) <- alphabet(seqdata)
+      rownames(tr) <- colnames(tr) <- alphabet ##(seqdata)
   }
 
 	## reorder rows and colunms according to state.order
 	
-	ord <- match(state.order.plus,alphabet(seqdata.ori))
-	ordo <- match(alphabet(seqdata.ori),state.order.plus)
+	ord <- match(state.order.plus,alphabet.ori)
+	ordo <- match(alphabet.ori,state.order.plus)
 
   #tr <- tr[ord,ord]
 	signs <- signs[ord,ord]	
@@ -198,7 +204,7 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	if(!is.null(state.equiv)){
 	  lc <- length(state.equiv)
 	  for (i in 1:lc) {
-	    iequiv <- match(state.equiv[[i]],alphabet(seqdata))
+	    iequiv <- match(state.equiv[[i]],alphabet)
 	    signs[iequiv,iequiv] <- 0
 	    tr[iequiv,iequiv] <- 0
 	  }
@@ -219,9 +225,10 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	rownames(transw) <- rownames(seqdata)
 	transpen <- transw
 	prop.transpen <- transw
-	
+
+
   if (penalized != 'NO') {
-	  dss.num <- TraMineR:::seqasnum(dss)+1
+	  dss.num <- TraMineR:::seqasnum(dss, with.missing=with.missing)+1
 	  ## sum of transition weights in the sequence
   	for (i in 1:nbseq) {
   		if (dssl[i]>1) {
@@ -249,4 +256,12 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	##attr(prop.transpen,"seqdata") <- seqdata
 	
 	return(prop.transpen)
+}
+
+print.seqprecorr <- function(x, ...){
+  names <- dimnames(x)
+  attributes(x) <- NULL
+  x <- as.matrix(x)
+  dimnames(x) <- names
+  print(x, ...)
 }

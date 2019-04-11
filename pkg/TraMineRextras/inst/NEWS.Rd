@@ -1,11 +1,20 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.5 [2018-12-14] (Development version)}{
+\section{Changes in version 0.5.5 [2019-04-11] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
-      No changes
+      \code{seqprecarity()} and \code{seqprecstart()} gain a argument \code{with.missing}.
+      \item
+      \code{seqprecarity()}: there is now a print method for the generated \code{seqprec} object that prevents the printing of all its attributes.
+    }
+  }
+  
+  \subsection{Bug fixes}{
+    \itemize{
+      \item
+      \code{seqprecarity()}, \code{seqprecorr()}, and \code{seqprecstart()}: errors due to bad handling of missing states.
     }
   }
 }
