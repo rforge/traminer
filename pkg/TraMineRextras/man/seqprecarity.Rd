@@ -10,7 +10,7 @@
 \title{Precarity index}
 
 \description{
-The precarity index returned by the function \code{seqprecarity} is a modified complexity index that takes account of the ordinal order (possibly only partial order) of the states and the precarity level of the first state in the sequence. The signed proportions (transition-based weighted proportions of negative transitions) used for the correction factor can be extracted per se by means of the function \code{seqprecorr}. (See details.)
+The precarity index returned by the function \code{seqprecarity} is a modified complexity index that takes account of the ordinal order (possibly only partial order) of the states and the precarity degree of the first state in the sequence. The signed proportions (transition-based weighted proportions of negative transitions) used for the correction factor can be extracted per se by means of the function \code{seqprecorr}. (See details.)
 }
 
 \usage{
@@ -29,7 +29,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{correction}{Vector of non-negative correction factor values. If \code{NULL}, the correction factors are computed by means of the \code{seqprecorr} function.}
 
-  \item{otto}{Scalar in the range [0,1]. Trade-off weight between the precarity level of the initial state and the corrected complexity. Default is \code{otto=.2}.}
+  \item{otto}{Scalar in the range [0,1]. Trade-off weight between the precarity degree of the initial state and the corrected complexity. Default is \code{otto=.2}.}
 
   \item{a}{Non-negative real value. Exponent weight of the complexity. Default is 1.}
 
@@ -41,7 +41,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{state.equiv}{List of state equivalence classes. Each class in the list is given as the vector of the short labels of the states forming the class. }
 
-  \item{method}{One of \code{'FREQ'}, \code{'TRATE'}, \code{'TRATEDSS'} (default), \code{'RANK'}, or \code{'ONE'}. Method for determining transition weights. Weights based on transition probabilities: \code{'FREQ'} overall frequency of the transitions, \code{'TRATE'} transition probabilities, and \code{'TRATEDSS'} transition probabilites in the DSS sequences. \code{'RANK'} differences between state precarity levels. \code{'ONE'} no weight.}
+  \item{method}{One of \code{'FREQ'}, \code{'TRATE'}, \code{'TRATEDSS'} (default), \code{'RANK'}, or \code{'ONE'}. Method for determining transition weights. Weights based on transition probabilities: \code{'FREQ'} overall frequency of the transitions, \code{'TRATE'} transition probabilities, and \code{'TRATEDSS'} transition probabilites in the DSS sequences. \code{'RANK'} differences between state precarity degrees. \code{'ONE'} no weight.}
 
   \item{weight.type}{One of \code{'ADD'} (default), \code{'INV'}, or \code{'LOGINV'}. When \code{method} is one of \code{'FREQ'}, \code{'TRATE'} or \code{'TRATEDSS'}, how weights are derived from the transition probabilities: \code{'ADD'} additive (1-p), \code{'INV'} inverse (1/p), and \code{'LOGINV'} log of inverse. Ignored when any other \code{method} is selected.}
 
@@ -63,13 +63,13 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
  \deqn{prec(x) = \lambda a(x_1) + (1-\lambda) (1 + q(x))^\beta c(x)^\alpha}{prec(x) = lambda * a(x_1) + (1 - lambda)*(1 + q(x))^b*c(x)^a}
 
-where \eqn{a(x_1)} is the level of precarity (argument \code{stprec}) of the starting state in sequence \eqn{x}, \eqn{q(x)} is the difference between the weighted proportions of negative and positive transitions in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the precarity of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
+where \eqn{a(x_1)} is the degree of precarity (argument \code{stprec}) of the starting state in sequence \eqn{x}, \eqn{q(x)} is the difference between the weighted proportions of negative and positive transitions in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the precarity of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
 The difference \eqn{q(x)} between the weighted proportion of negative and positive transitions can be obtained separately by means of the function \code{seqprecorr}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}.
 
-When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean precarity level is assigned to each state of the class (see \code{\link{seqprecstart}}).
+When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean precarity degree is assigned to each state of the class (see \code{\link{seqprecstart}}).
 
-As for non-comparable states (those not listed on the \code{state.order} argument and not equivalent to a listed state), the transition to or from such states is ignored and they all receive the mean value (.5) as state precarity level.
+As for non-comparable states (those not listed on the \code{state.order} argument and not equivalent to a listed state), the transition to or from such states is ignored and they all receive the mean value (.5) as state precarity degree.
 
 When there are missing states in the sequences, set \code{with.missing = TRUE} to treat the missing state as an additional state. In that case the missing state will be considered as non-comparable unless you include the \code{nr} attribute of \code{seqdata} in \code{state.order} or \code{state.equiv}. With \code{with.missing = FALSE}, transitions to and from the missing state will just be ignored. However, when \code{with.missing = FALSE}, there will be no \code{stprec} value for the missing state and, as a result, the precarity value will be \code{NA} for sequences starting with a missing state. To drop these starting missing states, use \code{left='DEL'} in \code{\link{seqdef}} when defining the state sequence object.
 }
@@ -78,10 +78,10 @@ When there are missing states in the sequences, set \code{with.missing = TRUE} t
 
 \value{
 
-For \code{seqprecarity}, an object of class \code{seqprec} with the value of the precarity index for each sequence. The returned object has an attribute \code{stprec} that contains the state precarity level used at the starting position. The associated print method (\code{print.seqprec}) prints the state precarity values without the additional attribute.
+For \code{seqprecarity}, an object of class \code{seqprec} with the value of the precarity index for each sequence. The returned object has an attribute \code{stprec} that contains the state precarity degree used at the starting position. The associated print method (\code{print.seqprec}) prints the state precarity values without the additional attribute.
 
 
-For \code{seqprecorr}, an object of class \code{seqprecorr} with the weighted proportions \eqn{q(x)} and as additional attributes: \code{tr} the used transition weights; \code{signs} the transitions signs; \code{state.noncomp} the non-comparable states; and \code{state.order} the used state order. The associated print method (\code{print.seqprecorr}) prints \eqn{q(x)} values without the additional attributes.
+For \code{seqprecorr}, an object of class \code{seqprecorr} with the weighted proportions \eqn{q(x)} and as additional attributes: \code{tr} the used transition weights; \code{signs} the transitions signs; \code{state.noncomp} the non-comparable states; and \code{state.order} the used state order. The associated print method (\code{print.seqprecorr}) prints the \eqn{q(x)} values without the additional attributes.
 
 }
 
