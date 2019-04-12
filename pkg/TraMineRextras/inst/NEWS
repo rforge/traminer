@@ -1,9 +1,10 @@
-                CHANGES IN TraMineRextras VERSION 0.5.5 [2019-04-11] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.5 [2019-04-12] (Development version)
 
 Changes in existing functions
     o   seqprecarity() and seqprecstart() gain a argument 'with.missing'.
     o   seqprecarity()}: there is now a print method for the generated 
         'seqprec' object that prevents the printing of all its attributes.
+    o   seqtabstocc() gains an argument 'with.missing'.
 
 Bug fixes
     o   seqprecarity(), seqprecorr(), and seqprecstart(): errors due 
