@@ -4,8 +4,8 @@ Date: 2019-04-12
 Title: TraMineR Extension
 Authors@R: c(
   person("Gilbert", "Ritschard", role = c("aut", "cre", "ths", "cph"),
-  email = "gilbert.ritschard@unige.ch"),
-  person("Matthias", "Studer", role = "aut"),
+  email = "gilbert.ritschard@unige.ch", comment = c(ORCID = "0000-0001-7776-0903")),
+  person("Matthias", "Studer", role = "aut", comment = c(ORCID = "0000-0002-6269-1412")),
   person("Reto", "Buergin", role = "aut"),
   person("Alexis", "Gabadinho", role = "ctb"),
   person("Pierre-Alexandre", "Fonta", role = "ctb"),
