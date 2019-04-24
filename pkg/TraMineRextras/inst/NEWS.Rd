@@ -12,9 +12,12 @@
       \code{seqtabstocc()} gains an argument \code{with.missing}.
     }
   }
-  
+
   \subsection{Bug fixes}{
     \itemize{
+      \item
+      \code{seqprecorr()}: \code{method='TRATE'} now works as expected.
+
       \item
       \code{seqprecarity()}, \code{seqprecorr()}, and \code{seqprecstart()}: errors due to bad handling of missing states.
     }

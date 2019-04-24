@@ -160,6 +160,7 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	  ## Computing transition weights from transition probabilities
 
     eps <- .000001
+    diag(tr) <- 0
 
 		if (weight.type == "ADD") {
 		  tr <- 1 - tr
@@ -170,7 +171,8 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 		else if (weight.type == "LOGINV"){
 		  tr <- log((1 + eps)/(tr + eps))
 		}
-  	tr <- tr/tr[1,1] ## normalize by diagonal value
+  	##tr <- tr/tr[1,1] ## normalize by diagonal value
+  	tr <- tr/diag(tr) ## normalize by diagonal value
   }
   else if (method == "RANK"){
       for (j in 1:length(stprec))
