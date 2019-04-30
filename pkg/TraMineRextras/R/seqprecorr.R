@@ -140,7 +140,6 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
   ##alphabet <- alphabet(seqdata)
   ##if (with.missing) alphabet <- c(alphabet, attr(seqdata, "nr"))
 
-
 	##  default tr set above as 1s
   if (method %in% c('FREQ','TRATE','TRATEDSS')) {
 	
@@ -159,14 +158,17 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 
 	  ## Computing transition weights from transition probabilities
 
-    eps <- .000001
+    eps <- 1e-10
+    border.effect <- 10
     diag(tr) <- 0
+    ## adjustement when any tr close from 1
+    if (any(tr > 1 - .1/border.effect)) tr <- tr - tr/border.effect
 
 		if (weight.type == "ADD") {
 		  tr <- 1 - tr
 		}
 		else if (weight.type == "INV"){
-		  tr <- (1 + eps)/(tr + eps)
+		  tr <- (1 + eps)/(tr + eps) ## - 1  ## GR 29/04/19 minus 1 to set min at 0
 		}
 		else if (weight.type == "LOGINV"){
 		  tr <- log((1 + eps)/(tr + eps))
@@ -251,8 +253,6 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	colnames(prop.transpen) <- "Penalty"
 	attr(prop.transpen,"tr") <- tr
 	attr(prop.transpen,"signs") <- signs
-	##attr(prop.transpen,"ord") <- ord
-	##attr(prop.transpen,"ordo") <- ordo
 	attr(prop.transpen,"state.noncomp") <- state.noncomp
 	attr(prop.transpen,"state.order") <- state.order.plus
 	##attr(prop.transpen,"seqdata") <- seqdata

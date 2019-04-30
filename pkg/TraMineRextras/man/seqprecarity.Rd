@@ -16,7 +16,7 @@ The precarity index returned by the function \code{seqprecarity} is a modified c
 \usage{
 seqprecarity(seqdata, correction=NULL, otto=.2, a=1, b=1.2,
     stprec=NULL, method="TRATEDSS",
-    state.order=alphabet(seqdata), state.equiv=NULL, 
+    state.order=alphabet(seqdata), state.equiv=NULL,
     with.missing=FALSE, ...)
 
 seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
@@ -65,7 +65,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
 where \eqn{a(x_1)} is the degree of precarity (argument \code{stprec}) of the starting state in sequence \eqn{x}, \eqn{q(x)} is the difference between the weighted proportions of negative and positive transitions in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the precarity of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
-The difference \eqn{q(x)} between the weighted proportion of negative and positive transitions can be obtained separately by means of the function \code{seqprecorr}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}.
+The difference \eqn{q(x)} between the weighted proportion of negative and positive transitions can be obtained separately by means of the function \code{seqprecorr}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. When any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, with \eqn{d = 10} to avoid an unwanted border effect.
 
 When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean precarity degree is assigned to each state of the class (see \code{\link{seqprecstart}}).
 
