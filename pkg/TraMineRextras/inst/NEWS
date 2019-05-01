@@ -1,12 +1,13 @@
-                CHANGES IN TraMineRextras VERSION 0.5.5 [2019-04-30] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.5 [2019-05-01] (Development version)
 
 Changes in existing functions
     o   seqprecarity() and seqprecstart() gain a argument 'with.missing'.
     o   seqprecarity()}: there is now a print method for the generated
         'seqprec' object that prevents the printing of all its attributes.
-    o   seqprecorr(): to avoid a border effect when method is 'FREQ', 
-        'TRATEDSS', or 'TRATE', the computed transition frequencies or 
-        probabilities p are adjusted as p - .1/marg when p > 1 - marg. 
+    o   seqprecorr(): new 'border.effect' argument. To avoid a border 
+        effect, when method is 'FREQ', 'TRATEDSS', or 'TRATE', the 
+        computed transition frequencies or probabilities p are adjusted 
+        as p - p/border.effect when any p > 1 - .1/border.effect.
     o   seqtabstocc() gains an argument 'with.missing'.
 
 Bug fixes

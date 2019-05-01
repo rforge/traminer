@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.5 [2019-04-30] (Development version)}{
+\section{Changes in version 0.5.5 [2019-05-01] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
@@ -9,8 +9,10 @@
       \item
       \code{seqprecarity()}: there is now a print method for the generated \code{seqprec} object that prevents the printing of all its attributes.
       \item
-      \code{seqprecorr()}: to avoid a border effect when method is \code{'FREQ'}, \code{'TRATEDSS'}, or \code{'TRATE'}, the computed transition frequencies or probabilities \code{p} are adjusted as \code{p - .1/marg} when \code{p > 1 - marg}.
-      
+      \code{seqprecorr()}: new \code{border.effect} argument. To avoid a border
+        effect, when method is \code{'FREQ'}, \code{'TRATEDSS'}, or \code{'TRATE'}, the
+        computed transition frequencies or probabilities \eqn{p} are adjusted
+        as \eqn{p - p/}\code{border.effect} when any \eqn{p > 1 - .1/}\code{border.effect}.
       \item
       \code{seqtabstocc()} gains an argument \code{with.missing}.
     }

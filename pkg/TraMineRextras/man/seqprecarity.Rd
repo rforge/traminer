@@ -21,7 +21,7 @@ seqprecarity(seqdata, correction=NULL, otto=.2, a=1, b=1.2,
 
 seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
     penalized="BOTH", method="TRATEDSS", weight.type="ADD", stprec=NULL,
-    with.missing=FALSE, tr.type)
+    with.missing=FALSE, border.effect = 10, tr.type)
 }
 
 \arguments{
@@ -49,6 +49,8 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{with.missing}{Logical. Should the missing state be considered as an element of the alphabet?
     }
+    
+  \item{border.effect}{Value (strictly greater than 1) used to adjust estimated transition probabilities to avoid border effect. Default is 10. See details.}
 
   \item{tr.type}{Deprecated. Use \code{method} instead.}
 
@@ -65,7 +67,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
 where \eqn{a(x_1)} is the degree of precarity (argument \code{stprec}) of the starting state in sequence \eqn{x}, \eqn{q(x)} is the difference between the weighted proportions of negative and positive transitions in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the precarity of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
-The difference \eqn{q(x)} between the weighted proportion of negative and positive transitions can be obtained separately by means of the function \code{seqprecorr}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. When any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, with \eqn{d = 10} to avoid an unwanted border effect.
+The difference \eqn{q(x)} between the weighted proportion of negative and positive transitions can be obtained separately by means of the function \code{seqprecorr}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. To avoid a border effect, when any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, where \eqn{d} is the \code{border.effect} parameter.
 
 When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean precarity degree is assigned to each state of the class (see \code{\link{seqprecstart}}).
 

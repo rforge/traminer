@@ -4,7 +4,7 @@
 
 seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NULL,
       penalized="BOTH", method="TRATEDSS", weight.type="ADD", stprec=NULL,
-      with.missing=FALSE, tr.type) {
+      with.missing=FALSE, border.effect=10, tr.type) {
 
   TraMineR.check.depr.args(alist(method = tr.type))
 
@@ -24,13 +24,14 @@ seqprecorr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NUL
   else
     seqprecorr.tr(seqdata, state.order=state.order, state.equiv = state.equiv,
       method=method, weight.type=weight.type, penalized=penalized,
-      stprec=stprec, with.missing=with.missing)
+      stprec=stprec, with.missing=with.missing, border.effect = border.effect)
 
 }
 
 
 seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = NULL,
-      method="TRATEDSS", weight.type="ADD", penalized="BOTH", stprec=NULL, with.missing=FALSE) {
+      method="TRATEDSS", weight.type="ADD", penalized="BOTH", stprec=NULL, with.missing=FALSE,
+      border.effect = 10) {
 
   ## weight.type == "ADD"  : additive, i.e. 1-tr
   ##             == "INV"  : inverse, i.e. 1/tr
@@ -59,6 +60,8 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
     weight.names <- c('ADD','INV','LOGINV')
     if (!(weight.type %in% weight.names))
   		stop(" [!] weight.type should be one of ", paste(weight.names, collapse=", "))
+    if (!(border.effect > 1))
+  		stop(" [!] border.effect should be strictly greater than one!")
   }
 
   pen.names <- c('NEG','POS','BOTH','NO')
@@ -159,7 +162,7 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	  ## Computing transition weights from transition probabilities
 
     eps <- 1e-10
-    border.effect <- 10
+    ##border.effect <- 10
     diag(tr) <- 0
     ## adjustement when any tr close from 1
     if (any(tr > 1 - .1/border.effect)) tr <- tr - tr/border.effect
