@@ -1,8 +1,8 @@
 ## =========
-Version 2.1-12 [2019-03-22] (Development version)
+Version 2.1-12 [2019-05-02] (Development version)
 
 Misc.:
-  - No changes
+  - seqST(): Suppressed unwanted messages when norm=TRUE.
 
 
 ## =========

@@ -59,7 +59,7 @@ seqST <- function(seqdata, norm=FALSE) {
         maxlength <- max(seqlength(seqdata))
         nrep <- ceiling(maxlength/length(alph))
 
-        turb.seq <- seqdef(t(rep(alph,nrep)[1:maxlength]))
+        turb.seq <- suppressMessages(seqdef(t(rep(alph,nrep)[1:maxlength])))
         turb.states <- seqdss(turb.seq)
         turb.dur <- seqdur(turb.seq)
         turb.phi <- suppressMessages(seqsubsn(seqdss(turb.seq), DSS=FALSE))

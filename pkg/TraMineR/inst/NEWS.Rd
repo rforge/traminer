@@ -1,12 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-12 [2019-03-22] (Development version)}{
+\section{Changes in version 2.1-12 [2019-05-02] (Development version)}{
 
   \subsection{Misc.}{
      \itemize{
        \item
-       No changes.
+       \code{seqST()}: Suppressed unwanted messages when \code{norm=TRUE}.
      }
   }
 }
