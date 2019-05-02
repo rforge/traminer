@@ -58,6 +58,8 @@ The normalized value is obtained by subtracting 1 to the index and dividing by t
 \examples{
   ## Loading the 'actcal' example data set
   data(actcal)
+  ## Here we consider only the first 10 sequences
+  actcal <- actcal[1:10,]
 
   ## Defining a sequence object with data in columns 13 to 24
   ## (activity status from january to december 2000)
