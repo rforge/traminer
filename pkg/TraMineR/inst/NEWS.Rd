@@ -6,9 +6,9 @@
   \subsection{Changes in existing functions:}{
      \itemize{
        \item
-       \code{seqST()}: New argument \code{silent} to control whether messages
-      about carried over operations should be displayed. In addition,
-      suppression of useless messages when \code{norm=TRUE}.
+       \code{seqici()}, \code{seqient()}, and \code{seqST()} gain a new argument \code{silent} to control whether messages about running operations should be displayed. 
+       \item
+       \code{seqST()}: suppression of useless messages when \code{norm=TRUE}.
      }
   }
 }

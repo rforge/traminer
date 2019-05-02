@@ -11,9 +11,9 @@
 \arguments{
   \item{seqdata}{a state sequence object as returned by the the \code{\link{seqdef}} function.}
 
-  \item{norm}{logical: Should the turbulence index be normalized?}
+  \item{norm}{logical: should the turbulence index be normalized?}
 
-  \item{silent}{logical: Should messages about carried over operations (extracting dss and durations, computing turbulence) be displayed?}
+  \item{silent}{logical: should messages about running operations (extracting dss and durations, computing turbulence) be displayed?}
 }
 
 
@@ -48,7 +48,7 @@ The normalized value is obtained by subtracting 1 to the index and dividing by t
 \code{seqdata} containing the turbulence value of each sequence. Normalized values are returned when \code{norm=TRUE}.}
 
 \seealso{
- \code{\link{seqdss}}, \code{\link{seqdur}}. For another composite measure of sequence complexity see and \code{\link{seqici}}.
+ \code{\link{seqdss}}, \code{\link{seqdur}}. For other measures of sequence complexity see \code{\link{seqient}} and  \code{\link{seqici}}.
 }
 \references{
   Elzinga, Cees H. and Liefbroer, Aart C. (2007).

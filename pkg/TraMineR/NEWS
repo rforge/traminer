@@ -2,9 +2,10 @@
 Version 2.1-12 [2019-05-02] (Development version)
 
 Changes in existing functions:
-  - seqST(). New argument 'silent' to control whether messages 
-    about carried over operations should be displayed. In addition,
-    suppression of useless messages when norm=TRUE.
+  - seqici(), seqient(), and seqST() gain a new argument 
+    'silent' to control whether messages about running 
+    operations should be displayed. 
+  - seqST(). Suppression of useless messages when norm=TRUE.
 
 
 ## =========

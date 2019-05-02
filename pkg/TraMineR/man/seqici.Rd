@@ -8,7 +8,7 @@ and the longitudinal entropy as a measure of the complexity induced
 by the state distribution in the sequence. }
 
 \usage{
- seqici(seqdata, with.missing=FALSE)
+ seqici(seqdata, with.missing=FALSE, silent=TRUE)
  }
 
 \arguments{
@@ -17,6 +17,8 @@ by the state distribution in the sequence. }
   \item{with.missing}{if set to \code{TRUE}, missing status (gaps in sequences)
 is handled as an additional state when computing the state
 distribution and the number of transitions in the sequence.}
+
+  \item{silent}{logical: should messages about running operations be displayed?}
  }
 
 \details{
@@ -48,6 +50,10 @@ the sequence \eqn{\ell}{l}
 sequence.
  }
 
+\seealso{
+ \code{\link{seqdss}}, \code{\link{seqstatd}}. For other measures of sequence complexity see \code{\link{seqient}} and  \code{\link{seqST}}.
+}
+
 \references{
 
 Gabadinho, A., G. Ritschard, N. S. Müller and M. Studer (2011). Analyzing and Visualizing State Sequences in R with TraMineR. \emph{Journal of Statistical Software} \bold{40}(4), 1-37.
@@ -58,8 +64,6 @@ séquences catégorielles", In \emph{Extraction et gestion des
 connaissances (EGC 2010), Revue des nouvelles technologies de
 l'information RNTI}. Vol. E-19, pp. 61-66. }
 
-
-\seealso{\code{\link{seqient}}, \code{\link{seqST}}}
 
 \examples{
 ## Creating a sequence object from the mvad data set
