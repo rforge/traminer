@@ -3,10 +3,12 @@
 
 \section{Changes in version 2.1-12 [2019-05-02] (Development version)}{
 
-  \subsection{Misc.}{
+  \subsection{Changes in existing functions:}{
      \itemize{
        \item
-       \code{seqST()}: Suppressed unwanted messages when \code{norm=TRUE}.
+       \code{seqST()}: New argument \code{silent} to control whether messages
+      about carried over operations should be displayed. In addition,
+      suppression of useless messages when \code{norm=TRUE}.
      }
   }
 }

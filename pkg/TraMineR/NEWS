@@ -1,8 +1,10 @@
 ## =========
 Version 2.1-12 [2019-05-02] (Development version)
 
-Misc.:
-  - seqST(): Suppressed unwanted messages when norm=TRUE.
+Changes in existing functions:
+  - seqST(). New argument 'silent' to control whether messages 
+    about carried over operations should be displayed. In addition,
+    suppression of useless messages when norm=TRUE.
 
 
 ## =========
