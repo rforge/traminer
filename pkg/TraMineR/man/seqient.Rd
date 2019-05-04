@@ -29,7 +29,7 @@ Normalization can be requested with the \code{norm=TRUE} option, in which case t
 }
 
 \value{
-a vector with an entropy value for each sequence in \code{seqdata}; the vector length is equal to the number of sequences.
+a single-column matrix with an entropy value for each sequence in \code{seqdata}; the column length is equal to the number of sequences.
 }
 
 \references{
@@ -42,7 +42,6 @@ Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2009). Mining Sequence
  \code{\link{seqstatd}} for the entropy of the transversal state distributions by positions in the sequence, and the composite measures of complexity \code{\link{seqici}} and  \code{\link{seqST}}.
 }
 
-}
 \examples{
 data(actcal)
 actcal.seq <- seqdef(actcal,13:24)

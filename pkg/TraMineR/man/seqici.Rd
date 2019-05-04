@@ -30,22 +30,21 @@ distribution and the number of transitions in the sequence.}
 where \eqn{q(s)} is the number of transitions in the sequence,
 \eqn{q_{max}} the maximum number of transitions,
 \eqn{h(s)} the within entropy, and \eqn{h_{max}} the theoretical maximum
-entropy which is \eqn{h_{max} = -\log 1/|A|}{h_max = -log 1/|A|}.
+entropy which is \eqn{h_{max} = -\log 1/|A|}{h_max = -log 1/|A|} with \eqn{|A|} the size of the alphabet.
 
-The index \eqn{C(s)} is the geometric mean of its two components
-which are normalized. The minimum value of 0 can only be reached by a
-sequence made of one distinct state, containing thus 0 transitions
+The index \eqn{C(s)} is the geometric mean of its two normalized components and is, 
+therefore, itself normalized.
+The minimum value of 0 can only be reached by a
+sequence made of one distinct state, thus containing 0 transitions
 and having an entropy of 0. The maximum 1 of \eqn{C(s)} is reached
 when the two following conditions are fulfilled: i) Each of the state
-in the alphabet is present in the sequence and the total durations
-are uniform, that is, equal to \eqn{\ell/a}{l/a} and ii) The number
-of transitions in the sequence is equal to \eqn{\ell-1}{l-1}, that
-is, the length \eqn{\ell_d}{l_d} of the DSS is equal to the length of
-the sequence \eqn{\ell}{l}
+in the alphabet is present in the sequence, and the total durations
+are uniform, i.e. each state occurs \eqn{\ell/|A|}{l/|A|} times, and ii) the number
+of transitions in the sequence is \eqn{\ell-1}{l-1}, meaning that the length \eqn{\ell_d}{l_d} of the DSS is equal to the length of the sequence \eqn{\ell}{l}.
  }
 
 \value{
- a vector of length equal to the number of sequences in
+ a single-column matrix of length equal to the number of sequences in
 \code{seqdata} containing the complexity index value of each
 sequence.
  }

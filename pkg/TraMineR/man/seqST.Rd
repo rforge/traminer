@@ -44,7 +44,7 @@ The function searches for missing states in the sequences and if found, adds the
 The normalized value is obtained by subtracting 1 to the index and dividing by the turbulence value of a sequence made by the successive repetition of the alphabet up to the maximal length in \code{seqdata}.
 }
 
-\value{a vector of length equal to the number of sequences in
+\value{a sinlge-column matrix of length equal to the number of sequences in
 \code{seqdata} containing the turbulence value of each sequence. Normalized values are returned when \code{norm=TRUE}.}
 
 \seealso{
