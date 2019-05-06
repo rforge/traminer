@@ -1,7 +1,17 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.5 [2019-05-01] (Development version)}{
+\section{Changes in version 0.5.6 [2019-05-06] (Development version)}{
+  \subsection{Misc}{
+    \itemize{
+      \item
+      No changes
+    }
+  }
+}
+
+
+\section{Changes in version 0.4.5 [2019-05-06]}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
@@ -25,6 +35,11 @@
 
       \item
       \code{seqprecarity()}, \code{seqprecorr()}, and \code{seqprecstart()}: errors due to bad handling of missing states.
+      \item
+      \code{seqedplot()} called \code{plot.survfit} with a \code{firstx} argument
+        that has been suppressed (non documented in survival news);
+        now uses \code{xlim} instead.
+
     }
   }
 }
