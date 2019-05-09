@@ -1,10 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-12 [2019-05-02] (Development version)}{
+\section{Changes in version 2.1-12 [2019-05-09] (Development version)}{
 
   \subsection{Changes in existing functions:}{
      \itemize{
+       \item
+       \code{seqdist()}, \code{'CHI2'} and \code{'EUCLID'} distances are now, when
+       \code{norm='auto'}, normalized by the maximal distance, which
+       for \code{'CHI2'} depends on the marginal state distribution.
        \item
        \code{seqici()}, \code{seqient()}, and \code{seqST()} gain a new argument \code{silent} to control whether messages about running operations should be displayed. 
        \item

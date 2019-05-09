@@ -15,7 +15,7 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE, we
 		}else{
 			bb <- seq(from=1, to=ncol(seqdata), by=step)
 			if(bb[length(bb)]!=(1+ncol(seqdata)-step)){
-				warning("[!] last episode is shorter than the others")
+				message("[!] With step=",step," last episode is shorter than the others")
 			}
 			bb <- c(bb, ncol(seqdata)+1)
 
@@ -58,7 +58,7 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE, we
 		lastbi <- breaks[[b]][1]
 		bi <- breaks[[b]][2]
 		bindice <- lastbi:bi
-		blength <- ifelse(norm, length(bindice), 1)
+		##blength <- ifelse(norm, length(bindice), 1)
 		mat <- matrix(0, nrow=nrow(seqdata), ncol=nalph)
 		ndot <- vector("numeric", length=nalph)
 		bseq <- seqdata[, bindice]
@@ -70,12 +70,23 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE, we
 			}
 		}
 		for(i in 1:nalph){
-			mat[, i] <- myrowSums(bseq==alph[i])/blength
+			mat[, i] <- myrowSums(bseq==alph[i]) ##/blength
 		}
     ndot <- colSums(mat, na.rm=TRUE) ##GR
     mat <- rbind(mat,ndot) ## GR
     mat <- mat/rowSums(mat, na.rm=TRUE)## GR
-		return(mat)
+    if (euclid) {
+      maxd <- ifelse(norm, 2, 1)
+      mat[nrow(mat),] <- rep(maxd, length(ndot))
+      mat[nrow(mat),ndot==0] <- 0
+    }
+    else {
+      pdot <- mat[nrow(mat),ndot!=0]
+      cmin <- c(min(pdot),min(pdot[-which.min(pdot)]))
+      maxd <- ifelse(norm, 1/cmin[1] + 1/cmin[2], 1)
+      mat[nrow(mat),] <- mat[nrow(mat),] * maxd
+    }
+    return(mat)
 	}
 	allmat <- list()
 	for(b in 1:length(breaks)){
@@ -88,11 +99,13 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE, we
 	##ndotj <- colSums(allmat) ## pdotj computed in dummies
 	cond <- pdotj>0
 	allmat <- allmat[, cond]
-	if(euclid){
-		pdotj <- rep(1.0, ncol(allmat))
-	} else{
-		pdotj <- pdotj[cond]
-	}
+  #### pdotj defined in dummies for euclid and chi2
+	##if(euclid){
+	##	pdotj <- rep(1.0, ncol(allmat))
+	##} else{
+	##  pdotj <- pdotj[cond]
+	##}
+  pdotj <- pdotj[cond]
   chdist <- function(i, j){
 		return(sqrt(sum((allmat[i, ]-allmat[j, ])^2/pdotj)))
 	}
@@ -108,6 +121,7 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE, we
 		## SEXP tmrChisq(SEXP ChiTableS, SEXP tdimS, SEXP margeS)
 		dd <- .Call(C_tmrChisq, as.double(allmat), as.integer(dim(allmat)), as.double(pdotj))
 	}
+  if (norm) dd <- dd/sqrt(length(breaks))
 	attributes(dd) <- list(Size = n, Labels = rownames(seqdata), Diag = FALSE,
         Upper = FALSE, method = "Chi square sequence", call = match.call(),
         class = "dist")

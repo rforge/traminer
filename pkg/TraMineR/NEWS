@@ -1,7 +1,10 @@
 ## =========
-Version 2.1-12 [2019-05-02] (Development version)
+Version 2.1-12 [2019-05-09] (Development version)
 
 Changes in existing functions:
+  - seqdist(), 'CHI2' and 'EUCLID' distances are now, when
+    norm='auto', normalized by the maximal distance, which 
+    for 'CHI2' depends on the marginal state distribution.
   - seqici(), seqient(), and seqST() gain a new argument 
     'silent' to control whether messages about running 
     operations should be displayed. 

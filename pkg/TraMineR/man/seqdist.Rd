@@ -49,15 +49,15 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     String.
     Default: \code{"none"}.
     The normalization to use when \code{method} is one of \code{"OM"},
-    \code{"HAM"}, \code{"DHD"}, \code{"CHI2"}, \code{"EUCLID"}, \code{"LCS"},
-    \code{"LCP"}, or \code{"RLCP"}. It can be \code{"none"}, \code{"auto"},
-    or, except for \code{"CHI2"} and \code{"EUCLID"}, \code{"maxlength"},
+    \code{"HAM"}, \code{"DHD"}, \code{"LCS"},
+    \code{"LCP"}, \code{"RLCP"}, \code{"CHI2"}, \code{"EUCLID"}. 
+    It can be \code{"none"}, \code{"auto"}, or, except for 
+    \code{"CHI2"} and \code{"EUCLID"}, \code{"maxlength"},
     \code{"gmean"}, \code{"maxdist"}, or \code{"YujianBo"}. \code{"auto"} is
     equivalent to \code{"maxlength"} when \code{method} is one of \code{"OM"},
     \code{"HAM"}, or \code{"DHD"}, to \code{"gmean"} when \code{method} is one
-    of \code{"LCS"}, \code{"LCP"}, or \code{"RLCP"}, and to a specific
-    normalization for\code{"CHI2"} and \code{"EUCLID"}. See the Details section.
-    % Others: OMloc, OMslen, OMspell, OMstran, NMS, NMSMST, SVRspell, TWED.
+    of \code{"LCS"}, \code{"LCP"}, or \code{"RLCP"}. See the Details section.
+    % Others: CHI2, EUCLID, OMloc, OMslen, OMspell, OMstran, NMS, NMSMST, SVRspell, TWED.
   }
   \item{indel}{
     Double or Vector of Doubles.
@@ -255,7 +255,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     }
   }
 
-  See \cite{Studer and Ritschard (2014)} for a description and the comparison
+  See \cite{Studer and Ritschard (2014, 2016)} for a description and the comparison
   of the above dissimilarity measures except \code{"TWED"} for which we refer to
   \cite{Marteau (2009)} and \cite{Halpin (2014)}.
 
@@ -284,15 +284,15 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   indels. \code{"DHD"} is \code{"HAM"} with specific substitution costs at each
   position.
 
-  \code{"HAM"} and \code{"DHD"} apply only to sequences of equal length. 
-  
+  \code{"HAM"} and \code{"DHD"} apply only to sequences of equal length.
+
   %%Currently, \code{"OM"} works only with sequences of equal lengths.
 
   When \code{sm = NULL}, the substitution-cost matrix is automatically created
   for \code{"HAM"} with a single substitution cost of 1 and for \code{"DHD"} with
   the costs derived from the transition rates at the successive positions.
 
-  Distances can optionally be normalized by means of the \code{norm} argument.
+  Some distances can optionally be normalized by means of the \code{norm} argument.
   If set to \code{"auto"}, Elzinga's normalization (similarity divided by
   geometrical mean of the two sequence lengths) is applied to \code{"LCS"},
   \code{"LCP"} and \code{"RLCP"} distances, while Abbott's normalization (distance
@@ -302,7 +302,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   normalized by its maximal possible value. For more details, see
   \cite{Gabadinho et al. (2009, 2011)}. Finally, \code{"YujianBo"} is the
   normalization proposed by \cite{Yujian and Bo (2007)} that preserves the
-  triangle inequality.
+  triangle inequality.  The square of the \code{"CHI2"} and \code{"EUCLID"}
+  distances are normalized by the number of intervals and by the maximal distance 
+  on each interval. Note that for 'CHI2' the maximal distance on each interval
+  depends on the state distribution on the interval.
 
   When sequences contain gaps and the \code{gaps = NA} option was passed to
   \code{\link{seqdef}} (i.e. when there are non deleted missing values), the

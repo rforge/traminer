@@ -175,6 +175,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
 
   # norm
   if (norm != "none" && ! method %in% c("OM", "HAM", "DHD", "CHI2", "EUCLID", "LCS", "LCP", "RLCP"))
+  ##if (norm != "none" && ! method %in% c("OM", "HAM", "DHD", "LCS", "LCP", "RLCP"))
     msg.stop.impl("norm", method)
 
   #### Check method specific arguments ####
