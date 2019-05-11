@@ -50,8 +50,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     Default: \code{"none"}.
     The normalization to use when \code{method} is one of \code{"OM"},
     \code{"HAM"}, \code{"DHD"}, \code{"LCS"},
-    \code{"LCP"}, \code{"RLCP"}, \code{"CHI2"}, \code{"EUCLID"}. 
-    It can be \code{"none"}, \code{"auto"}, or, except for 
+    \code{"LCP"}, \code{"RLCP"}, \code{"CHI2"}, \code{"EUCLID"}.
+    It can be \code{"none"}, \code{"auto"}, or, except for
     \code{"CHI2"} and \code{"EUCLID"}, \code{"maxlength"},
     \code{"gmean"}, \code{"maxdist"}, or \code{"YujianBo"}. \code{"auto"} is
     equivalent to \code{"maxlength"} when \code{method} is one of \code{"OM"},
@@ -218,9 +218,15 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   \item{weighted}{
     Logical.
     Default: \code{TRUE}.
-    When \code{method} is one of \code{"OMstran"}, \code{"CHI2"}, or
-    \code{"EUCLID"}, should the distributions account for the sequence weights
+    When \code{method} is \code{"CHI2"},
+    should the distributions of the states account for the sequence weights
     in \code{seqdata}? See \code{\link{seqdef}}.
+  }
+  \item{global.pdotj}{
+    Numerical vector or \code{"obs"}.
+    Default: \code{NULL}.
+    Only for \code{method = "CHI2"}.
+    The vector of state proportions to be used as marginal distribution. When set as \code{"obs"}, the overall state distribution in \code{seqdata} is used. When \code{NULL}, the state distribution on the corresponding interval is used.
   }
   \item{prox}{
     \code{NULL} or Matrix.
@@ -303,7 +309,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   \cite{Gabadinho et al. (2009, 2011)}. Finally, \code{"YujianBo"} is the
   normalization proposed by \cite{Yujian and Bo (2007)} that preserves the
   triangle inequality.  The square of the \code{"CHI2"} and \code{"EUCLID"}
-  distances are normalized by the number of intervals and by the maximal distance 
+  distances are normalized by the number of intervals and by the maximal distance
   on each interval. Note that for 'CHI2' the maximal distance on each interval
   depends on the state distribution on the interval.
 
