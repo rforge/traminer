@@ -14,7 +14,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   with.missing = FALSE, full.matrix = TRUE, kweights = rep(1.0, ncol(seqdata)),
   tpow = 1.0, expcost = 0.5, context, link = "mean", h = 0.5, nu,
   transindel = "constant", otto, previous = FALSE, add.column = TRUE,
-  breaks = NULL, step = 1, overlap = FALSE, weighted = TRUE, prox = NULL)
+  breaks = NULL, step = 1, overlap = FALSE, weighted = TRUE, 
+  global.pdotj = NULL, prox = NULL)
 }
 \arguments{
   \item{seqdata}{
