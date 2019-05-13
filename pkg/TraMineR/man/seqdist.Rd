@@ -224,10 +224,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     in \code{seqdata}? See \code{\link{seqdef}}.
   }
   \item{global.pdotj}{
-    Numerical vector or \code{"obs"}.
+    Numerical vector, \code{"obs"}, or \code{NULL}.
     Default: \code{NULL}.
     Only for \code{method = "CHI2"}.
-    The vector of state proportions to be used as marginal distribution. When set as \code{"obs"}, the overall state distribution in \code{seqdata} is used. When \code{NULL}, the state distribution on the corresponding interval is used.
+    The vector of state proportions to be used as marginal distribution. When \code{NULL}, the state distribution on the corresponding interval is used. When \code{"obs"}, the overall state distribution in \code{seqdata} is used for all intervals. When a vector of proportions, it is used as marginal distribution for all intervals.
   }
   \item{prox}{
     \code{NULL} or Matrix.
@@ -275,9 +275,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     \verb{OMloc} \tab \verb{sm, expcost, context, refseq} \cr
     \verb{OMslen} \tab \verb{sm, indel, link, h, refseq} \cr
     \verb{OMspell} \tab \verb{sm, indel, tpow, expcost, refseq} \cr
-    \verb{OMstran} \tab \verb{sm, indel, transindel, otto, previous, add.column, weighted} \cr
+    \verb{OMstran} \tab \verb{sm, indel, transindel, otto, previous, add.column} \cr
     \verb{HAM, DHD} \tab \verb{sm, norm, refseq}\cr
-    \verb{CHI2, EUCLID} \tab \verb{breaks, step, overlap, weighted, norm}\cr
+    \verb{CHI2} \tab \verb{breaks, step, overlap, norm, weighted, global.pdotj}\cr
+    \verb{EUCLID} \tab \verb{breaks, step, overlap, norm}\cr
     \verb{LCS, LCP, RLCP} \tab \verb{norm, refseq}\cr
     \verb{NMS} \tab \verb{prox, kweights, refseq}\cr
     \verb{NMSMST} \tab \verb{kweights, tpow, refseq}\cr
