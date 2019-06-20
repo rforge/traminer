@@ -1,12 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-12 [2019-05-11] (Development version)}{
+\section{Changes in version 2.1-12 [2019-06-20] (Development version)}{
 
   \subsection{Changes in existing functions:}{
      \itemize{
        \item
-       \code{seqdist()}, gains a new argument \code{global.pdotj} argument
+       \code{seqdef()} now raises an error when argument \code{alphabet} contains duplicate elements.
+       \code{alphabet()} in its assign form now raises an error
+        when the assigned vector contains duplicate elements.
+       \code{seqdist()} gains a new argument \code{global.pdotj} 
        to control the marginal distribution to be used for the \code{'CHI2'} distance.
        \item
        \code{seqdist()}, \code{'CHI2'} and \code{'EUCLID'} distances are now, when
@@ -18,7 +21,7 @@
        \code{seqST()}: suppression of useless messages when \code{norm=TRUE}.
      }
   }
-  
+
   \subsection{Misc.:}{
     \itemize{
       \item

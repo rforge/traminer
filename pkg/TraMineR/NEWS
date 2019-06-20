@@ -1,9 +1,13 @@
 ## =========
-Version 2.1-12 [2019-05-11] (Development version)
+Version 2.1-12 [2019-06-20] (Development version)
 
 Changes in existing functions:
-  - seqdist() gains a new argument 'global.pdotj' 
-    to control the marginal distribution to be used 
+  - seqdef() now raises an error when argument 'alphabet'
+    contains duplicate elements.
+  - alphabet() in its assign form now raises an error
+    when the assigned vector contains duplicate elements.
+  - seqdist() gains a new argument 'global.pdotj'
+    to control the marginal distribution to be used
     for the CHI2 distance.
   - seqdist(), 'CHI2' and 'EUCLID' distances are now, when
     norm='auto', normalized by the maximal distance, which
@@ -14,10 +18,10 @@ Changes in existing functions:
   - seqST(). Suppression of useless messages when norm=TRUE.
 
 Misc.:
-  - Suppressed unused argument \code{weighted} from 
+  - Suppressed unused argument \code{weighted} from
     internal OMstran function.
-  - Help page for \code{seqdist}: description of the 
-    \code{weighted} argument adjusted to reflect that it 
+  - Help page for \code{seqdist}: description of the
+    \code{weighted} argument adjusted to reflect that it
     applies only to the \code{"CHI2"} distance.
 
 
