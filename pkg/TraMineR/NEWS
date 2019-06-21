@@ -1,5 +1,11 @@
 ## =========
-Version 2.1-12 [2019-06-20] (Development version)
+Version 2.1-13 [2019-06-21] (Development version)
+
+Misc.:
+  - No changes.
+
+## =========
+Version 2.0-12 [2019-06-21] 
 
 Changes in existing functions:
   - seqdef() now raises an error when argument 'alphabet'
@@ -18,11 +24,13 @@ Changes in existing functions:
   - seqST(). Suppression of useless messages when norm=TRUE.
 
 Misc.:
-  - Suppressed unused argument \code{weighted} from
+  - Suppressed unused argument 'weighted' from
     internal OMstran function.
-  - Help page for \code{seqdist}: description of the
-    \code{weighted} argument adjusted to reflect that it
-    applies only to the \code{"CHI2"} distance.
+  - Help page for seqdist: description of the
+    weighted argument adjusted to reflect that it
+    applies only to the "CHI2" distance.
+  - Updated links to Swiss Household Panel in actcal and
+    biofam help pages.
 
 
 ## =========

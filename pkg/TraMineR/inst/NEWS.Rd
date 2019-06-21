@@ -1,15 +1,27 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-12 [2019-06-20] (Development version)}{
+\section{Changes in version 2.1-13 [2019-06-21] (Development version)}{
+
+  \subsection{Misc.:}{
+    \itemize{
+      \item
+      No changes.
+    }
+  }
+}
+
+
+\section{Changes in version 2.0-12 [2019-06-21]}{
 
   \subsection{Changes in existing functions:}{
      \itemize{
        \item
        \code{seqdef()} now raises an error when argument \code{alphabet} contains duplicate elements.
+       \item
        \code{alphabet()} in its assign form now raises an error
         when the assigned vector contains duplicate elements.
-       \code{seqdist()} gains a new argument \code{global.pdotj} 
+       \code{seqdist()} gains a new argument \code{global.pdotj}
        to control the marginal distribution to be used for the \code{'CHI2'} distance.
        \item
        \code{seqdist()}, \code{'CHI2'} and \code{'EUCLID'} distances are now, when
@@ -25,9 +37,11 @@
   \subsection{Misc.:}{
     \itemize{
       \item
-      Suppressed unused argument \code{weighted} from internal OMstran function.
+      Suppressed unused argument \code{weighted} from internal \code{OMstran} function.
       \item
       Help page for \code{seqdist}: description of the \code{weighted} argument adjusted to reflect that it applies only to the \code{"CHI2"} distance.
+      \item
+      Updated links to Swiss Household Panel in \code{actcal} and \code{biofam} help pages.
     }
   }
 }
