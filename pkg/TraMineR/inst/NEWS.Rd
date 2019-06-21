@@ -21,6 +21,7 @@
        \item
        \code{alphabet()} in its assign form now raises an error
         when the assigned vector contains duplicate elements.
+       \item
        \code{seqdist()} gains a new argument \code{global.pdotj}
        to control the marginal distribution to be used for the \code{'CHI2'} distance.
        \item
