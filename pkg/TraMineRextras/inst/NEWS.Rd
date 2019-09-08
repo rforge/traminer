@@ -1,7 +1,16 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.6 [2019-09-06] (Development version)}{
+\section{Changes in version 0.5.7 [2019-09-08] (Development version)}{
+  \subsection{Misc}{
+    \itemize{
+      \item
+      No changes
+    }
+  }
+}
+
+\section{Changes in version 0.4.6 [2019-09-06]}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
@@ -10,7 +19,7 @@
       \code{seqedplot()}: when \code{type = 'survival'}, now supports the \code{conf.int} argument of \code{plot.survfit} to control the display of confidence intervals.
     }
   }
-  
+
   \subsection{Bug fixes}{
     \itemize{
       \item
