@@ -1,15 +1,30 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-13 [2019-06-21] (Development version)}{
+\section{Changes in version 2.1-13 [2019-10-31] (Development version)}{
 
-  \subsection{Misc.:}{
+  \subsection{New functions}{
     \itemize{
       \item
-      No changes.
+      \code{seqindic()} returns a table with per sequence values of selected indicators.
+    }
+  }
+
+  \subsection{Changes in existing functions:}{
+    \itemize{
+      \item
+      \code{seqlength()}, \code{seqST()}, and \code{seqsubsn()} gain a \code{with.missing} argument to control how missing values should be treated.
+    }
+  }
+  
+  \subsection{Bug Fixes:}{
+    \itemize{
+      \item
+      \code{seqST()} normalization did not account for non-void missing values when present.
     }
   }
 }
+
 
 
 \section{Changes in version 2.0-12 [2019-06-21]}{
@@ -957,9 +972,9 @@
     \item
     \code{dissrep()}, \code{seqrep()}: error when \code{nrep} cannot be reached (reported by M. Studer)
     \item
-    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto Bürgin).
+    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto B\"{u}rgin).
     \item
-    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto Bürgin).
+    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto B\"{u}rgin).
     \item
     \code{print.seqelist()} and \code{as.character.seqelist()}: generated \code{segfault} when converting long event sequences to character (Reported by Pierre Molinier).
     \item

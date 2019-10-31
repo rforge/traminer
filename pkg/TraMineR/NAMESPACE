@@ -35,6 +35,7 @@ export(
   seqHtplot,
   seqici,
   seqient,
+  seqindic,
   seqiplot,
   seqIplot,
   seqistatd,
