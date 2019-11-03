@@ -1,8 +1,10 @@
-                CHANGES IN TraMineRextras VERSION 0.5.7 [2019-09-08] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.7 [2019-11-03] (Development version)
 
-Misc
-    o   No changes
-                    
+Bug fixes
+    o   seqedplot(): Issue with color selection when only one event.
+    o   seqedplot(): Now calls plot.survfit with by default 
+        conf.int=FALSE instead of "none" (advised by Terry Therneau).
+
 
                 CHANGES IN TraMineRextras VERSION 0.4.6 [2019-05-06]
 

@@ -1,11 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.7 [2019-09-08] (Development version)}{
-  \subsection{Misc}{
+\section{Changes in version 0.5.7 [2019-11-03] (Development version)}{
+  \subsection{Bug fixes}{
     \itemize{
       \item
-      No changes
+      \code{seqedplot()}: issue with color selection when only one event.
+      \item
+      \code{seqedplot()}: Now calls \code{plot.survfit} with by default
+        \code{conf.int=FALSE} instead of \code{"none"} (advised by Terry Therneau).
     }
   }
 }
