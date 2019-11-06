@@ -9,14 +9,20 @@
   Returns a table with per sequence values of selected indicators.
 }
 \usage{
-  seqindic(seqdata, indic=c("visited","trans","ient","cplx"), with.missing=FALSE)
+seqindic(seqdata, indic=c("visited","trans","ient","cplx"), with.missing=FALSE,
+    ipos.args=list(), prec.args=list())
 }
 \arguments{
-  \item{seqdata}{ A state sequence object as returned by \code{\link[TraMineR]{seqdef}}.}
+  \item{seqdata}{a state sequence object (\code{stslist}) as returned by \code{\link[TraMineR]{seqdef}}.}
 
-  \item{indic}{Vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"trans"} (number of transitions), "ptrans" (number of transitions as a proportion of maximum possible transitions), \code{"ient"} (longitudinal normalized entropy), \code{"cplx"} (complexity index), \code{"turb"} (turbulence), and \code{"nturb"} (normalized turbulence). To get all indicators, use \code{indic="all"}.}
+  \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"trans"} (number of transitions), "ptrans" (number of transitions as a proportion of maximum possible transitions), \code{"ient"} (longitudinal normalized entropy), \code{"cplx"} (complexity index), \code{"turb"} (turbulence), \code{"nturb"} (normalized turbulence), \code{"ipos"} (proportion of positive states), \code{"prec"} (precarity index). Setting \code{indic="all"} selects all indicators but \code{"ipos"} and \code{"prec"} that require an additional argument list.}
 
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
+
+  \item{ipos.args}{list: when \code{"ipos"} requested, the arguments passed to \code{seqipos} together with \code{seqdata}. See \code{\link{seqipos}}}
+      
+  \item{prec.args}{list: when \code{"prec"} requested, the arguments passed to \code{seqprecarity} together with \code{seqdata}. See \code{\link{seqprecarity}}}
+      
 }
 \details{
   The number of visited states is the number of different elements in the sequence, e.g. 2 for aababba.
@@ -26,6 +32,8 @@
   Number of distinct successive states is one plus the number of transitions.
   
   The \code{with.missing} argument applies to all indicators but the length. \code{lgth} returns the length obtained with \code{with.missing=TRUE}, and \code{nonm} the length obtained with \code{with.missing=FALSE}.
+  
+  The precarity (indicator \code{"prec"}) is computed with function \code{seqprecarity} of TraMineRextras.
 }
 \value{
   A data frame with the selected indicators. Names are:
@@ -49,5 +57,7 @@ data(ex1)
 sx <- seqdef(ex1[,1:13], right="DEL")
 seqindic(sx, indic=c("lgth","nonm","visited","nturb","cplx"), with.missing=TRUE)
 seqindic(sx, indic=c("lgth","nonm","visited","nturb","cplx"), with.missing=FALSE)
+seqindic(sx, indic=c("lgth","dlgth","ipos"),
+          ipos.args=list(pos.states=c("A","B")),with.missing=FALSE)
 }
 \keyword{util}

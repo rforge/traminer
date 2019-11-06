@@ -1,12 +1,20 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-13 [2019-10-31] (Development version)}{
+\section{Changes in version 2.1-13 [2019-11-05] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
       \item
       \code{seqindic()} returns a table with per sequence values of selected indicators.
+      \item
+      \code{seqipos()} proportion of positive spells/states per sequence.
+      \item
+      \code{seqprecarity()} precarity index (previously in TraMineRextras)
+      \item
+      \code{seqprecorr()} correction factor for precarity index (previously in TraMineRextras)
+      \item
+      \code{seqprecstart()} state precarity level for precarity index (previously in TraMineRextras)
     }
   }
 
@@ -972,9 +980,9 @@
     \item
     \code{dissrep()}, \code{seqrep()}: error when \code{nrep} cannot be reached (reported by M. Studer)
     \item
-    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto B\"{u}rgin).
+    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto Bürgin).
     \item
-    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto B\"{u}rgin).
+    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto Bürgin).
     \item
     \code{print.seqelist()} and \code{as.character.seqelist()}: generated \code{segfault} when converting long event sequences to character (Reported by Pierre Molinier).
     \item

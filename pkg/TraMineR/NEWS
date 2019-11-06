@@ -1,9 +1,17 @@
 ## =========
-Version 2.1-13 [2019-10-31] (Development version)
+Version 2.1-13 [2019-11-05] (Development version)
 
 New functions:
   - seqindic() returns a table with per sequence  
     values of selected indicators.
+  - seqipos(): proportion of positive spells/states 
+    per sequence.
+  - seqprecarity() precarity index 
+    (previously in TraMineRextras)
+  - seqprecorr() correction factor for precarity index 
+    (previously in TraMineRextras)
+  - seqprecstart() state precarity level for precarity index 
+    (previously in TraMineRextras)
 
 Changes in existing functions:
   - seqlength(), seqST(), and \code{seqsubsn() gain a 
@@ -634,8 +642,8 @@ Bug fixes:
         the plotting function.
   - dissrep(), seqrep(): error when 'nrep' cannot be reached (reported by M. Studer)
   - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint
-        was not taken into account (Reported by Reto B\"{u}rgin).
-  - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto B\"{u}rgin).
+        was not taken into account (Reported by Reto Bürgin).
+  - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto Bürgin).
   - print.seqelist() and as.character.seqelist(): generated segfault when
         converting long event sequences to character (Reported by Pierre Molinier).
   - seqsubm(): Very small rounding errors (1e-16) were sometimes leading to non symmetric
