@@ -10,7 +10,7 @@
 \title{Precarity index}
 
 \description{
-The precarity index returned by the function \code{seqprecarity} is a modified complexity index that takes account of the ordinal order (possibly only partial order) of the states and the precarity degree of the first state in the sequence. The signed proportions (transition-based weighted proportions of negative transitions) used for the correction factor can be extracted per se by means of the function \code{seqprecorr}. (See details.)
+The precarity index returned by the function \code{seqprecarity} is a modified complexity index that takes account of the ordering (possibly only partial order) of the states and the precarity degree of the first state in the sequence. The signed proportions (transition-based weighted proportions of negative transitions) used for setting the default correction factor can be extracted per se by means of the function \code{seqprecorr}. (See details.)
 }
 
 \usage{
@@ -27,7 +27,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by the \code{\link[TraMineR]{seqdef}} function.}
 
-  \item{correction}{Vector of non-negative correction factor values. If \code{NULL}, the correction factors are computed by means of the \code{seqprecorr} function.}
+  \item{correction}{Vector of non-negative correction factor values. If \code{NULL}, the correction factors are set as 1 minus the value returned by \code{seqprecorr}.}
 
   \item{otto}{Scalar in the range [0,1]. Trade-off weight between the precarity degree of the initial state and the corrected complexity. Default is \code{otto=.2}.}
 
@@ -49,7 +49,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{with.missing}{Logical. Should the missing state be considered as an element of the alphabet?
     }
-    
+
   \item{border.effect}{Value (strictly greater than 1) used to adjust estimated transition probabilities to avoid border effect. Default is 10. See details.}
 
   \item{tr.type}{Deprecated. Use \code{method} instead.}
@@ -61,13 +61,13 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 }
 
 
-\details{The precarity index of a sequence \eqn{x} is based on the complexity index  (\cite{Gabadinho et al., 2010}) \eqn{c(x)} (See the \code{\link[TraMineR]{seqici}} function from \pkg{TraMineR}) and is defined as
+\details{The precarity index of a sequence \eqn{x} is based on the complexity index  (\cite{Gabadinho et al., 2010}) \eqn{c(x)} (See the \code{\link[TraMineR]{seqici}} function) and is defined as
 
  \deqn{prec(x) = \lambda a(x_1) + (1-\lambda) (1 + q(x))^\beta c(x)^\alpha}{prec(x) = lambda * a(x_1) + (1 - lambda)*(1 + q(x))^b*c(x)^a}
 
 where \eqn{a(x_1)} is the degree of precarity (argument \code{stprec}) of the starting state in sequence \eqn{x}, \eqn{q(x)} is the difference between the weighted proportions of negative and positive transitions in the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the precarity of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
-The difference \eqn{q(x)} between the weighted proportion of negative and positive transitions can be obtained separately by means of the function \code{seqprecorr}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. To avoid a border effect, when any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, where \eqn{d} is the \code{border.effect} parameter.
+The correction factor is \eqn{(1 + q(x))}. When \code{correction = NULL} (default), it is determined from the difference \eqn{q(x)} between the weighted proportion of negative and positive transitions. This difference \eqn{q(x)} can be obtained separately by means of the function \code{seqprecorr}. The argument \code{penalized} allows to chose between three strategies: only penalizing negative weights, only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type of transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. To avoid a border effect, when any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, where \eqn{d} is the \code{border.effect} parameter.
 
 When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean precarity degree is assigned to each state of the class (see \code{\link{seqprecstart}}).
 
