@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-13 [2019-11-05] (Development version)}{
+\section{Changes in version 2.1-13 [2019-11-12] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -24,7 +24,7 @@
       \code{seqlength()}, \code{seqST()}, and \code{seqsubsn()} gain a \code{with.missing} argument to control how missing values should be treated.
     }
   }
-  
+
   \subsection{Bug Fixes:}{
     \itemize{
       \item

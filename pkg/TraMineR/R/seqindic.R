@@ -57,14 +57,14 @@ seqindic <- function(seqdata, indic=c("visited","trans","ient","cplx"), with.mis
 	  trans <- suppressMessages(
       seqtransn(seqdata, with.missing=with.missing, norm=FALSE))
     tab <- cbind(tab,trans)
-    lab <- c(lab,"Ntrn")
+    lab <- c(lab,"Ntra")
   }
   if("ntrans" %in% indic){
 	## Proportion of transitions
 	  trans <- suppressMessages(
       seqtransn(seqdata, with.missing=with.missing, norm=TRUE))
     tab <- cbind(tab,trans)
-    lab <- c(lab,"Ptrn")
+    lab <- c(lab,"Ptra")
   }
   if("ient" %in% indic){
 	## Longitudinal Entropy

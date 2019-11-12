@@ -1,25 +1,25 @@
 ## =========
-Version 2.1-13 [2019-11-05] (Development version)
+Version 2.1-13 [2019-11-12] (Development version)
 
 New functions:
-  - seqindic() returns a table with per sequence  
+  - seqindic() returns a table with per sequence
     values of selected indicators.
-  - seqipos(): proportion of positive spells/states 
+  - seqipos(): proportion of positive spells/states
     per sequence.
-  - seqprecarity() precarity index 
+  - seqprecarity() precarity index
     (previously in TraMineRextras)
-  - seqprecorr() correction factor for precarity index 
+  - seqprecorr() correction factor for precarity index
     (previously in TraMineRextras)
-  - seqprecstart() state precarity level for precarity index 
+  - seqprecstart() state precarity level for precarity index
     (previously in TraMineRextras)
 
 Changes in existing functions:
-  - seqlength(), seqST(), and \code{seqsubsn() gain a 
-    'with.missing' argument to control how missing 
+  - seqlength(), seqST(), and \code{seqsubsn() gain a
+    'with.missing' argument to control how missing
     values should be treated.
 
 Bug Fixes:
-  - seqST() normalization did not account for non-void 
+  - seqST() normalization did not account for non-void
     missing values when present.
 
 ## =========
