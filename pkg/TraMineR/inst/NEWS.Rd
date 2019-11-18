@@ -31,6 +31,13 @@
       \code{seqST()} normalization did not account for non-void missing values when present.
     }
   }
+  
+  \subsection{Misc.:}{
+    \itemize{
+      \item
+      Fixed issue with \code{\\traminer} in vignette.
+    }
+  }
 }
 
 

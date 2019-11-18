@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-13 [2019-11-12] (Development version)
+Version 2.1-13 [2019-11-18] (Development version)
 
 New functions:
   - seqindic() returns a table with per sequence
@@ -14,13 +14,16 @@ New functions:
     (previously in TraMineRextras)
 
 Changes in existing functions:
-  - seqlength(), seqST(), and \code{seqsubsn() gain a
+  - seqlength(), seqST(), and seqsubsn() gain a
     'with.missing' argument to control how missing
     values should be treated.
 
 Bug Fixes:
   - seqST() normalization did not account for non-void
     missing values when present.
+    
+Misc:
+  - Fixed issue with \traminer in vignette.
 
 ## =========
 Version 2.0-12 [2019-06-21]
