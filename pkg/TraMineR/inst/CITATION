@@ -104,8 +104,9 @@ citEntry(entry="incollection",
   address = "Cham",
   volume = 10,
   pages = "279-295",
+  doi = "10.1007/978-3-319-95420-2_16",
 
-  textVersion="Ritschard, G., Bussi, M. & O'Reilly, J. (2018), An Index of Precarity for Measuring Early Employment Insecurity, In Ritschard, G. & Studer, M. (eds) Sequence Analysis and Related Approaches: Innovative Methods and Applications. Series: Life Course Research and Social Policies. Vol. 10, pp. 279-295. Cham: Springer.",
+  textVersion="Ritschard, G., Bussi, M. & O'Reilly, J. (2018), An Index of Precarity for Measuring Early Employment Insecurity, In Ritschard, G. & Studer, M. (eds) Sequence Analysis and Related Approaches: Innovative Methods and Applications. Series: Life Course Research and Social Policies. Vol. 10, pp. 279-295. Cham: Springer. DOI http://dx.doi.org/10.1007/978-3-319-95420-2_16",
   header="For the precarity index:"
 )
 citEntry(entry="incollection",

@@ -68,7 +68,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 where \eqn{a(x_1)} is the degree of precarity (argument \code{stprec}) of the starting state in sequence \eqn{x}, \eqn{r(x)} is the correction factor (argument \code{correction}) for the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the precarity of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
 When \code{correction = NULL} (default), \eqn{r(x)} is determined as \eqn{r(x) = 1 + q(x)}, where the penalty \eqn{q(x)} is the difference between the weighted proportion of negative and positive transitions. This penalty \eqn{q(x)} can be obtained separately by means of the function \code{seqprecorr}.
-The argument \code{penalized} allows to chose between three strategies for computing \eqn{q(x)}: only penalizing negative weights (in which case \eqn{q(x)} is the proportion of negative transitions), only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type of transition weights used is selected with the \code{method} argument. 
+The argument \code{penalized} allows to chose between three strategies for computing \eqn{q(x)}: only penalizing negative weights (in which case \eqn{q(x)} is the proportion of negative transitions), only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type of transition weights used is selected with the \code{method} argument.
 For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. To avoid a border effect, when any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, where \eqn{d} is the \code{border.effect} parameter.
 
 When equivalent classes are provided, the transitions between states of a same class are ignored and the class mean precarity degree is assigned to each state of the class (see \code{\link{seqprecstart}}).
@@ -90,7 +90,7 @@ For \code{seqprecorr}, an object of class \code{seqprecorr} with the weighted pr
 }
 
 \seealso{
- \code{\link[TraMineR]{seqici}} and \code{\link{seqprecstart}}.
+ \code{\link{seqici}}, \code{\link{seqprecstart}}, \code{\link{seqindic}}.
 }
 
 \references{
@@ -154,4 +154,4 @@ seqprecarity(s.ex1, with.missing=TRUE)
 \author{Gilbert Ritschard}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{Sequence analysis}
+\keyword{Longitudinal characteristics}

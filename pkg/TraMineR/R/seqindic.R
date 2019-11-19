@@ -1,21 +1,25 @@
 ## Table of indicators
 
-seqindic <- function(seqdata, indic=c("visited","trans","ient","cplx"), with.missing=FALSE,
+seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
               ipos.args=list(), prec.args=list()) {
 
 	if (!inherits(seqdata,"stslist"))
 		stop("data is NOT a sequence object, see seqdef function to create one")
 
   indic.list <- c("lgth","nonm","dlgth","visited","trans",
-    "ntrans","ient","cplx","turb","nturb","all",
-    "prec","ipos")
+    "transp","entr","cplx","turb","turbn",
+    "all","prec","ppos","ipos","visit")
+
   if (!all(indic %in% indic.list)){
     stop("invalid values in indic: ",paste(indic[!indic %in% indic.list], collapse=", "))
   }
 
+  if ("ipos" %in% indic) indic[indic=="ipos"] <- "ppos"
+  if ("visit" %in% indic) indic[indic=="visit"] <- "visited"
+
   if (any(indic=="all")) {
-    indic.all <- indic.list[-((length(indic.list)-1):length(indic.list))]
-    if("ipos" %in% indic) indic.all <- c(indic.all,"ipos")
+    indic.all <- indic.list[-((length(indic.list)-4):length(indic.list))]
+    if("ppos" %in% indic) indic.all <- c(indic.all,"ppos")
     if("prec" %in% indic) indic.all <- c(indic.all,"prec")
     indic <- indic.all
   }
@@ -40,7 +44,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","ient","cplx"), with.mis
   if("dlgth" %in% indic){
   ## Length of dss
 	  dlgth <- suppressMessages(
-      seqtransn(seqdata, with.missing=with.missing, norm=FALSE)) + 1
+      seqlength(seqdss(seqdata, with.missing=with.missing), with.missing=with.missing))
     tab <- cbind(tab,dlgth)
     lab <- c(lab,"Dlgth")
   }
@@ -50,23 +54,23 @@ seqindic <- function(seqdata, indic=c("visited","trans","ient","cplx"), with.mis
       seqistatd(seqdata, with.missing=with.missing))
     nvisit <- rowSums(sdist>0)
     tab <- cbind(tab,nvisit)
-    lab <- c(lab,"Nvis")
+    lab <- c(lab,"Visited")
   }
   if("trans" %in% indic){
-	## Number of transitions
+	## Number of state changes (transitions)
 	  trans <- suppressMessages(
       seqtransn(seqdata, with.missing=with.missing, norm=FALSE))
     tab <- cbind(tab,trans)
-    lab <- c(lab,"Ntra")
+    lab <- c(lab,"Trans")
   }
-  if("ntrans" %in% indic){
-	## Proportion of transitions
+  if("transp" %in% indic){
+	## Proportion of state changes
 	  trans <- suppressMessages(
       seqtransn(seqdata, with.missing=with.missing, norm=TRUE))
     tab <- cbind(tab,trans)
-    lab <- c(lab,"Ptra")
+    lab <- c(lab,"Transp")
   }
-  if("ient" %in% indic){
+  if("entr" %in% indic){
 	## Longitudinal Entropy
 	  ient <- suppressMessages(
 		  seqient(seqdata, with.missing=with.missing, norm=TRUE))
@@ -74,27 +78,27 @@ seqindic <- function(seqdata, indic=c("visited","trans","ient","cplx"), with.mis
     lab <- c(lab,"Entr")
   }
   if("cplx" %in% indic){
-	## Longitudinal Entropy
+	## Complexity
 	  ici <- suppressMessages(
 		  seqici(seqdata, with.missing=with.missing, silent=TRUE))
     tab <- cbind(tab,ici)
     lab <- c(lab,"Cplx")
   }
-  if("nturb" %in% indic){
-	## Longitudinal Entropy
-	  nturb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE))
-    tab <- cbind(tab,nturb)
+  if("turbn" %in% indic){
+	## Normalized Turbulence
+	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE))
+    tab <- cbind(tab,turb)
     lab <- c(lab,"Turbn")
   }
   if("turb" %in% indic){
-	## Longitudinal Entropy
+	## Turbulence
 	  turb <- suppressMessages(seqST(seqdata, norm=FALSE, with.missing=with.missing, silent=TRUE))
     tab <- cbind(tab,turb)
     lab <- c(lab,"Turb")
   }
 
-  if("ipos" %in% indic){
-  ## index of precarity
+  if("ppos" %in% indic){
+  ## Proportion of positive states
     if(!is.null(ipos.args[["seqdata"]])) warning( "[!] seqdata argument in ipos.args will be overwritten!" )
     ipos.args[["seqdata"]] <- seqdata
     if(!is.null(ipos.args[["with.missing"]])) warning( "[!] with.missing argument in ipos.args will be overwritten!" )
@@ -106,8 +110,6 @@ seqindic <- function(seqdata, indic=c("visited","trans","ient","cplx"), with.mis
 
   if("prec" %in% indic){
   ## index of precarity
-    ##!existsFunction("seqprecarity")
-    ##  stop("[!] For 'prec', load the TraMineRextras library")
     if(!is.null(prec.args[["seqdata"]]))
       warning( "[!] seqdata argument in prec.args will be overwritten!" )
     prec.args[["seqdata"]] <- seqdata
