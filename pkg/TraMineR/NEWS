@@ -1,5 +1,11 @@
 ## =========
-Version 2.1-13 [2019-11-18] (Development version)
+Version 2.1-14 [2019-11-20] (Development version)
+
+Misc.:
+  - No changes
+
+## =========
+Version 2.0-13 [2019-11-19] 
 
 New functions:
   - seqindic() returns a table with per sequence

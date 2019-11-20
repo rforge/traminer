@@ -1,7 +1,17 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-13 [2019-11-12] (Development version)}{
+\section{Changes in version 2.1-14 [2019-11-20] (Development version)}{
+
+  \subsection{Misc.:}{
+    \itemize{
+      \item
+      No changes.
+    }
+  }
+}
+
+\section{Changes in version 2.0-13 [2019-11-19]}{
 
   \subsection{New functions}{
     \itemize{
@@ -31,7 +41,7 @@
       \code{seqST()} normalization did not account for non-void missing values when present.
     }
   }
-  
+
   \subsection{Misc.:}{
     \itemize{
       \item
