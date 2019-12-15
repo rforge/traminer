@@ -477,7 +477,8 @@ olmm_g_decormat <- function(T, Tindex, sVar, sCovWin, sCovBet, Nmax) {
 ##'
 ##' @return An object of the same class as 'x' but with new
 ##'    labels for category-specific coefficients.
-olmm_rename <- function(x, levels, family, etalab = c("int", "char", "eta")) {
+olmm_rename <- function(x, levels, family,
+                        etalab = c("int", "char", "eta")) {
 
   etalab <- match.arg(etalab)
 

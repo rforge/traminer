@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:       Reto Buergin
 ## E-Mail:       rbuergin@gmx.ch
-## Date:         2018-02-13
+## Date:         2018-02-15
 ##
 ## References:
 ## ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
@@ -14,6 +14,7 @@
 ##
 ##
 ## Modifications:
+## 2018-02-15: Fixed bug for 'numHess = TRUE'
 ## 2018-02-13: Few minor modification when exploring for the memory
 ##             overflow problem
 ## 2017-08-19: - Add check for the left-hand of the formula.
@@ -567,7 +568,8 @@ olmm <- function(formula, data, family = cumulative(),
                       func = object$optim[[2L]],
                       x = object$coefficients,
                       method.args = list(func = if (dims["numGrad"]) object$optim[[3L]] else NULL),
-                      restricted = rep.int(FALSE, dims["nPar"]))
+                      restricted = rep.int(FALSE, dims["nPar"]),
+                      env = object$optim$env)
             if (dims["verb"] > 0L) cat("OK")
         }
         

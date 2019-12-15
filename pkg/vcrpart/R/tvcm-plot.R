@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2017-08-19
+## Date:            2019-12-15
 ##
 ## Description:
 ## Plot functions for 'tvcm' objects.
@@ -18,6 +18,7 @@
 ## panel_empty:     grapcon generator for empty terminal node plots
 ##
 ## Last modifications:
+## 2019-12-15: modify checks for classes (newly use function 'inherits')
 ## 2017-08-18: improve warnings
 ## 2016-02-16: modified titles for 'panel_coef'.
 ## 2016-02-08: add warning in cases 'conf.int = TRUE' in 'panel_coef'.
@@ -47,7 +48,7 @@ plot.tvcm <- function(x, type = c("default", "coef",
     if (!missing(tnex)) stopifnot(is.numeric(tnex) && length(tnex) == 1L)
     stopifnot(is.logical(newpage) && length(newpage) == 1L)
     stopifnot(is.logical(pop) && length(pop) == 1L)
-    stopifnot(class(gp) %in% c("gpar", "list"))
+    stopifnot(inherits(gp, "gpar") | inherits(gp, "list"))
     
     if (type == "partdep") {
         

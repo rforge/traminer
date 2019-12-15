@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:       Reto Buergin
 ## E-Mail:       rbuergin@gmx.ch
-## Date:         2017-08-19
+## Date:         2019-12-15
 ##
 ## Description:
 ## methods for olmm objects.
@@ -41,6 +41,7 @@
 ## weights:     Weights
 ##
 ## Modifications:
+## 2019-12-15: modify checks for classes (newly use function 'inherits')
 ## 2017-08-19: prettified code
 ## 2016-10-31: checked new implementation of C-code
 ## 2016-02-22: removed 'rdig' argument from 'VarCorr' method
@@ -566,9 +567,9 @@ predict.olmm <- function(object, newdata = NULL,
     dims <- object$dims
     
     ## checks
-    if (!is.null(newdata) && !class(newdata) == "data.frame")
+    if (!is.null(newdata) && !inherits(newdata, "data.frame"))
         stop("'newdata' must be a 'data.frame'.")
-    if (!class(ranef) %in% c("logical", "matrix"))
+    if (!(inherits(ranef, "logical") | inherits(ranef, "matrix")))
         stop("'ranef' must be a 'logical' or a 'matrix'.")
     
     if (dims["hasRanef"] < 1L) {
@@ -949,7 +950,7 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
     
     ## fixed-effect coefficient-covariance matrix
     vcov <- try(vcov(object), silent = TRUE)
-    validVcov <- class(vcov) != "try-error" && min(diag(vcov)) > 0
+    validVcov <- !inherits(vcov, "try-error") && min(diag(vcov)) > 0
     if (!silent && !validVcov)
         warning("computation of variance-covariance matrix failed")
     
@@ -958,16 +959,16 @@ summary.olmm <- function(object, etalab = c("int", "char", "eta"),
         subs <- seq(dims["pCe"] * dims["nEta"] + 1L,
                     dims["pCe"] * dims["nEta"] + dims["pGe"], 1L)
         feMatGe <- 
-      cbind("Estimate" = fixef[subs],
-            "Std. Error" = rep.int(NaN, length(subs)),
-            "z value" = rep.int(NaN, length(subs)))
+            cbind("Estimate" = fixef[subs],
+                  "Std. Error" = rep.int(NaN, length(subs)),
+                  "z value" = rep.int(NaN, length(subs)))
         if (validVcov) {
-      feMatGe[, 2L] <- sqrt(diag(vcov)[subs])
-      feMatGe[, 3L] <- feMatGe[, 1L] / feMatGe[, 2L]
+            feMatGe[, 2L] <- sqrt(diag(vcov)[subs])
+            feMatGe[, 3L] <- feMatGe[, 1L] / feMatGe[, 2L]
         }
         
     } else { # empty matrix
-    feMatGe <- matrix(, 0L, 3L, dimnames = list(c(), c("Estimate", "Std. Error", "z value")))
+        feMatGe <- matrix(, 0L, 3L, dimnames = list(c(), c("Estimate", "Std. Error", "z value")))
     }
     
     ## category-specific fixed effects

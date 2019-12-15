@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2017-08-21
+## Date:            2019-12-15
 ##
 ## Description:
 ## Random forests and bagging for the 'tvcm' algorithm.
@@ -22,13 +22,14 @@
 ## - implement variable importance measures
 ##
 ## Last modifications:
-## 2017-08-21:  - bug fix predict.fvcm: order columns of predicted
-##                coefficients before multiplying them with the
-##                model matrix. This cause errors for example if
-##                'fvcm' models include 'fe' terms.
-## 2017-08-19:  - add default for 'minsize' to 'fvcm_control' and
-##                'tvcglm_control'.
-##               - allow for '...' in 'fvcolmm_control' and 'fvcglm_control'
+## 2019-12-15: modify checks for classes (newly use function 'inherits')
+## 2017-08-21: - bug fix predict.fvcm: order columns of predicted
+##               coefficients before multiplying them with the
+##               model matrix. This cause errors for example if
+##               'fvcm' models include 'fe' terms.
+## 2017-08-19: - add default for 'minsize' to 'fvcm_control' and
+##               'tvcglm_control'.
+##             - allow for '...' in 'fvcolmm_control' and 'fvcglm_control'
 ## 2017-07-17: - implement changes due to the new data handling in
 ##               'tvcm'.
 ##             - improve code for 'fvcolmm_control' and 'tvcglm_control'
@@ -326,7 +327,7 @@ predict.fvcm <- function(object, newdata = NULL,
         stop("'newdata' must be a 'data.frame'.")
     
     ## resolve conflicts with the 'ranef' argument
-    if (!class(ranef) %in% c("logical", "matrix"))
+    if (!(inherits(ranef, "logical") | inherits(ranef, "matrix")))
         stop("'ranef' must be a 'logical' or a 'matrix'.")
     if (!is.null(newdata) && is.logical(ranef) && ranef)
         stop("'ranef' should be 'FALSE' or a 'matrix' if 'newdata' is ",

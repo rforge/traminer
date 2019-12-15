@@ -1,3 +1,8 @@
+Changes in Version 1.0-3
+
+    o   Fixed bug for option 'numHess = TRUE' of 'olmm_control'
+    o   Fixed issues with change of class of matrices from R 4.0.0
+
 Changes in Version 1.0-2
 
     o   Replace in C-code 'alloca' memory allocations by 'R_alloc' to

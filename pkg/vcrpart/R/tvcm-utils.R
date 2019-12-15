@@ -2589,8 +2589,8 @@ tvcm_prune_node <- function(object, alpha = NULL,
                             maxstep = NULL, terminal = NULL) {
     
     stopifnot(class(object)[1] %in% c("tvcm", "party", "partynode"))
-    
-    if ("partynode" %in% class(object)) {
+
+    if (inherits(object, "partynode")) {
         rval <- list(object)
     } else {
         rval <- object$info$node    
