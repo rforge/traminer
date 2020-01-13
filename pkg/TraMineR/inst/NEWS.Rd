@@ -1,7 +1,17 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-14 [2020-01-13] (Development version)}{
+\section{Changes in version 2.1-15 [2020-01-13] (Development version)}{
+
+  \subsection{Misc:}{
+    \itemize{
+      \item
+      No changes.
+    }
+  }
+}
+
+\section{Changes in version 2.0-14 [2020-01-13]}{
 
   \subsection{Bug Fixes:}{
     \itemize{
