@@ -1,11 +1,11 @@
 ## =========
-Version 2.1-14 [2019-11-20] (Development version)
+Version 2.1-14 [2020-01-13] (Development version)
 
-Misc.:
-  - No changes
+Bug Fixes:
+  - print.stslist.freq() wrongly used 'width' argument
 
 ## =========
-Version 2.0-13 [2019-11-19] 
+Version 2.0-13 [2019-11-19]
 
 New functions:
   - seqindic() returns a table with per sequence
@@ -27,7 +27,7 @@ Changes in existing functions:
 Bug Fixes:
   - seqST() normalization did not account for non-void
     missing values when present.
-    
+
 Misc:
   - Fixed issue with \traminer in vignette.
 

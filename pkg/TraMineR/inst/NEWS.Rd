@@ -1,12 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-14 [2019-11-20] (Development version)}{
+\section{Changes in version 2.1-14 [2020-01-13] (Development version)}{
 
-  \subsection{Misc.:}{
+  \subsection{Bug Fixes:}{
     \itemize{
       \item
-      No changes.
+      \code{print.stslist.freq()} wrongly used \code{width} argument.
     }
   }
 }
