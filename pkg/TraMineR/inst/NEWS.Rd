@@ -1,14 +1,28 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-01-13] (Development version)}{
+\section{Changes in version 2.1-15 [2020-01-28] (Development version)}{
 
-  \subsection{Misc:}{
+  \subsection{New functions}{
     \itemize{
       \item
-      No changes.
+      \code{seqintegration} index of integrative potential of C. Brzinsky-Fay
+      \item
+      \code{seqivolatility} index of objective volatility of C. Brzinsky-Fay
     }
   }
+
+  \subsection{Changes in existing functions}{
+    \itemize{
+      \item
+      \code{seqipos} gains an argument \code{index} to select between three types of indicators: share of positive states, volatility, or integrative potential for the pos-neg sequences.
+      \item
+      \code{seqipos} returned object has an attribute \code{sbinary} with the derived binary sequences.
+      \item
+      \code{seqindic} possible values for argument \code{indic} include now the indicators of objective volatility and integrative potential both for the provided sequences and the positive-negative sequences derived from them.
+    }
+  }
+
 }
 
 \section{Changes in version 2.0-14 [2020-01-13]}{

@@ -1,11 +1,18 @@
-## proportion of positive spells (or states)
+## indexes measuring structure of positive/negative spells (or states)
 
-seqipos <- function(seqdata, dss=TRUE, pos.states=NULL, neg.states=NULL, with.missing=FALSE){
+seqipos <- function(seqdata, dss=NULL, pos.states=NULL, neg.states=NULL, index="share",
+    pow=1, w=.5, with.missing=FALSE){
 
 	if (!inherits(seqdata,"stslist"))
 		stop(" [!] data is NOT a sequence object, see seqdef function to create one")
   if (is.null(pos.states) & is.null(neg.states))
 		stop(" [!] at least one of pos.states and neg.states should be non null!")
+  ind <- c("share","integration","volatility")
+  if (!index %in% ind)
+		stop(" [!] index should be one of share, integration, or volatility")
+  if (is.null(dss)){
+    dss <- index=="share"
+  }
 
   alph <- alphabet(seqdata)
   void <- attr(seqdata,"void")
@@ -39,8 +46,20 @@ seqipos <- function(seqdata, dss=TRUE, pos.states=NULL, neg.states=NULL, with.mi
 
   sbinary <- seqrecode(s, recodes = recodes, otherwise=attr(s,'void'))
 
-  npos <- rowSums(sbinary=="p")
-  nneg <- rowSums(sbinary=="m")
-  ratio <- npos/(nneg + npos)
-  return(ratio)
+  if (index == "share") {
+    npos <- rowSums(sbinary=="p")
+    nneg <- rowSums(sbinary=="m")
+    ret <- npos/(nneg + npos)
+  }
+  else if (index == "integration"){
+    ret <- as.vector(suppressMessages(
+      seqintegration(sbinary, state="p", pow=pow, with.missing = with.missing)))
+  }
+  else if (index == "volatility"){
+    ret <- suppressMessages(
+      seqivolatility(sbinary, w=w, with.missing = with.missing))
+  }
+  attr(ret, "sbinary") <- sbinary
+
+  return(ret)
 }
