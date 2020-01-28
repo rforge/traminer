@@ -61,7 +61,8 @@ sx <- seqdef(ex1[,1:13], right="DEL")
 nr <- attr(sx,'nr') ## code for missing values
 
 seqipos(sx, pos.states=c("A","B"))
-seqipos(sx, pos.states=c("A","B"), with.missing=TRUE)
+seqipos(sx, pos.states=c("A","B"), with.missing=TRUE))
+
 ## ignoring state "D"
 seqipos(sx, pos.states=c("A","B"), neg.states=c("C",nr), with.missing=TRUE)
 
@@ -71,6 +72,11 @@ seqipos(sx, pos.states=c("A","B",nr), dss=FALSE, with.missing=TRUE)
 seqipos(sx, pos.states=c("A","B"), index="volatility")
 seqipos(sx, pos.states=c("A","B"), index="integration")
 
+## retrieving the binary sequences
+ip <- seqipos(sx, pos.states=c("A","B"))
+attr(ip,"sbinary")
+ip <- seqipos(sx, pos.states=c("A","B"), with.missing=TRUE)
+attr(ip,"sbinary")
 
 }
 

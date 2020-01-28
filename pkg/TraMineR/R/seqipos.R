@@ -48,7 +48,7 @@ seqipos <- function(seqdata, dss=NULL, pos.states=NULL, neg.states=NULL, index="
 
   if (index == "share") {
     npos <- rowSums(sbinary=="p")
-    nneg <- rowSums(sbinary=="m")
+    nneg <- rowSums(sbinary=="n")
     ret <- npos/(nneg + npos)
   }
   else if (index == "integration"){
@@ -59,7 +59,18 @@ seqipos <- function(seqdata, dss=NULL, pos.states=NULL, neg.states=NULL, index="
     ret <- suppressMessages(
       seqivolatility(sbinary, w=w, with.missing = with.missing))
   }
+  ret <- as.matrix(ret)
+  colnames(ret) <- index
   attr(ret, "sbinary") <- sbinary
+  class(ret) <- c(class(ret), "seqipos")
 
   return(ret)
+}
+
+print.seqipos <- function(x, ...){
+  names <- dimnames(x)
+  attributes(x) <- NULL
+  x <- as.matrix(x)
+  dimnames(x) <- names
+  print(x, ...)
 }

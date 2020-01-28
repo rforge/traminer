@@ -4,6 +4,7 @@ Version 2.1-15 [2020-01-28]
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
   - seqivolatility(), index of objective volatility of C. Brzinsky-Fay
+  - print.seqipos() print method for objects returned by seqipos()
 
 Changes in existing functions
   - seqipos() gains an argument \code{index} to select between three 
@@ -15,6 +16,10 @@ Changes in existing functions
     the indicators of objective volatility and integrative 
     potential both for the provided sequences and the 
     positive-negative sequences derived from them.
+    
+Bug fixes:
+  - Print methods for seqprec and seqprecorr objects 
+    did not work.
   
 ## =========
 Version 2.0-14 [2020-01-13]

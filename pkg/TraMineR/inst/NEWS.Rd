@@ -6,20 +6,29 @@
   \subsection{New functions}{
     \itemize{
       \item
-      \code{seqintegration} index of integrative potential of C. Brzinsky-Fay
+      \code{seqintegration()} index of integrative potential of C. Brzinsky-Fay
       \item
-      \code{seqivolatility} index of objective volatility of C. Brzinsky-Fay
+      \code{seqivolatility()} index of objective volatility of C. Brzinsky-Fay
+      \item
+      \code{print.seqipos()} print method for objects returned by \code{seqipos()}
     }
   }
 
   \subsection{Changes in existing functions}{
     \itemize{
       \item
-      \code{seqipos} gains an argument \code{index} to select between three types of indicators: share of positive states, volatility, or integrative potential for the pos-neg sequences.
+      \code{seqipos()} gains an argument \code{index} to select between three types of indicators: share of positive states, volatility, or integrative potential for the pos-neg sequences.
       \item
-      \code{seqipos} returned object has an attribute \code{sbinary} with the derived binary sequences.
+      \code{seqipos()} returned object has an attribute \code{sbinary} with the derived binary sequences.
       \item
-      \code{seqindic} possible values for argument \code{indic} include now the indicators of objective volatility and integrative potential both for the provided sequences and the positive-negative sequences derived from them.
+      \code{seqindic()} possible values for argument \code{indic} include now the indicators of objective volatility and integrative potential both for the provided sequences and the positive-negative sequences derived from them.
+    }
+  }
+
+  \subsection{Bug fixes}{
+    \itemize{
+      \item
+      Print methods for \code{seqprec} and \code{seqprecorr} objects did not work.
     }
   }
 

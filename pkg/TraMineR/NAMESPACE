@@ -129,6 +129,13 @@ S3method(print ,TraMineRPermut)
 S3method(summary ,TraMineRPermut)
 S3method(hist ,TraMineRPermut)
 
+## seqprecarity methods
+S3method(print , seqprecorr)
+S3method(print , seqprec)
+
+## seqipos methods
+S3method(print , seqipos)
+
 ## diss module
 export(
     dissassoc,

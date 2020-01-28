@@ -259,6 +259,7 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	attr(prop.transpen,"state.noncomp") <- state.noncomp
 	attr(prop.transpen,"state.order") <- state.order.plus
 	##attr(prop.transpen,"seqdata") <- seqdata
+  class(prop.transpen) <- c("seqprecorr",class(prop.transpen))
 	
 	return(prop.transpen)
 }
