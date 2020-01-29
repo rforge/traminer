@@ -1,0 +1,13 @@
+TO DO:
+
+- Resolve conflict between the specification of 
+  arguments 'hide.col' and shade.col'. 
+
+- Create vignette with R Markdown.
+
+- Check package 'markovchain' and export method
+  'trmatplot' if necessary.
+
+- Create wrapper function so that the method
+  'trmatplot' can be exported for objects of class
+  'march.Dcmm'.
