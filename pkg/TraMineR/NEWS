@@ -7,20 +7,20 @@ New functions:
   - print.seqipos() print method for objects returned by seqipos()
 
 Changes in existing functions
-  - seqipos() gains an argument \code{index} to select between three 
-    types of indicators: share of positive states, volatility, or 
+  - seqipos() gains an argument \code{index} to select between three
+    types of indicators: share of positive states, volatility, or
     integrative potential for the pos-neg sequences.
-  - seqipos() returned object has an attribute \code{sbinary} with 
+  - seqipos() returned object has an attribute \code{sbinary} with
     the derived binary sequences.
-  - seqindic} possible values for argument \code{indic} include now 
-    the indicators of objective volatility and integrative 
-    potential both for the provided sequences and the 
+  - seqindic() possible values for argument \code{indic} include now
+    the indicators of objective volatility and integrative
+    potential both for the provided sequences and the
     positive-negative sequences derived from them.
-    
+
 Bug fixes:
-  - Print methods for seqprec and seqprecorr objects 
+  - Print methods for seqprec and seqprecorr objects
     did not work.
-  
+
 ## =========
 Version 2.0-14 [2020-01-13]
 
