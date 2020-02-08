@@ -10,13 +10,14 @@ print.stslist <- function(x,format='STS', extended=FALSE, ...) {
 			print(x, quote=FALSE, ...)
 		} else NextMethod("print")
 	}
+  right <- ifelse(any(x[ncol(x)]==attr(x,"nr")), NA, 'DEL')
 	if (format=='SPS') {
 		x <- seqconc(x, void=attr(x,"void"))
 
 		if (extended==FALSE)
-			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = TRUE))
+			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = TRUE, right=right))
 		else if (extended==TRUE)
-			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = FALSE))
+			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = FALSE, right=right))
 
 		print(x, quote=FALSE)
 	}
@@ -69,5 +70,3 @@ print.stslist <- function(x,format='STS', extended=FALSE, ...) {
 Math.stslist <- function(...){
  stop("Invalid operation on sequences")
 }
-
-

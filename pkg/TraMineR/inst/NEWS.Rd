@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-01-28] (Development version)}{
+\section{Changes in version 2.1-15 [2020-02-08] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -29,6 +29,13 @@
     \itemize{
       \item
       Print methods for \code{seqprec} and \code{seqprecorr} objects did not work.
+      \item
+      \code{print.stslist()} did not print ending missing values when \code{format='SPS'}.
+      \item
+      \code{seqformat()} did not account for the \code{right} argument when \code{to='SPS'}.
+      \item
+      \code{seqdist()} with \code{method=CHI2}. Fixed issue with unexpected warnings when in an interval only one state present across sequences.
+      
     }
   }
 

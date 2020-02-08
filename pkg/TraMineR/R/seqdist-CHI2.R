@@ -103,9 +103,13 @@ CHI2 <- function(seqdata, breaks=NULL, step=1, with.missing=FALSE, norm=TRUE,
         mat[nrow(mat),ndot==0] <- 0
       }
       pdot <- mat[nrow(mat),ndot!=0]
-      cmin <- c(min(pdot),min(pdot[-which.min(pdot)]))
-      maxd <- ifelse(norm, 1/cmin[1] + 1/cmin[2], 1)
-      mat[nrow(mat),] <- mat[nrow(mat),] * maxd
+      ## normalize if at least two different states occur in the interval
+      ## otherwise distance can only be zero or NA
+      if(length(pdot)>1){
+        cmin <- c(min(pdot),min(pdot[-which.min(pdot)]))
+        maxd <- ifelse(norm, 1/cmin[1] + 1/cmin[2], 1)
+        mat[nrow(mat),] <- mat[nrow(mat),] * maxd
+      }
     }
     return(mat)
 	}

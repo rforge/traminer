@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-15 [2020-01-28]
+Version 2.1-15 [2020-02-08]
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
@@ -20,6 +20,13 @@ Changes in existing functions
 Bug fixes:
   - Print methods for seqprec and seqprecorr objects
     did not work.
+  - print.stslist() did not print ending missing values 
+    when format='SPS'.
+  - seqformat() did not account for the 'right' argument 
+    when to='SPS'.
+  - seqdist() with 'method=CHI2'. Fixed issue with unexpected warnings 
+    when only one state present in the interval across sequences.
+  
 
 ## =========
 Version 2.0-14 [2020-01-13]
