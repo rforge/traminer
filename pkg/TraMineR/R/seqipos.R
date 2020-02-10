@@ -24,7 +24,7 @@ seqipos <- function(seqdata, dss=NULL, pos.states=NULL, neg.states=NULL, index="
     stop(" [!] invalid values in pos.states: ",paste(pos.states[!pos.states %in% alph], collapse=",
     "))
   }
-  if (!is.null(pos.states) & !all(neg.states %in% alph)){
+  if (!is.null(neg.states) & !all(neg.states %in% alph)){
     stop(" [!] invalid values in neg.states: ",paste(neg.states[!neg.states %in% alph], collapse=",
     "))
   }
@@ -37,7 +37,7 @@ seqipos <- function(seqdata, dss=NULL, pos.states=NULL, neg.states=NULL, index="
   if (length(neg.states)!=length(unique(neg.states)))
     stop(" [!] Multiple occurrences of same state in neg.states")
 
-  recodes <- list("p"=pos.states, "m"=neg.states)
+  recodes <- list("p"=pos.states, "n"=neg.states)
 
   if (dss)
     s <- seqdss(seqdata, with.missing = with.missing)
