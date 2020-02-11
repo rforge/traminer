@@ -1,16 +1,18 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-02-08] (Development version)}{
+\section{Changes in version 2.1-15 [2020-02-11] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
       \item
-      \code{seqintegration()} index of integrative potential of C. Brzinsky-Fay
+      \code{seqintegration()} index of integrative potential of C. Brzinsky-Fay.
       \item
-      \code{seqivolatility()} index of objective volatility of C. Brzinsky-Fay
+      \code{seqivolatility()} index of objective volatility of C. Brzinsky-Fay.
       \item
-      \code{print.seqipos()} print method for objects returned by \code{seqipos()}
+      \code{print.seqipos()} print method for objects returned by \code{seqipos()}.
+      \item
+      \code{alphabet()} gains an argument \code{with.missing}. 
     }
   }
 
@@ -35,7 +37,8 @@
       \code{seqformat()} did not account for the \code{right} argument when \code{to='SPS'}.
       \item
       \code{seqdist()} with \code{method=CHI2}. Fixed issue with unexpected warnings when in an interval only one state present across sequences.
-      
+      \item
+      \code{seqdist()} raised an error for some methods when the unused argument \code{indel} was a vector.      
     }
   }
 

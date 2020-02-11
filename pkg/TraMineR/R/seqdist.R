@@ -90,7 +90,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
     msg.warn("'with.missing' set to FALSE as 'seqdata' doesn't contain missing values")
   }
   if (!isTRUE(with.missing) && (has.seqdata.missings || has.refseq.missings))
-    msg.stop("'with.missing' must be TRUE when 'seqdata' or 'refseq' contains missing values")
+    msg.stop("'with.missing' must be TRUE when 'seqdata' or 'refseq' contain missing values")
 
   if (isTRUE(with.missing)) {
     nstates <- nstates + 1
@@ -171,7 +171,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
   if (refseq.type != "none" && method %in% c("OMstran", "CHI2", "EUCLID"))
     msg.stop.impl("refseq", method)
   if (refseq.type == "sequence" && ! method %in% c("OM", "HAM", "DHD", "LCS", "LCP", "RLCP"))
-    msg.stop.impl("refseq", method, when = "it's an external sequence object")
+    msg.stop.impl("refseq", method, when = "it is an external sequence object")
 
   # norm
   if (norm != "none" && ! method %in% c("OM", "HAM", "DHD", "CHI2", "EUCLID", "LCS", "LCP", "RLCP"))
@@ -261,8 +261,9 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
     msg.stop("use 'prox' instead of 'sm'")
 
   # OMloc, OMslen, OMspell, HAM, DHD, CHI2, EUCLID, LCS, LCP, RLCP, NMS, NMSMST, SVRspell, TWED
-  if (! method %in% c("OM", "OMstran") && indel.type == "vector")
-    msg.stop("'indel' must be a single state-independent indel cost")
+  ##if (! method %in% c("OM", "OMstran") && indel.type == "vector")
+  if (method %in% c("OMslen", "OMspell", "TWED") && indel.type == "vector")
+    msg.stop("vector 'indel' not supported by the chosen method")
 
   #### Configure norm ####
 

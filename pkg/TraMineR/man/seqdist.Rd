@@ -384,44 +384,44 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
 ## Example without missings
 ## ========================
 
-## Defining a sequence object with columns 10 to 25 of a
-## subset of the 'biofam' data set
+## Defining a sequence object with columns 10 to 25
+## of a subset of the 'biofam' data set
 data(biofam)
 biofam.seq <- seqdef(biofam[501:600, 10:25])
 
-## OM distances with a substitution-cost matrix derived
-## from transition rates
-biofam.om <- seqdist(biofam.seq, method = "OM", indel = 3,
-  sm = "TRATE")
-
-## OM distances using the vector of estimated indels and
-## substitution costs derived from the estimated indels
+## OM distances using the vector of indels and substitution
+## costs derived from the estimated state frequencies
 costs <- seqcost(biofam.seq, method = "INDELSLOG")
 biofam.om <- seqdist(biofam.seq, method = "OM",
-  indel = costs$indel, sm = costs$sm)
+                     indel = costs$indel, sm = costs$sm)
+
+## OM between sequences of transitions
+biofam.omstran <- seqdist(biofam.seq, method = "OMstran",
+                     indel = costs$indel, sm = costs$sm,
+                     otto=.3, transindel="subcost")
 
 ## Normalized LCP distances
 biofam.lcp.n <- seqdist(biofam.seq, method = "LCP",
-  norm = "auto")
+                        norm = "auto")
 
 ## Normalized LCS distances to the most frequent sequence
 biofam.dref1 <- seqdist(biofam.seq, method = "LCS",
-  refseq = 0, norm = "auto")
+                        refseq = 0, norm = "auto")
 
 ## LCS distances to an external sequence
 ref <- seqdef(as.matrix("(0,5)-(3,5)-(4,6)"), informat = "SPS",
-  alphabet = alphabet(biofam.seq))
+              alphabet = alphabet(biofam.seq))
 biofam.dref2 <- seqdist(biofam.seq, method = "LCS",
-  refseq = ref)
+                        refseq = ref)
 
 ## Chi-squared distance over the full observed timeframe
 biofam.chi.full <- seqdist(biofam.seq, method = "CHI2",
-  step = max(seqlength(biofam.seq)))
+                           step = max(seqlength(biofam.seq)))
 
-## Chi-squared distance over successive overlaping
+## Chi-squared distance over successive overlapping
 ## intervals of length 4
 biofam.chi.ostep <- seqdist(biofam.seq, method = "CHI2",
-  step = 4, overlap = TRUE)
+                            step = 4, overlap = TRUE)
 
 
 ## =====================
@@ -430,33 +430,34 @@ biofam.chi.ostep <- seqdist(biofam.seq, method = "CHI2",
 data(ex1)
 ex1.seq <- seqdef(ex1[, 1:13])
 
-## OM with substitution costs based on transition
-## probabilities and indel set as half the maximum
-## substitution cost
-costs.tr <- seqcost(ex1.seq, method = "TRATE",
-  with.missing = TRUE)
+## OM with indel and substitution costs based on
+## log of inverse state frequencies
+costs.ex1 <- seqcost(ex1.seq, method = "INDELSLOG",
+                     with.missing = TRUE)
 ex1.om <- seqdist(ex1.seq, method = "OM",
-  indel = costs.tr$indel, sm = costs.tr$sm,
-  with.missing = TRUE)
+                  indel = costs.ex1$indel, sm = costs.ex1$sm,
+                  with.missing = TRUE)
 
 ## Localized OM
 ex1.omloc <- seqdist(ex1.seq, method = "OMloc",
-  indel = costs.tr$indel, sm = costs.tr$sm,
-  with.missing = TRUE)
+                     sm = costs.ex1$sm,
+                     with.missing = TRUE)
 
+## OMspell works only with a scalar indel
+indel <- max(costs.ex1$indel)
 ## OM of spells
 ex1.omspell <- seqdist(ex1.seq, method = "OMspell",
-  sm = costs.tr$sm, indel = costs.tr$indel,
-  with.missing = TRUE)
+                       indel = indel, sm = costs.ex1$sm,
+                       with.missing = TRUE)
 
 ## Distance based on number of matching subsequences
 ex1.nms <- seqdist(ex1.seq, method = "NMS",
-  with.missing = TRUE)
+                   with.missing = TRUE)
 
 ## Using the sequence vetorial representation metric
 costs.fut <- seqcost(ex1.seq, method = "FUTURE", lag = 4,
-  proximities = TRUE, with.missing = TRUE)
+                     proximities = TRUE, with.missing = TRUE)
 ex1.svr <- seqdist(ex1.seq, method = "SVRspell",
-  prox = costs.fut$prox, with.missing = TRUE)
+                   prox = costs.fut$prox, with.missing = TRUE)
 }
 \keyword{Dissimilarity measures}

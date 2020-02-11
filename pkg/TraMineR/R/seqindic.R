@@ -160,10 +160,10 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
   if("prec" %in% indic){
   ## index of precarity
     if(!is.null(prec.args[["seqdata"]]))
-      warning( "[!] seqdata argument in prec.args will be overwritten!" )
+      warning( "[!] seqdata argument given in prec.args is overwritten!" )
     prec.args[["seqdata"]] <- seqdata
     if(!is.null(prec.args[["with.missing"]]))
-      warning( "[!] with.missing argument in prec.args will be overwritten!" )
+      warning( "[!] with.missing argument given in prec.args is overwritten!" )
     prec.args[["with.missing"]] <- with.missing
     prec <- do.call(seqprecarity, args=prec.args)
     tab <- cbind(tab,prec)

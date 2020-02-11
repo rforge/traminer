@@ -128,12 +128,15 @@ Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence Dissimilar
 data(biofam)
 biofam.seq <- seqdef(biofam[501:600,10:25])
 
-## Optimal matching using transition rates based substitution-cost matrix
-## and insertion/deletion costs of 3
-trcost <- seqcost(biofam.seq, method="TRATE")
-biofam.om <- seqdist(biofam.seq, method="OM", indel=3, sm=trcost$sm)
+## Indel and substitution costs based on log of inverse state frequencies
+lifcost <- seqcost(biofam.seq, method="INDELSLOG")
+## Here lifcost$indel is a vector
+biofam.om <- seqdist(biofam.seq, method="OM", indel=lifcost$indel, sm=lifcost$sm)
 
-## Using the insertion/deletion cost returned by seqcost
+## Optimal matching using transition rates based substitution-cost matrix
+## and the associated indel cost
+## Here trcost$indel is a scalar
+trcost <- seqcost(biofam.seq, method="TRATE")
 biofam.om <- seqdist(biofam.seq, method="OM", indel=trcost$indel, sm=trcost$sm)
 
 ## Using costs based on FUTURE with a forward lag of 4
@@ -155,12 +158,12 @@ data(ex1)
 ex1.seq <- seqdef(ex1,1:13, weights=ex1$weights)
 
 ## Unweighted
-subm <- seqcost(ex1.seq, method="TRATE", with.missing=TRUE, weighted=FALSE)
-ex1.om <- seqdist(ex1.seq, method="OM", sm=subm$sm, with.missing=TRUE)
+subm <- seqcost(ex1.seq, method="INDELSLOG", with.missing=TRUE, weighted=FALSE)
+ex1.om <- seqdist(ex1.seq, method="OM", indel=subm$indel, sm=subm$sm, with.missing=TRUE)
 
 ## Weighted
-subm.w <- seqcost(ex1.seq, method="TRATE", with.missing=TRUE, weighted=TRUE)
-ex1.omw <- seqdist(ex1.seq, method="OM", sm=subm.w$sm, with.missing=TRUE)
+subm.w <- seqcost(ex1.seq, method="INDELSLOG", with.missing=TRUE, weighted=TRUE)
+ex1.omw <- seqdist(ex1.seq, method="OM", indel=subm$indel, sm=subm.w$sm, with.missing=TRUE)
 
 ex1.om == ex1.omw
 }
