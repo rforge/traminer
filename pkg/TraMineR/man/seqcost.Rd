@@ -65,9 +65,8 @@ seqsubm(...)
   If \code{NULL}, \code{cval=2} is used, unless \code{transition}
   is \code{"both"} and \code{time.varying} is \code{TRUE}, in which case \code{cval=4}.}
 
-    \item{with.missing}{Logical. Should an additional entry be added in the matrix for the missing states?
-    If \code{TRUE}, the \sQuote{missing} state is also added to the state alphabet. Use this if you want to compute
-    distances with gaps (non deleted missing values) inside the sequences. See \cite{Gabadinho et al. (2010)} for more details on the options for handling missing values when creating state sequence objects.}
+  \item{with.missing}{Logical. Should an additional entry be added in the matrix for the missing states?
+  If \code{TRUE}, the \sQuote{missing} state is also added to the alphabet. Set as \code{TRUE} if you want to use the costs for distances between sequences containing non deleted (non void) missing values. Forced as \code{FALSE} when there are no non-void missing values in \code{seqdata}. See \cite{Gabadinho et al. (2010)} for more details on the options for handling missing values when creating the state sequence object with \code{\link{seqdef}}.}
 
     \item{miss.cost}{Scalar or vector. Cost for substituting the missing state. Default is \code{cval}.}
 

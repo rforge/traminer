@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-02-11] (Development version)}{
+\section{Changes in version 2.1-15 [2020-02-14] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -12,7 +12,7 @@
       \item
       \code{print.seqipos()} print method for objects returned by \code{seqipos()}.
       \item
-      \code{alphabet()} gains an argument \code{with.missing}. 
+      \code{alphabet()} gains an argument \code{with.missing}.
     }
   }
 
@@ -24,6 +24,14 @@
       \code{seqipos()} returned object has an attribute \code{sbinary} with the derived binary sequences.
       \item
       \code{seqindic()} possible values for argument \code{indic} include now the indicators of objective volatility and integrative potential both for the provided sequences and the positive-negative sequences derived from them.
+      \item
+      \code{seqdist()}: OMloc, OMslen, OMspell, and OMstran now also apply to sequences of different lengths.
+      \item
+      \code{seqdist()}: \code{with.missing=TRUE} now supported by all methods.
+      \item
+      \code{seqdist()} now raises a warning when there are empty sequences and an error if with method OMloc that does not support empty sequences.
+      \item
+      \code{seqcost()}: \code{with.missing} forced as \code{FALSE} (as in \code{seqdist}) when there are no non-void missings in the sequences.
     }
   }
 
@@ -36,12 +44,14 @@
       \item
       \code{seqformat()} did not account for the \code{right} argument when \code{to='SPS'}.
       \item
-      \code{seqdist()} with \code{method=CHI2}. Fixed issue with unexpected warnings when in an interval only one state present across sequences.
+      \code{seqdist()} with \code{method=CHI2}. Fixed issue with unexpected warnings when over an interval all sequences stay in the same state.
       \item
-      \code{seqdist()} raised an error for some methods when the unused argument \code{indel} was a vector.      
+      \code{seqdist()} raised an error for some methods when the unused argument \code{indel} was a vector.
+      \item
+      \code{seqdist()}, argument \code{sm}: values \code{'CONSTANT'} and \code{'TRATE'} were only accepted for \code{method='OM'} and \code{'HAM'}. Now can be used with all methods that require the \code{sm} argument.
     }
   }
-
+  
 }
 
 \section{Changes in version 2.0-14 [2020-01-13]}{

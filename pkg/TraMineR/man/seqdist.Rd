@@ -19,9 +19,9 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
 }
 \arguments{
   \item{seqdata}{
-    State Sequence Object.
+    State sequence object of class \code{stslist}.
     The sequence data to use.
-    It can be created with the \code{\link{seqdef}} function.
+    Use \code{\link{seqdef}} to create such an object.
   }
   \item{method}{
     String.
@@ -87,14 +87,15 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     \code{method = "DHD"}. They are grouped in a 3-dimensional array with the
     third index referring to the position in the sequence.
 
-    The name of a \code{\link{seqcost}} method when a string and \code{method}
-    is one of \code{"OM"}, \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"},
-    \code{"OMstran"}, \code{"HAM"}, \code{"DHD"}, or \code{"TWED"}. The method
-    is used to build \code{sm}. It can be \code{"INDELS"} or \code{"INDELSLOG"}
-    for \code{"OM"}, \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"},
-    \code{"OMstran"}, \code{"HAM"}, and \code{"TWED"}, \code{"CONSTANT"} for
-    \code{"OM"} and \code{"HAM"}, \code{"TRATE"} for \code{"OM"}, \code{"HAM"},
-    and \code{"DHD"}.
+    One of the strings \code{"CONSTANT"}, \code{"INDELS"}, \code{"INDELSLOG"},
+    or \code{"TRATE"}. Designates a \code{\link{seqcost}} method to be used
+    to build \code{sm}. For \code{"DHD"}, only \code{"TRATE"} applies. In this
+    latter case, the outcome is the same as with \code{sm=NULL}.
+
+    %for \code{"OM"}, \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"},
+    %\code{"OMstran"}, \code{"HAM"}, and \code{"TWED"}, \code{"CONSTANT"} for
+    %\code{"OM"} and \code{"HAM"}, \code{"TRATE"} for \code{"OM"}, \code{"HAM"},
+    %and \code{"DHD"}.
 
     \code{sm} is mandatory when \code{method} is one of \code{"OM"},
     \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"}, \code{"OMstran"},
@@ -111,8 +112,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   \item{with.missing}{
     Logical.
     Default: \code{FALSE}.
-    When \code{method} isn't \code{"OMslen"} or \code{"OMstran"}, should the
-    non-deleted gap (missing value) be added to the alphabet as an additional
+    Should the non-deleted missing value be added to the alphabet as an additional
     state? If \code{FALSE} and \code{seqdata} or \code{refseq} contains such
     gaps, an error is raised.
   }
@@ -195,7 +195,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     Logical.
     Default: \code{TRUE}.
     When \code{method = "OMstran"}, should the last column (and also the first
-    column when \code{previous = TRUE}) be duplicated?
+    column when \code{previous = TRUE}) be duplicated? When sequences have different
+    lengths, should the last (first) valid state be duplicated.
   }
   \item{breaks}{
     \code{NULL}, List of pairs Integers.
@@ -438,9 +439,10 @@ ex1.om <- seqdist(ex1.seq, method = "OM",
                   indel = costs.ex1$indel, sm = costs.ex1$sm,
                   with.missing = TRUE)
 
-## Localized OM
-ex1.omloc <- seqdist(ex1.seq, method = "OMloc",
-                     sm = costs.ex1$sm,
+## Localized OM 
+## OMloc does not support empty sequences, only first 6 sequences
+ex1.omloc <- seqdist(ex1.seq[1:6,], method = "OMloc",
+                     sm = costs.ex1$sm, expcost=.1, context = .4,
                      with.missing = TRUE)
 
 ## OMspell works only with a scalar indel
@@ -454,7 +456,7 @@ ex1.omspell <- seqdist(ex1.seq, method = "OMspell",
 ex1.nms <- seqdist(ex1.seq, method = "NMS",
                    with.missing = TRUE)
 
-## Using the sequence vetorial representation metric
+## Using the sequence vectorial representation metric
 costs.fut <- seqcost(ex1.seq, method = "FUTURE", lag = 4,
                      proximities = TRUE, with.missing = TRUE)
 ex1.svr <- seqdist(ex1.seq, method = "SVRspell",

@@ -81,6 +81,16 @@ msg.stop.ie <- function(info, ...) {
   msg.stop("internal error, contact the package maintainer:", info, ...)
 }
 
+# empty sequence
+msg.stop.sempty <- function(method, values) {
+  msg.stop(method," does not support empty sequences ", paste(values, collapse = ", "))
+}
+
+msg.warn.sempty <- function(values) {
+  msg.warn("Empty sequence(s) ", paste(values, collapse = ", "), " may cause inconsistent results!")
+}
+
+
 # ignored
 msg.warn.ign1 <- function(arg) {
   msg.warn(aprint(arg), "has been ignored")

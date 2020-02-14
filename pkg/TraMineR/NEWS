@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-15 [2020-02-11]
+Version 2.1-15 [2020-02-14]
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
@@ -17,19 +17,33 @@ Changes in existing functions
     potential both for the provided sequences and the
     positive-negative sequences derived from them.
   - alphabet() gains an argument 'with.missing'.
+  - seqdist(): OMloc, OMslen, OMspell, and OMstran now also 
+    apply to sequences of different lengths.
+  - seqdist(): with.missing=TRUE now supported by all methods.
+  - seqdist() now raises a warning when there are empty sequences 
+    and an error if with method OMloc that does not support 
+    empty sequences.
+  - seqcost(): 'with.missing' forced as FALSE (as in seqdist) 
+    when there are no non-void missings in the sequences.
+  
 
 Bug fixes:
   - Print methods for seqprec and seqprecorr objects
     did not work.
-  - print.stslist() did not print ending missing values 
+  - print.stslist() did not print ending missing values
     when format='SPS'.
-  - seqformat() did not account for the 'right' argument 
+  - seqformat() did not account for the 'right' argument
     when to='SPS'.
-  - seqdist() with 'method=CHI2'. Fixed issue with unexpected warnings 
-    when only one state present in the interval across sequences.
-  - seqdist() raised an error for some methods when the 
-    unused argument indel was a vector. 
-  
+  - seqdist() with 'method=CHI2'. Fixed issue with unexpected 
+    warnings when over an interval all sequences stay in 
+    the same state.
+  - seqdist() raised an error for some methods when the
+    unused argument indel was a vector.
+  - seqdist(), argument 'sm': values 'CONSTANT' and 'TRATE' 
+    were only accepted for method='OM' and 'HAM'. Now can be 
+    used with all methods that require the sm argument.
+    
+
 
 ## =========
 Version 2.0-14 [2020-01-13]
