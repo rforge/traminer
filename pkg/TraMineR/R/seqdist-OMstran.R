@@ -79,6 +79,7 @@ OMstran <- function(seqdata, indel, sm, full.matrix, transindel, otto, previous,
 	## Build substitution matrix and new alphabet
 	alphabet <- alphabet(newseqdata)
 	alphabet_size <- length(alphabet)
+	msg("Creating", alphabet_size, "distinct transition states")
 	## Recomputing the subsitution matrix
 	indels <- numeric(alphabet_size)
 	names(indels) <- alphabet
@@ -131,5 +132,5 @@ OMstran <- function(seqdata, indel, sm, full.matrix, transindel, otto, previous,
 			newsm[j, i] <- cost
 		}
 	}
-	return(seqdist(newseqdata, method = "OM", indel = indels, sm = newsm, full.matrix = full.matrix))
+	suppressMessages(return(seqdist(newseqdata, method = "OM", indel = indels, sm = newsm, full.matrix = full.matrix)))
 }

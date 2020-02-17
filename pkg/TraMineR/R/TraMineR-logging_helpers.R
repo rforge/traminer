@@ -18,7 +18,7 @@ msg.stop <- function(msg, ...) {
 
 # warn
 f.warn <- function(f, msg, ...) {
-  message(paste(" [!]", f(msg, ...)))
+  message(paste(" [!!]", f(msg, ...)))
 }
 msg.warn <- function(msg, ...) {
   f.warn(paste, msg, ...)

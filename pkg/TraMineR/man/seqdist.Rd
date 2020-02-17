@@ -381,9 +381,9 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   multichannel distances \code{\link{seqdistmc}}.
 }
 \examples{
-## ========================
-## Example without missings
-## ========================
+## =========================
+## Examples without missings
+## =========================
 
 ## Defining a sequence object with columns 10 to 25
 ## of a subset of the 'biofam' data set
@@ -425,11 +425,12 @@ biofam.chi.ostep <- seqdist(biofam.seq, method = "CHI2",
                             step = 4, overlap = TRUE)
 
 
-## =====================
-## Example with missings
-## =====================
+## ======================
+## Examples with missings
+## ======================
 data(ex1)
-ex1.seq <- seqdef(ex1[, 1:13])
+## Ignore empty row 7
+ex1.seq <- seqdef(ex1[1:6, 1:13])
 
 ## OM with indel and substitution costs based on
 ## log of inverse state frequencies
@@ -440,8 +441,7 @@ ex1.om <- seqdist(ex1.seq, method = "OM",
                   with.missing = TRUE)
 
 ## Localized OM 
-## OMloc does not support empty sequences, only first 6 sequences
-ex1.omloc <- seqdist(ex1.seq[1:6,], method = "OMloc",
+ex1.omloc <- seqdist(ex1.seq, method = "OMloc",
                      sm = costs.ex1$sm, expcost=.1, context = .4,
                      with.missing = TRUE)
 
