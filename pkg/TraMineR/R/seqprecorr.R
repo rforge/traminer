@@ -52,9 +52,15 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 		stop("seqdata is NOT a sequence object, see seqdef function to create one")
 
 
-  method.names <- c("FREQ","TRATE","TRATEDSS","RANK","ONE")
+  method.names <- c("FREQ","TRATE","TRATEDSS","RANK","FREQ+","TRATE+","TRATEDSS+","RANK+","ONE")
   if (!(method %in% method.names))
 		stop(" [!] method should be one of ", paste(method.names, collapse=", "))
+
+  use.mean.tr <- FALSE
+  if (method %in% c("FREQ+","TRATE+","TRATEDSS+","RANK+")) {
+    use.mean.tr <- TRUE
+    method <- switch(method, "FREQ+"="FREQ","TRATE+"="TRATE","TRATEDSS+"="TRATEDSS","RANK+"="RANK")
+  }
 
   if (method %in% c("FREQ","TRATE","TRATEDSS")){
     weight.names <- c('ADD','INV','LOGINV')
@@ -233,7 +239,6 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
 	transpen <- transw
 	prop.transpen <- transw
 
-
   if (penalized != 'NO') {
 	  dss.num <- seqasnum(dss, with.missing=with.missing)+1
 	  ## sum of transition weights in the sequence
@@ -250,6 +255,10 @@ seqprecorr.tr <- function(seqdata, state.order=alphabet(seqdata), state.equiv = 
   		}
   	  ## else leave prop.transpen[i] <- 0
   	}
+    if (use.mean.tr){
+      mean.transw <- transw/dssl ## mean transition weight
+      prop.transpen <- mean.transw * prop.transpen
+    }
   }
 	
 	dimnames(signs) <- dimnames(tr)

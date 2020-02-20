@@ -41,7 +41,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata), state.equiv=NULL,
 
   \item{state.equiv}{List of state equivalence classes. Each class in the list is given as the vector of the short labels of the states forming the class. }
 
-  \item{method}{One of \code{'FREQ'}, \code{'TRATE'}, \code{'TRATEDSS'} (default), \code{'RANK'}, or \code{'ONE'}. Method for determining transition weights. Weights based on transition probabilities: \code{'FREQ'} overall frequency of the transitions, \code{'TRATE'} transition probabilities, and \code{'TRATEDSS'} transition probabilites in the DSS sequences. \code{'RANK'} differences between state precarity degrees. \code{'ONE'} no weight.}
+  \item{method}{One of \code{'FREQ'}, \code{'FREQ+'}, \code{'TRATE'}, \code{'TRATE+'}, \code{'TRATEDSS'} (default), \code{'TRATEDSS+'}, \code{'RANK'}, \code{'RANK+'}, or \code{'ONE'}. Method for determining transition weights. Weights based on transition probabilities: \code{'FREQ'} overall frequency of the transitions, \code{'TRATE'} transition probabilities, and \code{'TRATEDSS'} transition probabilites in the DSS sequences. \code{'RANK'} differences between state precarity degrees. \code{'ONE'} no weight. With the \code{+} form the returned penalty is adjusted by the mean transition weight.}
 
   \item{weight.type}{One of \code{'ADD'} (default), \code{'INV'}, or \code{'LOGINV'}. When \code{method} is one of \code{'FREQ'}, \code{'TRATE'} or \code{'TRATEDSS'}, how weights are derived from the transition probabilities: \code{'ADD'} additive (1-p), \code{'INV'} inverse (1/p), and \code{'LOGINV'} log of inverse. Ignored when any other \code{method} is selected.}
 

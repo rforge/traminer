@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-02-14] (Development version)}{
+\section{Changes in version 2.1-15 [2020-02-20] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -11,15 +11,15 @@
       \code{seqivolatility()} index of objective volatility of C. Brzinsky-Fay.
       \item
       \code{print.seqipos()} print method for objects returned by \code{seqipos()}.
-      \item
-      \code{alphabet()} gains an argument \code{with.missing}.
     }
   }
 
   \subsection{Changes in existing functions}{
     \itemize{
       \item
-      \code{seqipos()} gains an argument \code{index} to select between three types of indicators: share of positive states, volatility, or integrative potential for the pos-neg sequences.
+      \code{alphabet()} gains an argument \code{with.missing}.
+      \item
+      \code{seqipos()} gains an argument \code{index} to select between three types of indicators: share of positive states, volatility, or integrative potential for the positive state.
       \item
       \code{seqipos()} returned object has an attribute \code{sbinary} with the derived binary sequences.
       \item
@@ -29,9 +29,11 @@
       \item
       \code{seqdist()}: \code{with.missing=TRUE} now supported by all methods.
       \item
-      \code{seqdist()} now raises a warning when there are empty sequences and an error if with method OMloc that does not support empty sequences.
+      \code{seqdist()} raises a warning when there are empty sequences except for OMloc where an error is raised.
       \item
       \code{seqcost()}: \code{with.missing} forced as \code{FALSE} (as in \code{seqdist}) when there are no non-void missings in the sequences.
+      \item
+      \code{seqprecorr()}: new methods \code{"FREQ+"}, \code{"TRATE+"}, \code{"TRATEDSS+"}, \code{"RANK+"}     that adjust the returned penalty for the mean transition weight.
     }
   }
 
@@ -51,7 +53,7 @@
       \code{seqdist()}, argument \code{sm}: values \code{'CONSTANT'} and \code{'TRATE'} were only accepted for \code{method='OM'} and \code{'HAM'}. Now can be used with all methods that require the \code{sm} argument.
     }
   }
-  
+
 }
 
 \section{Changes in version 2.0-14 [2020-01-13]}{

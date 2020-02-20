@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-15 [2020-02-14]
+Version 2.1-15 [2020-02-20]
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
@@ -7,25 +7,26 @@ New functions:
   - print.seqipos() print method for objects returned by seqipos()
 
 Changes in existing functions
+  - alphabet() gains an argument 'with.missing'.
   - seqipos() gains an argument 'index' to select between three
     types of indicators: share of positive states, volatility, or
-    integrative potential for the pos-neg sequences.
+    integrative potential for the positive state.
   - seqipos() returned object has an attribute 'sbinary' with
     the derived binary sequences.
   - seqindic() possible values for argument 'indic' include now
     the indicators of objective volatility and integrative
     potential both for the provided sequences and the
     positive-negative sequences derived from them.
-  - alphabet() gains an argument 'with.missing'.
-  - seqdist(): OMloc, OMslen, OMspell, and OMstran now also 
+  - seqdist(): OMloc, OMslen, OMspell, and OMstran now also
     apply to sequences of different lengths.
   - seqdist(): with.missing=TRUE now supported by all methods.
-  - seqdist() now raises a warning when there are empty sequences 
-    and an error if with method OMloc that does not support 
-    empty sequences.
-  - seqcost(): 'with.missing' forced as FALSE (as in seqdist) 
+  - seqdist() raises a warning when there are empty sequences
+    except for OMloc where an error is raised.
+  - seqcost(): 'with.missing' forced as FALSE (as in seqdist)
     when there are no non-void missings in the sequences.
-  
+  - seqprecorr(): new methods "FREQ+", "TRATE+", "TRATEDSS+", "RANK+"
+    that adjust the returned penalty for the mean transition weight.
+
 
 Bug fixes:
   - Print methods for seqprec and seqprecorr objects
@@ -34,15 +35,15 @@ Bug fixes:
     when format='SPS'.
   - seqformat() did not account for the 'right' argument
     when to='SPS'.
-  - seqdist() with 'method=CHI2'. Fixed issue with unexpected 
-    warnings when over an interval all sequences stay in 
+  - seqdist() with 'method=CHI2'. Fixed issue with unexpected
+    warnings when over an interval all sequences stay in
     the same state.
   - seqdist() raised an error for some methods when the
     unused argument indel was a vector.
-  - seqdist(), argument 'sm': values 'CONSTANT' and 'TRATE' 
-    were only accepted for method='OM' and 'HAM'. Now can be 
+  - seqdist(), argument 'sm': values 'CONSTANT' and 'TRATE'
+    were only accepted for method='OM' and 'HAM'. Now can be
     used with all methods that require the sm argument.
-    
+
 
 
 ## =========
