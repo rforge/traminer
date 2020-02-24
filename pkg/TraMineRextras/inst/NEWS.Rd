@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.7 [2019-11-03] (Development version)}{
+\section{Changes in version 0.5.7 [2020-02-24] (Development version)}{
   \subsection{Bug fixes}{
     \itemize{
       \item
@@ -9,6 +9,12 @@
       \item
       \code{seqedplot()}: Now calls \code{plot.survfit} with by default
         \code{conf.int=FALSE} instead of \code{"none"} (advised by Terry Therneau).
+    }
+  }
+  \subsection{Misc.}{
+    \itemize{
+      \item
+      \code{seqprecarity(), seqprecorr(), seqprecstart()} deleted. These functions are now in TraMineR since v 2.0-13.
     }
   }
 }
