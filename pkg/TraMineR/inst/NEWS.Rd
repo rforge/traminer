@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-02-20] (Development version)}{
+\section{Changes in version 2.1-15 [2020-02-25] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -51,6 +51,7 @@
       \code{seqdist()} raised an error for some methods when the unused argument \code{indel} was a vector.
       \item
       \code{seqdist()}, argument \code{sm}: values \code{'CONSTANT'} and \code{'TRATE'} were only accepted for \code{method='OM'} and \code{'HAM'}. Now can be used with all methods that require the \code{sm} argument.
+      \code{seqprecorr()}, a same state value is assigned to equivalent states when counting transitions and computing transition probabilities (methods \code{FREQ}, \code{TRATE), \code{TRATEDSS}).
     }
   }
 

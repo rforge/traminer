@@ -6,7 +6,7 @@ alphabet <- function(seqdata, with.missing=FALSE) {
 
 	if (inherits(seqdata,c("stslist","PSTf"))){
     statl <- attr(seqdata,"alphabet")
-    if (with.missing) statl <- c(statl, attr(seqdata,"nr"))
+    if (isTRUE(with.missing)) statl <- c(statl, attr(seqdata,"nr"))
   }
   else if (inherits(seqdata,"seqelist")){
     statl <- levels(seqdata)

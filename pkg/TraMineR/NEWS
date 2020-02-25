@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-15 [2020-02-20]
+Version 2.1-15 [2020-02-25]
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
@@ -26,7 +26,10 @@ Changes in existing functions
     when there are no non-void missings in the sequences.
   - seqprecorr(): new methods "FREQ+", "TRATE+", "TRATEDSS+", "RANK+"
     that adjust the returned penalty for the mean transition weight.
-
+  - seqprecorr(), a same state value is assigned to equivalent 
+    states when counting transitions and computing transition 
+    probabilities (methods \code{FREQ}, \code{TRATE), 
+    \code{TRATEDSS}).
 
 Bug fixes:
   - Print methods for seqprec and seqprecorr objects
