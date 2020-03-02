@@ -1,4 +1,10 @@
-                CHANGES IN TraMineRextras VERSION 0.5.7 [2020-02-24] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.8 [2020-03-02] (Development version)
+                
+Misc.
+    o   No changes.
+
+
+                CHANGES IN TraMineRextras VERSION 0.4.7 [2020-03-02]
 
 Bug fixes
     o   seqedplot(): Issue with color selection when only one event.
@@ -8,6 +14,7 @@ Bug fixes
 Misc.
     o   seqprecarity(), seqprecorr(), seqprecstart() deleted. These
         functions are in TraMineR since v 2.0-13.
+
 
                 CHANGES IN TraMineRextras VERSION 0.4.6 [2019-05-06]
 
