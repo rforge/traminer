@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-02-25] (Development version)}{
+\section{Changes in version 2.1-15 [2020-03-09] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -34,6 +34,8 @@
       \code{seqcost()}: \code{with.missing} forced as \code{FALSE} (as in \code{seqdist}) when there are no non-void missings in the sequences.
       \item
       \code{seqprecorr()}: new methods \code{"FREQ+"}, \code{"TRATE+"}, \code{"TRATEDSS+"}, \code{"RANK+"}     that adjust the returned penalty for the mean transition weight.
+      \item
+      \code{seqprecorr()}, a same state value is assigned to equivalent states when counting transitions and computing transition probabilities (methods \code{FREQ}, \code{TRATE}, \code{TRATEDSS}).
     }
   }
 
@@ -51,10 +53,8 @@
       \code{seqdist()} raised an error for some methods when the unused argument \code{indel} was a vector.
       \item
       \code{seqdist()}, argument \code{sm}: values \code{'CONSTANT'} and \code{'TRATE'} were only accepted for \code{method='OM'} and \code{'HAM'}. Now can be used with all methods that require the \code{sm} argument.
-      \code{seqprecorr()}, a same state value is assigned to equivalent states when counting transitions and computing transition probabilities (methods \code{FREQ}, \code{TRATE), \code{TRATEDSS}).
     }
   }
-
 }
 
 \section{Changes in version 2.0-14 [2020-01-13]}{

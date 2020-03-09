@@ -84,7 +84,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
   }
 
   # checking for empty sequences
-  sdur <- seqdur(seqdata, with.missing=TRUE)
+  sdur <- seqdur(seqdata, with.missing=with.missing)
   emptyseq <- which(is.na(sdur[,1]))
   if (length(emptyseq) > 0){
     if (method == "OMloc")
@@ -98,7 +98,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
   has.refseq.missings <- if (refseq.type == "sequence" && any(refseq == refseq.nr)) TRUE else FALSE
   if (isTRUE(with.missing) && !has.seqdata.missings && !has.refseq.missings) {
     with.missing <- FALSE
-    msg.warn("'seqdist: with.missing' set to FALSE as 'seqdata' has no non-void missing values")
+    msg.warn("seqdist: 'with.missing' set as FALSE as 'seqdata' has no non-void missing values")
   }
   if (!isTRUE(with.missing) && (has.seqdata.missings || has.refseq.missings))
     msg.stop("'with.missing' must be TRUE when 'seqdata' or 'refseq' contain missing values")
