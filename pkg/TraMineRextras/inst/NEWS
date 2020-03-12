@@ -1,7 +1,8 @@
-                CHANGES IN TraMineRextras VERSION 0.5.8 [2020-03-02] (Development version)
-                
-Misc.
-    o   No changes.
+                CHANGES IN TraMineRextras VERSION 0.5.8 [2020-03-12] (Development version)
+
+New functions
+    o   seqLRT() Likelihood ratio test for comparing two sets of sequences.
+    o   seqBIC() Bayesian Information Criterion (BIC) for comparing sequence data.
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.7 [2020-03-02]
