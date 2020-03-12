@@ -374,9 +374,9 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = 1.0,
         } #else {
           # msg.stop.na("sm")
           #}
-      } else {
-        msg.stop.na("sm")
-      }
+      } #else {
+        #msg.stop.na("sm")
+      #}
       sm <- seqsubm(seqdata, sm, with.missing, cval = cost, miss.cost = cost, time.varying = tv)
       rm(cost)
       rm(tv)
