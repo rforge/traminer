@@ -88,6 +88,11 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
     else {
       inotna <- which(!is.na(gvar))
     }
+    ########
+    ina <- nrow(seqdata) - length(inotna)
+    if(ina > 0)
+      message("[!!] ", ina, " sequences removed because of NA values of the grouping variable(s)\n")
+    ##########
     gvar <- gvar[inotna]
     gvar <- factor(gvar)
     lev.g <- levels(gvar)
