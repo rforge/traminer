@@ -60,16 +60,18 @@ The default option \code{squared="LTRonly"} corresponds to the initial propositi
 
 \value{The function \code{seqLRT} with the default \code{"LRT"} stat value value outputs two variables, \var{LRT} and \var{p.LRT}.
 
-\item{LRT}{This is the likelihood ratio test statistic for comparing the two groups.
-}
-\item{p.LRT}{This is the upper tail probability associated with the LRT.
-}
+  \item{LRT}{This is the likelihood ratio test statistic for comparing the two groups.
+  }
+  \item{p.LRT}{This is the upper tail probability associated with the LRT.
+  }
 The function \code{seqBIC} (and \code{seqLRT} with the \code{"BIC"} stat value) outputs two variables, \var{BIC} and \var{BF}.
 
-\item{BIC}{This is the difference between two BICs for comparing the two groups.
-}
-\item{BF}{This is the Bayes factor associated with the BIC difference.
-}
+  \item{BIC}{This is the difference between two BICs for comparing the two groups.
+  }
+  \item{BF}{This is the Bayes factor associated with the BIC difference.
+  }
+  
+\code{seqLRT} with \code{stat="all"} outputs all four indicators.
 }
 
 \examples{
