@@ -3,9 +3,10 @@
 ## version 1.0, March 2020
 
 seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
-  s=100, seed=36963, method=method, squared=FALSE, ...)
+  s=100, seed=36963, squared=FALSE, method=method, ...)
 {
-  return(seqLRT(seq1, seq2, s=s, seed=seed, stat="BIC", method=method, squared=squared, ...))
+  return(seqLRT(seqdata, seqdata2, group, subgroup, s=s, seed=seed,
+         stat="BIC", squared=squared, method=method, ...))
 }
 
 
@@ -22,6 +23,7 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
   if (!is.null(subgroup) & is.null(group)){
     stop("'subgroup' not NULL while 'group' is NULL!")
   }
+
   is1.stslist <- inherits(seqdata,"stslist")
   is2.stslist <- inherits(seqdata2,"stslist")
 
@@ -182,6 +184,7 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
     if (is.BIC) colnames <- c(colnames, "BIC diff.", "Bayes Factor")
     colnames(Results) <- colnames
   }
+  if(!is.null(subgroup)) rownames(Results) <- lev.sg
   return(Results)
 }
 
