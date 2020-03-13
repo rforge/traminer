@@ -3,15 +3,15 @@
 ## version 1.0, March 2020
 
 seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
-  s=100, seed=36963, squared=FALSE, method=method, ...)
+  s=100, seed=36963, squared="LRTonly", method, ...)
 {
   return(seqLRT(seqdata, seqdata2, group, subgroup, s=s, seed=seed,
-         stat="BIC", squared=squared, method=method, ...))
+         stat="BIC", squared=squared, method, ...))
 }
 
 
 seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
-  s=100, seed=36963, stat="LRT", squared=FALSE, method=method, ...)
+  s=100, seed=36963, stat="LRT", squared="LRTonly", method, ...)
 {
   #require("gtools")
   #require("TraMineR")
@@ -22,6 +22,14 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
   }
   if (!is.null(subgroup) & is.null(group)){
     stop("'subgroup' not NULL while 'group' is NULL!")
+  }
+
+  if (is.logical(squared))
+    LRTpow <- ifelse(squared, 2, 1)
+  else {
+    if (squared != "LRTonly") stop("squared must be logical or 'LRTonly'")
+    LRTpow <- 2
+    squared <- FALSE
   }
 
   is1.stslist <- inherits(seqdata,"stslist")
@@ -176,7 +184,9 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
       seqA<-seq.a[[i]][r.s1[[i]][j,],]
       seqB<-seq.b[[i]][r.s2[[i]][j,],]
       ##suppressMessages(t[j,]<-unlist(seq.comp2(seqA, seqB, BIC=BIC, method=method, ...)))
-      suppressMessages(t[j,] <- seq.comp2(seqA, seqB, is.LRT=is.LRT, is.BIC=is.BIC, method=method, squared=squared, ...))
+      suppressMessages(t[j,] <-
+        seq.comp2(seqA, seqB, is.LRT=is.LRT, is.BIC=is.BIC,
+        method=method, squared=squared, LRTpow=LRTpow, ...))
     }
     Results[i,]<-apply(t,2,mean)
     colnames <- NULL
@@ -188,7 +198,7 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
   return(Results)
 }
 
-seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, ...)
+seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, LRTpow,...)
 {
 
   # compute some basic statistics
@@ -213,7 +223,7 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, ...)
 
 
   # compute LRTs and alpha probabilities
-  LRT<-n0*log(sum(dist.S^2)/n0)-n0*log(sum(c(dist.S1,dist.S2)^2)/n0)
+  LRT<-n0*log(sum(dist.S^LRTpow)/n0)-n0*log(sum(c(dist.S1,dist.S2)^LRTpow)/n0)
 
   if (is.LRT) {
     p.LRT <- pchisq(LRT,1,lower.tail=FALSE)
