@@ -10,8 +10,8 @@ Determines the initial state precarity degree from the state ordering. (See deta
 }
 
 \usage{
-seqprecstart(seqdata, state.order=alphabet(seqdata, with.missing), state.equiv=NULL, stprec=NULL,
-    with.missing=FALSE)
+seqprecstart(seqdata, state.order=alphabet(seqdata, with.missing), state.equiv=NULL, 
+    stprec=NULL, with.missing=FALSE)
 }
 
 \arguments{
