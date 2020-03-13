@@ -2,14 +2,52 @@
 ## Tim Liao, University of Illionis, and Anette Fasang, Humboldt University
 ## version 1.0, March 2020
 
-seqBIC <- function(seq1, seq2, s=100, sd=36963, method=method, squared=FALSE, ...)
+seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
+  s=100, seed=36963, method=method, squared=FALSE, ...)
 {
-  return(seqLRT(seq1, seq2, s=100, sd=36963, stat="BIC", method=method, squared=squared, ...))
+  return(seqLRT(seq1, seq2, s=s, seed=seed, stat="BIC", method=method, squared=squared, ...))
 }
 
 
-seqLRT <- function(seq1, seq2, s=100, sd=36963, stat="LRT", squared=FALSE, method=method, ...)
+seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
+  s=100, seed=36963, stat="LRT", squared=FALSE, method=method, ...)
 {
+  #require("gtools")
+  #require("TraMineR")
+
+
+  if (is.null(seqdata2) & is.null(group)){
+    stop("'seqdata2' and 'group' cannot both be NULL!")
+  }
+  if (!is.null(subgroup) & is.null(group)){
+    stop("'subgroup' not NULL while 'group' is NULL!")
+  }
+  is1.stslist <- inherits(seqdata,"stslist")
+  is2.stslist <- inherits(seqdata2,"stslist")
+
+  if (is.list(seqdata) & !is1.stslist) {
+    if (is2.stslist | length(seqdata) != length(seqdata2))
+      stop("When 'seqdata' is a list, seqdata2 must be a list of same length")
+    else {
+      l <- length(seqdata)
+      test <- FALSE
+      i <- 1
+      while (i <= l) {
+        if(!inherits(seqdata[[i]], "stslist") | !inherits(seqdata2[[i]], "stslist"))
+           stop("At least one element of the seqdata lists is not a state sequence object!")
+        i=i+1
+      }
+    }
+  }
+  else if (!is1.stslist) {
+    stop("If not a list, 'seqdata' must be a state sequence object (stslist) created with seqdef()")
+  }
+  else if (!is.null(seqdata2) & !is2.stslist) {
+    stop("If not a list, 'seqdata2' must be a state sequence object (stslist) created with seqdef()")
+  }
+
+  if (!stat %in% c("LRT","BIC","all"))
+    stop("Bad stat value, must be one of 'LRT', 'BIC', or 'all'")
 
   if (stat=="all") {
     is.LRT <- is.BIC <- TRUE
@@ -18,8 +56,49 @@ seqLRT <- function(seq1, seq2, s=100, sd=36963, stat="LRT", squared=FALSE, metho
     is.LRT <- "LRT" %in% stat
     is.BIC <- "BIC" %in% stat
   }
-  #require("gtools")
-  #require("TraMineR")
+
+  if (!is1.stslist){
+    seq1 <- seqdata
+    seq2 <- seqdata2
+  }
+  else if (is1.stslist & !is.null(seqdata2)) {
+    seq1 <- list(seqdata)
+    seq2 <- list(seqdata2)
+  }
+  else if (is1.stslist & is.null(seqdata2)) {
+    ## suppress cases with NA group values
+    gvar <- as.vector(group)
+    if (!is.null(subgroup)){
+      sgvar <- as.vector(subgroup)
+      inotna <- which(!is.na(gvar) & !is.na(sgvar))
+      sgvar <- sgvar[inotna]
+      sgvar <- factor(sgvar)
+      lev.sg <- levels(sgvar)
+    }
+    else {
+      inotna <- which(!is.na(gvar))
+    }
+    gvar <- gvar[inotna]
+    gvar <- factor(gvar)
+    lev.g <- levels(gvar)
+    if (length(lev.g) > 2)
+      stop("Currently seqLRT supports only 2 groups!")
+    seqdata <- seqdata[inotna,]
+    seq1 <- list()
+    seq2 <- list()
+    if (is.null(subgroup)){
+      #cat("\n No subgroup\n")
+      seq1[[1]] <- seqdata[gvar==lev.g[1],]
+      seq2[[1]] <- seqdata[gvar==lev.g[2],]
+    }
+    else {
+      #cat("\n Subgroup\n")
+      for (i in 1:length(lev.sg)){
+        seq1[[i]] <- seqdata[gvar==lev.g[1] & sgvar==lev.sg[i],]
+        seq2[[i]] <- seqdata[gvar==lev.g[2] & sgvar==lev.sg[i],]
+      }
+    }
+  }
 
   # prepare samples
   G = length(seq1)
@@ -68,7 +147,7 @@ seqLRT <- function(seq1, seq2, s=100, sd=36963, stat="LRT", squared=FALSE, metho
 
   r.s1=r.s2 = list(rep(NA,G))
   for (i in 1:G) {
-    set.seed(sd)
+    set.seed(seed)
     #if (s<m.n[i]) {
     #  r.s1[[i]] <- c(permute(1:m.n[i]),sample(1:m.n[i],r.n1[i],F))
     #}
