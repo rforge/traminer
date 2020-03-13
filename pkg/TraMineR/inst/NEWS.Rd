@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-03-09] (Development version)}{
+\section{Changes in version 2.1-15 [2020-03-13] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -53,6 +53,8 @@
       \code{seqdist()} raised an error for some methods when the unused argument \code{indel} was a vector.
       \item
       \code{seqdist()}, argument \code{sm}: values \code{'CONSTANT'} and \code{'TRATE'} were only accepted for \code{method='OM'} and \code{'HAM'}. Now can be used with all methods that require the \code{sm} argument.
+      \item
+      \code{seqplot()} raised an error when deprecated \code{tlim} argument was used. Now a warning.
     }
   }
 }

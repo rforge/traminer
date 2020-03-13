@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-15 [2020-03-09] (Development version)
+Version 2.1-15 [2020-03-13] (Development version)
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
@@ -46,6 +46,8 @@ Bug fixes:
   - seqdist(), argument 'sm': values 'CONSTANT' and 'TRATE'
     were only accepted for method='OM' and 'HAM'. Now can be
     used with all methods that require the sm argument.
+  - seqplot() raised an error when deprecated 'tlim' argument
+    was used. Now a warning.
 
 
 
