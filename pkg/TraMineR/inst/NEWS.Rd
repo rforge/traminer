@@ -21,6 +21,8 @@
   \subsection{Changes in existing functions}{
     \itemize{
       \item
+      \code{seqdef()} now provides a default color palette (using colorspace) when number of states exceeds 12.
+      \item
       \code{alphabet()} gains an argument \code{with.missing}.
       \item
       \code{seqipos()} gains an argument \code{index} to select between three types of indicators: share of positive states, volatility, or integrative potential for the positive state.

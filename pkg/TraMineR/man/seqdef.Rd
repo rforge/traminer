@@ -16,7 +16,7 @@ seqdef(data, var=NULL, informat="STS", stsep=NULL,
        cnames=NULL, xtstep=1, tick.last=FALSE, cpal=NULL,
        missing.color="darkgrey", labels=NULL, ...)
        
-print.stslist(seqdata, format="STS", extended=FALSE, ...)
+print.stslist(x, format="STS", extended=FALSE, ...)
 }
 
 \arguments{
@@ -98,10 +98,8 @@ by calling the \code{brewer.pal} function of the \code{RColorBrewer}
 package. If number of states is less or equal than 8, the
 \code{"Accent"} palette is used. If number of states is between 8 and
 12, the \code{"Set3"} palette is used. If the number of states in the
-data is greater than 12 you have to specify your own palette. The
-list of available colors is displayed by the \code{\link{colors}}
-function. You can also use alternatively some other palettes from the
-RColorBrewer package.}
+data is greater than 12, colors are set using \code{\link[colorspace]{qualitative_hcl}} with the "Set 3" palette. To specify your own palette use e.g. the \code{\link{colors}}
+function, or the RColorBrewer or colorspace packages.}
 
 	\item{missing.color}{alternative color for representing missing
 values inside the sequences. Defaults to \code{"darkgrey"}.}
@@ -113,7 +111,7 @@ alphabet are used as state labels as well.}
 	\item{...}{options passed to the \code{\link{seqformat}} function
 for handling input data that is not in STS format or print format.}
 
-  \item{seqdata}{A state sequence (\code{stslist}) object.}
+  \item{x}{A state sequence (\code{stslist}) object.}
   
   \item{format}{string: print format. One of \code{"STS"} (default) or \code{"SPS"}.}
   

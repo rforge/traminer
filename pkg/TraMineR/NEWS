@@ -9,6 +9,8 @@ New functions:
   - rbind.stslist() checks that the object is a proper stslist object.
 
 Changes in existing functions
+  - seqdef() now provides a default color palette (using colorspace) 
+    when number of states exceeds 12.
   - alphabet() gains an argument 'with.missing'.
   - seqipos() gains an argument 'index' to select between three
     types of indicators: share of positive states, volatility, or

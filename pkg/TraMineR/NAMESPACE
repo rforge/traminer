@@ -5,6 +5,7 @@ importFrom("stats", "chisq.test", "complete.cases", "density", "dnorm", "dunif",
 importFrom("utils", "combn", "download.file", "read.table", packageDescription, packageVersion)
 importFrom("Hmisc", "errbar")
 importFrom("cluster", "daisy")
+importFrom("colorspace","qualitative_hcl")
 
 export(
   alphabet,
