@@ -11,6 +11,7 @@ export(
   "alphabet<-",
   cpal,
   "cpal<-",
+  is.stslist,
   read.tda.mdist,
   recodef,
   seqalign,
@@ -91,6 +92,7 @@ S3method(summary, stslist)
 S3method(print, stslist)
 S3method("[", stslist)
 S3method(plot, stslist)
+S3method(rbind, stslist)
 
 ## seqalign methods
 S3method(plot, seqalign)

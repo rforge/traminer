@@ -1,10 +1,12 @@
 ## =========
-Version 2.1-15 [2020-03-13] (Development version)
+Version 2.1-15 [2020-03-17] (Development version)
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
   - seqivolatility(), index of objective volatility of C. Brzinsky-Fay
   - print.seqipos() print method for objects returned by seqipos()
+  - is.stslist() checks that the object is a proper stslist object.
+  - rbind.stslist() checks that the object is a proper stslist object.
 
 Changes in existing functions
   - alphabet() gains an argument 'with.missing'.
@@ -48,6 +50,8 @@ Bug fixes:
     used with all methods that require the sm argument.
   - seqplot() raised an error when deprecated 'tlim' argument
     was used. Now a warning.
+  - [] subsetting of stslist objects with negative column 
+    indexes produced unexpected results.
 
 
 

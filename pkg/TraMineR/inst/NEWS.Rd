@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-03-13] (Development version)}{
+\section{Changes in version 2.1-15 [2020-03-17] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -11,6 +11,10 @@
       \code{seqivolatility()} index of objective volatility of C. Brzinsky-Fay.
       \item
       \code{print.seqipos()} print method for objects returned by \code{seqipos()}.
+      \item
+      \code{is.stslist()} checks that the object is a proper \code{stslist} object.
+      \item
+      \code{rbind.stslist()} \code{rbind} method for state sequence objects.
     }
   }
 
@@ -55,6 +59,9 @@
       \code{seqdist()}, argument \code{sm}: values \code{'CONSTANT'} and \code{'TRATE'} were only accepted for \code{method='OM'} and \code{'HAM'}. Now can be used with all methods that require the \code{sm} argument.
       \item
       \code{seqplot()} raised an error when deprecated \code{tlim} argument was used. Now a warning.
+      \item
+      \code{[]} subsetting of \code{stslist} objects with negative column
+      indexes produced unexpected results.
     }
   }
 }
