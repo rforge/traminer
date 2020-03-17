@@ -16,7 +16,7 @@ seqdef(data, var=NULL, informat="STS", stsep=NULL,
        cnames=NULL, xtstep=1, tick.last=FALSE, cpal=NULL,
        missing.color="darkgrey", labels=NULL, ...)
        
-print.stslist(x, format="STS", extended=FALSE, ...)
+print(x, format="STS", extended=FALSE, ...)
 }
 
 \arguments{
