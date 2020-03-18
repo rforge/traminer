@@ -1,13 +1,16 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.8 [2020-03-12] (Development version)}{
+\section{Changes in version 0.5.8 [2020-03-18] (Development version)}{
   \subsection{New functions}{
     \itemize{
       \item
-      \code{seqLRT()} Likelihood ratio test for comparing two sets of sequences.
+      \code{seqCompare()} BIC and Likelihood ratio test (LRT) for comparing
+        two sets of sequences.
       \item
-      \code{seqBIC()} Bayesian Information Criterion (BIC) for comparing sequence data.
+      \code{seqLRT()} LRT for comparing two sets of sequences.
+      \item
+      \code{seqBIC()} BIC for comparing sequence data.
     }
   }
 }

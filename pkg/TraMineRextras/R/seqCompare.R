@@ -2,16 +2,23 @@
 ## Tim Liao, University of Illionis, and Anette Fasang, Humboldt University
 ## version 1.0, March 2020
 
-seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
-  s=100, seed=36963, squared="LRTonly", method, ...)
+seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
 {
-  return(seqLRT(seqdata, seqdata2, group, subgroup, s=s, seed=seed,
-         stat="BIC", squared=squared, method, ...))
+  return(seqCompare(seqdata, seqdata2, group, set, s, seed,
+         stat="BIC", squared, weighted, method, ...))
 }
 
+seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+{
+  return(seqCompare(seqdata, seqdata2, group, set, s, seed,
+         stat="LRT", squared, weighted, method, ...))
+}
 
-seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
-  s=100, seed=36963, stat="LRT", squared="LRTonly", method, ...)
+seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
+  s=100, seed=36963, stat="LRT", squared="LRTonly",
+  weighted=TRUE, method, ...)
 {
   #require("gtools")
   #require("TraMineR")
@@ -20,8 +27,8 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
   if (is.null(seqdata2) & is.null(group)){
     stop("'seqdata2' and 'group' cannot both be NULL!")
   }
-  if (!is.null(subgroup) & is.null(group)){
-    stop("'subgroup' not NULL while 'group' is NULL!")
+  if (!is.null(set) & is.null(group)){
+    stop("'set' not NULL while 'group' is NULL!")
   }
 
   if (is.logical(squared))
@@ -78,12 +85,12 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
   else if (is1.stslist & is.null(seqdata2)) {
     ## suppress cases with NA group values
     gvar <- as.vector(group)
-    if (!is.null(subgroup)){
-      sgvar <- as.vector(subgroup)
-      inotna <- which(!is.na(gvar) & !is.na(sgvar))
-      sgvar <- sgvar[inotna]
-      sgvar <- factor(sgvar)
-      lev.sg <- levels(sgvar)
+    if (!is.null(set)){
+      setvar <- as.vector(set)
+      inotna <- which(!is.na(gvar) & !is.na(setvar))
+      setvar <- setvar[inotna]
+      setvar <- factor(setvar)
+      lev.set <- levels(setvar)
     }
     else {
       inotna <- which(!is.na(gvar))
@@ -101,16 +108,14 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
     seqdata <- seqdata[inotna,]
     seq1 <- list()
     seq2 <- list()
-    if (is.null(subgroup)){
-      #cat("\n No subgroup\n")
+    if (is.null(set)){
       seq1[[1]] <- seqdata[gvar==lev.g[1],]
       seq2[[1]] <- seqdata[gvar==lev.g[2],]
     }
     else {
-      #cat("\n Subgroup\n")
-      for (i in 1:length(lev.sg)){
-        seq1[[i]] <- seqdata[gvar==lev.g[1] & sgvar==lev.sg[i],]
-        seq2[[i]] <- seqdata[gvar==lev.g[2] & sgvar==lev.sg[i],]
+      for (i in 1:length(lev.set)){
+        seq1[[i]] <- seqdata[gvar==lev.g[1] & setvar==lev.set[i],]
+        seq2[[i]] <- seqdata[gvar==lev.g[2] & setvar==lev.set[i],]
       }
     }
   }
@@ -199,7 +204,7 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, subgroup=NULL,
     if (is.BIC) colnames <- c(colnames, "BIC diff.", "Bayes Factor")
     colnames(Results) <- colnames
   }
-  if(!is.null(subgroup)) rownames(Results) <- lev.sg
+  if(!is.null(set)) rownames(Results) <- lev.set
   return(Results)
 }
 

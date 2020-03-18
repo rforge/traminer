@@ -40,6 +40,7 @@ export(
     seqtabstocc,
     seqsurv,
     seqsplot,
+    seqCompare,
     seqBIC,
     seqLRT
 )
