@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-15 [2020-03-17] (Development version)}{
+\section{Changes in version 2.1-15 [2020-03-18] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -64,6 +64,8 @@
       \item
       \code{[]} subsetting of \code{stslist} objects with negative column
       indexes produced unexpected results.
+      \item
+      \code{print.stslist()}, when \code{format="SPS"}, additional parameters for controlling the format were ignored.
     }
   }
 }

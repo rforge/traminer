@@ -15,9 +15,9 @@ print.stslist <- function(x,format='STS', extended=FALSE, ...) {
 		x <- seqconc(x, void=attr(x,"void"))
 
 		if (extended==FALSE)
-			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = TRUE, right=right))
+			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = TRUE, right=right, ...))
 		else if (extended==TRUE)
-			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = FALSE, right=right))
+			x <- suppressMessages(seqformat(x, from = "STS", to = "SPS", compress = FALSE, right=right, ...))
 
 		print(x, quote=FALSE)
 	}

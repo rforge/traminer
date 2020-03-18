@@ -1,6 +1,5 @@
 \name{seqdef}
 \alias{seqdef}
-\alias{print.stslist}
 \alias{rbind.stslist}
 \alias{summary.stslist}
 \title{Create a state sequence object}
@@ -15,8 +14,6 @@ seqdef(data, var=NULL, informat="STS", stsep=NULL,
        left=NA, right="DEL", gaps=NA, missing=NA, void="\%", nr="*",
        cnames=NULL, xtstep=1, tick.last=FALSE, cpal=NULL,
        missing.color="darkgrey", labels=NULL, ...)
-       
-print(x, format="STS", extended=FALSE, ...)
 }
 
 \arguments{
@@ -111,11 +108,6 @@ alphabet are used as state labels as well.}
 	\item{...}{options passed to the \code{\link{seqformat}} function
 for handling input data that is not in STS format or print format.}
 
-  \item{x}{A state sequence (\code{stslist}) object.}
-  
-  \item{format}{string: print format. One of \code{"STS"} (default) or \code{"SPS"}.}
-  
-  \item{extended}{logical: should the output be printed in extended matrix form?}
 }
 
 \details{Applying subscripts to sequence objects (eg. \code{seq[,1:5]
@@ -133,7 +125,8 @@ alpha-numeric order returned by the \code{\link{seqstatl}} function
 which may differ when you have different original codings. }
 
 \seealso{
- \code{\link{plot.stslist}} to plot state sequence objects,\cr
+ \code{\link{plot.stslist}} plot method for state sequence objects,\cr
+ \code{\link{print.stslist}} print method for state sequence objects,\cr
  \code{\link{is.stslist}} to test whether an object is a proper \code{stslist} object,\cr
  \code{\link{seqplot}} for high level plots of state sequence objects,\cr
  \code{\link{seqecreate}} to create an event sequence object,\cr
@@ -186,6 +179,7 @@ actcal.seq <- seqdef(actcal,13:24,
   states=c("FT","PT","LT","NO","TR"))
 alphabet(actcal.seq)
 
+## rbind and summary
 seq1 <- actcal.seq[1:10,]
 seq2 <- actcal.seq[20:25,]
 seq <- rbind(seq1,seq2)

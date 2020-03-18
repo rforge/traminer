@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-15 [2020-03-17] (Development version)
+Version 2.1-15 [2020-03-18] (Development version)
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
@@ -54,6 +54,8 @@ Bug fixes:
     was used. Now a warning.
   - [] subsetting of stslist objects with negative column 
     indexes produced unexpected results.
+  - print.stslist(), when format="SPS", additional parameters
+    for controlling the format were ignored. 
 
 
 
