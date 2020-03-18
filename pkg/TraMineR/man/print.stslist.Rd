@@ -38,5 +38,7 @@ print(biofam.seq[1:5,], format="SPS")
 print(biofam.seq[1:5,], format="SPS", SPS.out = list(xfix = "", sdsep = "/"))
 
 }
+
+\author{Gilbert Ritschard}
 \keyword{Method}
 \keyword{State sequences}

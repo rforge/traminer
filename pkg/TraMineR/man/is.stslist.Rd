@@ -3,7 +3,6 @@
 \title{Test if is a proper state sequence (stslist) object}
 \description{The function tests whether \code{x} is of class \code{stslist} and if its \code{weights} attribute has the expected length and names.
 }
-\details{The function tests whether \code{x} is of class \code{stslist} and if its \code{weights} has the expected length and names.}
 
 \usage{
 is.stslist(x)

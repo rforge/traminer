@@ -154,7 +154,7 @@ biofam.om.c2[1:10,1:10]
 ## Example with weights and missings
 ## =================================
 data(ex1)
-ex1.seq <- seqdef(ex1,1:13, weights=ex1$weights)
+ex1.seq <- seqdef(ex1[,1:13], weights=ex1$weights)
 
 ## Unweighted
 subm <- seqcost(ex1.seq, method="INDELSLOG", with.missing=TRUE, weighted=FALSE)
@@ -162,7 +162,7 @@ ex1.om <- seqdist(ex1.seq, method="OM", indel=subm$indel, sm=subm$sm, with.missi
 
 ## Weighted
 subm.w <- seqcost(ex1.seq, method="INDELSLOG", with.missing=TRUE, weighted=TRUE)
-ex1.omw <- seqdist(ex1.seq, method="OM", indel=subm$indel, sm=subm.w$sm, with.missing=TRUE)
+ex1.omw <- seqdist(ex1.seq, method="OM", indel=subm.w$indel, sm=subm.w$sm, with.missing=TRUE)
 
 ex1.om == ex1.omw
 }
