@@ -40,6 +40,8 @@ Bug fixes:
     did not work.
   - print.stslist() did not print ending missing values
     when format='SPS'.
+  - print.stslist(), when format='SPS', additional parameters
+    for controlling the format were ignored.
   - seqformat() did not account for the 'right' argument
     when to='SPS'.
   - seqdist() with 'method=CHI2'. Fixed issue with unexpected
@@ -54,8 +56,6 @@ Bug fixes:
     was used. Now a warning.
   - [] subsetting of stslist objects with negative column 
     indexes produced unexpected results.
-  - print.stslist(), when format="SPS", additional parameters
-    for controlling the format were ignored. 
 
 
 

@@ -52,6 +52,8 @@
       \item
       \code{print.stslist()} did not print ending missing values when \code{format='SPS'}.
       \item
+      \code{print.stslist()}, when \code{format='SPS'}, additional parameters for controlling the format were ignored.
+      \item
       \code{seqformat()} did not account for the \code{right} argument when \code{to='SPS'}.
       \item
       \code{seqdist()} with \code{method=CHI2}. Fixed issue with unexpected warnings when over an interval all sequences stay in the same state.
@@ -64,8 +66,6 @@
       \item
       \code{[]} subsetting of \code{stslist} objects with negative column
       indexes produced unexpected results.
-      \item
-      \code{print.stslist()}, when \code{format="SPS"}, additional parameters for controlling the format were ignored.
     }
   }
 }
