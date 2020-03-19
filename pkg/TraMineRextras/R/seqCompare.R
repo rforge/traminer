@@ -17,7 +17,7 @@ seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
 }
 
 seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, stat="LRT", squared="LRTonly",
+  s=100, seed=36963, stat="all", squared="LRTonly",
   weighted=TRUE, method, ...)
 {
   #require("gtools")
@@ -47,7 +47,6 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
       stop("When 'seqdata' is a list, seqdata2 must be a list of same length")
     else {
       l <- length(seqdata)
-      test <- FALSE
       i <- 1
       while (i <= l) {
         if(!inherits(seqdata[[i]], "stslist") | !inherits(seqdata2[[i]], "stslist"))
@@ -63,10 +62,10 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     stop("If not a list, 'seqdata2' must be a state sequence object (stslist) created with seqdef()")
   }
 
-  if (!stat %in% c("LRT","BIC","all"))
+  if (any(!stat %in% c("LRT","BIC","all")))
     stop("Bad stat value, must be one of 'LRT', 'BIC', or 'all'")
 
-  if (stat=="all") {
+  if (any(stat=="all")) {
     is.LRT <- is.BIC <- TRUE
   }
   else{
@@ -196,7 +195,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
       ##suppressMessages(t[j,]<-unlist(seq.comp2(seqA, seqB, BIC=BIC, method=method, ...)))
       suppressMessages(t[j,] <-
         seq.comp2(seqA, seqB, is.LRT=is.LRT, is.BIC=is.BIC,
-        method=method, squared=squared, LRTpow=LRTpow, ...))
+        method=method, squared=squared, weighted=weighted, LRTpow=LRTpow, ...))
     }
     Results[i,]<-apply(t,2,mean)
     colnames <- NULL
@@ -208,33 +207,54 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   return(Results)
 }
 
-seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, LRTpow,...)
+seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, LRTpow,...)
 {
 
   # compute some basic statistics
   n1 = nrow(S1)
   n2 = nrow(S2)
   S = rbind(S1,S2)
-  attr(S, "weights") <- c(attr(S1, "weights"), attr(S2, "weights"))
+  #attr(S, "weights") <- c(attr(S1, "weights"), attr(S2, "weights"))
   n0 = nrow(S)
   n.0=log((n0*n0-n0)/2)
   dist.S=dist.S1=dist.S2<-vector()
 
+  ## weights
+  if (weighted) {
+    w1 <- attr(S1,"weights")
+    w2 <- attr(S2,"weights")
+    w <- attr(S,"weights")
+    ## normalize weights such that sum(w) = n0
+    nw <- sum(w)
+    nw1 <- sum(w1)
+    nw2 <- sum(w2)
+    w1 <- nrow(S1)/nw1 * w1
+    w2 <- nrow(S2)/nw2 * w2
+    w <- n0/nw * w
+    #print(paste("sum(w)=",sum(w)," sum(w1)=",sum(w1)," sum(w2)=",sum(w2)))
+  }
+  else {
+    w <- w1 <- w2 <- NULL
+  }
+
 
   # compute dissimilarity matrices & distances to centers
-  distS <- seqdist(S, method=method, ...) #  distance matrix for overall sample
-  dist.S<-disscenter(distS, squared=squared) # calculate S distance to center
-  distS1 <- seqdist(S1, method=method, ...) #  distance matrix for sample 1
-  distS2 <- seqdist(S2, method=method, ...) #  distance matrix for sample 2
-  dist.S1<-disscenter(distS1, squared=squared) # calculate S1 distance to center
-  dist.S2<-disscenter(distS2, squared=squared) # calculate S2 distance to center
+  distS  <- seqdist(S, method=method, weighted=weighted, ...) #  distance matrix for overall sample
+  dist.S <-disscenter(distS, weights=w, squared=squared) # calculate S distance to center
+  distS1 <- seqdist(S1, method=method, weighted=weighted, ...) #  distance matrix for sample 1
+  distS2 <- seqdist(S2, method=method, weighted=weighted, ...) #  distance matrix for sample 2
+  dist.S1<-disscenter(distS1, weights=w1, squared=squared) # calculate S1 distance to center
+  dist.S2<-disscenter(distS2, weights=w2, squared=squared) # calculate S2 distance to center
 
   res <- NULL
 
 
   # compute LRTs and alpha probabilities
-  LRT<-n0*log(sum(dist.S^LRTpow)/n0)-n0*log(sum(c(dist.S1,dist.S2)^LRTpow)/n0)
-
+  if (weighted) {
+    LRT <- n0*log(sum(w*dist.S^LRTpow)/n0)-n0*log(sum(c(w1,w2)*c(dist.S1,dist.S2)^LRTpow)/n0)
+  } else {
+    LRT <- n0*log(sum(dist.S^LRTpow)/n0)-n0*log(sum(c(dist.S1,dist.S2)^LRTpow)/n0)
+  }
   if (is.LRT) {
     p.LRT <- pchisq(LRT,1,lower.tail=FALSE)
     res <- cbind(LRT, p.LRT)

@@ -14,11 +14,11 @@ seqCompare(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     squared="LRTonly", weighted=TRUE, method, ...)
 
 seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, squared="LRTonly", weighted=TRUE, 
+    s=100, seed=36963, squared="LRTonly", weighted=TRUE,
     method, ...)
 
 seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, squared="LRTonly", weighted=TRUE, 
+    s=100, seed=36963, squared="LRTonly", weighted=TRUE,
     method, ...)
 }
 
@@ -45,7 +45,7 @@ seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   }
   \item{squared}{Logical. Should squared distances be used? Can also be \code{"LRTonly"}, in which case the distances to the centers are computed using non-squared distances and LRT is computed with squared distances.
   }
-  \item{weighted}{Not yet implemented.
+  \item{weighted}{Logical. Should weights be taken into account when available?
   }
 \item{method}{String. Method for computing sequence distances. See documentation for \code{\link[TraMineR]{seqdist}}. Additional arguments may be required depending on the method chosen.
 }
