@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.5.8 [2020-03-18] (Development version)}{
+\section{Changes in version 0.5.8 [2020-03-20] (Development version)}{
   \subsection{New functions}{
     \itemize{
       \item
@@ -13,6 +13,19 @@
       \code{seqBIC()} BIC for comparing sequence data.
     }
   }
+  
+  \subsection{Changes in existing functions}{
+    \itemize{
+      \item{seqgranularity()} two new methods \code{"first.valid"} and \code{"last.valid"} for sequences with missing values.
+    }
+  } 
+  \subsection{Bug fixes}{
+    \itemize{
+      \item
+      \code{seqgranularity()} did not return a proper \code{stslist} object when \code{method="mostfreq"}.
+    }
+  }
+
 }
 
 \section{Changes in version 0.4.7 [2020-03-02]}{
