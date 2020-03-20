@@ -26,6 +26,7 @@ Successive positions are aggregated by group of \code{tspan} states. The aggrega
 
 Methods (\code{"first"}) and (\code{"last"}) differ from (\code{"first.valid"}) and (\code{"last.valid"}) only when sequences contain missing values and/or have different lengths.
 
+When there are (void or non void) missings, method \code{"mostfreq"} returns the most frequent valid state in the interval and a missing value only when there are no valid states in the interval.
 }
 \value{
 The resulting state sequence object.
