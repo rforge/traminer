@@ -1,12 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-03-18] (Development version)}{
+\section{Changes in version 2.1-16 [2020-03-20] (Development version)}{
 
-  \subsection{Misc.}{
+  \subsection{Bug fixes{
     \itemize{
       \item
-      No changes.
+      \code{[]} subsetting of \code{stslist} objects with a single column
+      did not return a proper \code{stslist} object.
     }
   }
 }

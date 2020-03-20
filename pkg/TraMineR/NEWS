@@ -1,8 +1,9 @@
 ## =========
-Version 2.1-16 [2020-03-18] (Development version)
+Version 2.1-16 [2020-03-20] (Development version)
 
-Misc.:
-  - no changes.
+Bug Fixes:
+  - [] subsetting of stslist objects with a single column
+    did not return a proper stslist object.
   
 ## =========
 Version 2.0-15 [2020-03-18] 
