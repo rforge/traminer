@@ -5,12 +5,12 @@
 
 \title{BIC and Likelihood ratio test for comparing two sequence data}
 
-\description{The function \code{seqLRT} computes the likelihood ratio test (LRT) and Bayesian Information Criterion (BIC) for comparing two groups within each of a series of set. The functions \code{seqBIC} and \code{seqLRT} are aliases that return only the BIC or the LRT.
+\description{The function \code{seqCompare} computes the likelihood ratio test (LRT) and Bayesian Information Criterion (BIC) for comparing two groups within each of a series of set. The functions \code{seqBIC} and \code{seqLRT} are aliases that return only the BIC or the LRT.
 }
 
 \usage{
 seqCompare(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, stat="LRT",
+    s=100, seed=36963, stat="all",
     squared="LRTonly", weighted=TRUE, method, ...)
 
 seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL,
