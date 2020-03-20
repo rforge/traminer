@@ -85,3 +85,57 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
 	
   return(newseq)
 }
+
+
+#####
+## We need to redefine the "[ststlist" method
+## will be in TraMineR v2.0-16
+## gr
+
+"[.stslist" <- function(x,i,j,drop=FALSE) {
+	## Specialized only for column subscript
+	## If one column we keep the original data.frame method
+	## Otherwise we copy attributes and update "start" value
+
+  ## For negative j, we first build the new subscript set
+  if (!missing(j) && j[1]<0) {
+    k <- -j
+    j <- 1:ncol(x)
+    j <- j[! j %in% k]
+  }
+
+	if (!missing(j) && length(j)>=1) {
+		## Storing the attributes
+		x.attributes <- attributes(x)
+
+		## Applying method
+	     x <- NextMethod("[")
+
+    if (length(j) == 1) {
+      x <- as.data.frame(x)
+      class(x) <- c("stslist", class(x))
+    }
+
+		## Adapting column names
+		x.attributes$names <- x.attributes$names[j]
+
+		## Redefining attributes
+		attributes(x) <- x.attributes
+
+	     attr(x,"start") <- x.attributes$start-1+j[1]
+
+		if (!missing(i)) {
+			attr(x,"row.names") <- attr(x,"row.names")[i]
+			attr(x,"weights") <- attr(x,"weights")[i]
+		}
+
+		return(x)
+	}
+
+	x <- NextMethod("[")
+
+	if (!missing(i))
+		attr(x,"weights") <- attr(x,"weights")[i]
+
+	return(x)
+ }
