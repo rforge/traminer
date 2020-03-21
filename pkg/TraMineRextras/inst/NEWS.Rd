@@ -23,8 +23,6 @@
     \itemize{
       \item
       \code{seqgranularity()} did not return a proper \code{stslist} object when \code{method="mostfreq"}.
-      \item
-      \code{seqemlt()} issue resulting from fix of "[stslist" in TraMineR.
     }
   }
 

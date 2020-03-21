@@ -12,8 +12,7 @@ Changes in existing functions
 
 Bug fixes
     o   seqgranularity() did not return a proper stslist object
-        when \code{method="mostfreq".
-    o   seqemlt() issue resulting from fix of "[stslist" in TraMineR.
+        when \code{method="mostfreq"}.
 
 
                 CHANGES IN TraMineRextras VERSION 0.4.7 [2020-03-02]
