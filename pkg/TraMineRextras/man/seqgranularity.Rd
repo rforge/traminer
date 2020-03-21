@@ -26,10 +26,12 @@ Successive positions are aggregated by group of \code{tspan} states. The aggrega
 
 Methods (\code{"first"}) and (\code{"last"}) differ from (\code{"first.valid"}) and (\code{"last.valid"}) only when sequences contain missing values and/or have different lengths.
 
-When there are (void or non void) missings, method \code{"mostfreq"} returns the most frequent valid state in the interval and a missing value only when there are no valid states in the interval.
+When there are (void or non void) missings, method \code{"mostfreq"} replaces each interval with the most frequent valid state on the interval or the missing state when there are no valid state.
+
+End missings are set as void when there are voids in \code{seqdata} and as the \code{nr} attribute otherwise.
 }
 \value{
-The resulting state sequence object.
+A \code{stslist} object: The compacted state sequence object.
 }
 \author{
 Matthias Studer and Gilbert Ritschard

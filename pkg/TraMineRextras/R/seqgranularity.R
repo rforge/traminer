@@ -10,6 +10,7 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
   missing.char <- attr(seqdata,"missing")
   nr <- attr(seqdata,"nr")
   void <- attr(seqdata, "void")
+  is.void <- any(seqdata==void)
   lgth <- max(seqlength(seqdata))
   alph <- alphabet(seqdata)
 
@@ -77,7 +78,8 @@ seqgranularity <- function(seqdata, tspan=3, method="last"){
                   #xtstep  =attr(seqdata,"xtstep"),
                   cpal    =attr(seqdata,"cpal"),
                   tick.last=attr(seqdata,"tick.last"),
-                  Version =attr(seqdata,"Version")
+                  Version =attr(seqdata,"Version"),
+                  right   =ifelse(is.void,"DEL",NA)
                   ))
   }
   colnames(newseq) <- newcnames
