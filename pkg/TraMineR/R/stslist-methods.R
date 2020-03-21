@@ -39,17 +39,12 @@ print.stslist <- function(x,format='STS', extended=FALSE, ...) {
     j <- j[! j %in% k]
   }
 
-	if (!missing(j) && length(j)>=1) {
+	if (!missing(j) && length(j)>1) {
 		## Storing the attributes
 		x.attributes <- attributes(x)
 
 		## Applying method
-	     x <- NextMethod("[")
-
-    if (length(j) == 1) {
-      x <- as.data.frame(x)
-      class(x) <- c("stslist", class(x))
-    }
+	  x <- NextMethod("[")
 
 		## Adapting column names
 		x.attributes$names <- x.attributes$names[j]
@@ -57,7 +52,7 @@ print.stslist <- function(x,format='STS', extended=FALSE, ...) {
 		## Redefining attributes
 		attributes(x) <- x.attributes
 
-	     attr(x,"start") <- x.attributes$start-1+j[1]
+    attr(x,"start") <- x.attributes$start-1+j[1]
 
 		if (!missing(i)) {
 			attr(x,"row.names") <- attr(x,"row.names")[i]
@@ -73,7 +68,7 @@ print.stslist <- function(x,format='STS', extended=FALSE, ...) {
 		attr(x,"weights") <- attr(x,"weights")[i]
 
 	return(x)
- }
+}
 
 
 ## "[.stslist" <- function(x,...) {

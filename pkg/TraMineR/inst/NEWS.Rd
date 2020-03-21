@@ -3,11 +3,10 @@
 
 \section{Changes in version 2.1-16 [2020-03-20] (Development version)}{
 
-  \subsection{Bug fixes{
+  \subsection{Misc.}{
     \itemize{
       \item
-      \code{[]} subsetting of \code{stslist} objects with a single column
-      did not return a proper \code{stslist} object.
+      No changes.
     }
   }
 }

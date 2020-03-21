@@ -112,17 +112,19 @@ for handling input data that is not in STS format or print format.}
 
 \details{Applying subscripts to sequence objects (eg. \code{seq[,1:5]
 or seq[1:10,]}) returns a state sequence object with some attributes
-preserved (alphabet, missing) and some others (start, column names)
-adapted to the selected column or row subset. If only one column is
-specified, a factor is returned. \cr
+preserved (alphabet, missing) and some others (start, column names, weights)
+adapted to the selected column or row subset. When the number of 
+columns selected is 1, the returned object is a factor. \cr
 
 For reordering the states use the \code{alphabet} argument. This may
-for instance be of interest when you want to compare data from
+for instance be useful to compare data from
 different sources with different codings of similar states. Using
 \code{alphabet} permits to order the states conformably in all
 sequence objects. Otherwise, the default state order is the
 alpha-numeric order returned by the \code{\link{seqstatl}} function
-which may differ when you have different original codings. }
+which may differ when you have different original codings. 
+
+}
 
 \seealso{
  \code{\link{plot.stslist}} plot method for state sequence objects,\cr
@@ -133,7 +135,7 @@ which may differ when you have different original codings. }
  \code{\link{seqformat}} for converting between various longitudinal data formats. }
 
 \value{An object of class \code{stslist}. There are \code{print},
-\code{plot}, \code{rbind}, and \code{summary} methods for such objects. State
+\code{plot}, \code{rbind}, \code{summary}, and subsetting \code{[,]} methods for such objects. State
 sequence objects are required as argument to other functions such as
 plotting functions (\code{seqdplot}, \code{seqiplot} or
 \code{seqfplot}), functions to compute distances (\code{seqdist}),
@@ -206,6 +208,8 @@ ex1.seq <- seqdef(ex1, 1:13, weights=ex1$weights)
 
 ## weighted sequence frequencies
 seqtab(ex1.seq)
+
+
 }
 
 \author{Alexis Gabadinho and Gilbert Ritschard}
