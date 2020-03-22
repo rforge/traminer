@@ -2,11 +2,11 @@
 Version 2.1-16 [2020-03-20] (Development version)
 
 Bug Fixes:
-  - [] subsetting of stslist objects with a single column
-    did not return a proper stslist object.
-  
+  - seqdist(), argument 'sm' did not recognize values "INDELS" and 
+    "INDELSLOG".
+
 ## =========
-Version 2.0-15 [2020-03-18] 
+Version 2.0-15 [2020-03-18]
 
 New functions:
   - seqintegration(), index of integrative potential of C. Brzinsky-Fay
@@ -16,7 +16,7 @@ New functions:
   - rbind.stslist() checks that the object is a proper stslist object.
 
 Changes in existing functions
-  - seqdef() now provides a default color palette (using colorspace) 
+  - seqdef() now provides a default color palette (using colorspace)
     when number of states exceeds 12.
   - alphabet() gains an argument 'with.missing'.
   - seqipos() gains an argument 'index' to select between three
@@ -35,12 +35,12 @@ Changes in existing functions
     except for OMloc where an error is raised.
   - seqcost(): 'with.missing' forced as FALSE (as in seqdist)
     when there are no non-void missings in the sequences.
-  - seqprecorr(): new methods "FREQ+", "TRATE+", "TRATEDSS+", "RANK+"
-    that adjust the returned penalty for the mean transition weight.
+  - seqprecorr(): new methods "FREQ+", "TRATE+", "TRATEDSS+", 
+    "RANK+" that adjust the returned penalty for the mean 
+    transition weight.
   - seqprecorr(), a same state value is assigned to equivalent
     states when counting transitions and computing transition
-    probabilities (methods \code{FREQ}, \code{TRATE),
-    \code{TRATEDSS}).
+    probabilities (methods "FREQ", "TRATE", "TRATEDSS").
 
 Bug fixes:
   - Print methods for seqprec and seqprecorr objects
@@ -61,7 +61,7 @@ Bug fixes:
     used with all methods that require the sm argument.
   - seqplot() raised an error when deprecated 'tlim' argument
     was used. Now a warning.
-  - [] subsetting of stslist objects with negative column 
+  - [] subsetting of stslist objects with negative column
     indexes produced unexpected results.
 
 

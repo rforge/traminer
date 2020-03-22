@@ -3,10 +3,11 @@
 
 \section{Changes in version 2.1-16 [2020-03-20] (Development version)}{
 
-  \subsection{Misc.}{
+  \subsection{Bug fixes}{
     \itemize{
       \item
-      No changes.
+      \code{seqdist()}, argument \code{sm} did not recognize values \code{"INDELS"} and
+      \code{"INDELSLOG"}.
     }
   }
 }
