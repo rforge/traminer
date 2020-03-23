@@ -10,16 +10,16 @@
 
 \usage{
 seqCompare(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, stat="all",
+    s=100, seed=36963, stat="all", with.missing=FALSE,
     squared="LRTonly", weighted=TRUE, method, ...)
 
 seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, squared="LRTonly", weighted=TRUE,
-    method, ...)
+    s=100, seed=36963, with.missing=FALSE, squared="LRTonly", 
+    weighted=TRUE, method, ...)
 
 seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, squared="LRTonly", weighted=TRUE,
-    method, ...)
+    s=100, seed=36963, with.missing=FALSE, squared="LRTonly", 
+    weighted=TRUE, method, ...)
 }
 
 \arguments{
@@ -42,6 +42,8 @@ seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   each time.
 }
   \item{stat}{String. The requested statistics. One of \code{"LRT"}, \code{"BIC"}, or \code{"all"}
+  }
+  \item{with.missing}{Logical. Should non void missing states be treated as regular states?
   }
   \item{squared}{Logical. Should squared distances be used? Can also be \code{"LRTonly"}, in which case the distances to the centers are computed using non-squared distances and LRT is computed with squared distances.
   }
@@ -84,12 +86,13 @@ The function \code{seqBIC} (and \code{seqLRT} with the \code{"BIC"} stat value) 
 \examples{
 ## biofam data set
 data(biofam)
-## We use only a sample of 300 cases
-set.seed(10)
-biofam <- biofam[sample(nrow(biofam),300),]
 biofam.lab <- c("Parent", "Left", "Married", "Left+Marr",
                 "Child", "Left+Child", "Left+Marr+Child", "Divorced")
-biofam.seq <- seqdef(biofam, 10:25, labels=biofam.lab)
+alph <- seqstatl(biofam[10:25])
+## We use only a sample of 300 cases
+set.seed(10)
+biofam <- biofam[sample(nrow(biofam),150),]
+biofam.seq <- seqdef(biofam, 10:25, alphabet=alph, labels=biofam.lab)
 
 ## Defining the grouping variable
 lang <- as.vector(biofam[["plingu02"]])
@@ -109,7 +112,7 @@ for (i in 1:l){
 
 seqCompare(list(seq.list[[1]]),list(seq.list[[2]]), stat="all", method="OM", sm="CONSTANT")
 seqBIC(biofam.seq, group=biofam$sex, method="HAM")
-seqLRT(biofam.seq, group=biofam$sex, set=lang, s=120, method="HAM")
+seqLRT(biofam.seq, group=biofam$sex, set=lang, s=80, method="HAM")
 
 }
 

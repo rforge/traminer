@@ -11,7 +11,7 @@ Authors@R: c(
   person("Pierre-Alexandre", "Fonta", role = "ctb"),
   person("Nicolas", "Muller", role = "ctb"),
   person("Patrick", "Rousset", role = "ctb"))
-Depends: R (>= 3.0.0), TraMineR (>= 2.0-14)
+Depends: R (>= 3.0.0), TraMineR (>= 2.0-15)
 Imports: grDevices, graphics, gtools, stats, cluster, RColorBrewer, survival
 Description: Collection of ancillary functions and utilities to be used in conjunction with the 'TraMineR' package for sequence data exploration. Most of the functions are in test phase, lack systematic consistency check of the arguments and are subject to changes. Once fully checked, some of the functions of this collection could be included in a next release of 'TraMineR'.
 License: GPL (>= 2)

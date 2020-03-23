@@ -3,21 +3,23 @@
 ## version 1.0, March 2020
 
 seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+  s=100, seed=36963, with.missing=FALSE, squared="LRTonly",
+  weighted=TRUE, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="BIC", squared, weighted, method, ...))
+         stat="BIC", with.missing, squared, weighted, method, ...))
 }
 
 seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+  s=100, seed=36963, with.missing=FALSE, squared="LRTonly",
+  weighted=TRUE, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="LRT", squared, weighted, method, ...))
+         stat="LRT", with.missing, squared, weighted, method, ...))
 }
 
 seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, stat="all", squared="LRTonly",
+  s=100, seed=36963, stat="all", with.missing=FALSE, squared="LRTonly",
   weighted=TRUE, method, ...)
 {
   #require("gtools")
@@ -208,7 +210,8 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
       ##suppressMessages(t[j,]<-unlist(seq.comp2(seqA, seqB, BIC=BIC, method=method, ...)))
       suppressMessages(t[j,] <-
         seq.comp2(seqA, seqB, is.LRT=is.LRT, is.BIC=is.BIC,
-        method=method, squared=squared, weighted=weighted, weight.by=weight.by, LRTpow=LRTpow, ...))
+        method=method, squared=squared, weighted=weighted, weight.by=weight.by,
+        with.missing=with.missing, LRTpow=LRTpow, ...))
     }
     Results[i,]<-apply(t,2,mean)
     colnames <- NULL
@@ -230,7 +233,8 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   return(Results)
 }
 
-seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weight.by, LRTpow,...)
+seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weight.by,
+                    with.missing, LRTpow,...)
 {
 
   # compute some basic statistics
@@ -268,10 +272,10 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weig
 
 
   # compute dissimilarity matrices & distances to centers
-  distS  <- seqdist(S, method=method, weighted=weighted, ...) #  distance matrix for overall sample
+  distS  <- seqdist(S, method=method, weighted=weighted, with.missing=with.missing, ...) #  distance matrix for overall sample
   dist.S <-disscenter(distS, weights=w, squared=squared) # calculate S distance to center
-  distS1 <- seqdist(S1, method=method, weighted=weighted, ...) #  distance matrix for sample 1
-  distS2 <- seqdist(S2, method=method, weighted=weighted, ...) #  distance matrix for sample 2
+  distS1 <- seqdist(S1, method=method, weighted=weighted, with.missing=with.missing, ...) #  distance matrix for sample 1
+  distS2 <- seqdist(S2, method=method, weighted=weighted, with.missing=with.missing, ...) #  distance matrix for sample 2
   dist.S1<-disscenter(distS1, weights=w1, squared=squared) # calculate S1 distance to center
   dist.S2<-disscenter(distS2, weights=w2, squared=squared) # calculate S2 distance to center
 
