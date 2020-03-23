@@ -1,13 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-03-20] (Development version)}{
+\section{Changes in version 2.1-16 [2020-03-23] (Development version)}{
 
   \subsection{Bug fixes}{
     \itemize{
       \item
       \code{seqdist()}, argument \code{sm} did not recognize values \code{"INDELS"} and
       \code{"INDELSLOG"}.
+      \item
+      \code{rbind.stslist()} bad handling of missing states.
     }
   }
 }

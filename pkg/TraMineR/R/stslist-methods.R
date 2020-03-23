@@ -86,17 +86,28 @@ rbind.stslist <- function(..., deparse.level = 1) {
   alph <- alphabet(seqlist[[1]])
   kalph <- 1
   void <-attr(seqlist[[1]],"void")
+  nr <-attr(seqlist[[1]],"nr")
+  missing.char <-attr(seqlist[[1]],"missing")
 
   res <- seqlist[[1]]
   n.null <- ifelse(is.null(ww),1,0)
   for (i in 2:l) {
     seqi <- seqlist[[i]]
+    print(seqi)
     weights <- attr(seqi,"weights")
     n.null <- n.null + is.null(weights)
     if (length(alph) < length(alphabet(seqi))) {
+      if (!all(alph %in% alphabet(seqi)))
+        stop("Alphabet mismatch between stslist objects!")
       alph <- alphabet(seqi)
       kalph <- i
     }
+    else {
+      if (!all(alphabet(seqi) %in% alph))
+        stop("Alphabet mismatch between stslist objects!")
+    }
+    if (nr != attr(seqi,"nr") || void!= attr(seqi,"void"))
+      stop("nr and/or void mismatch between stslist objects!")
     res <- as.matrix(res)
     ## when stslist do not have same number of columns
     ## we adjust with columns of voids
@@ -118,6 +129,10 @@ rbind.stslist <- function(..., deparse.level = 1) {
   if(n.null > 0 & n.null != l)
     stop("!! Cannot rbind stslist objects with and without weights!")
 
+  is.void <- any(res==void)
+  res[res == nr] <- missing.char
+  res[res == void] <- missing.char
+
   res <- seqdef(res,
     alphabet=alph,
     weights =ww,
@@ -129,7 +144,7 @@ rbind.stslist <- function(..., deparse.level = 1) {
     xtstep  =attr(seqlist[[1]],"xtstep"),
     cpal    =attr(seqlist[[kalph]],"cpal"),
     tick.last=attr(seqlist[[1]],"tick.last"),
-    Version =attr(seqlist[[1]],"Version")
+    right   =ifelse(is.void,"DEL",NA)
   )
 
   return(res)
