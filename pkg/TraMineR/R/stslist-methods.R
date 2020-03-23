@@ -93,7 +93,6 @@ rbind.stslist <- function(..., deparse.level = 1) {
   n.null <- ifelse(is.null(ww),1,0)
   for (i in 2:l) {
     seqi <- seqlist[[i]]
-    print(seqi)
     weights <- attr(seqi,"weights")
     n.null <- n.null + is.null(weights)
     if (length(alph) < length(alphabet(seqi))) {
