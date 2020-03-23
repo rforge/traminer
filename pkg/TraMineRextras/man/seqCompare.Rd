@@ -45,7 +45,7 @@ seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   }
   \item{squared}{Logical. Should squared distances be used? Can also be \code{"LRTonly"}, in which case the distances to the centers are computed using non-squared distances and LRT is computed with squared distances.
   }
-  \item{weighted}{Logical. Should weights be taken into account when available?
+  \item{weighted}{Logical or String. Should weights be taken into account when available? Can also be \code{"by.group"}, in which case weights are used and normalized to respect group sizes.
   }
 \item{method}{String. Method for computing sequence distances. See documentation for \code{\link[TraMineR]{seqdist}}. Additional arguments may be required depending on the method chosen.
 }

@@ -23,6 +23,8 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   #require("gtools")
   #require("TraMineR")
 
+  gc(FALSE)
+  ptime.begin <- proc.time()
 
   if (is.null(seqdata2) & is.null(group)){
     stop("'seqdata2' and 'group' cannot both be NULL!")
@@ -31,8 +33,19 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     stop("'set' not NULL while 'group' is NULL!")
   }
 
+  if (!is.logical(weighted)) {
+    if (weighted != 'by.group')
+      stop("weighted must be logical or 'by.group'")
+    weight.by <- weighted
+    weighted <- TRUE
+  }
+  else {
+    weight.by <- 'global'
+  }
+
   if (is.logical(squared))
-    LRTpow <- ifelse(squared, 2, 1)
+    #LRTpow <- ifelse(squared, 2, 1)
+    LRTpow <- 1
   else {
     if (squared != "LRTonly") stop("squared must be logical or 'LRTonly'")
     LRTpow <- 2
@@ -155,12 +168,12 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   ## we have an error when s > min(m.n), because then we get some r.n1 > m.n
   if(any(m.n<r.n1)) {
     ii <- which(m.n<r.n1)
-    print(cbind(n,m.n,r.n1))
+    #print(cbind(n,m.n,r.n1))
     stop("rest r.n1 values greater than max m.n for i= ", ii, " s= ", s)
   }
   if(any(n.n<r.n2)) {
     ii <- which(n.n<r.n2)
-    print(cbind(n,n.n,r.n2))
+    #print(cbind(n,n.n,r.n2))
     stop("rest r.n2 values greater than min n.n for i= ", ii, " s= ", s)
   }
 
@@ -195,7 +208,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
       ##suppressMessages(t[j,]<-unlist(seq.comp2(seqA, seqB, BIC=BIC, method=method, ...)))
       suppressMessages(t[j,] <-
         seq.comp2(seqA, seqB, is.LRT=is.LRT, is.BIC=is.BIC,
-        method=method, squared=squared, weighted=weighted, LRTpow=LRTpow, ...))
+        method=method, squared=squared, weighted=weighted, weight.by=weight.by, LRTpow=LRTpow, ...))
     }
     Results[i,]<-apply(t,2,mean)
     colnames <- NULL
@@ -204,10 +217,20 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     colnames(Results) <- colnames
   }
   if(!is.null(set)) rownames(Results) <- lev.set
+
+  #### Display elaspsed time ####
+
+  ptime.end <- proc.time()
+  time.begin <- as.POSIXct(sum(ptime.begin[1:2]), origin = "1960-01-01")
+  time.end <- as.POSIXct(sum(ptime.end[1:2]), origin = "1960-01-01")
+  time.elapsed <- format(round(difftime(time.end, time.begin), 3))
+
+  message("elapsed time:", time.elapsed)
+
   return(Results)
 }
 
-seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, LRTpow,...)
+seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weight.by, LRTpow,...)
 {
 
   # compute some basic statistics
@@ -216,25 +239,31 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, LRTp
   S = rbind(S1,S2)
   #attr(S, "weights") <- c(attr(S1, "weights"), attr(S2, "weights"))
   n0 = nrow(S)
-  n.0=log((n0*n0-n0)/2)
+  #n.0=log((n0*n0-n0)/2)  ## not used
   dist.S=dist.S1=dist.S2<-vector()
+
+  weighted <- weighted && !any(is.null(attr(S,"weights")))
 
   ## weights
   if (weighted) {
     w1 <- attr(S1,"weights")
     w2 <- attr(S2,"weights")
     w <- attr(S,"weights")
-    ## normalize weights such that sum(w) = n0
+    ## normalize weights such that sum(w) = n
+    if (weight.by == 'by.group') {
+      w1 <- nrow(S1)/sum(w1) * w1
+      w2 <- nrow(S2)/sum(w2) * w2
+      w <- c(w1,w2)
+    }
     nw <- sum(w)
     nw1 <- sum(w1)
     nw2 <- sum(w2)
-    w1 <- nrow(S1)/nw1 * w1
-    w2 <- nrow(S2)/nw2 * w2
-    w <- n0/nw * w
-    #print(paste("sum(w)=",sum(w)," sum(w1)=",sum(w1)," sum(w2)=",sum(w2)))
   }
-  else {
+  else { # no weight
     w <- w1 <- w2 <- NULL
+    nw <- n0
+    nw1 <- n1
+    nw2 <- n2
   }
 
 
@@ -248,6 +277,8 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, LRTp
 
   res <- NULL
 
+  #print(c(sum(w*dist.S^LRTpow),sum(w1*dist.S1^LRTpow),sum(w2*dist.S2^LRTpow)))
+  #print(c(sum(dist.S^LRTpow),sum(dist.S1^LRTpow),sum(dist.S2^LRTpow)))
 
   # compute LRTs and alpha probabilities
   if (weighted) {
@@ -275,6 +306,7 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, LRTp
   #        "BIC difference between Groups 1 & 2"=BIC,
   #        "Bayes factor comparing the two groups"=BF)
   }
+
 
   return(res)
 }
