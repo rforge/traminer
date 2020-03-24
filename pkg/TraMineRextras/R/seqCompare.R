@@ -240,7 +240,7 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weig
   # compute some basic statistics
   n1 = nrow(S1)
   n2 = nrow(S2)
-  S = rbind(S1,S2)
+  S = seqrbind(S1,S2)
   #attr(S, "weights") <- c(attr(S1, "weights"), attr(S2, "weights"))
   n0 = nrow(S)
   #n.0=log((n0*n0-n0)/2)  ## not used
@@ -311,6 +311,78 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weig
   #        "Bayes factor comparing the two groups"=BF)
   }
 
+
+  return(res)
+}
+
+## rbind method for stslist objects requires TraMineR v2.0-16
+## In meantime we redefine it here as seqrbind
+seqrbind <- function(..., deparse.level = 1) {
+  seqlist <- list(...)
+  l <- length(seqlist)
+  ww <- attr(seqlist[[1]],"weights")
+  alph <- alphabet(seqlist[[1]])
+  kalph <- 1
+  void <-attr(seqlist[[1]],"void")
+  nr <-attr(seqlist[[1]],"nr")
+  missing.char <-attr(seqlist[[1]],"missing")
+
+  res <- seqlist[[1]]
+  n.null <- ifelse(is.null(ww),1,0)
+  for (i in 2:l) {
+    seqi <- seqlist[[i]]
+    weights <- attr(seqi,"weights")
+    n.null <- n.null + is.null(weights)
+    if (length(alph) < length(alphabet(seqi))) {
+      if (!all(alph %in% alphabet(seqi)))
+        stop("Alphabet mismatch between stslist objects!")
+      alph <- alphabet(seqi)
+      kalph <- i
+    }
+    else {
+      if (!all(alphabet(seqi) %in% alph))
+        stop("Alphabet mismatch between stslist objects!")
+    }
+    if (nr != attr(seqi,"nr") || void!= attr(seqi,"void"))
+      stop("nr and/or void mismatch between stslist objects!")
+    res <- as.matrix(res)
+    ## when stslist do not have same number of columns
+    ## we adjust with columns of voids
+    if (ncol(res) < ncol(seqi)) {
+      emptycol <- matrix(void, nrow(res), ncol(seqi)-ncol(res))
+      names <- c(names(res),names(seqi)[(ncol(res)+1):ncol(seqi)])
+      res <- cbind(res,emptycol)
+      names(res) <- names
+    }
+    else if (ncol(res) > ncol(seqi)) {
+      emptycol <- matrix(void, nrow(seqi), ncol(res)-ncol(seqi))
+      names <- c(names(seqi),names(res)[(ncol(seqi)+1):ncol(res)])
+      seqi <- cbind(seqi,emptycol)
+      names(res) <- names
+    }
+    res <- rbind(as.matrix(res),as.matrix(seqi), deparse.level=deparse.level)
+    if (!is.null(weights)) ww <-c(ww,weights)
+  }
+  if(n.null > 0 & n.null != l)
+    stop("!! Cannot rbind stslist objects with and without weights!")
+
+  is.void <- any(res==void)
+  res[res == nr] <- missing.char
+  res[res == void] <- missing.char
+
+  res <- seqdef(res,
+    alphabet=alph,
+    weights =ww,
+    start   =attr(seqlist[[1]],"start"),
+    missing =attr(seqlist[[1]],"missing"),
+    nr      =attr(seqlist[[1]],"nr"),
+    void    =attr(seqlist[[1]],"void"),
+    labels  =attr(seqlist[[kalph]],"labels"),
+    xtstep  =attr(seqlist[[1]],"xtstep"),
+    cpal    =attr(seqlist[[kalph]],"cpal"),
+    tick.last=attr(seqlist[[1]],"tick.last"),
+    right   =ifelse(is.void,"DEL",NA)
+  )
 
   return(res)
 }

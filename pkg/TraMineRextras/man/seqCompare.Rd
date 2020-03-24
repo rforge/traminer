@@ -89,7 +89,7 @@ data(biofam)
 biofam.lab <- c("Parent", "Left", "Married", "Left+Marr",
                 "Child", "Left+Child", "Left+Marr+Child", "Divorced")
 alph <- seqstatl(biofam[10:25])
-## We use only a sample of 300 cases
+## To illustrate, we use only a sample of 150 cases
 set.seed(10)
 biofam <- biofam[sample(nrow(biofam),150),]
 biofam.seq <- seqdef(biofam, 10:25, alphabet=alph, labels=biofam.lab)
