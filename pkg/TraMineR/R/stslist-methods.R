@@ -132,18 +132,20 @@ rbind.stslist <- function(..., deparse.level = 1) {
   res[res == nr] <- missing.char
   res[res == void] <- missing.char
 
-  res <- seqdef(res,
-    alphabet=alph,
-    weights =ww,
-    start   =attr(seqlist[[1]],"start"),
-    missing =attr(seqlist[[1]],"missing"),
-    nr      =attr(seqlist[[1]],"nr"),
-    void    =attr(seqlist[[1]],"void"),
-    labels  =attr(seqlist[[kalph]],"labels"),
-    xtstep  =attr(seqlist[[1]],"xtstep"),
-    cpal    =attr(seqlist[[kalph]],"cpal"),
-    tick.last=attr(seqlist[[1]],"tick.last"),
-    right   =ifelse(is.void,"DEL",NA)
+  suppressMessages(
+    res <- seqdef(res,
+      alphabet=alph,
+      weights =ww,
+      start   =attr(seqlist[[1]],"start"),
+      missing =attr(seqlist[[1]],"missing"),
+      nr      =attr(seqlist[[1]],"nr"),
+      void    =attr(seqlist[[1]],"void"),
+      labels  =attr(seqlist[[kalph]],"labels"),
+      xtstep  =attr(seqlist[[1]],"xtstep"),
+      cpal    =attr(seqlist[[kalph]],"cpal"),
+      tick.last=attr(seqlist[[1]],"tick.last"),
+      right   =ifelse(is.void,"DEL",NA)
+    )
   )
 
   return(res)
