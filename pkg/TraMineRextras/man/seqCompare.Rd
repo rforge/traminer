@@ -10,16 +10,14 @@
 
 \usage{
 seqCompare(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, stat="all", with.missing=FALSE,
-    squared="LRTonly", weighted=TRUE, method, ...)
-
-seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, with.missing=FALSE, squared="LRTonly", 
+    s=100, seed=36963, stat="all", squared="LRTonly", 
     weighted=TRUE, method, ...)
 
-seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, with.missing=FALSE, squared="LRTonly", 
-    weighted=TRUE, method, ...)
+seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100, 
+    seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+
+seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100, 
+    seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
 }
 
 \arguments{
@@ -42,8 +40,6 @@ seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   each time.
 }
   \item{stat}{String. The requested statistics. One of \code{"LRT"}, \code{"BIC"}, or \code{"all"}
-  }
-  \item{with.missing}{Logical. Should non void missing states be treated as regular states?
   }
   \item{squared}{Logical. Should squared distances be used? Can also be \code{"LRTonly"}, in which case the distances to the centers are computed using non-squared distances and LRT is computed with squared distances.
   }

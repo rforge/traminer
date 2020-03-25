@@ -3,23 +3,21 @@
 ## version 1.0, March 2020
 
 seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, with.missing=FALSE, squared="LRTonly",
-  weighted=TRUE, method, ...)
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="BIC", with.missing, squared, weighted, method, ...))
+         stat="BIC", squared, weighted, method, ...))
 }
 
 seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, with.missing=FALSE, squared="LRTonly",
-  weighted=TRUE, method, ...)
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="LRT", with.missing, squared, weighted, method, ...))
+         stat="LRT", squared, weighted, method, ...))
 }
 
 seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, stat="all", with.missing=FALSE, squared="LRTonly",
+  s=100, seed=36963, stat="all", squared="LRTonly",
   weighted=TRUE, method, ...)
 {
   #require("gtools")
@@ -46,7 +44,6 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   }
 
   if (is.logical(squared))
-    #LRTpow <- ifelse(squared, 2, 1)
     LRTpow <- 1
   else {
     if (squared != "LRTonly") stop("squared must be logical or 'LRTonly'")
@@ -138,6 +135,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   G = length(seq1)
   n = matrix(NA,nrow=G,ncol=2)
   seq.a = seq.b <- list(rep(NA,G))
+
   for (i in 1:G) {
     if (nrow(seq1[[i]])>=nrow(seq2[[i]])) {
       n[i,1] <- nrow(seq1[[i]])
@@ -164,61 +162,50 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   k.n = floor((ff.n1*m.n+r.n1)/n.n)
   r.n2 = (ff.n1*m.n+r.n1)-k.n*n.n
 
-  #tmp <- data.frame(m.n,n.n,f.n1,r.n1,k.n,r.n2)
-  #print(tmp)
-
-  ## we have an error when s > min(m.n), because then we get some r.n1 > m.n
+  ##GR we have an error when s > min(m.n), because then we get some r.n1 > m.n
+  ##GR Has been fixed, so we should never reach the following stops
   if(any(m.n<r.n1)) {
     ii <- which(m.n<r.n1)
-    #print(cbind(n,m.n,r.n1))
     stop("rest r.n1 values greater than max m.n for i= ", ii, " s= ", s)
   }
   if(any(n.n<r.n2)) {
     ii <- which(n.n<r.n2)
-    #print(cbind(n,n.n,r.n2))
     stop("rest r.n2 values greater than min n.n for i= ", ii, " s= ", s)
   }
-
-  r.s1=r.s2 = list(rep(NA,G))
-  for (i in 1:G) {
-    set.seed(seed)
-    #if (s<m.n[i]) {
-    #  r.s1[[i]] <- c(permute(1:m.n[i]),sample(1:m.n[i],r.n1[i],F))
-    #}
-    #else {
-      r.s1[[i]] <- c(permute(rep(1:m.n[i],ff.n1[i])),sample(1:m.n[i],r.n1[i],F))
-    #}
-    #cat("length r.s1 ",length(r.s1[[i]]))
-    r.s2[[i]] <- c(permute(rep(1:n.n[i],k.n[i])),sample(1:n.n[i],r.n2[i],F))
-    #cat("length r.s2 ",length(r.s2[[i]]))
-    r.s1[[i]] = matrix(r.s1[[i]],ncol=s)
-    r.s2[[i]] = matrix(r.s2[[i]],ncol=s)
-  }
-  #k = rep(NA,G)
-  #for (i in 1:G) k[i]<-nrow(r.s1[[i]])
-  #print(k)
 
   nc <- ifelse(is.LRT & is.BIC, 4, 2)
   Results=matrix(NA,G,nc)
 
-  ### new complete samples without replacement of length s over G comparisons
+  ## Constructing vector of indexes of sampled cases
+  #r.s1=r.s2 = list(rep(NA,G))
   for (i in 1:G) {
-    t<-matrix(NA,nrow=nrow(r.s1[[i]]),ncol=nc)
-    for (j in 1:nrow(r.s1[[i]])) {
-      seqA<-seq.a[[i]][r.s1[[i]][j,],]
-      seqB<-seq.b[[i]][r.s2[[i]][j,],]
-      ##suppressMessages(t[j,]<-unlist(seq.comp2(seqA, seqB, BIC=BIC, method=method, ...)))
+    set.seed(seed)
+    r.s1 <- c(permute(rep(1:m.n[i],ff.n1[i])),sample(1:m.n[i],r.n1[i],F))
+    r.s2 <- c(permute(rep(1:n.n[i],k.n[i])),sample(1:n.n[i],r.n2[i],F))
+    r.s2b <- nrow(seq.a[[i]]) + r.s2
+    r.s1 = matrix(r.s1,ncol=s)
+    r.s2 = matrix(r.s2b,ncol=s)
+
+    suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, ...))
+    weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
+
+  ### new complete samples without replacement of length s over G comparisons
+    t<-matrix(NA,nrow=nrow(r.s1),ncol=nc)
+    for (j in 1:nrow(r.s1)) {
+      #seqA<-seq.a[[i]][r.s1[j,],]
+      #seqB<-seq.b[[i]][r.s2[j,],]
+
       suppressMessages(t[j,] <-
-        seq.comp2(seqA, seqB, is.LRT=is.LRT, is.BIC=is.BIC,
-        method=method, squared=squared, weighted=weighted, weight.by=weight.by,
-        with.missing=with.missing, LRTpow=LRTpow, ...))
+        seq.comp(r.s1[j,], r.s2[j,], diss, weights, is.LRT=is.LRT, is.BIC=is.BIC,
+          squared=squared, weighted=weighted, weight.by=weight.by,
+          LRTpow=LRTpow, ...))
     }
     Results[i,]<-apply(t,2,mean)
-    colnames <- NULL
-    if (is.LRT) colnames <- c("LRT", "p-value")
-    if (is.BIC) colnames <- c(colnames, "BIC diff.", "Bayes Factor")
-    colnames(Results) <- colnames
   }
+  colnames <- NULL
+  if (is.LRT) colnames <- c("LRT", "p-value")
+  if (is.BIC) colnames <- c(colnames, "BIC diff.", "Bayes Factor")
+  colnames(Results) <- colnames
   if(!is.null(set)) rownames(Results) <- lev.set
 
   #### Display elaspsed time ####
@@ -233,30 +220,31 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   return(Results)
 }
 
-seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weight.by,
-                    with.missing, LRTpow,...)
+####################
+seq.comp <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, weight.by,
+                    LRTpow,...)
 {
 
   # compute some basic statistics
-  n1 = nrow(S1)
-  n2 = nrow(S2)
-  S = seqrbind(S1,S2)
-  #attr(S, "weights") <- c(attr(S1, "weights"), attr(S2, "weights"))
-  n0 = nrow(S)
-  #n.0=log((n0*n0-n0)/2)  ## not used
+  #n1 = nrow(S1)
+  #n2 = nrow(S2)
+  n1 <- length(r1)
+  n2 <- length(r2)
+  n0 <- n1+n2
+  #n.0=log((n0*n0-n0)/2) #not used
   dist.S=dist.S1=dist.S2<-vector()
 
-  weighted <- weighted && !any(is.null(attr(S,"weights")))
+  weighted <- weighted && !any(is.null(weights))
 
   ## weights
   if (weighted) {
-    w1 <- attr(S1,"weights")
-    w2 <- attr(S2,"weights")
-    w <- attr(S,"weights")
-    ## normalize weights such that sum(w) = n
+    w1 <- weights[r1]
+    w2 <- weights[r2]
+    w <- c(w1,w2)
+    ## normalize weights to respect group sizes
     if (weight.by == 'by.group') {
-      w1 <- nrow(S1)/sum(w1) * w1
-      w2 <- nrow(S2)/sum(w2) * w2
+      w1 <- n1/sum(w1) * w1
+      w2 <- n2/sum(w2) * w2
       w <- c(w1,w2)
     }
     nw <- sum(w)
@@ -264,32 +252,33 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weig
     nw2 <- sum(w2)
   }
   else { # no weight
-    w <- w1 <- w2 <- NULL
     nw <- n0
     nw1 <- n1
     nw2 <- n2
+    w <- rep(1,nw)
+    w1 <- rep(1,nw1)
+    w2 <- rep(1,nw2)
   }
 
 
-  # compute dissimilarity matrices & distances to centers
-  distS  <- seqdist(S, method=method, weighted=weighted, with.missing=with.missing, ...) #  distance matrix for overall sample
-  dist.S <-disscenter(distS, weights=w, squared=squared) # calculate S distance to center
-  distS1 <- seqdist(S1, method=method, weighted=weighted, with.missing=with.missing, ...) #  distance matrix for sample 1
-  distS2 <- seqdist(S2, method=method, weighted=weighted, with.missing=with.missing, ...) #  distance matrix for sample 2
-  dist.S1<-disscenter(distS1, weights=w1, squared=squared) # calculate S1 distance to center
-  dist.S2<-disscenter(distS2, weights=w2, squared=squared) # calculate S2 distance to center
+  ## SS <- nw*dissvar(diss[c(r1,r2),c(r1,r2)], weights=w, squared=squared) #
+  ## SS1 <- nw1*dissvar(diss[r1,r1], weights=w1, squared=squared) #
+  ## SS2 <- nw2*dissvar(diss[r2,r2], weights=w2, squared=squared) #
+
+  ## Using dissvar does not allow the 'LRTonly' solution
+
+  dist.S <-disscenter(diss[c(r1,r2),c(r1,r2)], weights=w, squared=squared) # calculate S distance to center
+  dist.S1<-disscenter(diss[r1,r1], weights=w1, squared=squared) # calculate S1 distance to center
+  dist.S2<-disscenter(diss[r2,r2], weights=w2, squared=squared) # calculate S2 distance to center
+
+  SS <- sum(w*dist.S^LRTpow)
+  SS1 <- sum(w1*dist.S1^LRTpow)
+  SS2 <- sum(w2*dist.S2^LRTpow)
 
   res <- NULL
 
-  #print(c(sum(w*dist.S^LRTpow),sum(w1*dist.S1^LRTpow),sum(w2*dist.S2^LRTpow)))
-  #print(c(sum(dist.S^LRTpow),sum(dist.S1^LRTpow),sum(dist.S2^LRTpow)))
+  LRT <- n0*(log(SS/n0) - log((SS1+SS2)/n0))
 
-  # compute LRTs and alpha probabilities
-  if (weighted) {
-    LRT <- n0*log(sum(w*dist.S^LRTpow)/n0)-n0*log(sum(c(w1,w2)*c(dist.S1,dist.S2)^LRTpow)/n0)
-  } else {
-    LRT <- n0*log(sum(dist.S^LRTpow)/n0)-n0*log(sum(c(dist.S1,dist.S2)^LRTpow)/n0)
-  }
   if (is.LRT) {
     p.LRT <- pchisq(LRT,1,lower.tail=FALSE)
     res <- cbind(LRT, p.LRT)
@@ -303,15 +292,7 @@ seq.comp2 <- function(S1,S2,is.LRT,is.BIC,method=method, squared, weighted, weig
     BF <- exp(BIC/2)
 
     res <- cbind(res, BIC, BF)
-
-  # output computation results
-  #results <- list("LRT comparing Groups 1 & 2"=LRT,
-  #        "LRT significance level"=p.LRT,
-  #        "BIC difference between Groups 1 & 2"=BIC,
-  #        "Bayes factor comparing the two groups"=BF)
   }
-
-
   return(res)
 }
 
