@@ -187,7 +187,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
 
     if (is.null(opt))
       opt <- ifelse(nrow(seq.a[[i]]) + nrow(seq.b[[i]]) > 2*s, 1, 2)
-    print(opt)
+    #print(opt)
     if (opt==2) {
       suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
       weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
@@ -213,7 +213,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
         suppressMessages(diss <- seqdist(seqAB, method=method, weighted=weighted, ...))
       }
       suppressMessages(t[j,] <-
-          seq.comp.opt1(r1, r2, diss, weights, is.LRT=is.LRT, is.BIC=is.BIC,
+          seq.comp(r1, r2, diss, weights, is.LRT=is.LRT, is.BIC=is.BIC,
             squared=squared, weighted=weighted, weight.by=weight.by,
             LRTpow=LRTpow, ...))
 
@@ -239,7 +239,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
 }
 
 ####################
-seq.comp.opt1 <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, weight.by,
+seq.comp <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, weight.by,
                     LRTpow,...)
 {
   #print(r1)
@@ -281,7 +281,6 @@ seq.comp.opt1 <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighte
     w1 <- rep(1,nw1)
     w2 <- rep(1,nw2)
   }
-
 
   ## SS <- nw*dissvar(diss[c(r1,r2),c(r1,r2)], weights=w, squared=squared) #
   ## SS1 <- nw1*dissvar(diss[r1,r1], weights=w1, squared=squared) #
