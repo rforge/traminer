@@ -175,6 +175,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
 
   nc <- ifelse(is.LRT & is.BIC, 4, 2)
   Results=matrix(NA,G,nc)
+  oopt <- opt
 
   ## Constructing vector of indexes of sampled cases
   #r.s1=r.s2 = list(rep(NA,G))
@@ -185,9 +186,9 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     r.s1 = matrix(r.s1,ncol=s)
     r.s2 = matrix(r.s2,ncol=s)
 
-    if (is.null(opt))
+    if (is.null(oopt))
       opt <- ifelse(nrow(seq.a[[i]]) + nrow(seq.b[[i]]) > 2*s, 1, 2)
-    #print(opt)
+    #message('opt = ',opt)
     if (opt==2) {
       suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
       weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
