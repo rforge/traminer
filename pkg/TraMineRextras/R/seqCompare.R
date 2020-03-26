@@ -3,22 +3,22 @@
 ## version 1.0, March 2020
 
 seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="BIC", squared, weighted, method, ...))
+         stat="BIC", squared, weighted, opt, method, ...))
 }
 
 seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="LRT", squared, weighted, method, ...))
+         stat="LRT", squared, weighted, opt, method, ...))
 }
 
 seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   s=100, seed=36963, stat="all", squared="LRTonly",
-  weighted=TRUE, method, ...)
+  weighted=TRUE, opt=NULL, method, ...)
 {
   #require("gtools")
   #require("TraMineR")
@@ -182,23 +182,41 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     set.seed(seed)
     r.s1 <- c(permute(rep(1:m.n[i],ff.n1[i])),sample(1:m.n[i],r.n1[i],F))
     r.s2 <- c(permute(rep(1:n.n[i],k.n[i])),sample(1:n.n[i],r.n2[i],F))
-    r.s2b <- nrow(seq.a[[i]]) + r.s2
     r.s1 = matrix(r.s1,ncol=s)
-    r.s2 = matrix(r.s2b,ncol=s)
+    r.s2 = matrix(r.s2,ncol=s)
 
-    suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, ...))
-    weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
+    if (is.null(opt))
+      opt <- ifelse(nrow(seq.a[[i]]) + nrow(seq.b[[i]]) > 2*s, 1, 2)
+    print(opt)
+    if (opt==2) {
+      suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
+      weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
+    }
 
   ### new complete samples without replacement of length s over G comparisons
     t<-matrix(NA,nrow=nrow(r.s1),ncol=nc)
     for (j in 1:nrow(r.s1)) {
-      #seqA<-seq.a[[i]][r.s1[j,],]
-      #seqB<-seq.b[[i]][r.s2[j,],]
 
+      if (opt==2) {
+        r1 <- r.s1[j,]
+        r2 <- r.s2[j,] + nrow(seq.a[[i]])
+      }
+      else {
+        seqA<-seq.a[[i]][r.s1[j,],]
+        seqB<-seq.b[[i]][r.s2[j,],]
+        seqAB <- seqrbind(seqA, seqB)
+        wA <- attr(seqA,"weights")
+        wB <- attr(seqB,"weights")
+        weights <- c(wA,wB)
+        r1 <- 1:length(r.s1[j,])
+        r2 <- length(r.s1[j,]) + 1:length(r.s2[j,])
+        suppressMessages(diss <- seqdist(seqAB, method=method, weighted=weighted, ...))
+      }
       suppressMessages(t[j,] <-
-        seq.comp(r.s1[j,], r.s2[j,], diss, weights, is.LRT=is.LRT, is.BIC=is.BIC,
-          squared=squared, weighted=weighted, weight.by=weight.by,
-          LRTpow=LRTpow, ...))
+          seq.comp.opt1(r1, r2, diss, weights, is.LRT=is.LRT, is.BIC=is.BIC,
+            squared=squared, weighted=weighted, weight.by=weight.by,
+            LRTpow=LRTpow, ...))
+
     }
     Results[i,]<-apply(t,2,mean)
   }
@@ -221,9 +239,13 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
 }
 
 ####################
-seq.comp <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, weight.by,
+seq.comp.opt1 <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, weight.by,
                     LRTpow,...)
 {
+  #print(r1)
+  #print(r2)
+  #print(dim(diss))
+  #print(weights)
 
   # compute some basic statistics
   #n1 = nrow(S1)
@@ -295,6 +317,7 @@ seq.comp <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, we
   }
   return(res)
 }
+
 
 ## rbind method for stslist objects requires TraMineR v2.0-16
 ## In meantime we redefine it here as seqrbind

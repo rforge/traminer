@@ -11,13 +11,15 @@
 \usage{
 seqCompare(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     s=100, seed=36963, stat="all", squared="LRTonly", 
-    weighted=TRUE, method, ...)
+    weighted=TRUE, opt=NULL, method, ...)
 
 seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100, 
-    seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+    seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, 
+    method, ...)
 
 seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100, 
-    seed=36963, squared="LRTonly", weighted=TRUE, method, ...)
+    seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, 
+    method, ...)
 }
 
 \arguments{
@@ -45,6 +47,8 @@ seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100,
   }
   \item{weighted}{Logical or String. Should weights be taken into account when available? Can also be \code{"by.group"}, in which case weights are used and normalized to respect group sizes.
   }
+  \item{opt}{Integer. Either 1 or 2. Computation option. When 1, the distance matrix is computed successively for each pair of samples of size s. When 2, the distances are computed only once for each pair of sets of observed sequences and the distances for the samples are extracted from that matrix. When \code{NULL} (default), 1 is chosen when the sum of sizes of the two groups is larger than 2*s and 2 otherwise.
+  }
 \item{method}{String. Method for computing sequence distances. See documentation for \code{\link[TraMineR]{seqdist}}. Additional arguments may be required depending on the method chosen.
 }
 \item{...}{Additional arguments passed to \code{\link[TraMineR]{seqdist}}.
@@ -59,8 +63,9 @@ When \code{seqdata} and \code{seqdata2} are both provided, the LRT and BIC stati
 
 When \code{seqdata} is a list of \code{stslist} objects, \code{seqdata2} must be a list of the same number of \code{stslist} objects.
 
-The default option \code{squared="LRTonly"} corresponds to the initial proposition of Liao and Fasang (2020). With that option, the distances to the virtual center are obtained from the pairwise non-squared dissimilarities. The resulting distances to the virtual center are however squared when computing the LRT and, as a consequence, the BIC derived from that LRT. With \code{squared=FALSE}, non-squared distances are used in both cases, and with \code{squared=TRUE}, squared distances are used in both cases.
+The default option \code{squared="LRTonly"} corresponds to the initial proposition of Liao and Fasang (2020). With that option, the distances to the virtual center are obtained from the pairwise non-squared dissimilarities and the resulting distances to the virtual center are  squared when computing the LRT (and, as a consequence, the BIC derived from the LRT). With \code{squared=FALSE}, non-squared distances are used in both cases, and with \code{squared=TRUE}, squared distances are used in both cases.
 
+The computation is based on the pairwise distances between the sequences. The \code{opt} argument permits to chose between two strategies. With \code{opt=1}, the matrix of distances is computed successively for each pair of samples of size s. When \code{opt=2}, the matrix of distances is computed once for the observed sequences and the distances for the samples are extracted from that matrix. Option 2 is often more efficient, especially for distances based on spells. It may be slower for methods such as OM or LCS when the number of observed sequences becomes large.
 }
 
 \value{The function \code{seqLRT} (and seqCompare) with the default \code{"LRT"} stat value) outputs two variables, \var{LRT} and \var{p.LRT}.
