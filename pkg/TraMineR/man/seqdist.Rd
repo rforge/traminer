@@ -10,7 +10,7 @@
   of common attributes, and distances between sequence state distributions.
 }
 \usage{
-seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
+seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL,
   with.missing = FALSE, full.matrix = TRUE, kweights = rep(1.0, ncol(seqdata)),
   tpow = 1.0, expcost = 0.5, context, link = "mean", h = 0.5, nu,
   transindel = "constant", otto, previous = FALSE, add.column = TRUE,
@@ -18,7 +18,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
   global.pdotj = NULL, prox = NULL)
 }
 \arguments{
-  \item{seqdata}{
+  \item{seqdata}{ 
     State sequence object of class \code{stslist}.
     The sequence data to use.
     Use \code{\link{seqdef}} to create such an object.
@@ -61,8 +61,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     % Others: CHI2, EUCLID, OMloc, OMslen, OMspell, OMstran, NMS, NMSMST, SVRspell, TWED.
   }
   \item{indel}{
-    Double or Vector of Doubles.
-    Default: \code{1.0}.
+    Double, Vector of Doubles, or String.
+    Default: \code{"auto"}.
     Insertion/deletion cost(s).
 
     The single state-independent insertion/deletion cost when a double and
@@ -72,6 +72,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = 1.0, sm = NULL,
     The state-dependent insertion/deletion costs when a vector of doubles and
     \code{method = "OM"} or \code{method = "OMstran"}. It contains an indel cost
     for each state in the same order as the alphabet.
+    
+    When \code{"auto"}, the indel is set as \code{max(sm)/2} when \code{sm} is 
+    a matrix and is computed by means of \code{\link{seqcost}} when \code{sm} is 
+    a string specifying a cost method. 
 
     % Others: OMloc, HAM, DHD, CHI2, EUCLID, LCS, LCP, RLCP, NMS, NMSMST, SVRspell.
   }
@@ -440,7 +444,7 @@ ex1.om <- seqdist(ex1.seq, method = "OM",
                   indel = costs.ex1$indel, sm = costs.ex1$sm,
                   with.missing = TRUE)
 
-## Localized OM 
+## Localized OM
 ex1.omloc <- seqdist(ex1.seq, method = "OMloc",
                      sm = costs.ex1$sm, expcost=.1, context = .4,
                      with.missing = TRUE)

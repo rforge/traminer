@@ -1,8 +1,16 @@
 ## =========
-Version 2.1-16 [2020-03-23] (Development version)
+Version 2.1-16 [2020-03-28] (Development version)
+
+Changes in existing functions:
+  - seqdist(), argument 'indel' can now be "auto" (new default) 
+    in which case a suitable indel value is generated for the 
+    provided sm.  
+  - seqdist() now uses the rbind stslist method to add refseq to 
+    the set of sequences when it is a sequence object. 
+    (Transparent to the user.)
 
 Bug Fixes:
-  - seqdist(), argument 'sm' did not recognize values "INDELS" and 
+  - seqdist(), argument 'sm' did not recognize values "INDELS" and
     "INDELSLOG".
   - rbind.stslist() bad handling of missing states.
 
@@ -36,8 +44,8 @@ Changes in existing functions
     except for OMloc where an error is raised.
   - seqcost(): 'with.missing' forced as FALSE (as in seqdist)
     when there are no non-void missings in the sequences.
-  - seqprecorr(): new methods "FREQ+", "TRATE+", "TRATEDSS+", 
-    "RANK+" that adjust the returned penalty for the mean 
+  - seqprecorr(): new methods "FREQ+", "TRATE+", "TRATEDSS+",
+    "RANK+" that adjust the returned penalty for the mean
     transition weight.
   - seqprecorr(), a same state value is assigned to equivalent
     states when counting transitions and computing transition

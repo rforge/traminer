@@ -1,7 +1,19 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-03-23] (Development version)}{
+\section{Changes in version 2.1-16 [2020-03-28] (Development version)}{
+
+  \subsection{Changes in existing functions}{
+    \itemize{
+      \item
+      \code{seqdist()}, argument \code{indel} can now be \code{"auto"} (new default)
+      in which case a suitable indel value is generated for the provided \code{sm}.
+      \item
+      \code{seqdist()} now uses the \code{rbind} stslist method to add \code{refseq} to
+      the set of sequences when it is a state sequence object.
+      (Transparent to the user.)
+    }
+  }
 
   \subsection{Bug fixes}{
     \itemize{
