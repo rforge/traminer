@@ -10,15 +10,15 @@
 
 \usage{
 seqCompare(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-    s=100, seed=36963, stat="all", squared="LRTonly", 
+    s=100, seed=36963, stat="all", squared="LRTonly",
     weighted=TRUE, opt=NULL, method, ...)
 
-seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100, 
-    seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, 
+seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100,
+    seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL,
     method, ...)
 
-seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100, 
-    seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, 
+seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100,
+    seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL,
     method, ...)
 }
 
@@ -35,7 +35,7 @@ seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100,
   \item{set}{Vector of length equal to number of sequences in \code{seqdata}. Variable defining the sets. See details.
   }
 
-\item{s}{Integer. Default 100. The number of randomly chosen sequences with replacement.
+\item{s}{Integer. Default 100. The size of random samples of sequences. When 0, no sampling is done.
 }
 
 \item{seed}{Integer. Default 36963. Using the same seed number guarantees the same results
@@ -63,7 +63,7 @@ When \code{seqdata} and \code{seqdata2} are both provided, the LRT and BIC stati
 
 When \code{seqdata} is a list of \code{stslist} objects, \code{seqdata2} must be a list of the same number of \code{stslist} objects.
 
-The default option \code{squared="LRTonly"} corresponds to the initial proposition of Liao and Fasang (2020). With that option, the distances to the virtual center are obtained from the pairwise non-squared dissimilarities and the resulting distances to the virtual center are  squared when computing the LRT (and, as a consequence, the BIC derived from the LRT). With \code{squared=FALSE}, non-squared distances are used in both cases, and with \code{squared=TRUE}, squared distances are used in both cases.
+The default option \code{squared="LRTonly"} corresponds to the initial proposition of Liao and Fasang (2020). With that option, the distances to the virtual center are obtained from the pairwise non-squared dissimilarities and the resulting distances to the virtual center are  squared when computing the LRT (which is in turn used to compute the BIC). With \code{squared=FALSE}, non-squared distances are used in both cases, and with \code{squared=TRUE}, squared distances are used in both cases.
 
 The computation is based on the pairwise distances between the sequences. The \code{opt} argument permits to chose between two strategies. With \code{opt=1}, the matrix of distances is computed successively for each pair of samples of size s. When \code{opt=2}, the matrix of distances is computed once for the observed sequences and the distances for the samples are extracted from that matrix. Option 2 is often more efficient, especially for distances based on spells. It may be slower for methods such as OM or LCS when the number of observed sequences becomes large.
 }

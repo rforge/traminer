@@ -151,75 +151,89 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     }
   }
 
-  m.n = apply(n,1,max)
-  n.n = apply(n,1,min)
-  f.n1 <- floor(s/m.n)
-  ff.n1 <- sapply(f.n1, g<-function(x){max(1,x)})
-  #r.n1 = s-m.n%%s
-  r.n1 = ifelse(s<m.n, s - m.n%%s, s - f.n1*m.n)
-  #k.n = floor((m.n+r.n1)/n.n)
-  #r.n2 = (m.n+r.n1)-k.n*n.n
-  k.n = floor((ff.n1*m.n+r.n1)/n.n)
-  r.n2 = (ff.n1*m.n+r.n1)-k.n*n.n
+  if (s>0) { # for s=0 we do not need that
+    m.n = apply(n,1,max)
+    n.n = apply(n,1,min)
+    f.n1 <- floor(s/m.n)
+    ff.n1 <- sapply(f.n1, g<-function(x){max(1,x)})
+    #r.n1 = s-m.n%%s
+    r.n1 = ifelse(s<m.n, s - m.n%%s, s - f.n1*m.n)
+    #k.n = floor((m.n+r.n1)/n.n)
+    #r.n2 = (m.n+r.n1)-k.n*n.n
+    k.n = floor((ff.n1*m.n+r.n1)/n.n)
+    r.n2 = (ff.n1*m.n+r.n1)-k.n*n.n
 
-  ##GR we have an error when s > min(m.n), because then we get some r.n1 > m.n
-  ##GR Has been fixed, so we should never reach the following stops
-  if(any(m.n<r.n1)) {
-    ii <- which(m.n<r.n1)
-    stop("rest r.n1 values greater than max m.n for i= ", ii, " s= ", s)
-  }
-  if(any(n.n<r.n2)) {
-    ii <- which(n.n<r.n2)
-    stop("rest r.n2 values greater than min n.n for i= ", ii, " s= ", s)
+    ##GR we have an error when s > min(m.n), because then we get some r.n1 > m.n
+    ##GR Has been fixed, so we should never reach the following stops
+    if(any(m.n<r.n1)) {
+      ii <- which(m.n<r.n1)
+      stop("rest r.n1 values greater than max m.n for i= ", ii, " s= ", s)
+    }
+    if(any(n.n<r.n2)) {
+      ii <- which(n.n<r.n2)
+      stop("rest r.n2 values greater than min n.n for i= ", ii, " s= ", s)
+    }
   }
 
   nc <- ifelse(is.LRT & is.BIC, 4, 2)
-  Results=matrix(NA,G,nc)
+  Results <- matrix(NA,G,nc)
   oopt <- opt
 
   ## Constructing vector of indexes of sampled cases
   #r.s1=r.s2 = list(rep(NA,G))
   for (i in 1:G) {
-    set.seed(seed)
-    r.s1 <- c(permute(rep(1:m.n[i],ff.n1[i])),sample(1:m.n[i],r.n1[i],F))
-    r.s2 <- c(permute(rep(1:n.n[i],k.n[i])),sample(1:n.n[i],r.n2[i],F))
-    r.s1 = matrix(r.s1,ncol=s)
-    r.s2 = matrix(r.s2,ncol=s)
-
-    if (is.null(oopt))
-      opt <- ifelse(nrow(seq.a[[i]]) + nrow(seq.b[[i]]) > 2*s, 1, 2)
-    #message('opt = ',opt)
-    if (opt==2) {
+    if (s==0) { # no sampling
+      r1 <- 1:nrow(seq.a[[i]])
+      r2 <- 1:nrow(seq.b[[i]]) + nrow(seq.a[[i]])
       suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
       weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
-    }
-
-  ### new complete samples without replacement of length s over G comparisons
-    t<-matrix(NA,nrow=nrow(r.s1),ncol=nc)
-    for (j in 1:nrow(r.s1)) {
-
-      if (opt==2) {
-        r1 <- r.s1[j,]
-        r2 <- r.s2[j,] + nrow(seq.a[[i]])
-      }
-      else {
-        seqA<-seq.a[[i]][r.s1[j,],]
-        seqB<-seq.b[[i]][r.s2[j,],]
-        seqAB <- seqrbind(seqA, seqB)
-        wA <- attr(seqA,"weights")
-        wB <- attr(seqB,"weights")
-        weights <- c(wA,wB)
-        r1 <- 1:length(r.s1[j,])
-        r2 <- length(r.s1[j,]) + 1:length(r.s2[j,])
-        suppressMessages(diss <- seqdist(seqAB, method=method, weighted=weighted, ...))
-      }
-      suppressMessages(t[j,] <-
+      suppressMessages(
+        Results[i,] <-
           seq.comp(r1, r2, diss, weights, is.LRT=is.LRT, is.BIC=is.BIC,
-            squared=squared, weighted=weighted, weight.by=weight.by,
-            LRTpow=LRTpow, ...))
-
+             squared=squared, weighted=weighted, weight.by=weight.by,
+             LRTpow=LRTpow, ...))
     }
-    Results[i,]<-apply(t,2,mean)
+    else { # sampling
+      set.seed(seed)
+      r.s1 <- c(permute(rep(1:m.n[i],ff.n1[i])),sample(1:m.n[i],r.n1[i],F))
+      r.s2 <- c(permute(rep(1:n.n[i],k.n[i])),sample(1:n.n[i],r.n2[i],F))
+      r.s1 = matrix(r.s1,ncol=s)
+      r.s2 = matrix(r.s2,ncol=s)
+
+      if (is.null(oopt))
+        opt <- ifelse(nrow(seq.a[[i]]) + nrow(seq.b[[i]]) > 2*s, 1, 2)
+      #message('opt = ',opt)
+      if (opt==2) {
+        suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
+        weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
+      }
+
+    ### new complete samples without replacement of length s over G comparisons
+      t<-matrix(NA,nrow=nrow(r.s1),ncol=nc)
+      for (j in 1:nrow(r.s1)) {
+
+        if (opt==2) {
+          r1 <- r.s1[j,]
+          r2 <- r.s2[j,] + nrow(seq.a[[i]])
+        }
+        else {
+          seqA<-seq.a[[i]][r.s1[j,],]
+          seqB<-seq.b[[i]][r.s2[j,],]
+          seqAB <- seqrbind(seqA, seqB)
+          wA <- attr(seqA,"weights")
+          wB <- attr(seqB,"weights")
+          weights <- c(wA,wB)
+          r1 <- 1:length(r.s1[j,])
+          r2 <- length(r.s1[j,]) + 1:length(r.s2[j,])
+          suppressMessages(diss <- seqdist(seqAB, method=method, weighted=weighted, ...))
+        }
+        suppressMessages(t[j,] <-
+            seq.comp(r1, r2, diss, weights, is.LRT=is.LRT, is.BIC=is.BIC,
+              squared=squared, weighted=weighted, weight.by=weight.by,
+              LRTpow=LRTpow, ...))
+      }
+      Results[i,]<-apply(t,2,mean)
+    }
   }
   colnames <- NULL
   if (is.LRT) colnames <- c("LRT", "p-value")
@@ -243,10 +257,10 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
 seq.comp <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, weight.by,
                     LRTpow,...)
 {
-  #print(r1)
-  #print(r2)
+  #print(length(r1))
+  #print(length(r2))
   #print(dim(diss))
-  #print(weights)
+  #print(length(weights))
 
   # compute some basic statistics
   #n1 = nrow(S1)
