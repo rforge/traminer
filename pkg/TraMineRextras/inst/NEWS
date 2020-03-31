@@ -1,4 +1,4 @@
-                CHANGES IN TraMineRextras VERSION 0.5.8 [2020-03-26] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.8 [2020-03-31] (Development version)
 
 New functions
     o   seqCompare() BIC and Likelihood ratio test (LRT) for comparing
@@ -9,6 +9,7 @@ New functions
 Changes in existing functions
     o   seqgranularity(): two new methods "first.valid" and
         "last.valid" for sequences with missing values.
+    o   seqplot-rf() gains a new argument 'which.plot'.
 
 Bug fixes
     o   seqgranularity() did not return a proper stslist object
