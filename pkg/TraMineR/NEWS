@@ -10,11 +10,14 @@ Changes in existing functions:
     (Transparent to the user.)
   - seqdist() now gives a zero weight to the refseq when specified
     as a state sequence object.
+  - seqdist() now uses hcl.colors (grDevices) instead of 
+    qualitative_hcl (colorspace) to set default colors when n>13.
+    (Transparent to the user.)
 
 Bug Fixes:
+  - rbind.stslist() bad handling of missing states.
   - seqdist(), argument 'sm' did not recognize values "INDELS" and
     "INDELSLOG".
-  - rbind.stslist() bad handling of missing states.
   - seqdist() raised warnings when method='OMslen' because of a 
     vector of conditions in an if test.
   - seqdist() ignored the 'weighted' value when computing substitution 
@@ -28,7 +31,7 @@ New functions:
   - seqivolatility(), index of objective volatility of C. Brzinsky-Fay
   - print.seqipos() print method for objects returned by seqipos()
   - is.stslist() checks that the object is a proper stslist object.
-  - rbind.stslist() checks that the object is a proper stslist object.
+  - rbind.stslist() rbind method for state sequence objects.
 
 Changes in existing functions
   - seqdef() now provides a default color palette (using colorspace)

@@ -95,7 +95,8 @@ by calling the \code{brewer.pal} function of the \code{RColorBrewer}
 package. If number of states is less or equal than 8, the
 \code{"Accent"} palette is used. If number of states is between 8 and
 12, the \code{"Set3"} palette is used. If the number of states in the
-data is greater than 12, colors are set using \code{qualitative_hcl} with the "Set 3" palette (See \code{\link[colorspace]{hcl_palettes}}). To specify your own palette use e.g. the \code{\link{colors}}
+data is greater than 12, colors are set using \code{hcl.colors} with 
+the "Set 3" palette (See \code{\link[grDevices]{hcl.colors}}). To specify your own palette use e.g. the \code{\link{colors}}
 function, or the RColorBrewer or colorspace packages.}
 
 	\item{missing.color}{alternative color for representing missing

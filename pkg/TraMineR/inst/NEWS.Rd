@@ -15,16 +15,20 @@
       \item
       \code{seqdist()} now gives a zero weight to the \code{refseq} when specified 
       as a state sequence object.
+      \item
+      \code{seqdist()} now uses \code{hcl.colors} (grDevices) instead of
+      \code{qualitative_hcl} (colorspace) to set default colors when n>13.
+      (Transparent to the user.)
     }
   }
 
   \subsection{Bug fixes}{
     \itemize{
       \item
+      \code{rbind.stslist()} bad handling of missing states.
+      \item
       \code{seqdist()}, argument \code{sm} did not recognize values \code{"INDELS"} and
       \code{"INDELSLOG"}.
-      \item
-      \code{rbind.stslist()} bad handling of missing states.
       \item
       \code{seqdist()} raised warnings when \code{method='OMslen'} because of a
       vector of conditions in an if test.
