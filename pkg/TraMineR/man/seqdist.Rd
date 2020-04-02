@@ -18,7 +18,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   global.pdotj = NULL, prox = NULL)
 }
 \arguments{
-  \item{seqdata}{ 
+  \item{seqdata}{
     State sequence object of class \code{stslist}.
     The sequence data to use.
     Use \code{\link{seqdef}} to create such an object.
@@ -72,10 +72,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     The state-dependent insertion/deletion costs when a vector of doubles and
     \code{method = "OM"} or \code{method = "OMstran"}. It contains an indel cost
     for each state in the same order as the alphabet.
-    
-    When \code{"auto"}, the indel is set as \code{max(sm)/2} when \code{sm} is 
-    a matrix and is computed by means of \code{\link{seqcost}} when \code{sm} is 
-    a string specifying a cost method. 
+
+    When \code{"auto"}, the indel is set as \code{max(sm)/2} when \code{sm} is
+    a matrix and is computed by means of \code{\link{seqcost}} when \code{sm} is
+    a string specifying a cost method.
 
     % Others: OMloc, HAM, DHD, CHI2, EUCLID, LCS, LCP, RLCP, NMS, NMSMST, SVRspell.
   }
@@ -224,7 +224,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   \item{weighted}{
     Logical.
     Default: \code{TRUE}.
-    When \code{method} is \code{"CHI2"},
+    When \code{method} is \code{"CHI2"} or when \code{sm} is a string (method),
     should the distributions of the states account for the sequence weights
     in \code{seqdata}? See \code{\link{seqdef}}.
   }

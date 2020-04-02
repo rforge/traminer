@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-03-28] (Development version)}{
+\section{Changes in version 2.1-16 [2020-04-02] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -12,6 +12,9 @@
       \code{seqdist()} now uses the \code{rbind} stslist method to add \code{refseq} to
       the set of sequences when it is a state sequence object.
       (Transparent to the user.)
+      \item
+      \code{seqdist()} now gives a zero weight to the \code{refseq} when specified 
+      as a state sequence object.
     }
   }
 
@@ -22,6 +25,12 @@
       \code{"INDELSLOG"}.
       \item
       \code{rbind.stslist()} bad handling of missing states.
+      \item
+      \code{seqdist()} raised warnings when \code{method='OMslen'} because of a
+      vector of conditions in an if test.
+      \item
+      \code{seqdist()} ignored the 'weighted' value when computing substitution
+      costs with the sm method.
     }
   }
 }

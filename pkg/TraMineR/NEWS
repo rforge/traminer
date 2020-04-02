@@ -1,18 +1,24 @@
 ## =========
-Version 2.1-16 [2020-03-28] (Development version)
+Version 2.1-16 [2020-04-02] (Development version)
 
 Changes in existing functions:
-  - seqdist(), argument 'indel' can now be "auto" (new default) 
-    in which case a suitable indel value is generated for the 
-    provided sm.  
-  - seqdist() now uses the rbind stslist method to add refseq to 
-    the set of sequences when it is a sequence object. 
+  - seqdist(), argument 'indel' can now be "auto" (new default)
+    in which case a suitable indel value is generated for the
+    provided sm.
+  - seqdist() now uses the rbind stslist method to add refseq to
+    the set of sequences when it is a sequence object.
     (Transparent to the user.)
+  - seqdist() now gives a zero weight to the refseq when specified
+    as a state sequence object.
 
 Bug Fixes:
   - seqdist(), argument 'sm' did not recognize values "INDELS" and
     "INDELSLOG".
   - rbind.stslist() bad handling of missing states.
+  - seqdist() raised warnings when method='OMslen' because of a 
+    vector of conditions in an if test.
+  - seqdist() ignored the 'weighted' value when computing substitution 
+    costs with the sm method.
 
 ## =========
 Version 2.0-15 [2020-03-18]

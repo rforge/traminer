@@ -388,7 +388,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
         #msg.stop.na("sm")
       #}
       msg("Computing sm with seqcost using ",method)
-      sm <- seqcost(seqdata, sm, with.missing = with.missing, cval = cost, miss.cost = cost, time.varying = tv)
+      sm <- seqcost(seqdata, sm, with.missing = with.missing, cval = cost, miss.cost = cost, time.varying = tv, weighted = weighted)
       if (indel.type=="auto"){
 
         indel <- sm$indel
@@ -413,7 +413,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
         # Autogenerate sm
         msg("creating a 'sm' with the costs derived from the transition rates")
         #sm.type <- "array" # Not used. Should be here if it changes.
-        sm <- seqsubm(seqdata, "TRATE", with.missing=with.missing, cval = 4, miss.cost = 4, time.varying = TRUE)
+        sm <- seqsubm(seqdata, "TRATE", with.missing=with.missing, cval = 4, miss.cost = 4, time.varying = TRUE, weighted = weighted)
       } else {
         msg.stop.miss("sm")
       }
@@ -444,6 +444,12 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     ##  alphabet=alphabet(seqdata),
     ##  missing = seqdata.nr))
     ## We use the rbind method available since v2.0-16
+    ##  and set a zero weight for refseq
+    if (is.null(attr(seqdata,"weights")) || !weighted) {
+      attr(seqdata,"weights") <- rep(1,nrow(seqdata))
+      weighted <- TRUE
+    }
+    attr(refseq,"weights") <- 0
     seqdata <- rbind(seqdata,refseq)
   }
 
@@ -505,7 +511,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     dur.mat <- matrix(0, nrow = nrow(dseqs.num), ncol = ncol(dseqs.num))
     for (i in 1:nrow(dseqs.num)) {
       y <- dseqs.dur[i, !is.na(dseqs.dur[i, ])]
-      if(y>0) dur.mat[i, 1:sum(y)] <- rep(y, times = y)
+      if(length(y) > 0) dur.mat[i, 1:sum(y)] <- rep(y, times = y)
     }
     dur.mat <- dur.mat ^ (-1 * h)
     rm(dseqs.dur)
