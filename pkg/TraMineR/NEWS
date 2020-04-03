@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-16 [2020-04-02] (Development version)
+Version 2.1-16 [2020-04-03] (Development version)
 
 Changes in existing functions:
   - seqdist(), argument 'indel' can now be "auto" (new default)
@@ -13,6 +13,7 @@ Changes in existing functions:
   - seqdist() now uses hcl.colors (grDevices) instead of 
     qualitative_hcl (colorspace) to set default colors when n>13.
     (Transparent to the user.)
+  - seqdist() refseq can be used with OMstran.
 
 Bug Fixes:
   - rbind.stslist() bad handling of missing states.
@@ -22,6 +23,9 @@ Bug Fixes:
     vector of conditions in an if test.
   - seqdist() ignored the 'weighted' value when computing substitution 
     costs with the sm method.
+  - seqdist() for OMstran ignored the 'weighted' value when computing
+    probability based indels (i.e. with transindel="prob").
+
 
 ## =========
 Version 2.0-15 [2020-03-18]

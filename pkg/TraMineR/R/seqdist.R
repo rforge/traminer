@@ -181,9 +181,10 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     msg.stop.impl("sm", method, values = c("INDELS", "INDELSLOG")) # See seqcost()
 
   # refseq
-  if (refseq.type != "none" && method %in% c("OMstran", "CHI2", "EUCLID"))
+  #if (refseq.type != "none" && method %in% c("OMstran", "CHI2", "EUCLID"))
+  if (refseq.type != "none" && method %in% c("CHI2", "EUCLID"))
     msg.stop.impl("refseq", method)
-  if (refseq.type == "sequence" && ! method %in% c("OM", "HAM", "DHD", "LCS", "LCP", "RLCP"))
+  if (refseq.type == "sequence" && ! method %in% c("OM", "OMstran", "HAM", "DHD", "LCS", "LCP", "RLCP"))
     msg.stop.impl("refseq", method, when = "it is an external sequence object")
 
   # norm
@@ -726,10 +727,29 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   else if (method == "OMstran") {
     # TODO Integrate into C++ code instead of using OMstran()
     # OMstran() calls seqdist() with 'method = "OM"'
-    distances <- OMstran(seqdata, indel = indel, sm = sm,
-      full.matrix = full.matrix, transindel = transindel, otto = otto,
-      previous = previous, add.column = add.column, with.missing=with.missing)
-    result <- distances
+
+    # Dissimilarities with a reference sequence
+    if (refseq.type != "none") {
+      distances <- OMstran(seqdata, indel = indel, sm = sm,
+        full.matrix = full.matrix, transindel = transindel, otto = otto,
+        previous = previous, add.column = add.column, with.missing=with.missing,
+        weighted = weighted, refseq = refseq.id)
+
+      #result <- distances[seqdata.didxs]
+      result <- distances
+      names(result) <- NULL
+
+      # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
+      if (refseq.type == "sequence")
+        result <- result[-length(result)]
+    }
+    else {
+      distances <- OMstran(seqdata, indel = indel, sm = sm,
+        full.matrix = full.matrix, transindel = transindel, otto = otto,
+        previous = previous, add.column = add.column, with.missing=with.missing,
+        weighted = weighted)
+      result <- distances
+    }
   }
   # Other methods
   else {

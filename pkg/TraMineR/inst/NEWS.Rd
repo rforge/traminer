@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-04-02] (Development version)}{
+\section{Changes in version 2.1-16 [2020-04-03] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -19,6 +19,8 @@
       \code{seqdist()} now uses \code{hcl.colors} (grDevices) instead of
       \code{qualitative_hcl} (colorspace) to set default colors when n>13.
       (Transparent to the user.)
+      \item
+      \code{seqdist()} \code{refseq} can be used with OMstran.
     }
   }
 
@@ -33,8 +35,11 @@
       \code{seqdist()} raised warnings when \code{method='OMslen'} because of a
       vector of conditions in an if test.
       \item
-      \code{seqdist()} ignored the 'weighted' value when computing substitution
+      \code{seqdist()} ignored the \code{weighted} value when computing substitution
       costs with the sm method.
+      \item
+      \code{seqdist()} for OMstran ignored the \code{weighted} value when computing
+      probability based indels (i.e. with \code{transindel="prob"}).
     }
   }
 }
