@@ -182,10 +182,10 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
   # refseq
   #if (refseq.type != "none" && method %in% c("OMstran", "CHI2", "EUCLID"))
-  if (refseq.type != "none" && method %in% c("CHI2", "EUCLID"))
-    msg.stop.impl("refseq", method)
-  if (refseq.type == "sequence" && ! method %in% c("OM", "OMstran", "HAM", "DHD", "LCS", "LCP", "RLCP"))
-    msg.stop.impl("refseq", method, when = "it is an external sequence object")
+  #if (refseq.type != "none" && method %in% c("CHI2", "EUCLID"))
+  #  msg.stop.impl("refseq", method)
+  #if (refseq.type == "sequence" && ! method %in% c("OM", "OMstran", "HAM", "DHD", "LCS", "LCP", "RLCP", "CHI2", "EUCLID"))
+  #  msg.stop.impl("refseq", method, when = "it is an external sequence object")
 
   # norm
   if (norm != "none" && ! method %in% c("OM", "HAM", "DHD", "CHI2", "EUCLID", "LCS", "LCP", "RLCP"))
@@ -476,7 +476,10 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     if (refseq.type == "sequence") {
       # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
       refseq.raw <- refseq
-      refseq.id <- seqdata.didxs[nseqs + 1]
+      if (method %in% c("OMstran","CHI2", "EUCLID"))
+        refseq.id <- nseqs + 1
+      else
+        refseq.id <- seqdata.didxs[nseqs + 1]
     }
     # most frequent
     else if (refseq.type == "most frequent") {
@@ -485,7 +488,11 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
       msg("the most frequent sequence appears", length(mfseq.idxs), "time(s)")
       mfseq.idx <- mfseq.idxs[1]
       refseq.raw <- seqdata[mfseq.idx, ]
-      refseq.id <- seqdata.didxs[mfseq.idx]
+      if (method %in% c("OMstran","CHI2", "EUCLID"))
+        refseq.id <- mfseq.idx
+      else
+        refseq.id <- seqdata.didxs[mfseq.idx]
+
       rm(mfseq.freq)
       rm(mfseq.idxs)
       rm(mfseq.idx)
@@ -558,12 +565,13 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   #### Pre-process data (part 2/2) ####
 
   # Modified dseqs.num for OMspell, NMSMST, SVRspell
-  dn <- nrow(dseqs.num)
+  ndn <- nrow(dseqs.num)
   # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
-  ndn <- if (refseq.type == "sequence") dn-1 else dn
+  #ndn <- if (refseq.type == "sequence") dn-1 else dn
+  incl.refseq <- if (refseq.type == "sequence") "(including refseq)" else ""
   seq.or.spell <- if (method %in% c("OMspell", "SVRspell")) "spell sequences" else "sequences"
-  msg(ndn, "distinct ", seq.or.spell)
-  rm(dn)
+  msg(ndn, "distinct ", seq.or.spell, incl.refseq)
+  ##rm(dn)
   rm(ndn)
   rm(seq.or.spell)
 
@@ -718,10 +726,19 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   if (method %in% c("CHI2", "EUCLID")) {
     # TODO Integrate into C++ code instead of using CHI2()
     is.EUCLID <- if (method == "EUCLID") TRUE else FALSE
-    distances <- CHI2(seqdata, breaks = breaks, step = step,
-      with.missing = with.missing, norm = norm.chi2euclid,  weighted = weighted,
-      overlap = overlap, euclid = is.EUCLID, global.pdotj=global.pdotj)
-    result <- if (full.matrix) dist2matrix(distances) else distances
+    if (refseq.type == "none") {
+      distances <- CHI2(seqdata, breaks = breaks, step = step,
+        with.missing = with.missing, norm = norm.chi2euclid,  weighted = weighted,
+        overlap = overlap, euclid = is.EUCLID, global.pdotj=global.pdotj)
+      result <- if (full.matrix) dist2matrix(distances) else distances
+    }
+    else { ## dist to ref
+      result <- CHI2(seqdata, breaks = breaks, step = step,
+        with.missing = with.missing, norm = norm.chi2euclid,  weighted = weighted,
+        overlap = overlap, euclid = is.EUCLID, global.pdotj=global.pdotj, refseq=refseq.id)
+      names(result) <- rownames(seqdata)
+      if (refseq.type == "sequence") result <- result[-length(result)]
+    }
   }
   # OMstran
   else if (method == "OMstran") {
@@ -730,14 +747,12 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
     # Dissimilarities with a reference sequence
     if (refseq.type != "none") {
-      distances <- OMstran(seqdata, indel = indel, sm = sm,
+      result <- OMstran(seqdata, indel = indel, sm = sm,
         full.matrix = full.matrix, transindel = transindel, otto = otto,
         previous = previous, add.column = add.column, with.missing=with.missing,
         weighted = weighted, refseq = refseq.id)
 
-      #result <- distances[seqdata.didxs]
-      result <- distances
-      names(result) <- NULL
+      names(result) <- rownames(seqdata)
 
       # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
       if (refseq.type == "sequence")
@@ -764,6 +779,9 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     if (refseq.type != "none") {
       distances <- .Call(C_cstringrefseqdistance, dseqs.mat.vect, dseqs.mat.dim,
         dseqs.lens.vect, params, norm.num, method.num, as.integer(refseq.id))
+
+      if (method %in% c("NMS", "NMSMST", "SVRspell"))
+        distances <- sqrt(distances)
 
       result <- distances[seqdata.didxs]
       names(result) <- NULL

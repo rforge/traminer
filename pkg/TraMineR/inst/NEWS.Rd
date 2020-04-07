@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-04-03] (Development version)}{
+\section{Changes in version 2.1-16 [2020-04-07] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -13,14 +13,15 @@
       the set of sequences when it is a state sequence object.
       (Transparent to the user.)
       \item
-      \code{seqdist()} now gives a zero weight to the \code{refseq} when specified 
+      \code{seqdist()} now gives a zero weight to the \code{refseq} when specified
       as a state sequence object.
+      \item
+      \code{seqdist()} \code{refseq} can also be used with OMstran, CHI2, and EUCLID,
+      and \code{refseq} as a state sequence object works with all methods.
       \item
       \code{seqdist()} now uses \code{hcl.colors} (grDevices) instead of
       \code{qualitative_hcl} (colorspace) to set default colors when n>13.
       (Transparent to the user.)
-      \item
-      \code{seqdist()} \code{refseq} can be used with OMstran.
     }
   }
 
@@ -40,6 +41,12 @@
       \item
       \code{seqdist()} for OMstran ignored the \code{weighted} value when computing
       probability based indels (i.e. with \code{transindel="prob"}).
+    }
+  }
+  \subsection{Misc.}{
+    \itemize{
+      \item
+      Deleted unused OMVI2distance h and cpp files.
     }
   }
 }
