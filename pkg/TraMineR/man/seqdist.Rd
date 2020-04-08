@@ -36,15 +36,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     Default: \code{NULL}.
     The baseline sequence to compute the distances from.
 
-    The most frequent sequence (\code{0}) or a sequence in \code{seqdata} at a
-    specified index (strictly greater than \code{0}) when an integer and
-    \code{method} is one \code{"OM"}, \code{"OMloc"}, \code{"OMslen"},
-    \code{"OMspell"}, \code{"HAM"}, \code{"DHD"}, \code{"LCS"}, \code{"LCP"},
-    \code{"RLCP"}, \code{"NMS"}, \code{"NMSMST"}, \code{"SVRspell"}, or \code{"TWED"}.
+    When an integer, the index of a sequence in \code{seqdata} or \code{0} for the most frequent sequence.
 
-    An external sequence when a state sequence object and \code{method} is one
-    of \code{"OM"}, \code{"HAM"}, \code{"DHD"}, \code{"LCS"}, \code{"LCP"}, or
-    \code{"RLCP"}. It must have a single row and the same alphabet as \code{seqdata}.
+    When a state sequence object, it must contain a single sequence and have the same 
+    alphabet as \code{seqdata}.
   }
   \item{norm}{
     String.
@@ -280,10 +275,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     \verb{OMloc} \tab \verb{sm, expcost, context, refseq} \cr
     \verb{OMslen} \tab \verb{sm, indel, link, h, refseq} \cr
     \verb{OMspell} \tab \verb{sm, indel, tpow, expcost, refseq} \cr
-    \verb{OMstran} \tab \verb{sm, indel, transindel, otto, previous, add.column} \cr
+    \verb{OMstran} \tab \verb{sm, indel, transindel, otto, previous, add.column, refseq} \cr
     \verb{HAM, DHD} \tab \verb{sm, norm, refseq}\cr
-    \verb{CHI2} \tab \verb{breaks, step, overlap, norm, weighted, global.pdotj}\cr
-    \verb{EUCLID} \tab \verb{breaks, step, overlap, norm}\cr
+    \verb{CHI2} \tab \verb{breaks, step, overlap, norm, weighted, global.pdotj, refseq}\cr
+    \verb{EUCLID} \tab \verb{breaks, step, overlap, norm, refseq}\cr
     \verb{LCS, LCP, RLCP} \tab \verb{norm, refseq}\cr
     \verb{NMS} \tab \verb{prox, kweights, refseq}\cr
     \verb{NMSMST} \tab \verb{kweights, tpow, refseq}\cr
@@ -320,7 +315,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   on each interval. Note that for 'CHI2' the maximal distance on each interval
   depends on the state distribution on the interval.
 
-  When sequences contain gaps and the \code{gaps = NA} option was passed to
+  When sequences contain gaps and the \code{left = NA}, \code{gaps = NA}, or \code{right = NA} 
+  option was passed to
   \code{\link{seqdef}} (i.e. when there are non deleted missing values), the
   \code{with.missing} argument should be set as \code{TRUE}. If left as
   \code{FALSE} the function stops when it encounters a gap. This is to make the
