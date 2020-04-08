@@ -75,7 +75,7 @@ seqplot.rf_internal <- function(seqdata, k=floor(nrow(seqdata)/10), diss, sortv=
 		
 	}
 
-	##Attribute to each sequences the medoid sequences
+	##Assign the medoid sequence to each sequence
 	seqtoplot <- seqdata[kmedoid.index, ]
 	
 	##Correct weights to their original weights (otherwise we use the medoid weights)

@@ -11,15 +11,15 @@
 \usage{
 seqCompare(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     s=100, seed=36963, stat="all", squared="LRTonly",
-    weighted=TRUE, opt=NULL, method, ...)
+    weighted=TRUE, opt=NULL, BFopt=NULL, method, ...)
 
 seqLRT(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100,
     seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL,
-    method, ...)
+    BFopt=NULL, method, ...)
 
 seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100,
     seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL,
-    method, ...)
+    BFopt=NULL, method, ...)
 }
 
 \arguments{
@@ -47,7 +47,9 @@ seqBIC(seqdata, seqdata2=NULL, group=NULL, set=NULL, s=100,
   }
   \item{weighted}{Logical or String. Should weights be taken into account when available? Can also be \code{"by.group"}, in which case weights are used and normalized to respect group sizes.
   }
-  \item{opt}{Integer. Either 1 or 2. Computation option. When 1, the distance matrix is computed successively for each pair of samples of size s. When 2, the distances are computed only once for each pair of sets of observed sequences and the distances for the samples are extracted from that matrix. When \code{NULL} (default), 1 is chosen when the sum of sizes of the two groups is larger than 2*s and 2 otherwise.
+  \item{opt}{Integer or \code{NULL}. Either 1 or 2. Computation option. When 1, the distance matrix is computed successively for each pair of samples of size s. When 2, the distances are computed only once for each pair of sets of observed sequences and the distances for the samples are extracted from that matrix. When \code{NULL} (default), 1 is chosen when the sum of sizes of the two groups is larger than 2*s and 2 otherwise.
+  }
+  \item{BFopt}{Integer or \code{NULL}. Either 1 or 2. Applies only when BIC is computed on multiple samples. When 1 the displayed Bayes Factor (BF) is the averaged BF. When 2, the displayed BF is obtained from the averaged BIC. When \code{NULL} both BFs are displayed.
   }
 \item{method}{String. Method for computing sequence distances. See documentation for \code{\link[TraMineR]{seqdist}}. Additional arguments may be required depending on the method chosen.
 }

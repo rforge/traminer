@@ -1,4 +1,4 @@
-                CHANGES IN TraMineRextras VERSION 0.5.8 [2020-03-31] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.5.8 [2020-04-08] (Development version)
 
 New functions
     o   seqCompare() BIC and Likelihood ratio test (LRT) for comparing

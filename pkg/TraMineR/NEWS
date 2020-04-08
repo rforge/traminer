@@ -10,8 +10,9 @@ Changes in existing functions:
     (Transparent to the user.)
   - seqdist() now gives a zero weight to the refseq when specified
     as a state sequence object.
-  - seqdist() refseq can also be used with OMstran, CHI2, and EUCLID,
-    and refseq as a state sequence object works with all methods.
+  - seqdist() refseq including refseq as a state sequence
+    object can be used with all methods (did not work with 
+    OMstran, CHI2, and EUCLID).
   - seqdist() now uses hcl.colors (grDevices) instead of
     qualitative_hcl (colorspace) to set default colors when n>13.
     (Transparent to the user.)
@@ -25,7 +26,7 @@ Bug Fixes:
   - seqdist() ignored the 'weighted' value when computing substitution
     costs with the sm method.
   - seqdist() for OMstran ignored the 'weighted' value when computing
-    probability based indels (i.e. with transindel="prob").
+    probability-based indels (i.e. with transindel="prob").
     
 Misc:
   - Deleted unused OMVI2distance cpp and h files

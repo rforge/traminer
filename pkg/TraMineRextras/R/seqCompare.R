@@ -3,22 +3,24 @@
 ## version 1.0, March 2020
 
 seqBIC <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, method, ...)
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL,
+  BFopt=NULL, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="BIC", squared, weighted, opt, method, ...))
+         stat="BIC", squared, weighted, opt, BFopt, method, ...))
 }
 
 seqLRT <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
-  s=100, seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL, method, ...)
+  s=100, seed=36963, squared="LRTonly", weighted=TRUE, opt=NULL,
+  BFopt=NULL, method, ...)
 {
   return(seqCompare(seqdata, seqdata2, group, set, s, seed,
-         stat="LRT", squared, weighted, opt, method, ...))
+         stat="LRT", squared, weighted, opt, BFopt, method, ...))
 }
 
 seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   s=100, seed=36963, stat="all", squared="LRTonly",
-  weighted=TRUE, opt=NULL, method, ...)
+  weighted=TRUE, opt=NULL, BFopt=NULL, method, ...)
 {
   #require("gtools")
   #require("TraMineR")
@@ -178,6 +180,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   nc <- ifelse(is.LRT & is.BIC, 4, 2)
   Results <- matrix(NA,G,nc)
   oopt <- opt
+  multsple <- FALSE
 
   ## Constructing vector of indexes of sampled cases
   #r.s1=r.s2 = list(rep(NA,G))
@@ -208,6 +211,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
         weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
       }
 
+      multsple <- nrow(r.s1) > 1 || multsple
     ### new complete samples without replacement of length s over G comparisons
       t<-matrix(NA,nrow=nrow(r.s1),ncol=nc)
       for (j in 1:nrow(r.s1)) {
@@ -237,7 +241,24 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
   }
   colnames <- NULL
   if (is.LRT) colnames <- c("LRT", "p-value")
-  if (is.BIC) colnames <- c(colnames, "BIC diff.", "Bayes Factor")
+  if (is.BIC) {
+    if (is.null(BFopt) && multsple) {
+      BF2 <- exp(Results[,nc-1]/2)
+      Results <- cbind(Results, BF2)
+      colnames <- c(colnames, "BIC diff.", "Bayes Factor (Avg)", "Bayes Factor (From Avg BIC)")
+    }
+    else if (BFopt==1 && multsple) {
+      colnames <- c(colnames, "BIC diff.", "Bayes Factor (Avg)")
+    }
+    else if (BFopt==2 && multsple) {
+      BF2 <- exp(Results[,nc-1]/2)
+      Results[,nc] <- BF2
+      colnames <- c(colnames, "BIC diff.", "Bayes Factor (From Avg BIC)")
+    }
+    else {
+      colnames <- c(colnames, "BIC diff.", "Bayes Factor")
+    }
+  }
   colnames(Results) <- colnames
   if(!is.null(set)) rownames(Results) <- lev.set
 

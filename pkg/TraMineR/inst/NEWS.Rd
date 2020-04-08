@@ -16,8 +16,8 @@
       \code{seqdist()} now gives a zero weight to the \code{refseq} when specified
       as a state sequence object.
       \item
-      \code{seqdist()} \code{refseq} can also be used with OMstran, CHI2, and EUCLID,
-      and \code{refseq} as a state sequence object works with all methods.
+      \code{seqdist()} \code{refseq} including \code{refseq} as a state sequence 
+      object can be used with all methods (did not work with OMstran, CHI2, and EUCLID).
       \item
       \code{seqdist()} now uses \code{hcl.colors} (grDevices) instead of
       \code{qualitative_hcl} (colorspace) to set default colors when n>13.
@@ -40,7 +40,7 @@
       costs with the sm method.
       \item
       \code{seqdist()} for OMstran ignored the \code{weighted} value when computing
-      probability based indels (i.e. with \code{transindel="prob"}).
+      probability-based indels (i.e. with \code{transindel="prob"}).
     }
   }
   \subsection{Misc.}{
