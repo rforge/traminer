@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-04-07] (Development version)}{
+\section{Changes in version 2.1-16 [2020-04-11] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -16,8 +16,10 @@
       \code{seqdist()} now gives a zero weight to the \code{refseq} when specified
       as a state sequence object.
       \item
-      \code{seqdist()} \code{refseq} including \code{refseq} as a state sequence 
+      \code{seqdist()} \code{refseq} including \code{refseq} as a state sequence
       object can be used with all methods (did not work with OMstran, CHI2, and EUCLID).
+      \item
+      \code{seqdist()} vector \code{indel} now supported by OMspell and OMslen (in addition to OM and OMstran).
       \item
       \code{seqdist()} now uses \code{hcl.colors} (grDevices) instead of
       \code{qualitative_hcl} (colorspace) to set default colors when n>13.

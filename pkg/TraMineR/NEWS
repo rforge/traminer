@@ -1,5 +1,5 @@
 ## =========
-Version 2.1-16 [2020-04-07] (Development version)
+Version 2.1-16 [2020-04-11] (Development version)
 
 Changes in existing functions:
   - seqdist(), argument 'indel' can now be "auto" (new default)
@@ -11,8 +11,10 @@ Changes in existing functions:
   - seqdist() now gives a zero weight to the refseq when specified
     as a state sequence object.
   - seqdist() refseq including refseq as a state sequence
-    object can be used with all methods (did not work with 
+    object can be used with all methods (did not work with
     OMstran, CHI2, and EUCLID).
+  - seqdist() vector indel now supported by OMspell and OMslen 
+    (in addition to OM and OMstran).
   - seqdist() now uses hcl.colors (grDevices) instead of
     qualitative_hcl (colorspace) to set default colors when n>13.
     (Transparent to the user.)
@@ -27,7 +29,7 @@ Bug Fixes:
     costs with the sm method.
   - seqdist() for OMstran ignored the 'weighted' value when computing
     probability-based indels (i.e. with transindel="prob").
-    
+
 Misc:
   - Deleted unused OMVI2distance cpp and h files
 

@@ -276,7 +276,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
   # OMloc, OMslen, OMspell, HAM, DHD, CHI2, EUCLID, LCS, LCP, RLCP, NMS, NMSMST, SVRspell, TWED
   ##if (! method %in% c("OM", "OMstran") && indel.type == "vector")
-  if (method %in% c("OMslen", "OMspell", "TWED") && indel.type == "vector"){
+  ##if (method %in% c("OMslen","OMspell", "TWED") && indel.type == "vector"){
+  if (method == "TWED" && indel.type == "vector"){
     msg.warn("indel vector not supported by the chosen method, max(indel) used instead!")
     indel <- max(indel)
     indel.type <- "number"
@@ -394,7 +395,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
         indel <- sm$indel
         indel.type <- ifelse (length(indel) > 1, "vector", "number")
-        if (method %in% c("OMslen", "OMspell", "TWED") && indel.type == "vector"){
+        #if (method %in% c("OMslen", "OMspell", "TWED") && indel.type == "vector"){
+        if (method == "TWED" && indel.type == "vector"){
           indel <- max(indel)
           indel.type <- "number"
         }
@@ -513,6 +515,11 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
   #### Compute method specific values ####
 
+  if (method %in% c("OMslen","OMspell","TWED") && indel.type == "number"){
+    indel <- rep(indel, nstates)
+    indel.type <- "vector"
+  }
+
   # OMslen
   if (method == "OMslen") {
     dseqs.dur <- seqdur(dseqs.num, with.missing=with.missing)
@@ -609,7 +616,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   # OMloc
   else if (method == "OMloc") {
     params[["alphasize"]] <- nstates
-    params[["indel"]] <- max(sm) * (expcost + context)
+    params[["indel"]] <- max(sm) * (expcost + context)  ## not used, indels computed in C++
     params[["indelmethod"]] <- as.integer(1)
     params[["scost"]] <- sm
     params[["localcost"]] <- context
@@ -618,7 +625,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   # OMslen
   else if (method == "OMslen") {
     params[["alphasize"]] <- nstates
-    params[["indel"]] <- indel
+    params[["indel"]] <- max(indel)
+    params[["indels"]] <- indel
     params[["seqdur"]] <- as.double(dur.mat)
 
     if (link == "mean") {
@@ -636,7 +644,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   # OMspell
   else if (method == "OMspell") {
     params[["alphasize"]] <- nstates
-    params[["indel"]] <- indel
+    params[["indel"]] <- max(indel)
+    params[["indels"]] <- indel
     params[["scost"]] <- sm
     params[["seqdur"]] <- as.double(dseqs.dur)
     params[["timecost"]] <- expcost
@@ -683,6 +692,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   else if (method == "TWED") {
     params[["alphasize"]] <- nstates
     params[["indel"]] <- indel
+    #params[["indel"]] <- max(indel)
+    #params[["indels"]] <- indel
     params[["lambda"]] <- h
     params[["nu"]] <- nu
     params[["scost"]] <- sm

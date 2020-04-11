@@ -38,7 +38,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
 
     When an integer, the index of a sequence in \code{seqdata} or \code{0} for the most frequent sequence.
 
-    When a state sequence object, it must contain a single sequence and have the same 
+    When a state sequence object, it must contain a single sequence and have the same
     alphabet as \code{seqdata}.
   }
   \item{norm}{
@@ -65,12 +65,13 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     \code{"OMstran"}, or \code{"TWED"}.
 
     The state-dependent insertion/deletion costs when a vector of doubles and
-    \code{method = "OM"} or \code{method = "OMstran"}. It contains an indel cost
-    for each state in the same order as the alphabet.
+    \code{method} is one of \code{"OM"}, \code{"OMslen"}, \code{"OMspell"},
+    \code{"OMstran"}. It contains an indel cost by state in the order of the alphabet.
 
     When \code{"auto"}, the indel is set as \code{max(sm)/2} when \code{sm} is
     a matrix and is computed by means of \code{\link{seqcost}} when \code{sm} is
-    a string specifying a cost method.
+    a string specifying a cost method. For \code{method="TWED"}, the auto indel 
+    is set as 100. 
 
     % Others: OMloc, HAM, DHD, CHI2, EUCLID, LCS, LCP, RLCP, NMS, NMSMST, SVRspell.
   }
@@ -315,7 +316,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   on each interval. Note that for 'CHI2' the maximal distance on each interval
   depends on the state distribution on the interval.
 
-  When sequences contain gaps and the \code{left = NA}, \code{gaps = NA}, or \code{right = NA} 
+  When sequences contain gaps and the \code{left = NA}, \code{gaps = NA}, or \code{right = NA}
   option was passed to
   \code{\link{seqdef}} (i.e. when there are non deleted missing values), the
   \code{with.missing} argument should be set as \code{TRUE}. If left as

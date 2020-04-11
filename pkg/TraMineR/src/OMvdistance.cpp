@@ -3,14 +3,14 @@ OMvdistance::OMvdistance(SEXP normS, SEXP Ssequences, SEXP seqdim, SEXP lenS)
 	:OMdistance(normS, Ssequences, seqdim, lenS){
 }
 OMvdistance::OMvdistance(OMvdistance *dc)
-	:OMdistance(dc), seqdur(dc->seqdur), sublink(dc->sublink){
+	:OMdistance(dc), seqdur(dc->seqdur), indellist(dc->indellist), sublink(dc->sublink){
 }
 
 void OMvdistance::setParameters(SEXP params){
 	OMdistance::setParameters(params);
 	this->seqdur=REAL(getListElement(params, "seqdur"));
+	this->indellist=REAL(getListElement(params, "indels"));
 	this->sublink=INTEGER(getListElement(params, "sublink"))[0];
-	
 }
 
 OMvdistance::~OMvdistance(){
@@ -30,14 +30,17 @@ double OMvdistance::distance(const int&is, const int& js){
 	int mSuf = m+1, nSuf = n+1;
     int prefix=0;
 
+	// GR initalize fmat using state dependent indels
 	for(int ii=prefix+1; ii<mSuf; ii++){
+		i_state=sequences[MINDICE(is, ii-1, nseq)];
 		fmat[MINDICE(ii-prefix,0,fmatsize)] = fmat[MINDICE(ii-prefix-1,0,fmatsize)]+
-				getIndel(MINDICE(is, ii-1, nseq));
+				getIndel(MINDICE(is, ii-1, nseq), i_state);
 	}
 
 	for(int ii=prefix+1; ii<nSuf; ii++){
+		j_state=sequences[MINDICE(js, ii-1, nseq)];
 		fmat[MINDICE(0,ii-prefix,fmatsize)] = fmat[MINDICE(0,ii-prefix-1,fmatsize)]+
-				getIndel(MINDICE(js, ii-1, nseq)); 
+				getIndel(MINDICE(js, ii-1, nseq), j_state); 
 	}
 		TMRLOGMATRIX(10,  fmat, mSuf-prefix, nSuf-prefix, fmatsize);
 	TMRLOG(5,"m =%d, n=%d, mSuf=%d, nSuf=%d i=%d, j=%d, prefix=%d, fmatsize=%d\n", m, n, mSuf, nSuf, i, j, prefix, fmatsize);
@@ -62,10 +65,10 @@ double OMvdistance::distance(const int&is, const int& js){
 			//minimum=fmat[MINDICE(i-prefix,j-1-prefix,fmatsize)]+ indel;
 			//TMRLOG(6,"fmat_ij_prefix =%d,th =%d \n", fmat_ij_prefix, (MINDICE(i-prefix,j-prefix,fmatsize)));
 			//Adding i_indel
-            minimum=fmat[fmat_ij_prefix-fmatsize]+getIndel(j_state_indice);
+            minimum=fmat[fmat_ij_prefix-fmatsize]+getIndel(j_state_indice, j_state);
             //j_indel=fmat[MINDICE(i-1-prefix,j-prefix,fmatsize)]+ indel;
 			//add j_indel
-            j_indel=fmat[fmat_ij_prefix-1]+getIndel(i_state_indice);
+            j_indel=fmat[fmat_ij_prefix-1]+getIndel(i_state_indice, i_state);
             if (j_indel<minimum)minimum=j_indel;
 			
 			//////////////////////////////
