@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-04-11] (Development version)}{
+\section{Changes in version 2.1-16 [2020-04-14] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -43,7 +43,10 @@
       \item
       \code{seqdist()} for OMstran ignored the \code{weighted} value when computing
       probability-based indels (i.e. with \code{transindel="prob"}).
-    }
+      \item
+      \code{seqdist()} TWED wrongly depended on the indel value. Now indel
+      serves only in the improbable case of empty sequences.
+   }
   }
   \subsection{Misc.}{
     \itemize{

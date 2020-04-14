@@ -325,7 +325,10 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   #### Configure sm and indel ####
 
   if (indel.type =="auto" && sm.type == "matrix"){
-    indel <- max(sm)/2
+    if (method == "TWED")
+      indel <- 2*max(sm) + nu + h
+    else
+      indel <- max(sm)/2
     indel.type <- "number"
   }
 
@@ -396,8 +399,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
         indel <- sm$indel
         indel.type <- ifelse (length(indel) > 1, "vector", "number")
         #if (method %in% c("OMslen", "OMspell", "TWED") && indel.type == "vector"){
-        if (method == "TWED" && indel.type == "vector"){
-          indel <- max(indel)
+        if (method == "TWED" ){
+          indel <- 2*max(sm) + nu + h
           indel.type <- "number"
         }
         msg("generated an indel of type ",indel.type)
@@ -515,7 +518,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
   #### Compute method specific values ####
 
-  if (method %in% c("OMslen","OMspell","TWED") && indel.type == "number"){
+  if (method %in% c("OMslen","OMspell") && indel.type == "number"){
     indel <- rep(indel, nstates)
     indel.type <- "vector"
   }
@@ -691,9 +694,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   # TWED
   else if (method == "TWED") {
     params[["alphasize"]] <- nstates
-    params[["indel"]] <- indel
-    #params[["indel"]] <- max(indel)
-    #params[["indels"]] <- indel
+    params[["indel"]] <- max(indel)
     params[["lambda"]] <- h
     params[["nu"]] <- nu
     params[["scost"]] <- sm
