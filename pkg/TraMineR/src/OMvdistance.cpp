@@ -26,6 +26,7 @@ double OMvdistance::distance(const int&is, const int& js){
     int j=1;
     int m=slen[is];
     int n=slen[js];
+	double nl, ml;
 	//int minlen = imin2(m, n);
 	int mSuf = m+1, nSuf = n+1;
     int prefix=0;
@@ -40,7 +41,7 @@ double OMvdistance::distance(const int&is, const int& js){
 	for(int ii=prefix+1; ii<nSuf; ii++){
 		j_state=sequences[MINDICE(js, ii-1, nseq)];
 		fmat[MINDICE(0,ii-prefix,fmatsize)] = fmat[MINDICE(0,ii-prefix-1,fmatsize)]+
-				getIndel(MINDICE(js, ii-1, nseq), j_state); 
+				getIndel(MINDICE(js, ii-1, nseq), j_state);
 	}
 		TMRLOGMATRIX(10,  fmat, mSuf-prefix, nSuf-prefix, fmatsize);
 	TMRLOG(5,"m =%d, n=%d, mSuf=%d, nSuf=%d i=%d, j=%d, prefix=%d, fmatsize=%d\n", m, n, mSuf, nSuf, i, j, prefix, fmatsize);
@@ -70,7 +71,7 @@ double OMvdistance::distance(const int&is, const int& js){
 			//add j_indel
             j_indel=fmat[fmat_ij_prefix-1]+getIndel(i_state_indice, i_state);
             if (j_indel<minimum)minimum=j_indel;
-			
+
 			//////////////////////////////
             //Computing current indel cost
 			//////////////////////////////
@@ -92,8 +93,14 @@ double OMvdistance::distance(const int&is, const int& js){
 		j++;
     }//Fmat build
 	//Max possible cost
-    maxpossiblecost=abs(n-m)*indel+maxscost*fmin2((double)m,(double)n);
 	
+	if (sublink==1) {
+		maxpossiblecost=abs(n-m)*indel+2*maxscost*fmin2((double)m,(double)n);
+	} else {
+		maxpossiblecost=abs(n-m)*indel+maxscost*fmin2((double)m,(double)n);
+	}
+	//maxpossiblecost = indel * R_pow(abs(n-m),-hhh) * abs(n-m) + maxscost * R_pow(fmin2((double)m, (double)n), -hhh) * fmin2((double)m,(double)n);
+
 	TMRLOG(6,"End of dist compute index %d val %g\n", MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize), fmat[MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize)]);
 	if(MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize)<0||MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize)>fmatsize*fmatsize){
 		TMRLOG(4,"End of dist compute index %d val %g\n", MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize), fmat[MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize)]);
@@ -101,6 +108,9 @@ double OMvdistance::distance(const int&is, const int& js){
 		TMRLOG(4,"is =%d, js=%d\n", is, js);
 	}
 	TMRLOGMATRIX(10,  fmat, mSuf-prefix, nSuf-prefix, fmatsize);
-    return normalizeDistance(fmat[MINDICE(mSuf-1-prefix, nSuf-1-prefix, fmatsize)], maxpossiblecost, m, n);
+
+	nl = double(n) * indel;
+	ml = double(m) * indel;
+    return normalizeDistance(fmat[MINDICE(mSuf-1-prefix, nSuf-1-prefix, fmatsize)], maxpossiblecost, ml, nl);
 }
 

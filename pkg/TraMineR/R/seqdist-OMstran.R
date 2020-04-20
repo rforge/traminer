@@ -1,7 +1,7 @@
 # Should only be used through seqdist()
 
 OMstran <- function(seqdata, indel, sm, full.matrix, transindel, otto, previous,
-  add.column, with.missing, weighted, refseq=NULL) {
+  add.column, with.missing, weighted, refseq, norm) {
 
   alph <- alphabet(seqdata, with.missing=with.missing)
   void <- attr(seqdata,"void")
@@ -133,5 +133,5 @@ OMstran <- function(seqdata, indel, sm, full.matrix, transindel, otto, previous,
 		}
 	}
 	suppressMessages(return(seqdist(newseqdata, method = "OM", indel = indels, sm = newsm, full.matrix = full.matrix,
-      weighted = weighted, refseq = refseq)))
+      weighted = weighted, refseq = refseq, norm = norm)))
 }

@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.1-16 [2020-04-14] (Development version)}{
+\section{Changes in version 2.1-16 [2020-04-20] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -20,6 +20,8 @@
       object can be used with all methods (did not work with OMstran, CHI2, and EUCLID).
       \item
       \code{seqdist()} vector \code{indel} now supported by OMspell and OMslen (in addition to OM and OMstran).
+      \item
+      \code{seqdist()}, normalization now also possible for OMspell, OMslen, OMstran, OMloc, and TWED.
       \item
       \code{seqdist()} now uses \code{hcl.colors} (grDevices) instead of
       \code{qualitative_hcl} (colorspace) to set default colors when n>13.
@@ -46,6 +48,11 @@
       \item
       \code{seqdist()} TWED wrongly depended on the indel value. Now indel
       serves only in the improbable case of empty sequences.
+      \item
+      \code{seqdist()} \code{maxlength} and \code{gmean} normalization generated negative
+      distances in some circumstances. Fixed by setting the maximum length as 
+      max length x max indel.
+
    }
   }
   \subsection{Misc.}{

@@ -32,6 +32,7 @@ double minimum=0, i_warp=0, j_warp=0, sub=0;//, lenmax=0;
     int j=1;
     int m=slen[is]+1;
     int n=slen[js]+1;
+	double nl, ml;
 	
     int prefix=0;
 
@@ -149,7 +150,11 @@ double minimum=0, i_warp=0, j_warp=0, sub=0;//, lenmax=0;
 	
     //Warning! m and n decreased!!!!!
     //maxpossiblecost=abs(n-m)*lambda+maxscost*fmin2((double)m,(double)n); // BH: indel replaced with lambda, probably incorrect May 30 2013 15:57:59
-    maxpossiblecost=abs(n-m)*(nu + lambda+maxscost) + 2*(maxscost+nu)*fmin2((double)m,(double)n); // upper GR: April 14 2020!
-    return normalizeDistance(fmat[MINDICE(m-prefix,n-prefix,fmatsize)], maxpossiblecost, m, n);
+    maxpossiblecost=abs(n-m)*(nu + lambda+maxscost) + 2*(maxscost+nu)*fmin2((double)m,(double)n); // upper bound GR: April 14 2020!
+	
+	nl = double(n) * indel;
+	ml = double(m) * indel;
+	
+    return normalizeDistance(fmat[MINDICE(m-prefix,n-prefix,fmatsize)], maxpossiblecost, ml, nl);
 }
 

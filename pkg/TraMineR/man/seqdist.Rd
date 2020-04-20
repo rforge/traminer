@@ -45,14 +45,17 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     String.
     Default: \code{"none"}.
     The normalization to use when \code{method} is one of \code{"OM"},
-    \code{"HAM"}, \code{"DHD"}, \code{"LCS"},
+    \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"},
+    \code{"OMstran"}, \code{"TWED"}, \code{"HAM"}, \code{"DHD"}, \code{"LCS"},
     \code{"LCP"}, \code{"RLCP"}, \code{"CHI2"}, \code{"EUCLID"}.
     It can be \code{"none"}, \code{"auto"}, or, except for
     \code{"CHI2"} and \code{"EUCLID"}, \code{"maxlength"},
     \code{"gmean"}, \code{"maxdist"}, or \code{"YujianBo"}. \code{"auto"} is
     equivalent to \code{"maxlength"} when \code{method} is one of \code{"OM"},
     \code{"HAM"}, or \code{"DHD"}, to \code{"gmean"} when \code{method} is one
-    of \code{"LCS"}, \code{"LCP"}, or \code{"RLCP"}. See the Details section.
+    of \code{"LCS"}, \code{"LCP"}, or \code{"RLCP"}, to \code{YujianBo} when 
+    \code{method} is one of \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"},
+    \code{"OMstran"}, \code{"TWED"}. See the Details section.
     % Others: CHI2, EUCLID, OMloc, OMslen, OMspell, OMstran, NMS, NMSMST, SVRspell, TWED.
   }
   \item{indel}{
@@ -64,12 +67,12 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     The single state-independent insertion/deletion cost when a double.
     %, or \code{"TWED"}.
 
-    The state-dependent insertion/deletion costs when a vector of doubles. 
+    The state-dependent insertion/deletion costs when a vector of doubles.
     The vector should contain an indel cost by state in the order of the alphabet.
 
     When \code{"auto"}, the indel is set as \code{max(sm)/2} when \code{sm} is
     a matrix and is computed by means of \code{\link{seqcost}} when \code{sm} is
-    a string specifying a cost method. 
+    a string specifying a cost method.
 
     % Others: OMloc, HAM, DHD, CHI2, EUCLID, LCS, LCP, RLCP, NMS, NMSMST, SVRspell.
   }
@@ -168,7 +171,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   }
   \item{nu}{
     Double.
-    Stiffness when \code{method = "TWED"}. It must be strictly greater than 0 
+    Stiffness when \code{method = "TWED"}. It must be strictly greater than 0
     is usually less than 1.
     See \cite{Halpin (2014), p 88}.
   }
@@ -271,19 +274,19 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   \tabular{ll}{
     method \tab parameters \cr
     ------------------ \tab ---------------------------------\cr
-    \verb{OM} \tab \verb{sm, indel, norm, refseq} \cr
-    \verb{OMloc} \tab \verb{sm, expcost, context, refseq} \cr
-    \verb{OMslen} \tab \verb{sm, indel, link, h, refseq} \cr
-    \verb{OMspell} \tab \verb{sm, indel, tpow, expcost, refseq} \cr
-    \verb{OMstran} \tab \verb{sm, indel, transindel, otto, previous, add.column, refseq} \cr
-    \verb{HAM, DHD} \tab \verb{sm, norm, refseq}\cr
-    \verb{CHI2} \tab \verb{breaks, step, overlap, norm, weighted, global.pdotj, refseq}\cr
-    \verb{EUCLID} \tab \verb{breaks, step, overlap, norm, refseq}\cr
-    \verb{LCS, LCP, RLCP} \tab \verb{norm, refseq}\cr
-    \verb{NMS} \tab \verb{prox, kweights, refseq}\cr
-    \verb{NMSMST} \tab \verb{kweights, tpow, refseq}\cr
-    \verb{SVRspell} \tab \verb{prox, kweights, tpow, refseq}\cr
-    \verb{TWED} \tab \verb{sm, (indel), h, nu, refseq} \cr
+    \verb{OM} \tab \verb{sm, indel, norm} \cr
+    \verb{OMloc} \tab \verb{sm, expcost, context, norm} \cr
+    \verb{OMslen} \tab \verb{sm, indel, link, h, norm} \cr
+    \verb{OMspell} \tab \verb{sm, indel, norm, tpow, expcost, norm} \cr
+    \verb{OMstran} \tab \verb{sm, indel, transindel, otto, previous, add.column, norm} \cr
+    \verb{HAM, DHD} \tab \verb{sm, norm}\cr
+    \verb{CHI2} \tab \verb{breaks, step, overlap, norm, weighted, global.pdotj, norm}\cr
+    \verb{EUCLID} \tab \verb{breaks, step, overlap, norm}\cr
+    \verb{LCS, LCP, RLCP} \tab \verb{norm}\cr
+    \verb{NMS} \tab \verb{prox, kweights}\cr
+    \verb{NMSMST} \tab \verb{kweights, tpow}\cr
+    \verb{SVRspell} \tab \verb{prox, kweights, tpow}\cr
+    \verb{TWED} \tab \verb{sm, (indel), h, nu, norm} \cr
     ------------------ \tab ---------------------------------
   }
 
@@ -293,11 +296,11 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   position.
 
   \code{"HAM"} and \code{"DHD"} apply only to sequences of equal length.
-  
-  For \code{"TWED"}, the (single) indel serves only for empty sequences. 
+
+  For \code{"TWED"}, the (single) indel serves only for empty sequences.
   The distance to an empty sequence is set as \eqn{n*}\code{indel}, where \eqn{n} is
   the length of the non empty sequence. By default (\code{indel="auto"}), indel is set
-  as \code{2 * max(sm) + nu + lambda}.  
+  as \code{2 * max(sm) + nu + lambda}.
 
   %%Currently, \code{"OM"} works only with sequences of equal lengths.
 
@@ -308,15 +311,18 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   Some distances can optionally be normalized by means of the \code{norm} argument.
   If set to \code{"auto"}, Elzinga's normalization (similarity divided by
   geometrical mean of the two sequence lengths) is applied to \code{"LCS"},
-  \code{"LCP"} and \code{"RLCP"} distances, while Abbott's normalization (distance
+  \code{"LCP"} and \code{"RLCP"} distances, Abbott's normalization (distance
   divided by length of the longer sequence) is used for \code{"OM"}, \code{"HAM"}
-  and \code{"DHD"}. Elzinga's method can be forced with \code{"gmean"} and
-  Abbott's rule with \code{"maxlength"}. With \code{"maxdist"} the distance is
-  normalized by its maximal possible value. For more details, see
-  \cite{Gabadinho et al. (2009, 2011)}. Finally, \code{"YujianBo"} is the
-  normalization proposed by \cite{Yujian and Bo (2007)} that preserves the
-  triangle inequality.  The square of the \code{"CHI2"} and \code{"EUCLID"}
-  distances are normalized by the number of intervals and by the maximal distance
+  and \code{"DHD"}, and the normalization of \cite{Yujian and Bo (2007)} that preserves the
+  triangle inequality is used in the other cases. Yujian and Bo's method can be forced
+  with \code{"YujianBo"}, Elzinga's method with \code{"gmean"}, and
+  Abbott's rule with \code{"maxlength"}. The \code{maxlength} used is actually
+  set as the maximum length times the (maximum) indel to avoid negative normalized values. 
+  With \code{"maxdist"} each distance is
+  normalized by an upper bound of the distance given the lengths of the sequences. 
+  For more details, see  \cite{Gabadinho et al. (2009, 2011)}. 
+  The square of the \code{"CHI2"} and \code{"EUCLID"}
+  distances are normalized by the number of intervals and the maximal distance
   on each interval. Note that for 'CHI2' the maximal distance on each interval
   depends on the state distribution on the interval.
 
