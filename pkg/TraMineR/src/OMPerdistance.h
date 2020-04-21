@@ -6,6 +6,7 @@ class OMPerdistance: public OMdistance{
 	double timecost;
 	double * seqdur;
 	double * indellist;
+	int * seqlen;
   public:
 	OMPerdistance(SEXP normS, SEXP Ssequences, SEXP seqdim, SEXP lenS);
 	OMPerdistance(OMPerdistance *dc);

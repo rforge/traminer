@@ -3,7 +3,7 @@ OMPerdistance::OMPerdistance(SEXP normS, SEXP Ssequences, SEXP seqdim, SEXP lenS
 	:OMdistance(normS, Ssequences, seqdim, lenS){
 }
 OMPerdistance::OMPerdistance(OMPerdistance *dc)
-	:OMdistance(dc), timecost(dc->timecost), seqdur(dc->seqdur), indellist(dc->indellist){
+	:OMdistance(dc), timecost(dc->timecost), seqdur(dc->seqdur), indellist(dc->indellist), seqlen(dc->seqlen){
 }
 
 void OMPerdistance::setParameters(SEXP params){
@@ -11,6 +11,7 @@ void OMPerdistance::setParameters(SEXP params){
 	this->timecost = REAL(getListElement(params, "timecost"))[0];
 	this->seqdur=REAL(getListElement(params, "seqdur"));
 	this->indellist=REAL(getListElement(params, "indels"));
+	this->seqlen=INTEGER(getListElement(params, "seqlength"));
 }
 
 OMPerdistance::~OMPerdistance(){
@@ -26,10 +27,13 @@ double OMPerdistance::distance(const int&is, const int& js){
     int j=1;
     int m=slen[is];
     int n=slen[js];
+	int nn=seqlen[is];
+	int mm=seqlen[js];
 	double nl, ml;
 	//int minlen = imin2(m, n);
 	int mSuf = m+1, nSuf = n+1;
     int prefix=0;
+	
 	//Skipping common prefix
 	TMRLOG(6,"Skipping common prefix\n");
     //Skipping common suffix
@@ -40,12 +44,14 @@ double OMPerdistance::distance(const int&is, const int& js){
 		i_state=sequences[MINDICE(is, ii-1, nseq)];
 		fmat[MINDICE(ii-prefix,0,fmatsize)] = fmat[MINDICE(ii-prefix-1,0,fmatsize)]+
 				getIndel(MINDICE(is, ii-1, nseq), i_state);
+		//mm = mm + seqdur[MINDICE(is, ii-1, nseq)];
 	}
 
 	for(int ii=prefix+1; ii<nSuf; ii++){
 		j_state=sequences[MINDICE(js, ii-1, nseq)];
 		fmat[MINDICE(0,ii-prefix,fmatsize)] = fmat[MINDICE(0,ii-prefix-1,fmatsize)]+
 				getIndel(MINDICE(js, ii-1, nseq), j_state); 
+		//nn = nn + seqdur[MINDICE(js, ii-1, nseq)];
 	}
 		TMRLOGMATRIX(10,  fmat, mSuf-prefix, nSuf-prefix, fmatsize);
 	TMRLOG(5,"m =%d, n=%d, mSuf=%d, nSuf=%d i=%d, j=%d, prefix=%d, fmatsize=%d\n", m, n, mSuf, nSuf, i, j, prefix, fmatsize);
@@ -96,8 +102,10 @@ double OMPerdistance::distance(const int&is, const int& js){
         }
 		j++;
     }//Fmat build
+	
 	//Max possible cost
-    maxpossiblecost=abs(n-m)*indel+maxscost*fmin2((double)m,(double)n);
+
+    maxpossiblecost=abs(nn-mm)*indel+maxscost*fmin2((double)mm,(double)nn);
 	
 	TMRLOG(6,"End of dist compute index %d val %g\n", MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize), fmat[MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize)]);
 	if(MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize)<0||MINDICE(mSuf-1-prefix,nSuf-1-prefix,fmatsize)>fmatsize*fmatsize){
@@ -107,8 +115,8 @@ double OMPerdistance::distance(const int&is, const int& js){
 	}
 	TMRLOGMATRIX(10,  fmat, mSuf-prefix, nSuf-prefix, fmatsize);
 
-	nl = double(n) * indel;
-	ml = double(m) * indel;
+	nl = double(nn) * indel;
+	ml = double(mm) * indel;
     return normalizeDistance(fmat[MINDICE(mSuf-1-prefix, nSuf-1-prefix, fmatsize)], maxpossiblecost, ml, nl);
 }
 

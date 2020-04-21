@@ -402,7 +402,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
       } #else {
         #msg.stop.na("sm")
       #}
-      msg("Computing sm with seqcost using ",method)
+      msg("Computing sm with seqcost using ",sm)
       sm <- seqcost(seqdata, sm, with.missing = with.missing, cval = cost, miss.cost = cost, time.varying = tv, weighted = weighted)
 
       if (indel.type=="auto"){
@@ -554,6 +554,10 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     dseqs.dur <- dseqs.dur[dseqs.oidxs, ] - c
     seqdata.dss <- seqdss(seqdata, with.missing)
     dseqs.num <- seqnum(seqdata.dss[dseqs.oidxs, ], with.missing)
+    if (method == "OMspell") {
+      seqlength <- seqlength(seqdata, with.missing)
+      seqlength <- seqlength[dseqs.oidxs]
+    }
     rm(dseqs.oidxs)
     rm(c)
     rm(seqdata.dss)
@@ -662,6 +666,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     params[["scost"]] <- sm
     params[["seqdur"]] <- as.double(dseqs.dur)
     params[["timecost"]] <- expcost
+    params[["seqlength"]] <- as.integer(seqlength)
     rm(dseqs.dur)
   }
   # HAM + DHD
@@ -740,7 +745,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
   #### Compute distances ####
 
-  nm <- if (norm != "none") paste(" ",norm,"normalized ") else ""
+  nm <- if (norm != "none") paste("", norm,"normalized") else ""
   msg0("computing distances using the ", method, nm, " metric")
   rm(nm)
 
