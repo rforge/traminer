@@ -309,18 +309,21 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   the costs derived from the transition rates at the successive positions.
 
   Some distances can optionally be normalized by means of the \code{norm} argument.
-  If set to \code{"auto"}, Elzinga's normalization (similarity divided by
-  geometrical mean of the two sequence lengths) is applied to \code{"LCS"},
-  \code{"LCP"} and \code{"RLCP"} distances, Abbott's normalization (distance
-  divided by length of the longer sequence) is used for \code{"OM"}, \code{"HAM"}
-  and \code{"DHD"}, and the normalization of \cite{Yujian and Bo (2007)} that preserves the
-  triangle inequality is used in the other cases. Yujian and Bo's method can be forced
-  with \code{"YujianBo"}, Elzinga's method with \code{"gmean"}, and
-  Abbott's rule with \code{"maxlength"}. The \code{maxlength} used is actually
-  set as the maximum length times the (maximum) indel to avoid negative normalized values. 
-  With \code{"maxdist"} each distance is
-  normalized by an upper bound of the distance given the lengths of the sequences. 
-  For more details, see  \cite{Gabadinho et al. (2009, 2011)}. 
+  Let \eqn{d} be the distance, \eqn{m} the maximum possible of the distance
+  given the lengths \eqn{p} and \eqn{q} of the two sequences, and \eqn{k} the 
+  length of the longer sequence. Normalization \code{"maxlength"} is \eqn{d/k} 
+  (Abbott's normalization), \code{"gmean"} is \eqn{1-(m-d)/(p*q)^.5} (Elzinga's 
+  normalization), \code{"maxdist"} is \eqn{d/m}, and "YujianBo" is \eqn{2*d/(m+d)}.
+  For more details, see  \cite{Gabadinho et al. (2009, 2011)}.
+  Actually, to avoid negative outcomes, the length \eqn{p}, \eqn{q}, and \eqn{k} are
+  set as (max) indel times the corresponding length. For some distances, \eqn{m} is
+  only a possibly non-reachable upper bound.
+   
+  When \code{norm="auto"}, \code{"gmean"} is applied to \code{"LCS"},
+  \code{"LCP"} and \code{"RLCP"} distances, \code{"maxlength"} is applied to \code{"OM"}, \code{"HAM"}
+  and \code{"DHD"}, and the normalization "YujianBo" of \cite{Yujian and Bo (2007)} that preserves the
+  triangle inequality is used in the other cases.  
+   
   The square of the \code{"CHI2"} and \code{"EUCLID"}
   distances are normalized by the number of intervals and the maximal distance
   on each interval. Note that for 'CHI2' the maximal distance on each interval
