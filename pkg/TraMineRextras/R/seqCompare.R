@@ -188,7 +188,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
     if (s==0) { # no sampling
       r1 <- 1:nrow(seq.a[[i]])
       r2 <- 1:nrow(seq.b[[i]]) + nrow(seq.a[[i]])
-      suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
+      suppressMessages(diss <- seqdist(rbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
       weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
       suppressMessages(
         Results[i,] <-
@@ -207,7 +207,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
         opt <- ifelse(nrow(seq.a[[i]]) + nrow(seq.b[[i]]) > 2*s, 1, 2)
       #message('opt = ',opt)
       if (opt==2) {
-        suppressMessages(diss <- seqdist(seqrbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
+        suppressMessages(diss <- seqdist(rbind(seq.a[[i]],seq.b[[i]]), method=method, weighted=weighted, ...))
         weights <- c(attr(seq.a[[i]],"weights"),attr(seq.b[[i]],"weights"))
       }
 
@@ -223,7 +223,7 @@ seqCompare <- function(seqdata, seqdata2=NULL, group=NULL, set=NULL,
         else {
           seqA<-seq.a[[i]][r.s1[j,],]
           seqB<-seq.b[[i]][r.s2[j,],]
-          seqAB <- seqrbind(seqA, seqB)
+          seqAB <- rbind(seqA, seqB)
           wA <- attr(seqA,"weights")
           wB <- attr(seqB,"weights")
           weights <- c(wA,wB)
@@ -350,80 +350,5 @@ seq.comp <- function(r1, r2, diss, weights, is.LRT,is.BIC, squared, weighted, we
 
     res <- cbind(res, BIC, BF)
   }
-  return(res)
-}
-
-
-## rbind method for stslist objects requires TraMineR v2.0-16
-## In meantime we redefine it here as seqrbind
-seqrbind <- function(..., deparse.level = 1) {
-  seqlist <- list(...)
-  l <- length(seqlist)
-  ww <- attr(seqlist[[1]],"weights")
-  alph <- alphabet(seqlist[[1]])
-  kalph <- 1
-  void <-attr(seqlist[[1]],"void")
-  nr <-attr(seqlist[[1]],"nr")
-  missing.char <-attr(seqlist[[1]],"missing")
-
-  res <- seqlist[[1]]
-  n.null <- ifelse(is.null(ww),1,0)
-  for (i in 2:l) {
-    seqi <- seqlist[[i]]
-    weights <- attr(seqi,"weights")
-    n.null <- n.null + is.null(weights)
-    if (length(alph) < length(alphabet(seqi))) {
-      if (!all(alph %in% alphabet(seqi)))
-        stop("Alphabet mismatch between stslist objects!")
-      alph <- alphabet(seqi)
-      kalph <- i
-    }
-    else {
-      if (!all(alphabet(seqi) %in% alph))
-        stop("Alphabet mismatch between stslist objects!")
-    }
-    if (nr != attr(seqi,"nr") || void!= attr(seqi,"void"))
-      stop("nr and/or void mismatch between stslist objects!")
-    res <- as.matrix(res)
-    ## when stslist do not have same number of columns
-    ## we adjust with columns of voids
-    if (ncol(res) < ncol(seqi)) {
-      emptycol <- matrix(void, nrow(res), ncol(seqi)-ncol(res))
-      names <- c(names(res),names(seqi)[(ncol(res)+1):ncol(seqi)])
-      res <- cbind(res,emptycol)
-      names(res) <- names
-    }
-    else if (ncol(res) > ncol(seqi)) {
-      emptycol <- matrix(void, nrow(seqi), ncol(res)-ncol(seqi))
-      names <- c(names(seqi),names(res)[(ncol(seqi)+1):ncol(res)])
-      seqi <- cbind(seqi,emptycol)
-      names(res) <- names
-    }
-    res <- rbind(as.matrix(res),as.matrix(seqi), deparse.level=deparse.level)
-    if (!is.null(weights)) ww <-c(ww,weights)
-  }
-  if(n.null > 0 & n.null != l)
-    stop("!! Cannot rbind stslist objects with and without weights!")
-
-  is.void <- any(res==void)
-  res[res == nr] <- missing.char
-  res[res == void] <- missing.char
-
-  suppressMessages(
-    res <- seqdef(res,
-      alphabet=alph,
-      weights =ww,
-      start   =attr(seqlist[[1]],"start"),
-      missing =attr(seqlist[[1]],"missing"),
-      nr      =attr(seqlist[[1]],"nr"),
-      void    =attr(seqlist[[1]],"void"),
-      labels  =attr(seqlist[[kalph]],"labels"),
-      xtstep  =attr(seqlist[[1]],"xtstep"),
-      cpal    =attr(seqlist[[kalph]],"cpal"),
-      tick.last=attr(seqlist[[1]],"tick.last"),
-      right   =ifelse(is.void,"DEL",NA)
-    )
-  )
-
   return(res)
 }
