@@ -1,12 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-04-22] (Development version)}{
+\section{Changes in version 2.3-1 [2020-04-25] (Development version)}{
   
   \subsection{Misc.}{
     \itemize{
       \item
-      No changes
+      Changed R dependence from 3.0.0 to v 3.6.0 (needed because of hcl.colors)
     }
   }
 }

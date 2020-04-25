@@ -1,6 +1,6 @@
 Package: TraMineR
 Version: 2.3-1
-Date: 2020-04-22
+Date: 2020-04-25
 Title: Trajectory Miner: a Toolbox for Exploring and Rendering Sequences
 Authors@R: c(
   person("Alexis", "Gabadinho", role = c("aut", "cph")),
@@ -14,7 +14,7 @@ Authors@R: c(
     role = c("aut", "cre", "cph"),
     email = "gilbert.ritschard@unige.ch",
     comment = c(ORCID = "0000-0001-7776-0903")))
-Depends: R (>= 3.0.0)
+Depends: R (>= 3.6.0)
 Imports: utils, RColorBrewer, boot, graphics, grDevices, stats, Hmisc, cluster
 Suggests: xtable
 SystemRequirements: C++11

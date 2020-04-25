@@ -1,8 +1,9 @@
 ## =========
-Version 2.3-1 [2020-04-22] (Development version)
+Version 2.3-1 [2020-04-25] (Development version)
 
 Misc.:
-  - No changes
+  - Changed R dependence from 3.0.0 to v 3.6.0 (needed because 
+    of hcl.colors)
 
 ## =========
 Version 2.2-0 [2020-04-22] (Development version)
