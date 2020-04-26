@@ -1,12 +1,19 @@
 ## =========
-Version 2.3-1 [2020-04-25] (Development version)
+Version 2.3-1 [2020-04-26] (Development version)
 
 Misc.:
-  - Changed R dependence from 3.0.0 to v 3.6.0 (needed because 
-    of hcl.colors)
+  - No changes.
 
 ## =========
-Version 2.2-0 [2020-04-22] (Development version)
+Version 2.2-0.1 [2020-04-26] 
+
+Misc.:
+  - seqdef(): switched back from [grDevices] hcl.colors to
+    [colorspace] qualitative_hcl to avoid dependence
+    on R >=3.6 necessary for hcl.colors.
+
+## =========
+Version 2.2-0 [2020-04-22] 
 
 Changes in existing functions:
   - seqdist(), argument 'indel' can now be "auto" (new default)
