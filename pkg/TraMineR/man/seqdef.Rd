@@ -77,7 +77,7 @@ code used by TraMineR for representing void elements in the
 sequences. Default is \code{"\%"}. Must be different from \code{left}, \code{gaps}, and \code{right}.}
 
 	\item{nr}{the internal code used by TraMineR for representing real
-missing elements in the sequences. Default is\code{"*"}.}
+missing elements in the sequences. Default is \code{"*"}.}
 
 	\item{cnames}{optional names for the columns composing the
 sequence data. Those names will be used by default in the graphics as
@@ -94,7 +94,7 @@ in the graphics. If \code{NULL} (default), a color palette is created
 by means of the \code{brewer.pal} function of the \code{RColorBrewer}
 package for number of states up to 12. When the number of states is less or equal than 8, the
 \code{"Accent"} palette is used. If number of states is between 8 and
-12, the \code{"Set3"} palette is used. When the number of states is greater than 12, 
+12, the \code{"Set3"} palette is used. When the number of states is greater than 12,
 colors are set using \code{hcl.colors} with
 the "Set 3" palette. To specify your own palette use e.g. the \code{\link{colors}}
 function, or the RColorBrewer or colorspace packages.}
@@ -107,7 +107,7 @@ TraMineR's graphics. If \code{NULL} (default), the state names in the
 alphabet are used as state labels as well.}
 
 	\item{...}{options passed to the \code{\link{seqformat}} function
-for handling input data that is not in STS format or print format.}
+for handling input data that is not in STS format.}
 
 }
 

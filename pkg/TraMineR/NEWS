@@ -1,11 +1,11 @@
 ## =========
-Version 2.3-1 [2020-04-26] (Development version)
+Version 2.3-1 [2020-04-29] (Development version)
 
 Misc.:
   - No changes.
 
 ## =========
-Version 2.2-0.1 [2020-04-26] 
+Version 2.2-0.1 [2020-04-29]
 
 Misc.:
   - seqdef(): switched back from [grDevices] hcl.colors to
@@ -13,7 +13,7 @@ Misc.:
     on R >=3.6 necessary for hcl.colors.
 
 ## =========
-Version 2.2-0 [2020-04-22] 
+Version 2.2-0 [2020-04-22]
 
 Changes in existing functions:
   - seqdist(), argument 'indel' can now be "auto" (new default)
@@ -48,7 +48,7 @@ Bug Fixes:
   - seqdist() TWED wrongly depended on the indel value. Now indel
     serves only in the improbable case of empty sequences.
   - seqdist() maxlength and gmean normalization generated negative
-    distances in some circumstances. Fixed by setting the 
+    distances in some circumstances. Fixed by setting the
     maximum length as max length x max indel.
 
 Misc:

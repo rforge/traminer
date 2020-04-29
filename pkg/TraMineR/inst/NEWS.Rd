@@ -1,8 +1,8 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-04-26] (Development version)}{
-  
+\section{Changes in version 2.3-1 [2020-04-29] (Development version)}{
+
   \subsection{Misc.}{
     \itemize{
       \item
@@ -11,7 +11,7 @@
   }
 }
 
-\section{Changes in version 2.2-0.1 [2020-04-26]}{
+\section{Changes in version 2.2-0.1 [2020-04-29]}{
 
   \subsection{Misc.}{
     \itemize{
@@ -72,7 +72,7 @@
       serves only in the improbable case of empty sequences.
       \item
       \code{seqdist()} \code{maxlength} and \code{gmean} normalization generated negative
-      distances in some circumstances. Fixed by setting the maximum length as 
+      distances in some circumstances. Fixed by setting the maximum length as
       max length x max indel.
 
    }
