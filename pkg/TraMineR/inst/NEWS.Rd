@@ -1,12 +1,12 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-04-29] (Development version)}{
+\section{Changes in version 2.3-1 [2020-05-19] (Development version)}{
 
-  \subsection{Misc.}{
+  \subsection{Bug Fixes}{
     \itemize{
       \item
-      No changes.
+      \code{seqdplot()} and \code{plot.stslist.statd()} ignored the \code{xlab} argument.
     }
   }
 }
@@ -1151,9 +1151,9 @@
     \item
     \code{dissrep()}, \code{seqrep()}: error when \code{nrep} cannot be reached (reported by M. Studer)
     \item
-    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto Bürgin).
+    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto B\"{u}rgin).
     \item
-    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto Bürgin).
+    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto B\"{u}rgin).
     \item
     \code{print.seqelist()} and \code{as.character.seqelist()}: generated \code{segfault} when converting long event sequences to character (Reported by Pierre Molinier).
     \item

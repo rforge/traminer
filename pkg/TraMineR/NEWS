@@ -1,8 +1,8 @@
 ## =========
-Version 2.3-1 [2020-04-29] (Development version)
+Version 2.3-1 [2020-05-19] (Development version)
 
-Misc.:
-  - No changes.
+Bug Fixes:
+  - seqdplot() and plot.stslist.statd() ignored the xlab argument.
 
 ## =========
 Version 2.2-0.1 [2020-04-29]
@@ -769,8 +769,8 @@ Bug fixes:
         the plotting function.
   - dissrep(), seqrep(): error when 'nrep' cannot be reached (reported by M. Studer)
   - seqefsub(): when using strsubseq argument, countMethod of seqeconstraint
-        was not taken into account (Reported by Reto Bürgin).
-  - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto Bürgin).
+        was not taken into account (Reported by Reto B\"{u}rgin).
+  - seqeconstraint(): added consistency checks to avoid misuses (Reported by Reto B\"{u}rgin).
   - print.seqelist() and as.character.seqelist(): generated segfault when
         converting long event sequences to character (Reported by Pierre Molinier).
   - seqsubm(): Very small rounding errors (1e-16) were sometimes leading to non symmetric
