@@ -1,12 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-05-19] (Development version)}{
+\section{Changes in version 2.3-1 [2020-06-12] (Development version)}{
 
   \subsection{Bug Fixes}{
     \itemize{
       \item
       \code{seqdplot()} and \code{plot.stslist.statd()} ignored the \code{xlab} argument.
+      \item
+      \code{seqconc()}, \code{seqdecomp()}, \code{seqformat()}, and the print method for
+      \code{stslist} objects produced output without the row names of the input data.
     }
   }
 }

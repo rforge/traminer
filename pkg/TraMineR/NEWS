@@ -1,8 +1,11 @@
 ## =========
-Version 2.3-1 [2020-05-19] (Development version)
+Version 2.3-1 [2020-06-12] (Development version)
 
 Bug Fixes:
   - seqdplot() and plot.stslist.statd() ignored the xlab argument.
+  - seqconc(), seqdecomp(), seqformat(), and the print method for 
+    stslist objects produced output without the row names of the
+    input data.
 
 ## =========
 Version 2.2-0.1 [2020-04-29]
