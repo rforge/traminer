@@ -1,11 +1,16 @@
 ## =========
-Version 2.3-1 [2020-06-12] (Development version)
+Version 2.3-1 [2020-07-14] (Development version)
+
+Changes in existing functions:
+  - seqdist() the check of allowed number of unique sequences now
+    depends on refseq and is sqrt(.Machine$integer.max) when 
+    refseq==NULL, and .Machine$integer.max otherwise.
 
 Bug Fixes:
   - seqdplot() and plot.stslist.statd() ignored the xlab argument.
-  - seqconc(), seqdecomp(), seqformat(), and the print method for 
-    stslist objects produced output without the row names of the
-    input data.
+  - seqconc(), seqdecomp(), seqformat(), and the print method for
+    stslist objects produced in some circumstances output without
+    the row names of the input data.
 
 ## =========
 Version 2.2-0.1 [2020-04-29]

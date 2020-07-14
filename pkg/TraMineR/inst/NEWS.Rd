@@ -1,7 +1,16 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-06-12] (Development version)}{
+\section{Changes in version 2.3-1 [2020-07-14] (Development version)}{
+
+  \subsection{Changes in existing functions}{
+    \itemize{
+      \item
+      \code{seqdist()} the check of allowed number of unique sequences now
+      depends on \code{refseq} and is \code{sqrt(.Machine$integer.max)} when
+      \code{refseq==NULL}, and \coe{.Machine$integer.max} otherwise.
+    }
+  }
 
   \subsection{Bug Fixes}{
     \itemize{
@@ -9,7 +18,7 @@
       \code{seqdplot()} and \code{plot.stslist.statd()} ignored the \code{xlab} argument.
       \item
       \code{seqconc()}, \code{seqdecomp()}, \code{seqformat()}, and the print method for
-      \code{stslist} objects produced output without the row names of the input data.
+      \code{stslist} objects produced in some circumstances output without the row names of the input data.
     }
   }
 }

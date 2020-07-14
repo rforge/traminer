@@ -476,8 +476,13 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   dseqs.num <- unique(seqdata.num)
   # Check that dseqs.num does not exceed the max allowed
   max.allowed.seq <- floor(sqrt(.Machine$integer.max))
-  if (nrow(dseqs.num) > max.allowed.seq){
-    msg.stop(nrow(dseqs.num), " unique sequences exceeds max allowed of ", max.allowed.seq)
+  if (refseq.type=="none"){
+    if (nrow(dseqs.num) > max.allowed.seq){
+      msg.stop(nrow(dseqs.num), " unique sequences exceeds max allowed of ", max.allowed.seq)
+    }
+  }
+  else if (nrow(dseqs.num) > .Machine$integer.max - 1){
+      msg.stop(nrow(dseqs.num), " unique sequences exceeds max allowed of ", .Machine$integer.max)
   }
 
   #### Handle reference sequence ####

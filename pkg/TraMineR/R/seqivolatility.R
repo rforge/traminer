@@ -3,7 +3,7 @@ seqivolatility <- function(seqdata, type=1, w=.5, with.missing=FALSE){
 	if (!inherits(seqdata,"stslist"))
 		stop(" [!] data is NOT a sequence object, see seqdef function to create one")
   if (!type %in% c(1,2))
-		stop(" [!] type should be 1  or 2!")
+		stop(" [!] type should be 1 or 2!")
   if (w>1 | w<0)
 		stop(" [!] w should be in the range [0, 1]!")
 
