@@ -7,8 +7,8 @@
     \itemize{
       \item
       \code{seqdist()} the check of allowed number of unique sequences now
-      depends on \code{refseq} and is \code{sqrt(.Machine$integer.max)} when
-      \code{refseq==NULL}, and \coe{.Machine$integer.max} otherwise.
+      depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when
+      \code{refseq==NULL}, and \code{.Machine$integer.max} otherwise.
     }
   }
 
