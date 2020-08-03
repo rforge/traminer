@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-1 [2020-07-27] (Development version)
+Version 2.3-1 [2020-08-03] (Development version)
 
 Changes in existing functions:
   - seqdist() the check of allowed number of unique sequences now
@@ -13,6 +13,10 @@ Bug Fixes:
   - seqconc(), seqdecomp(), seqformat(), and the print method for
     stslist objects produced in some circumstances output without
     the row names of the input data.
+    
+Misc.:
+  - TraMineRextras added to 'Suggests' list (to avoid NOTE on
+    undeclared package in Rd xrefs.
 
 ## =========
 Version 2.2-0.1 [2020-04-29]

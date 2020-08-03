@@ -1,14 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-07-27] (Development version)}{
+\section{Changes in version 2.3-1 [2020-08-03] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
       \item
       \code{seqdist()} the check of allowed number of unique sequences now
       depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when
-      \code{refseq==NULL}, and \code{.Machine$integer.max} otherwise. 
+      \code{refseq==NULL}, and \code{.Machine$integer.max} otherwise.
       In addition, a new argument permits to skip the test.
     }
   }
@@ -20,6 +20,13 @@
       \item
       \code{seqconc()}, \code{seqdecomp()}, \code{seqformat()}, and the print method for
       \code{stslist} objects produced in some circumstances output without the row names of the input data.
+    }
+  }
+  
+  \subsection{Misc.}{
+    \itemize{
+      \item
+      TraMineRextras added to the 'Suggests' list (to avoid NOTE on undeclared package in Rd xrefs.)
     }
   }
 }
