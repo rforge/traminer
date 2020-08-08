@@ -15,8 +15,8 @@ nsubs <- function (x, nbstat, statlist, void) {
 			N[i] <- 2*N[i-1]
 			cidx <- which(statlist==x[i-1])
 
-			if (l[cidx] > 0) N[i] <- N[i] - N[l[cidx]]
-			l[cidx] <- i-1
+			if (l[cidx[1]] > 0) N[i] <- N[i] - N[l[cidx[1]]]
+			l[cidx[1]] <- i-1
 		}
 		return(N[(slength+1)])
 	}
@@ -29,7 +29,7 @@ seqsubsn <- function(seqdata, DSS=TRUE, with.missing=FALSE) {
 
 ## Since v 2.0.13 we use thw with.missing argument
 	## with.missing=FALSE
-	nr <- attr(seqdata,"nr")
+	##nr <- attr(seqdata,"nr")
 	##if (any(seqdata==nr)) {
 	##	message(" [!] found missing state in the sequence(s), adding missing state to the alphabet")
 	##	with.missing=TRUE
@@ -40,10 +40,11 @@ seqsubsn <- function(seqdata, DSS=TRUE, with.missing=FALSE) {
 	}
 
 	## alphabet
-	sl <- attr(seqdata,"alphabet")
-	if (with.missing) {
-		sl <- c(sl, nr)
-	}
+	#sl <- attr(seqdata,"alphabet")
+	#if (with.missing) {
+	#	sl <- c(sl, nr)
+	#}
+  sl <- alphabet(seqdata, with.missing=with.missing)
 
 	ns <- length(sl)
 

@@ -10,7 +10,7 @@
 }
 \usage{
 seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
-    ipos.args=list(), integr.args=list(), prec.args=list(), w=1)
+    ipos.args=list(), integr.args=list(), prec.args=list(), vardur.type=1, w=1)
 }
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by \code{\link[TraMineR]{seqdef}}.}
@@ -24,7 +24,9 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
   \item{integr.args}{list: when \code{"integr"} requested, the arguments passed to \code{seqintegration} together with \code{seqdata} and \code{with.missing}. See \code{\link{seqintegration}}}
 
   \item{prec.args}{list: when \code{"prec"} requested, the arguments passed to \code{seqprecarity} together with \code{seqdata} and \code{with.missing}. See \code{\link{seqprecarity}}}
-      
+
+  \item{vardur.type}{either 1 or 2: type of duration variance used for \code{'dvar'}, \code{'turb'}, and \code{'turbn'}. Default is 1.}
+
   \item{w}{real in range [0,1]: when \code{volat} weight coefficient passed to \code{\link{seqivolatility}}. Default is 1.}
 }
 \details{
@@ -44,6 +46,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
   \cr \code{Transp}: Number of state changes as a proportion of maximum number of transitions
   \cr \code{Entr}: Longitudinal entropy
   \cr \code{Volat}: Objective volatility
+  \cr \code{Dvar}: Duration variance
   \cr \code{Cplx}: Complexity
   \cr \code{Turbn}: Normalized turbulence
   \cr \code{Turb}: Turbulence
@@ -54,7 +57,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
   \cr \code{Prec}: Precarity
 }
 \seealso{
-\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqici}},  \code{\link{seqST}}, \code{\link{seqipos}}, and \code{\link{seqprecarity}}
+\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqvardur}}, \code{\link{seqici}},  \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegration}} and \code{\link{seqprecarity}}
 }
 \examples{
 data(ex1)

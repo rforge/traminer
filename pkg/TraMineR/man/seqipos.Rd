@@ -3,10 +3,10 @@
 %
 \author{Gilbert Ritschard}
 %
-\title{Proportion of positive spells or states per sequence}
+\title{Indicators for binary sequences of positive and negative states.}
 %
 \description{
-  Indicators for the underlaying binary sequences of positive and negative states.
+  Indicators for the underlying binary sequences of positive and negative states.
   Possible indicators are the proportion of positive states within each sequence, i.e. of positive spells if computed on the sequences of distinct successive states (DSS), objective volatility of the binary sequences, and capacity to integrate a positive state.
 }
 \usage{

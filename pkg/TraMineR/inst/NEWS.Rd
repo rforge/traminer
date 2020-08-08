@@ -1,10 +1,28 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-08-03] (Development version)}{
+\section{Changes in version 2.3-1 [2020-08-08] (Development version)}{
+
+  \subsection{New functions}{
+    \itemize{
+      \item
+      \code{seqdurvar()} computes the variance of spell durations for each individual sequence.
+      Either the variance of the observed spells or by accounting also for the 0-time spent 
+      in non-visited states.
+    }
+  }
 
   \subsection{Changes in existing functions}{
     \itemize{
+      \item
+      \code{seqST()} gains an argument \code{type} to select whether the duration
+      variance should account for the 0-length spells
+      in non-visited states.
+      \item
+      \code{seqindic()} gains an argument \code{durvar.type} to select the type of 
+      duration variance to use for the turbulence.
+      \item
+      \code{seqindic()} the possible indicator list gains an element \code{'dvar'} for the duration variance.
       \item
       \code{seqdist()} the check of allowed number of unique sequences now
       depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when
@@ -22,7 +40,7 @@
       \code{stslist} objects produced in some circumstances output without the row names of the input data.
     }
   }
-  
+
   \subsection{Misc.}{
     \itemize{
       \item

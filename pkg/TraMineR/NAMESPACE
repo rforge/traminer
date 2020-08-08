@@ -75,6 +75,7 @@ export(
   seqtab,
   seqtransn,
   seqtrate,
+  seqvardur,
   stlab,
   "stlab<-",
   TraMineR.check.depr.args,
@@ -138,6 +139,9 @@ S3method(print , seqprec)
 
 ## seqipos methods
 S3method(print , seqipos)
+
+## seqvardur methods
+S3method(print , seqvardur)
 
 ## diss module
 export(
