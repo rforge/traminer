@@ -7,7 +7,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
 		stop("data is NOT a sequence object, see seqdef function to create one")
 
   indic.list <- c("lgth","nonm","dlgth","visited","trans",
-    "transp","entr","volat","dvar","cplx","turb","turbn",
+    "transp","entr","volat","dustd","cplx","turb","turbn",
     "all","ppos","vpos","inpos","prec","integr","visit")
 
   indic.ipos <- c("ppos","vpos","inpos")
@@ -96,12 +96,12 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
     tab <- cbind(tab,volat)
     lab <- c(lab,"Volat")
   }
-  if("dvar" %in% indic){
+  if("dustd" %in% indic){
 	## Longitudinal Entropy
-	  dvar <- suppressMessages(
-		  seqvardur(seqdata, with.missing=with.missing, type=vardur.type))
-    tab <- cbind(tab,dvar)
-    lab <- c(lab,"Dvar")
+	  dustd <- suppressMessages(
+		  sqrt(seqvardur(seqdata, with.missing=with.missing, type=vardur.type)))
+    tab <- cbind(tab,dustd)
+    lab <- c(lab,"Dustd")
   }
   if("cplx" %in% indic){
 	## Complexity
