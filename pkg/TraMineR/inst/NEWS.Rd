@@ -1,14 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-08-08] (Development version)}{
+\section{Changes in version 2.3-1 [2020-08-10] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
       \item
       \code{seqdurvar()} computes the variance of spell durations for each individual sequence.
       Either the variance of the observed spells or by accounting also for the 0-time spent 
-      in non-visited states.
+      in non-visited states. The associated print method can print
+      the mean, standard deviation, variance, or max variance.
     }
   }
 

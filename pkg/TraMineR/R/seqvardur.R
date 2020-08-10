@@ -40,14 +40,26 @@ seqvardur <- function(seqdata, type=1, with.missing=FALSE){
 
   ret <- as.vector(ret)
   attr(ret,"vmax") <- as.vector(var.max)
+  attr(ret,"meand") <- as.vector(meand)
 
 	class(ret) <- c("seqvardur", class(ret))
   return(ret)
 }
 
-print.seqvardur <- function(x, digits=2, ...) {
+print.seqvardur <- function(x, stat='var', ...) {
 	## Conversion for printing without attributes
-	x <- as.vector(x)
+  statlist <- c('mean','std','var','vmax','all')
+  if (any(!stat %in% statlist)) msg.stop.in("stat",statlist)
 
-	NextMethod("print", digits=digits,...)
+  dvar <- as.vector(x)
+  std <- sqrt(as.vector(x))
+  meand <- as.vector(attr(x,'meand'))
+  vmax <- as.vector(attr(x,'vmax'))
+
+  x <- cbind(meand,std,dvar,vmax)
+  a <- which(stat=='all')
+  if (length(a)>0)  stat <- stat[-a]
+  if (length(stat) >0) x <- x[,which(statlist %in% stat)]
+
+	NextMethod("print", ...)
 }
