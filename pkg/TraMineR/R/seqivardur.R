@@ -1,4 +1,4 @@
-seqvardur <- function(seqdata, type=1, with.missing=FALSE){
+seqivardur <- function(seqdata, type=1, with.missing=FALSE){
 
 	if (!inherits(seqdata,"stslist"))
 		stop(" [!] data is NOT a sequence object, see seqdef function to create one")
@@ -42,11 +42,11 @@ seqvardur <- function(seqdata, type=1, with.missing=FALSE){
   attr(ret,"vmax") <- as.vector(var.max)
   attr(ret,"meand") <- as.vector(meand)
 
-	class(ret) <- c("seqvardur", class(ret))
+	class(ret) <- c("seqivardur", class(ret))
   return(ret)
 }
 
-print.seqvardur <- function(x, stat='var', ...) {
+print.seqivardur <- function(x, stat='var', ...) {
 	## Conversion for printing without attributes
   statlist <- c('mean','std','var','vmax','all')
   if (any(!stat %in% statlist)) msg.stop.in("stat",statlist)

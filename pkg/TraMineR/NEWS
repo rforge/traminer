@@ -1,8 +1,8 @@
 ## =========
-Version 2.3-1 [2020-08-10] (Development version)
+Version 2.3-1 [2020-08-12] (Development version)
 
 New functions:
-  - seqdurvar() computes the variance of spell durations 
+  - seqivardur() computes the variance of spell durations 
     for each individual sequence. Either the variance of observed 
     non null spells or by accounting also for the 0-time spent
     in non-visited states. The associated print method can print
@@ -14,8 +14,9 @@ Changes in existing functions:
     in non-visited states.
   - seqindic() gains an argument 'durvar.type' to select the type
     of duration variance to use for the turbulence.
-  - seqindic() the possible indicator list gains an element 'dvar' 
-    for the duration variance.
+  - seqindic() the possible indicator list gains elements 'meand'
+    for the mean duration and 'dustd' for the standard deviation
+    of the duration.
   - seqdist() the check of allowed number of unique sequences now
     depends on refseq and used thresholds are
     sqrt(.Machine$integer.max) when refseq==NULL,
@@ -32,7 +33,7 @@ Bug Fixes:
 
 Misc.:
   - TraMineRextras added to 'Suggests' list (to avoid NOTE on
-    undeclared package in Rd xrefs.
+    undeclared package in Rd xrefs.)
 
 ## =========
 Version 2.2-0.1 [2020-04-29]

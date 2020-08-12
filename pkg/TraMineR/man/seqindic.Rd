@@ -15,7 +15,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by \code{\link[TraMineR]{seqdef}}.}
 
-  \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"trans"} (number of state changes), \code{"transp"} (number of state changes as a proportion of maximum possible transitions), \code{"entr"} (longitudinal normalized entropy), \code{"volat"} (objective volatility), \code{"dustd"} (duration standard deviation), \code{"cplx"} (complexity index), \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence), \code{"integr"} (integrative potential), \code{"ppos"} (proportion of positive states), \code{"vpos"} volatility of positive-negative state sequences, \code{"inpos"} (potential to integrate a positive state"),  \code{"prec"} (precarity index). Setting \code{indic="all"} selects all indicators but \code{"integr"}, \code{"ppos"}, \code{"vpos"}, \code{"inpos"}, and \code{"prec"} that require an additional argument list.}
+  \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"trans"} (number of state changes), \code{"transp"} (number of state changes as a proportion of maximum possible transitions), \code{"meand"} (mean spell duration), \code{"dustd"} (duration standard deviation), \code{"entr"} (longitudinal normalized entropy), \code{"volat"} (objective volatility), \code{"cplx"} (complexity index), \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence), \code{"integr"} (integrative potential), \code{"ppos"} (proportion of positive states), \code{"vpos"} volatility of positive-negative state sequences, \code{"inpos"} (potential to integrate a positive state"),  \code{"prec"} (precarity index). Setting \code{indic="all"} selects all indicators but \code{"integr"}, \code{"ppos"}, \code{"vpos"}, \code{"inpos"}, and \code{"prec"} that require an additional argument list.}
 
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
 
@@ -25,14 +25,14 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
 
   \item{prec.args}{list: when \code{"prec"} requested, the arguments passed to \code{seqprecarity} together with \code{seqdata} and \code{with.missing}. See \code{\link{seqprecarity}}.}
 
-  \item{vardur.type}{either 1 or 2: type of duration variance used for \code{'dustd'}, \code{'turb'}, and \code{'turbn'}. Default is 1. See \code{\link{seqvardur}}.}
+  \item{vardur.type}{either 1 or 2: type of duration variance used for \code{'meand'}, \code{'dustd'}, \code{'turb'}, and \code{'turbn'}. Default is 1. See \code{\link{seqivardur}}.}
 
   \item{w}{real in range [0,1]: when \code{volat} weight coefficient passed to \code{\link{seqivolatility}}. Default is 1.}
 }
 \details{
   The number of visited states is the number of different elements in the sequence, e.g. 2 for \code{aababba}.
 
-  The sequence length, number of transitions, longitudinal entropy, volatility, duration standard deviation, complexity, turbulence, proportion of positive states, and precarity are computed respectively with functions \code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqvardur}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegration}}, and \code{\link{seqprecarity}}. See corresponding help pages for details.
+  The sequence length, number of transitions, longitudinal entropy, volatility, duration standard deviation, complexity, turbulence, proportion of positive states, and precarity are computed respectively with functions \code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqivardur}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegration}}, and \code{\link{seqprecarity}}. See corresponding help pages for details.
 
   The \code{with.missing} argument applies to all indicators but the length. \code{lgth} returns the length obtained with \code{with.missing=TRUE}, and \code{nonm} the length obtained with \code{with.missing=FALSE}.
 }
@@ -57,7 +57,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
   \cr \code{Prec}: Precarity
 }
 \seealso{
-\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqvardur}}, \code{\link{seqici}},  \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegration}} and \code{\link{seqprecarity}}
+\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqivardur}}, \code{\link{seqici}},  \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegration}} and \code{\link{seqprecarity}}
 }
 \examples{
 data(ex1)

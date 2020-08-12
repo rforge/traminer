@@ -17,7 +17,7 @@
 
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
 
-  \item{type}{either 1 or 2. Type of duration variance. The default \code{type=1} ignores non visited states. Type 2 accounts for the 0-time spent in non-visited states (see \code{\link{seqvardur}}).}
+  \item{type}{either 1 or 2. Type of duration variance. The default \code{type=1} ignores non visited states. Type 2 accounts for the 0-time spent in non-visited states (see \code{\link{seqivardur}}).}
 
 }
 

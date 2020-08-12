@@ -1,6 +1,6 @@
-\name{seqvardur}
-\alias{seqvardur}
-\alias{print.seqvardur}
+\name{seqivardur}
+\alias{seqivardur}
+\alias{print.seqivardur}
 %
 \author{Gilbert Ritschard}
 %
@@ -10,9 +10,9 @@
   Variance of spell durations of individual state sequences.
 }
 \usage{
-  seqvardur(seqdata, type=1, with.missing=FALSE)
+  seqivardur(seqdata, type=1, with.missing=FALSE)
   
-  ## S3 method for class 'seqvardur'
+  ## S3 method for class 'seqivardur'
   print(x, stat='var')
 }
 \arguments{
@@ -22,7 +22,7 @@
 
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
 
-  \item{x}{an outcome of \code{seqvardur}.}
+  \item{x}{an outcome of \code{seqivardur}.}
   
   \item{stat}{string or vector of strings. Duration statistic to be printed. Either \code{'mean'} (mean duration), \code{'std'} (standard deviation), \code{'var'} (variance), \code{'vmax'} (maximum variance for number of spells), or \code{'all'}. Default is \code{'var'}.}
 }
@@ -52,11 +52,11 @@ Ritschard, Gilbert (2020) Measuring the nature of state sequences, University of
 sq.dat <- c('AAAA','AAAC','ABC','ABAA','AC')
 sq <- seqdef(seqdecomp(sq.dat, sep=''), right=NA)
 
-seqvardur(sq, type=1)
-seqvardur(sq, type=1, with.missing=TRUE)
-vd2 <- seqvardur(sq, type=2)
+seqivardur(sq, type=1)
+seqivardur(sq, type=1, with.missing=TRUE)
+vd2 <- seqivardur(sq, type=2)
 print(vd2, stat='all')
-vd2m <- seqvardur(sq, type=2, with.missing=TRUE)
+vd2m <- seqivardur(sq, type=2, with.missing=TRUE)
 print(vd2m, stat=c('var','vmax'))
 
 }
