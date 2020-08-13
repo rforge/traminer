@@ -10,10 +10,9 @@
   Variance of spell durations of individual state sequences.
 }
 \usage{
-  seqivardur(seqdata, type=1, with.missing=FALSE)
-  
-  ## S3 method for class 'seqivardur'
-  print(x, stat='var')
+seqivardur(seqdata, type=1, with.missing=FALSE)
+
+\method{print}{seqivardur}(x, stat='var', ...)
 }
 \arguments{
   \item{seqdata}{a state sequence object (\code{stslist}) as returned by \code{\link[TraMineR]{seqdef}}.}
@@ -23,18 +22,20 @@
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
 
   \item{x}{an outcome of \code{seqivardur}.}
-  
+
   \item{stat}{string or vector of strings. Duration statistic to be printed. Either \code{'mean'} (mean duration), \code{'std'} (standard deviation), \code{'var'} (variance), \code{'vmax'} (maximum variance for number of spells), or \code{'all'}. Default is \code{'var'}.}
+      
+  \item{...}{further arguments such as \code{digits} passed to the next \code{\link{print}} method.}
 }
 \details{
-  The returned variance is a population variance, i.e. the sum of squares divided by the number of terms. 
-  
-  When \code{type=1}, this is the variance of the observed spells in the sequence. When \code{type=2}, in addition to the observed spells one spell of length 0 is considered for each non-visited state. The mean duration is computed conformably. 
+  The returned variance is a population variance, i.e. the sum of squares divided by the number of terms.
+
+  When \code{type=1}, this is the variance of the observed spells in the sequence. When \code{type=2}, in addition to the observed spells one spell of length 0 is considered for each non-visited state. The mean duration is computed conformably.
 }
 
 \value{
-  A numeric vector with the spell duration variance of each sequence. 
-  
+  A numeric vector with the spell duration variance of each sequence.
+
   The returned object has two attributes:
    \item{vmax}{the maximum value that the variance of each sequence could reach given its number of spells.}
    \item{meand}{the mean spell duration of each sequence.}
