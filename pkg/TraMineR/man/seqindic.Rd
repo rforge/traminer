@@ -15,7 +15,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by \code{\link[TraMineR]{seqdef}}.}
 
-  \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"trans"} (number of state changes), \code{"transp"} (number of state changes as a proportion of maximum possible transitions), \code{"meand"} (mean spell duration), \code{"dustd"} (duration standard deviation), \code{"entr"} (longitudinal normalized entropy), \code{"volat"} (objective volatility), \code{"cplx"} (complexity index), \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence), \code{"integr"} (integrative potential), \code{"ppos"} (proportion of positive states), \code{"vpos"} volatility of positive-negative state sequences, \code{"inpos"} (potential to integrate a positive state"),  \code{"prec"} (precarity index). Setting \code{indic="all"} selects all indicators but \code{"integr"}, \code{"ppos"}, \code{"vpos"}, \code{"inpos"}, and \code{"prec"} that require an additional argument list.}
+  \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"anv"} (average number of visits), \code{"trans"} (number of state changes), \code{"transp"} (number of state changes as a proportion of maximum possible transitions), \code{"meand"} (mean spell duration), \code{"dustd"} (duration standard deviation), \code{"entr"} (longitudinal normalized entropy), \code{"volat"} (objective volatility), \code{"cplx"} (complexity index), \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence), \code{"integr"} (integrative potential), \code{"ppos"} (proportion of positive states), \code{"vpos"} volatility of positive-negative state sequences, \code{"inpos"} (potential to integrate a positive state"),  \code{"prec"} (precarity index). Setting \code{indic="all"} selects all indicators but \code{"integr"}, \code{"ppos"}, \code{"vpos"}, \code{"inpos"}, and \code{"prec"} that require an additional argument list.}
 
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
 
@@ -42,6 +42,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
   \cr \code{NonM}: Number of non missing elements
   \cr \code{Dlgth}: Length of the sequence of distinct successive states (DSS)
   \cr \code{Visited}: Number of visited states
+  \cr \code{Anv}: Average number of visits to visited states
   \cr \code{Trans}: Number of state changes
   \cr \code{Transp}: Number of state changes as a proportion of maximum number of transitions
   \cr \code{Entr}: Longitudinal entropy

@@ -1,13 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-08-12] (Development version)}{
+\section{Changes in version 2.3-1 [2020-08-16] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
       \item
       \code{seqivardur()} computes the variance of spell durations for each individual sequence.
-      Either the variance of the observed spells or by accounting also for the 0-time spent 
+      Either the variance of the observed spells or by accounting also for the 0-time spent
       in non-visited states. The associated print method can print
       the mean, standard deviation, variance, or max variance.
     }
@@ -20,10 +20,11 @@
       variance should account for the 0-length spells
       in non-visited states.
       \item
-      \code{seqindic()} gains an argument \code{durvar.type} to select the type of 
+      \code{seqindic()} gains an argument \code{durvar.type} to select the type of
       duration variance to use for the turbulence.
       \item
-      \code{seqindic()} the possible indicator list gains elements \code{'meand'} for the mean spell duration 
+      \code{seqindic()} the possible indicator list gains elements \code{'anv'},
+      for the average number of visits to visited states, \code{'meand'} for the mean spell duration,
       and \code{'dustd'} for the standard deviation of the duration.
       \item
       \code{seqdist()} the check of allowed number of unique sequences now

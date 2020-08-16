@@ -6,7 +6,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
 	if (!inherits(seqdata,"stslist"))
 		stop("data is NOT a sequence object, see seqdef function to create one")
 
-  indic.list <- c("lgth","nonm","dlgth","visited","meand","dustd",
+  indic.list <- c("lgth","nonm","dlgth","visited","anv","meand","dustd",
     "trans","transp","entr","volat","cplx","turb","turbn",
     "all","ppos","vpos","inpos","prec","integr","visit")
 
@@ -53,20 +53,28 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
     tab <- cbind(tab,nonm)
     lab <- c(lab,"NonM")
   }
-  if("dlgth" %in% indic){
-  ## Length of dss
+  if ("dlgth" %in% indic || "visited" %in% indic || "anv" %in% indic){
 	  dlgth <- suppressMessages(
       seqlength(seqdss(seqdata, with.missing=with.missing), with.missing=with.missing))
-    tab <- cbind(tab,dlgth)
-    lab <- c(lab,"Dlgth")
-  }
-  if("visited" %in% indic){
-  ## Number of visited states
+    if("dlgth" %in% indic){
+    ## Length of dss
+      tab <- cbind(tab,dlgth)
+      lab <- c(lab,"Dlgth")
+    }
     sdist <- suppressMessages(
       seqistatd(seqdata, with.missing=with.missing))
     nvisit <- rowSums(sdist>0)
-    tab <- cbind(tab,nvisit)
-    lab <- c(lab,"Visited")
+    if("visited" %in% indic){
+    ## Number of visited states
+      tab <- cbind(tab,nvisit)
+      lab <- c(lab,"Visited")
+    }
+    anv <- dlgth/nvisit
+    if("anv" %in% indic){
+    ## Number of visited states
+      tab <- cbind(tab,anv)
+      lab <- c(lab,"Anv")
+    }
   }
   if("trans" %in% indic){
 	## Number of state changes (transitions)

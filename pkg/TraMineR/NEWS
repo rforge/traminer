@@ -1,20 +1,21 @@
 ## =========
-Version 2.3-1 [2020-08-12] (Development version)
+Version 2.3-1 [2020-08-16] (Development version)
 
 New functions:
-  - seqivardur() computes the variance of spell durations 
-    for each individual sequence. Either the variance of observed 
+  - seqivardur() computes the variance of spell durations
+    for each individual sequence. Either the variance of observed
     non null spells or by accounting also for the 0-time spent
     in non-visited states. The associated print method can print
     the mean, standard deviation, variance, or max variance.
 
 Changes in existing functions:
-  - seqST() gains an argument 'type' to select whether the duration 
-    variance should account for the 0-length spells 
+  - seqST() gains an argument 'type' to select whether the duration
+    variance should account for the 0-length spells
     in non-visited states.
   - seqindic() gains an argument 'durvar.type' to select the type
     of duration variance to use for the turbulence.
-  - seqindic() the possible indicator list gains elements 'meand'
+  - seqindic() the possible indicator list gains elements 'anv',
+    for the average number of visits to visited states, 'meand'
     for the mean duration and 'dustd' for the standard deviation
     of the duration.
   - seqdist() the check of allowed number of unique sequences now
