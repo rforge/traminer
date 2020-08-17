@@ -80,7 +80,11 @@ seqST <- function(seqdata, norm=FALSE, silent=TRUE, with.missing=FALSE, type=1) 
 
         maxT <- apply(tmp, 1, turb)
 
+        Tx.zero <- which(Tx < 1)
+
         Tx <- (Tx-1)/as.numeric(maxT-1)
+
+        if (length(Tx.zero)>0) Tx[Tx.zero,] <- 0
     }
 
 	rownames(Tx) <- rownames(seqdata)

@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-08-16] (Development version)}{
+\section{Changes in version 2.3-1 [2020-08-17] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -20,12 +20,10 @@
       variance should account for the 0-length spells
       in non-visited states.
       \item
-      \code{seqindic()} gains an argument \code{durvar.type} to select the type of
-      duration variance to use for the turbulence.
-      \item
       \code{seqindic()} the possible indicator list gains elements \code{'anv'},
       for the average number of visits to visited states, \code{'meand'} for the mean spell duration,
-      and \code{'dustd'} for the standard deviation of the duration.
+      \code{'dustd'} for the standard deviation of the duration, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
+      \code{'turb2'}, and \code{'turb2n'}. The \code{indic} arguments accepts now also values \code{'basic'}, \code{'diversity'}, and \code{'complexity'} that each select a subset of indicators.
       \item
       \code{seqdist()} the check of allowed number of unique sequences now
       depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when

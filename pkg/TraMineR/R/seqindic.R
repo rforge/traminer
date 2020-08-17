@@ -1,14 +1,18 @@
 ## Table of indicators
 
 seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
-              ipos.args=list(), integr.args=list(), prec.args=list(), vardur.type=1, w=1) {
+              ipos.args=list(), integr.args=list(), prec.args=list(), w=1) {
 
 	if (!inherits(seqdata,"stslist"))
 		stop("data is NOT a sequence object, see seqdef function to create one")
 
-  indic.list <- c("lgth","nonm","dlgth","visited","anv","meand","dustd",
-    "trans","transp","entr","volat","cplx","turb","turbn",
-    "all","ppos","vpos","inpos","prec","integr","visit")
+  indic.list <- c("lgth","nonm","dlgth","visited","anv","meand","dustd","meand2","dustd2",
+    "trans","transp","entr","volat","cplx","turb","turbn","turb2","turb2n",
+    "all","ppos","vpos","inpos","prec","integr","visit","basic","diversity","complexity")
+  basic.list <- c("lgth","nonm","visited","anv","trans","transp","meand")
+  diversity.list <- c("meand","dustd","meand2","dustd2", "entr","volat")
+  complexity.list <- c("cplx","turb","turbn","turb2","turb2n")
+  qualified.list <- c()
 
   indic.ipos <- c("ppos","vpos","inpos")
   if (any(indic.ipos %in% indic)){
@@ -26,8 +30,22 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
   ##if ("ipos" %in% indic) indic[indic=="ipos"] <- "ppos"
   if ("visit" %in% indic) indic[indic=="visit"] <- "visited"
 
+  if (any(indic=="basic")){
+    indic <- indic[indic!="basic"]
+    indic <- unique(c(indic, basic.list))
+  }
+  if (any(indic=="diversity")){
+    indic <- indic[indic!="diversity"]
+    indic <- unique(c(indic, diversity.list))
+  }
+  if (any(indic=="complexity")){
+    indic <- indic[indic!="complexity"]
+    indic <- unique(c(indic, complexity.list))
+  }
+
+
   if (any(indic=="all")) {
-    indic.all <- indic.list[-((length(indic.list)-6):length(indic.list))]
+    indic.all <- indic.list[-((length(indic.list)-9):length(indic.list))]
     if("ppos" %in% indic) indic.all <- c(indic.all,"ppos")
     if("vpos" %in% indic) indic.all <- c(indic.all,"vpos")
     if("inpos" %in% indic) indic.all <- c(indic.all,"inpos")
@@ -90,19 +108,37 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
     tab <- cbind(tab,trans)
     lab <- c(lab,"Transp")
   }
-  if("meand" %in% indic){
-	## Longitudinal Entropy
-	  meand <- suppressMessages(
-		  attr(seqivardur(seqdata, with.missing=with.missing, type=vardur.type),'meand'))
-    tab <- cbind(tab,meand)
-    lab <- c(lab,"MeanD")
+  if(any(c("meand","dustd") %in% indic)){
+    vardur <- suppressMessages(
+		  seqivardur(seqdata, with.missing=with.missing, type=1))
+    if("meand" %in% indic){
+  	## Longitudinal Entropy
+  	  meand <- attr(vardur,'meand')
+      tab <- cbind(tab,meand)
+      lab <- c(lab,"MeanD")
+    }
+    if("dustd" %in% indic){
+  	## Longitudinal Entropy
+  	  dustd <- sqrt(vardur)
+      tab <- cbind(tab,dustd)
+      lab <- c(lab,"Dustd")
+    }
   }
-  if("dustd" %in% indic){
-	## Longitudinal Entropy
-	  dustd <- suppressMessages(
-		  sqrt(seqivardur(seqdata, with.missing=with.missing, type=vardur.type)))
-    tab <- cbind(tab,dustd)
-    lab <- c(lab,"Dustd")
+  if(any(c("meand2","dustd2") %in% indic)){
+    vardur <- suppressMessages(
+		  seqivardur(seqdata, with.missing=with.missing, type=2))
+    if("meand2" %in% indic){
+  	## Longitudinal Entropy
+  	  meand <- attr(vardur,'meand')
+      tab <- cbind(tab,meand)
+      lab <- c(lab,"MeanD2")
+    }
+    if("dustd" %in% indic){
+  	## Longitudinal Entropy
+  	  dustd <- sqrt(vardur)
+      tab <- cbind(tab,dustd)
+      lab <- c(lab,"Dustd2")
+    }
   }
   if("entr" %in% indic){
 	## Longitudinal Entropy
@@ -127,15 +163,27 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
   }
   if("turbn" %in% indic){
 	## Normalized Turbulence
-	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE, type=vardur.type))
+	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE, type=1))
     tab <- cbind(tab,turb)
     lab <- c(lab,"Turbn")
   }
   if("turb" %in% indic){
 	## Turbulence
-	  turb <- suppressMessages(seqST(seqdata, norm=FALSE, with.missing=with.missing, silent=TRUE, type=vardur.type))
+	  turb <- suppressMessages(seqST(seqdata, norm=FALSE, with.missing=with.missing, silent=TRUE, type=1))
     tab <- cbind(tab,turb)
     lab <- c(lab,"Turb")
+  }
+  if("turb2n" %in% indic){
+	## Normalized Turbulence
+	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE, type=2))
+    tab <- cbind(tab,turb)
+    lab <- c(lab,"Turb2n")
+  }
+  if("turb2" %in% indic){
+	## Turbulence
+	  turb <- suppressMessages(seqST(seqdata, norm=FALSE, with.missing=with.missing, silent=TRUE, type=2))
+    tab <- cbind(tab,turb)
+    lab <- c(lab,"Turb2")
   }
 
   if("integr" %in% indic){
