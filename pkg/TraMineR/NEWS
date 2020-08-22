@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-1 [2020-08-17] (Development version)
+Version 2.3-1 [2020-08-22] (Development version)
 
 New functions:
   - seqivardur() computes the variance of spell durations
@@ -16,8 +16,8 @@ Changes in existing functions:
     for the average number of visits to visited states, 'meand'
     for the mean duration, 'dustd' for the standard deviation
     of the duration, as well as the type 2 forms 'meand2', 'dustd2',
-    'turb2', and 'turb2n'. The 'indic' argument accepts now also 
-    values 'basic', 'diversity', and 'complexity' that each 
+    'turb2', and 'turb2n'. The 'indic' argument accepts now also
+    values 'basic', 'diversity', and 'complexity' that each
     select a subset of indicators.
   - seqdist() the check of allowed number of unique sequences now
     depends on refseq and used thresholds are
