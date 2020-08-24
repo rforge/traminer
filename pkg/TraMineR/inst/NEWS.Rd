@@ -20,10 +20,12 @@
       variance should account for the 0-length spells
       in non-visited states.
       \item
-      \code{seqindic()} the possible indicator list gains elements \code{'anv'},
-      for the average number of visits to visited states, \code{'meand'} for the mean spell duration,
-      \code{'dustd'} for the standard deviation of the duration, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
-      \code{'turb2'}, and \code{'turb2n'}. The \code{indic} arguments accepts now also values \code{'basic'}, \code{'diversity'}, and \code{'complexity'} that each select a subset of indicators.
+      \code{seqindic()} the possible indicator list gains elements
+      \code{'anv'} for average number of visits to visited states,
+      \code{'nvolat'} for normative volatility,
+      \code{'meand'} for mean spell duration,
+      \code{'dustd'} for standard deviation of the duration, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
+      \code{'turb2'}, and \code{'turb2n'}. The \code{indic} arguments accepts now also values \code{'basic'}, \code{'diversity'},  \code{'complexity'}, and \code{'binary'} that each selects a subset of indicators.
       \item
       \code{seqdist()} the check of allowed number of unique sequences now
       depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when

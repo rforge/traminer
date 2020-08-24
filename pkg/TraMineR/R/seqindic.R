@@ -1,35 +1,31 @@
 ## Table of indicators
 
-seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.missing=FALSE,
+seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missing=FALSE,
               ipos.args=list(), integr.args=list(), prec.args=list(), w=1) {
 
 	if (!inherits(seqdata,"stslist"))
-		stop("data is NOT a sequence object, see seqdef function to create one")
+		msg.stop("data is NOT a sequence object, see seqdef function to create one")
 
-  indic.list <- c("lgth","nonm","dlgth","visited","anv","meand","dustd","meand2","dustd2",
-    "trans","transp","entr","volat","cplx","turb","turbn","turb2","turb2n",
-    "all","ppos","vpos","inpos","prec","integr","visit","basic","diversity","complexity")
-  basic.list <- c("lgth","nonm","visited","anv","trans","transp","meand")
+#  indic.list <- c("lgth","nonm","dlgth","visited","anv","meand","dustd","meand2","dustd2",
+#    "trans","transp","entr","volat","cplx","turb","turbn","turb2","turb2n",
+#    "all","vpos","ppos","nvolat","inpos","prec","integr","visit","basic","diversity","complexity","binary")
+  basic.list <- c("lgth","nonm","dlgth","visited","anv","trans","transp","meand")
   diversity.list <- c("meand","dustd","meand2","dustd2", "entr","volat")
   complexity.list <- c("cplx","turb","turbn","turb2","turb2n")
-  qualified.list <- c()
+  binary.list <- c("ppos","nvolat","vpos","inpos")
+  group.list <- c("all","basic","diversity","complexity","binary")
+  indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,"integr","prec")
 
-  indic.ipos <- c("ppos","vpos","inpos")
-  if (any(indic.ipos %in% indic)){
-    if(!is.null(ipos.args[["seqdata"]])) warning( "[!] seqdata argument in ipos.args will be overwritten!" )
-    ipos.args[["seqdata"]] <- seqdata
-    if(!is.null(ipos.args[["with.missing"]])) warning( "[!] with.missing argument in ipos.args will be overwritten!" )
-    ipos.args[["with.missing"]] <- with.missing
-    if(!is.null(ipos.args[["index"]])) warning( "[!] index argument in ipos.args will be overwritten!" )
-  }
-
-  if (!all(indic %in% indic.list)){
-    stop("invalid values in indic: ",paste(indic[!indic %in% indic.list], collapse=", "))
-  }
-
-  ##if ("ipos" %in% indic) indic[indic=="ipos"] <- "ppos"
   if ("visit" %in% indic) indic[indic=="visit"] <- "visited"
 
+  if (!all(indic %in% c(indic.list, group.list))){
+    msg.stop("invalid values in indic: ", paste(indic[!indic %in% c(indic.list, group.list)], collapse=", "))
+  }
+
+  if (any(indic=="all")) {
+    indic <- indic[indic!="all"]
+    indic <- unique(c(indic, basic.list, diversity.list, complexity.list))
+  }
   if (any(indic=="basic")){
     indic <- indic[indic!="basic"]
     indic <- unique(c(indic, basic.list))
@@ -42,17 +38,27 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
     indic <- indic[indic!="complexity"]
     indic <- unique(c(indic, complexity.list))
   }
-
-
-  if (any(indic=="all")) {
-    indic.all <- indic.list[-((length(indic.list)-9):length(indic.list))]
-    if("ppos" %in% indic) indic.all <- c(indic.all,"ppos")
-    if("vpos" %in% indic) indic.all <- c(indic.all,"vpos")
-    if("inpos" %in% indic) indic.all <- c(indic.all,"inpos")
-    if("prec" %in% indic) indic.all <- c(indic.all,"prec")
-    if("integr" %in% indic) indic.all <- c(indic.all,"integr")
-    indic <- indic.all
+  if (any(indic=="binary")){
+    indic <- indic[indic!="binary"]
+    indic <- unique(c(indic, binary.list))
   }
+
+  if (any(binary.list %in% indic)){
+    if(length(ipos.args)==0)
+      msg.stop("At least one of the selected indicators requires an non empty ipos.args")
+    if(!is.null(ipos.args[["seqdata"]])) msg.warn("seqdata argument in ipos.args will be overwritten!" )
+    ipos.args[["seqdata"]] <- seqdata
+    if(!is.null(ipos.args[["with.missing"]])) msg.warn("with.missing argument in ipos.args will be overwritten!" )
+    ipos.args[["with.missing"]] <- with.missing
+    if(!is.null(ipos.args[["index"]])) msg.warn("index argument in ipos.args will be overwritten!" )
+  }
+
+  if ("integr" %in% indic && length(integr.args)==0)
+    msg.stop("'integr' requires a non empty integr.args!")
+
+  if ("prec" %in% indic && length(prec.args)==0)
+    msg.warn("'prec' requested with empty prec.args!")
+
 
   tab <- as.data.frame(rownames(seqdata))
   lab <- "id"
@@ -203,13 +209,25 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
 
   }
 
-
+  ipos.dss <- NULL
+  if(!is.null(ipos.args[["dss"]])) ipos.dss <- ipos.args[["dss"]]
   if("ppos" %in% indic){
   ## Proportion of positive states
     ipos.args[["index"]] <- "share"
+    ipos.args[["dss"]] <- FALSE
     ipos <- do.call(seqipos, args=ipos.args)
+    ipos.args[["dss"]] <- ipos.dss
     tab <- cbind(tab,ipos)
     lab <- c(lab,"Ppos")
+  }
+  if("nvolat" %in% indic){
+  ## normative volatility
+    ipos.args[["index"]] <- "share"
+    ipos.args[["dss"]] <- TRUE
+    ipos <- do.call(seqipos, args=ipos.args)
+    ipos.args[["dss"]] <- ipos.dss
+    tab <- cbind(tab,ipos)
+    lab <- c(lab,"Nvolat")
   }
 
   if("vpos" %in% indic){
@@ -219,7 +237,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
     tab <- cbind(tab,ipos)
     lab <- c(lab,"Vpos")
   }
-  if("inpos" %in% indic){
+if("inpos" %in% indic){
   ## Potential to integrate pos states
     ipos.args[["index"]] <- "integration"
     ipos <- do.call(seqipos, args=ipos.args)
@@ -230,10 +248,10 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx"), with.mis
   if("prec" %in% indic){
   ## index of precarity
     if(!is.null(prec.args[["seqdata"]]))
-      warning( "[!] seqdata argument given in prec.args is overwritten!" )
+      msg.warn( "seqdata argument given in prec.args is overwritten!" )
     prec.args[["seqdata"]] <- seqdata
     if(!is.null(prec.args[["with.missing"]]))
-      warning( "[!] with.missing argument given in prec.args is overwritten!" )
+      msg.warn( "with.missing argument given in prec.args is overwritten!" )
     prec.args[["with.missing"]] <- with.missing
     prec <- do.call(seqprecarity, args=prec.args)
     tab <- cbind(tab,prec)
