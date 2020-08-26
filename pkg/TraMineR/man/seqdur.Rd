@@ -13,7 +13,7 @@ seqdur(seqdata, with.missing=FALSE)
 
 }
 \details{
-When \code{with.missing=FALSE} (default) missing values are ignored and a substring \code{AA***A} will be considered as a spell \code{AAA} of duration 3. When \code{with.missing=TRUE}, durations are also computed for spells of missing values (gaps in sequences).
+When \code{with.missing=FALSE} (default) missing values are ignored and a substring \code{AA***A} for example will be considered as a spell \code{AAA} of duration 3. When \code{with.missing=TRUE}, durations are also computed for spells of missing values (gaps in sequences).
 
 See \link{seqdef} on options for handling missing values when creating sequence objects.
 }
@@ -25,16 +25,17 @@ See \link{seqdef} on options for handling missing values when creating sequence 
 }
 
 \examples{
-## Creating a sequence object with the columns 13 to 24
+## Creating a sequence object from columns 13 to 24
 ## in the 'actcal' example data set
+## Here we retain the first 10 sequences only.
 data(actcal)
-actcal.seq <- seqdef(actcal,13:24)
+actcal.seq <- seqdef(actcal[1:10,13:24])
 
-## Retrieving the DSS
+## Retrieving the spell durations
 actcal.dur <- seqdur(actcal.seq)
 
 ## Displaying the durations for the first 10 sequences
-actcal.dur[1:10,]
+actcal.dur
 }
 
 \author{Alexis Gabadinho and Gilbert Ritschard}
