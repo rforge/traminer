@@ -6,12 +6,12 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
 	if (!inherits(seqdata,"stslist"))
 		msg.stop("data is NOT a sequence object, see seqdef function to create one")
 
-#  indic.list <- c("lgth","nonm","dlgth","visited","anv","meand","dustd","meand2","dustd2",
+#  indic.list <- c("lgth","nonm","dlgth","visited","recu","meand","dustd","meand2","dustd2",
 #    "trans","transp","entr","volat","cplx","turb","turbn","turb2","turb2n",
 #    "all","vpos","ppos","nvolat","inpos","prec","integr","visit","basic","diversity","complexity","binary")
-  basic.list <- c("lgth","nonm","dlgth","visited","anv","trans","transp","meand")
+  basic.list <- c("lgth","nonm","dlgth","visited","recu","trans","transp","meand")
   diversity.list <- c("meand","dustd","meand2","dustd2", "entr","volat")
-  complexity.list <- c("cplx","turb","turbn","turb2","turb2n")
+  complexity.list <- c("nsubs","cplx","turb","turbn","turb2","turb2n")
   binary.list <- c("ppos","nvolat","vpos","inpos")
   group.list <- c("all","basic","diversity","complexity","binary")
   indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,"integr","prec")
@@ -77,7 +77,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     tab <- cbind(tab,nonm)
     lab <- c(lab,"NonM")
   }
-  if ("dlgth" %in% indic || "visited" %in% indic || "anv" %in% indic){
+  if ("dlgth" %in% indic || "visited" %in% indic || "recu" %in% indic){
 	  dlgth <- suppressMessages(
       seqlength(seqdss(seqdata, with.missing=with.missing), with.missing=with.missing))
     if("dlgth" %in% indic){
@@ -93,11 +93,11 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
       tab <- cbind(tab,nvisit)
       lab <- c(lab,"Visited")
     }
-    anv <- dlgth/nvisit
-    if("anv" %in% indic){
+    recu <- dlgth/nvisit
+    if("recu" %in% indic){
     ## Number of visited states
-      tab <- cbind(tab,anv)
-      lab <- c(lab,"Anv")
+      tab <- cbind(tab,recu)
+      lab <- c(lab,"Recu")
     }
   }
   if("trans" %in% indic){
@@ -139,7 +139,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
       tab <- cbind(tab,meand)
       lab <- c(lab,"MeanD2")
     }
-    if("dustd" %in% indic){
+    if("dustd2" %in% indic){
   	## Longitudinal Entropy
   	  dustd <- sqrt(vardur)
       tab <- cbind(tab,dustd)
@@ -159,6 +159,12 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
 		  seqivolatility(seqdata, with.missing=with.missing, w=w))
     tab <- cbind(tab,volat)
     lab <- c(lab,"Volat")
+  }
+  if("nsubs" %in% indic){
+  ## number of subsequences of the DSS
+    nsubs <- seqsubsn(seqdata, with.missing=with.missing)
+    tab <- cbind(tab,nsubs)
+    lab <- c(lab,"Nsubs")
   }
   if("cplx" %in% indic){
 	## Complexity

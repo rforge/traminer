@@ -9,8 +9,13 @@ seqdur(seqdata, with.missing=FALSE)
 }
 \arguments{
    \item{seqdata}{a sequence object as defined by the \code{\link{seqdef}} function.}
-	\item{with.missing}{if set to \code{TRUE}, durations are also computed for missing statuses (gaps in sequences). See \link{seqdef} on options for handling missing values when creating sequence objects.}
+	\item{with.missing}{Should non-void missing values be considered as regular states? See Details.}
 
+}
+\details{
+When \code{with.missing=FALSE} (default) missing values are ignored and a substring \code{AA***A} will be considered as a spell \code{AAA} of duration 3. When \code{with.missing=TRUE}, durations are also computed for spells of missing values (gaps in sequences).
+
+See \link{seqdef} on options for handling missing values when creating sequence objects.
 }
 
 \value{a matrix containing the states durations for each distinct state in each sequence.}
@@ -32,6 +37,6 @@ actcal.dur <- seqdur(actcal.seq)
 actcal.dur[1:10,]
 }
 
-\author{Alexis Gabadinho}
+\author{Alexis Gabadinho and Gilbert Ritschard}
 
 \keyword{Longitudinal characteristics}

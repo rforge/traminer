@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-1 [2020-08-24] (Development version)
+Version 2.3-1 [2020-08-26] (Development version)
 
 New functions:
   - seqivardur() computes the variance of spell durations
@@ -12,8 +12,8 @@ Changes in existing functions:
   - seqST() gains an argument 'type' to select whether the duration
     variance should account for the 0-length spells
     in non-visited states.
-  - seqindic() the possible indicator list gains elements 'anv',
-    for average number of visits to visited states,
+  - seqindic() the possible indicator list gains elements 'recu',
+    for recurrence index,
     'nvolat' for normative volatility, 'meand'
     the mean duration, 'dustd' for standard deviation
     of the duration, as well as the type 2 forms 'meand2', 'dustd2',
@@ -29,10 +29,16 @@ Changes in existing functions:
 Bug Fixes:
   - seqdur() returned sometimes bad values for the duration of the
     last spell when with.missing=TRUE.
+  - seqdur() unexpected outcome for sequences with missing values
+    when with.missing=FALSE. Now correctly ignores missing values.
   - seqdplot() and plot.stslist.statd() ignored the xlab argument.
   - seqconc(), seqdecomp(), seqformat(), and the print method for
     stslist objects produced in some circumstances output without
     the row names of the input data.
+  - seqsubsn() error for sequences with missing values when 
+    with.missing=FALSE. Now correctly ignores missing values.
+
+
 
 Misc.:
   - TraMineRextras added to 'Suggests' list (to avoid NOTE on

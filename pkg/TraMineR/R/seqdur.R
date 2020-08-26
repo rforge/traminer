@@ -8,7 +8,7 @@ seqdur <- function(seqdata, with.missing=FALSE) {
 		stop("data is not a sequence object, see seqdef function to create one")
 
 	nbseq <- nrow(seqdata)
-	sl <- seqlength(seqdata, with.missing=with.missing)
+	sl <- seqlength(seqdata, with.missing=TRUE)
 
 	maxsl <- max(sl)
 	trans <- matrix(nrow=nbseq, ncol=maxsl)
@@ -16,8 +16,8 @@ seqdur <- function(seqdata, with.missing=FALSE) {
 	colnames(trans) <- paste("DUR",1:maxsl, sep="")
 
 	seqdatanum <- seqasnum(seqdata, with.missing=with.missing)
-	if (!with.missing)
-		seqdatanum[is.na(seqdatanum)] <- -99
+	#if (!with.missing)
+	seqdatanum[is.na(seqdatanum)] <- -99
 
 	maxcol <- 0
 	for (i in 1:nbseq) {
@@ -25,14 +25,16 @@ seqdur <- function(seqdata, with.missing=FALSE) {
 		j <- 1
 
 		tmpseq <- seqdatanum[i,]
-		
+
+    while (idx <= sl[i] && tmpseq[idx]==-99) idx <- idx + 1 ## Skipping initial -99 values
+
 		while (idx <= sl[i]) {
 			iseq <- tmpseq[idx]
 			dur <- 1
 
 			while (idx < sl[i] && (tmpseq[idx+1]==iseq || tmpseq[idx+1]==-99)) {
+          if (tmpseq[idx+1]!=-99) dur <- dur+1
 					idx <- idx+1
-					dur <- dur+1
 			}
 
 			## The range of the numeric alphabet

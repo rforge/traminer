@@ -15,7 +15,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by \code{\link[TraMineR]{seqdef}}.}
 
-  \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"anv"} (average number of visits), \code{"trans"} (number of state changes), \code{"transp"} (number of state changes as a proportion of maximum possible transitions), \code{"meand"} (mean spell duration), \code{"dustd"} (duration standard deviation), \code{"meand2"} (mean spell duration accounting for non-visited states), \code{"dustd2"} (duration standard deviation accounting for non-visited states), \code{"entr"} (longitudinal normalized entropy), \code{"volat"} (objective volatility), \code{"cplx"} (complexity index), \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence), \code{"turbn2"} (normalized turbulence accounting for non-visited states), \code{"turb2"} (turbulence accounting for non-visited states), \code{"integr"} (integrative potential), \code{"ppos"} (proportion of positive states), \code{"nvolat"} (normative volatility), \code{"vpos"} volatility of positive-negative state sequences, \code{"inpos"} (potential to integrate a positive state"),  \code{"prec"} (precarity index). Can also be \code{"all"}, \code{"basic"}, \code{"diversity"}, \code{"complexity"},  or \code{"binary"} that each select a subset of the indicators. Setting \code{indic="all"} selects all indicators but \code{"integr"}, \code{"ppos"}, \code{"vpos"}, \code{"nvolat"}, \code{"inpos"}, and \code{"prec"} that require an additional argument list.}
+  \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"recu"} (recurrence index), \code{"trans"} (number of state changes), \code{"transp"} (number of state changes as a proportion of maximum possible transitions), \code{"meand"} (mean spell duration), \code{"dustd"} (duration standard deviation), \code{"meand2"} (mean spell duration accounting for non-visited states), \code{"dustd2"} (duration standard deviation accounting for non-visited states), \code{"entr"} (longitudinal normalized entropy), \code{"volat"} (objective volatility), \code{"nsubs"} (number of subsequences of the DSS sequence), \code{"cplx"} (complexity index), \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence), \code{"turbn2"} (normalized turbulence accounting for non-visited states), \code{"turb2"} (turbulence accounting for non-visited states), \code{"integr"} (integrative potential), \code{"ppos"} (proportion of positive states), \code{"nvolat"} (normative volatility), \code{"vpos"} volatility of positive-negative state sequences, \code{"inpos"} (potential to integrate a positive state"),  \code{"prec"} (precarity index). Can also be \code{"all"}, \code{"basic"}, \code{"diversity"}, \code{"complexity"},  or \code{"binary"} that each select a subset of the indicators. Setting \code{indic="all"} selects all indicators but \code{"integr"}, \code{"ppos"}, \code{"vpos"}, \code{"nvolat"}, \code{"inpos"}, and \code{"prec"} that require an additional argument list.}
 
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
 
@@ -28,7 +28,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
   \item{w}{real in range [0,1]: when \code{volat} weight coefficient passed to \code{\link{seqivolatility}}. Default is 1.}
 }
 \details{
-  The number of visited states is the number of different elements in the sequence, e.g. 2 for \code{aababba}. The average number of visits is \code{Dlgth/Visited}, i.e. the number of spells on the number of visited states.
+  The number of visited states is the number of different elements in the sequence, e.g. 2 for \code{aababba}. The recurrence index \code{'recu'} is the average number of visits of visited states, i.e. \code{Dlgth/Visited}, the number of spells on the number of visited states.
 
   The sequence length, number of transitions, longitudinal entropy, volatility, duration standard deviation, complexity, turbulence, proportion of positive states, integrative potential, and precarity are computed respectively with functions \code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqivardur}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegration}}, and \code{\link{seqprecarity}}. See corresponding help pages for details.
   
@@ -42,7 +42,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
   \cr \code{NonM}: Number of non missing elements
   \cr \code{Dlgth}: Length of the sequence of distinct successive states (DSS)
   \cr \code{Visited}: Number of visited states
-  \cr \code{Anv}: Average number of visits to visited states
+  \cr \code{Recu}: Average number of visits to visited states
   \cr \code{Trans}: Number of state changes
   \cr \code{Transp}: Number of state changes as a proportion of maximum number of transitions
   \cr \code{Meand}: Mean spell duration
@@ -51,6 +51,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
   \cr \code{Dustd2}: Duration standard deviation accounting for non visited states
   \cr \code{Entr}: Longitudinal entropy
   \cr \code{Volat}: Objective volatility
+  \cr \code{Nsubs}: Number of subsequences of the DSS sequence
   \cr \code{Cplx}: Complexity
   \cr \code{Turbn}: Normalized turbulence
   \cr \code{Turb}: Turbulence

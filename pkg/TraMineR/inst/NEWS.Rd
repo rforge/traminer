@@ -21,7 +21,7 @@
       in non-visited states.
       \item
       \code{seqindic()} the possible indicator list gains elements
-      \code{'anv'} for average number of visits to visited states,
+      \code{'recu'} for recurrence index,
       \code{'nvolat'} for normative volatility,
       \code{'meand'} for mean spell duration,
       \code{'dustd'} for standard deviation of the duration, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
@@ -37,10 +37,18 @@
   \subsection{Bug Fixes}{
     \itemize{
       \item
+      \code{seqdur()} returned sometimes bad values for the duration of the
+      last spell when \code{with.missing=TRUE}.
+      \item
+      \code{seqdur()} unexpected outcome for sequences with missing values when \code{with.missing=FALSE}. Now correctly ignores missing values.
+      \item
       \code{seqdplot()} and \code{plot.stslist.statd()} ignored the \code{xlab} argument.
       \item
       \code{seqconc()}, \code{seqdecomp()}, \code{seqformat()}, and the print method for
       \code{stslist} objects produced in some circumstances output without the row names of the input data.
+      \item
+      \code{seqsubsn()} error for sequences with missing values when \code{with.missing=FALSE}. Now correctly ignores missing values.
+
     }
   }
 

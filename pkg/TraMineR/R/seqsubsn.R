@@ -2,9 +2,10 @@
 ## Number of distinct subsequences in a sequence
 ## =============================================
 
-nsubs <- function (x, nbstat, statlist, void) {
+nsubs <- function (x, nbstat, statlist, void, nr, with.missing) {
 		l <- vector(mode="integer", nbstat)
 		x <- x[x!=void]
+    if (!with.missing) x <- x[x!=nr]
 		slength <- length(x)
     if (slength == 0) return(1) ## empty sequence has one subseq (the empty one)
 
@@ -49,8 +50,9 @@ seqsubsn <- function(seqdata, DSS=TRUE, with.missing=FALSE) {
 	ns <- length(sl)
 
 	void <- attr(seqdata,"void")
+	nr <- attr(seqdata,"nr")
 		
-	result <- apply(seqdata, 1, nsubs, nbstat=ns, statlist=sl, void=void)
+	result <- apply(seqdata, 1, nsubs, nbstat=ns, statlist=sl, void=void, nr=nr, with.missing=with.missing)
 
 	result <- as.matrix(result)
 	colnames(result) <- "Subseq."
