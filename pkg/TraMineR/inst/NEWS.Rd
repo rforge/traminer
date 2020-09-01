@@ -10,6 +10,10 @@
       Either the variance of the observed spells or by accounting also for the 0-time spent
       in non-visited states. The associated print method can print
       the mean, standard deviation, variance, or max variance.
+      \item
+      \code{seqsprec()} simplified normalized precarity index.
+      \item
+      \code{seqdegr()} degrading index.
     }
   }
 
@@ -31,6 +35,8 @@
       depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when
       \code{refseq==NULL}, and \code{.Machine$integer.max} otherwise.
       In addition, a new argument permits to skip the test.
+      \item
+      \code{seqprecarity()} new attribute \code{degr} to use the degrading index as correction factor.
     }
   }
 

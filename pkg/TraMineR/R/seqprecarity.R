@@ -1,6 +1,24 @@
+## aliases for simplified precarity
+
+seqsprec <- function(seqdata, correction=NULL,
+    otto=.2, a=.5, stprec=NULL, method = "TRATEDSS",
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE, ...){
+
+  sprec <- seqprecarity(seqdata, correction=correction,
+            otto=otto, a=a, b=1-a,
+            stprec=stprec, method=method,
+            state.order=state.order, state.equiv=state.equiv,
+            with.missing=with.missing, degr=TRUE, ...)
+  colnames(sprec)<-"Degrad"
+
+  return(sprec)
+}
+
+
 seqprecarity <- function(seqdata, correction=NULL,
     otto=.2, a=1, b=1.2, stprec=NULL, method = "TRATEDSS",
-    state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE, ...){
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE,
+    degr = FALSE, ...){
 
 	if (!inherits(seqdata,"stslist"))
 		stop(call.=FALSE, "seqprecarity: data is not a state sequence object, use seqdef function to create one")
@@ -21,6 +39,7 @@ seqprecarity <- function(seqdata, correction=NULL,
   if (is.null(correction)){
     correction <- 1 + seqprecorr(seqdata, method=method, state.order=state.order,
                   state.equiv=state.equiv, stprec=stprec, with.missing=with.missing, ...)
+    if (degr) correction <- correction/2
   }
 ##  index of complexity
   ici <- suppressMessages(seqici(seqdata, with.missing=with.missing))

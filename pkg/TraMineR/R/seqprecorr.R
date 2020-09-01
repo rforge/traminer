@@ -1,3 +1,21 @@
+## alias for degrading index
+
+seqdegr <- function(seqdata,
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
+    penalized="BOTH", method = "TRATEDSS", weight.type="ADD", stprec=NULL,
+    with.missing=FALSE, border.effect=10){
+
+  degr <- seqprecorr(seqdata,
+            state.order=state.order, state.equiv=state.equiv,
+            penalized=penalized, method=method, weight.type=weight.type,
+            stprec=stprec, with.missing=with.missing, border.effect=border.effect)
+  degr <- (1-degr)/2
+  colnames(degr)<-"Degrad"
+  return(degr)
+}
+
+
+
 ## =====================================
 ## Correction term
 ## =====================================

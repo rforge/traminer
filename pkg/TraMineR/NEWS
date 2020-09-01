@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-1 [2020-08-26] (Development version)
+Version 2.3-1 [2020-09-01] (Development version)
 
 New functions:
   - seqivardur() computes the variance of spell durations
@@ -7,6 +7,8 @@ New functions:
     non null spells or by accounting also for the 0-time spent
     in non-visited states. The associated print method can print
     the mean, standard deviation, variance, or max variance.
+  - seqsprec() simplified normalized precarity index.
+  - seqdegr() degrading index.
 
 Changes in existing functions:
   - seqST() gains an argument 'type' to select whether the duration
@@ -25,6 +27,8 @@ Changes in existing functions:
     sqrt(.Machine$integer.max) when refseq==NULL,
     and .Machine$integer.max otherwise. In addition, a new argument
     permits to skip the test.
+  - seqprecarity() new attribute 'degr' to use the
+    degrading index as correction factor.
 
 Bug Fixes:
   - seqdur() returned sometimes bad values for the duration of the
@@ -35,7 +39,7 @@ Bug Fixes:
   - seqconc(), seqdecomp(), seqformat(), and the print method for
     stslist objects produced in some circumstances output without
     the row names of the input data.
-  - seqsubsn() error for sequences with missing values when 
+  - seqsubsn() error for sequences with missing values when
     with.missing=FALSE. Now correctly ignores missing values.
 
 
