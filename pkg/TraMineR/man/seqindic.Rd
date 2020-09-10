@@ -31,9 +31,9 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
   The number of visited states is the number of different elements in the sequence, e.g. 2 for \code{aababba}. The recurrence index \code{'recu'} is the average number of visits of visited states, i.e. \code{Dlgth/Visited}, the number of spells on the number of visited states.
 
   The sequence length, number of transitions, longitudinal entropy, volatility, duration standard deviation, complexity, turbulence, proportion of positive states, integrative potential, and precarity are computed respectively with functions \code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqivardur}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegration}}, and \code{\link{seqprecarity}}. See corresponding help pages for details.
-  
+
   The proportion of positive states (\code{'ppos'}) and the normative volatility (\code{'nvolat'}) are the proportions of positive states in respectively the original sequences and the DSS. They ignore the value of \code{dss} in the \code{ipos.args} list.
-  
+
   The \code{with.missing} argument applies to all indicators but the length. \code{'lgth'} returns the length obtained with \code{with.missing=TRUE}, and \code{'nonm'} the length obtained with \code{with.missing=FALSE}.
 }
 \value{

@@ -1,25 +1,25 @@
 ## =========
-Version 2.3-1 [2020-09-01] (Development version)
+Version 2.3-1 [2020-09-10] (Development version)
 
 New functions:
   - seqivardur() computes the variance of spell durations
     for each individual sequence. Either the variance of observed
     non null spells or by accounting also for the 0-time spent
     in non-visited states. The associated print method can print
-    the mean, standard deviation, variance, or max variance.
-  - seqsprec() simplified normalized precarity index.
-  - seqdegr() degrading index.
+    the mean, standard deviation, variance, and max variance.
 
 Changes in existing functions:
   - seqST() gains an argument 'type' to select whether the duration
     variance should account for the 0-length spells
     in non-visited states.
-  - seqindic() the possible indicator list gains elements 'recu',
-    for recurrence index,
-    'nvolat' for normative volatility, 'meand'
-    the mean duration, 'dustd' for standard deviation
-    of the duration, as well as the type 2 forms 'meand2', 'dustd2',
-    'turb2', and 'turb2n'. The 'indic' argument accepts now also
+  - seqindic() the possible indicator list gains elements
+    'recu' for recurrence index,
+    'nvolat' for normative volatility,
+    'meand' for mean duration,
+    'dustd' for standard deviation of the duration,
+    as well as the type 2 forms 'meand2', 'dustd2',
+    'turb2', and 'turb2n'.
+    The 'indic' argument accepts now also
     values 'basic', 'diversity', 'complexity', and 'binary' that each
     selects a subset of indicators.
   - seqdist() the check of allowed number of unique sequences now
@@ -27,12 +27,12 @@ Changes in existing functions:
     sqrt(.Machine$integer.max) when refseq==NULL,
     and .Machine$integer.max otherwise. In addition, a new argument
     permits to skip the test.
-  - seqprecarity() new attribute 'degr' to use the
-    degrading index as correction factor.
+  - seqprecstart() the normalized stprec has now a minimum 0.
 
 Bug Fixes:
   - seqdur() returned sometimes bad values for the duration of the
-    last spell when with.missing=TRUE.
+    last spell of sequences of unequal lengths when
+    with.missing=TRUE.
   - seqdur() unexpected outcome for sequences with missing values
     when with.missing=FALSE. Now correctly ignores missing values.
   - seqdplot() and plot.stslist.statd() ignored the xlab argument.
@@ -41,8 +41,6 @@ Bug Fixes:
     the row names of the input data.
   - seqsubsn() error for sequences with missing values when
     with.missing=FALSE. Now correctly ignores missing values.
-
-
 
 Misc.:
   - TraMineRextras added to 'Suggests' list (to avoid NOTE on

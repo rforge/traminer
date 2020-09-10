@@ -13,8 +13,9 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
   diversity.list <- c("meand","dustd","meand2","dustd2", "entr","volat")
   complexity.list <- c("nsubs","cplx","turb","turbn","turb2","turb2n")
   binary.list <- c("ppos","nvolat","vpos","inpos")
-  group.list <- c("all","basic","diversity","complexity","binary")
-  indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,"integr","prec")
+  ranked.list <- c("bad","degrad","prec","prec2")
+  group.list <- c("all","basic","diversity","complexity","binary","ranked")
+  indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,"integr",ranked.list)
 
   if ("visit" %in% indic) indic[indic=="visit"] <- "visited"
 
@@ -42,6 +43,11 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     indic <- indic[indic!="binary"]
     indic <- unique(c(indic, binary.list))
   }
+  if (any(indic=="ranked")){
+    indic <- indic[indic!="ranked"]
+    indic <- unique(c(indic, ranked.list))
+  }
+
 
   if (any(binary.list %in% indic)){
     if(length(ipos.args)==0)
@@ -53,11 +59,22 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     if(!is.null(ipos.args[["index"]])) msg.warn("index argument in ipos.args will be overwritten!" )
   }
 
+  if (any(ranked.list %in% indic)){
+    if(length(prec.args)==0)
+      msg.warn("No prec.args list. Alphabet order used as state order.")
+    if(!is.null(prec.args[["seqdata"]])) msg.warn("seqdata argument in prec.args will be overwritten!" )
+    prec.args[["seqdata"]] <- seqdata
+    if(!is.null(prec.args[["with.missing"]])) msg.warn("with.missing argument in prec.args will be overwritten!" )
+    prec.args[["with.missing"]] <- with.missing
+    if(!is.null(ipos.args[["type"]])) msg.warn("type argument in prec.args will be overwritten!" )
+  }
+
+
   if ("integr" %in% indic && length(integr.args)==0)
     msg.stop("'integr' requires a non empty integr.args!")
 
-  if ("prec" %in% indic && length(prec.args)==0)
-    msg.warn("'prec' requested with empty prec.args!")
+  #if ("prec" %in% indic && length(prec.args)==0)
+  #  msg.warn("'prec' requested with empty prec.args!")
 
 
   tab <- as.data.frame(rownames(seqdata))
@@ -199,7 +216,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
   }
 
   if("integr" %in% indic){
-  ## index of precarity
+  ## index of integration
     if(!is.null(integr.args[["state"]])){
       if(!is.null(integr.args[["seqdata"]]))
         warning( "[!] seqdata argument in integr.args will be overwritten!" )
@@ -251,18 +268,36 @@ if("inpos" %in% indic){
     lab <- c(lab,"Inpos")
   }
 
+  if("bad" %in% indic){
+  ## index of precarity
+    bad <- do.call(seqibad, args=prec.args)
+    tab <- cbind(tab,bad)
+    lab <- c(lab,"Bad")
+  }
+
+  if("degrad" %in% indic){
+  ## index of precarity
+    degrad <- do.call(seqidegrad, args=prec.args)
+    tab <- cbind(tab,bad)
+    lab <- c(lab,"Degrad")
+  }
+
   if("prec" %in% indic){
   ## index of precarity
-    if(!is.null(prec.args[["seqdata"]]))
-      msg.warn( "seqdata argument given in prec.args is overwritten!" )
-    prec.args[["seqdata"]] <- seqdata
-    if(!is.null(prec.args[["with.missing"]]))
-      msg.warn( "with.missing argument given in prec.args is overwritten!" )
-    prec.args[["with.missing"]] <- with.missing
-    prec <- do.call(seqprecarity, args=prec.args)
+    prec.args[["type"]] <- 1
+    prec <- do.call(seqprecarity.private, args=prec.args)
     tab <- cbind(tab,prec)
     lab <- c(lab,"Prec")
   }
+
+  if("prec2" %in% indic){
+  ## index of precarity
+    prec.args[["type"]] <- 2
+    prec <- do.call(seqprecarity.private, args=prec.args)
+    tab <- cbind(tab,prec)
+    lab <- c(lab,"Prec2")
+  }
+
 
   names(tab) <- lab
   tab <- tab[,-1, drop=FALSE]

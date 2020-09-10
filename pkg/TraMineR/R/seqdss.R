@@ -9,7 +9,7 @@ seqdss <- function(seqdata, with.missing=FALSE) {
 
 	nbseq <- nrow(seqdata)
 
-	sl <- seqlength(seqdata, with.missing=with.missing)
+	sl <- seqlength(seqdata, with.missing=TRUE)
 	maxsl <- max(sl)
 
 	void <- attr(seqdata, "void")

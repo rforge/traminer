@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-08-22] (Development version)}{
+\section{Changes in version 2.3-1 [2020-09-10] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -9,11 +9,11 @@
       \code{seqivardur()} computes the variance of spell durations for each individual sequence.
       Either the variance of the observed spells or by accounting also for the 0-time spent
       in non-visited states. The associated print method can print
-      the mean, standard deviation, variance, or max variance.
-      \item
-      \code{seqsprec()} simplified normalized precarity index.
-      \item
-      \code{seqdegr()} degrading index.
+      the mean, standard deviation, variance, and max variance.
+      %\item
+      %\code{seqidegrad()} degrading index.
+      %\item
+      %\code{seqibad()} badness index.
     }
   }
 
@@ -27,16 +27,18 @@
       \code{seqindic()} the possible indicator list gains elements
       \code{'recu'} for recurrence index,
       \code{'nvolat'} for normative volatility,
+      %\code{'degrad'} for degrading index,
+      %\code{'bad'} for badness index,
+      %\code{'prec2'} for revised precarity index,
       \code{'meand'} for mean spell duration,
       \code{'dustd'} for standard deviation of the duration, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
-      \code{'turb2'}, and \code{'turb2n'}. The \code{indic} arguments accepts now also values \code{'basic'}, \code{'diversity'},  \code{'complexity'}, and \code{'binary'} that each selects a subset of indicators.
+      \code{'turb2'}, and \code{'turb2n'}. 
+      The \code{indic} argument accepts now also values \code{'basic'}, \code{'diversity'},  \code{'complexity'}, and \code{'binary'} that each selects a subset of indicators.
       \item
       \code{seqdist()} the check of allowed number of unique sequences now
       depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when
       \code{refseq==NULL}, and \code{.Machine$integer.max} otherwise.
       In addition, a new argument permits to skip the test.
-      \item
-      \code{seqprecarity()} new attribute \code{degr} to use the degrading index as correction factor.
     }
   }
 
@@ -44,7 +46,7 @@
     \itemize{
       \item
       \code{seqdur()} returned sometimes bad values for the duration of the
-      last spell when \code{with.missing=TRUE}.
+      last spell of sequences of unequal lengths when \code{with.missing=TRUE}.
       \item
       \code{seqdur()} unexpected outcome for sequences with missing values when \code{with.missing=FALSE}. Now correctly ignores missing values.
       \item
