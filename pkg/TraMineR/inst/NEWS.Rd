@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-09-10] (Development version)}{
+\section{Changes in version 2.3-1 [2020-09-18] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -32,7 +32,7 @@
       %\code{'prec2'} for revised precarity index,
       \code{'meand'} for mean spell duration,
       \code{'dustd'} for standard deviation of the duration, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
-      \code{'turb2'}, and \code{'turb2n'}. 
+      \code{'turb2'}, and \code{'turb2n'}.
       The \code{indic} argument accepts now also values \code{'basic'}, \code{'diversity'},  \code{'complexity'}, and \code{'binary'} that each selects a subset of indicators.
       \item
       \code{seqdist()} the check of allowed number of unique sequences now

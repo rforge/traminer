@@ -270,30 +270,34 @@ if("inpos" %in% indic){
 
   if("bad" %in% indic){
   ## index of precarity
-    bad <- do.call(seqibad, args=prec.args)
+    dlist <- names(formals(seqibad))
+    bad <- do.call(seqibad, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,bad)
     lab <- c(lab,"Bad")
   }
 
   if("degrad" %in% indic){
   ## index of precarity
-    degrad <- do.call(seqidegrad, args=prec.args)
-    tab <- cbind(tab,bad)
+    dlist <- names(formals(seqidegrad))
+    degrad <- do.call(seqidegrad, args=prec.args[names(prec.args) %in% dlist])
+    tab <- cbind(tab,degrad)
     lab <- c(lab,"Degrad")
   }
 
   if("prec" %in% indic){
   ## index of precarity
+    dlist <- names(formals(seqprecarity.private))
     prec.args[["type"]] <- 1
-    prec <- do.call(seqprecarity.private, args=prec.args)
+    prec <- do.call(seqprecarity.private, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,prec)
     lab <- c(lab,"Prec")
   }
 
   if("prec2" %in% indic){
   ## index of precarity
+    dlist <- names(formals(seqprecarity.private))
     prec.args[["type"]] <- 2
-    prec <- do.call(seqprecarity.private, args=prec.args)
+    prec <- do.call(seqprecarity.private, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,prec)
     lab <- c(lab,"Prec2")
   }

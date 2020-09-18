@@ -62,7 +62,7 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
   ##}
 
   if (is.null(correction)){
-    correction <- 1 - seqdegrad.private(seqdata, method=method, state.order=state.order,
+    correction <- 1 + seqdegrad.private(seqdata, method=method, state.order=state.order,
                   state.equiv=state.equiv, stprec=stprec, with.missing=with.missing,
                   tr.sum=tr.sum,
                   ...)
@@ -74,12 +74,15 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
   }
 
 ##  index of complexity
-  if (a != 0)
+  if (a != 0){
     ici <- suppressMessages(seqici(seqdata, with.missing=with.missing))
+    #if (type==2) ici <- 1+ici
+  }
   else
     ici <- 1
   alphabet <- alphabet(seqdata, with.missing=with.missing)
-  lalph <- sapply(seqdss(seqdata,with.missing=with.missing)[,1],'match',alphabet)
+  sdss <- seqdss(seqdata,with.missing=with.missing)
+  lalph <- sapply(sdss[,1],'match',alphabet)
   #nr1 <- which(seqdata[,1]==attr(seqdata,'nr'))
   #if (with.missing && length(nr1)>0 && ncol(seqdata)>1) {
   #  lalph2 <- sapply(seqdss(seqdata,with.missing=with.missing)[,2],'match',alphabet)
@@ -109,7 +112,26 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
 #  if (degr)
 #    prec <- integr1 * stprec[lalph] + correction
 #  else
+  if (type==1){
     prec <- otto*(stprec[lalph]*integr1) + (1-otto) * ici^a * correction^b
+  }
+  else {
+    minstprec <- function(dssrow,stprec,alphabet){
+      if (any(dssrow %in% alphabet))
+        best <- min(stprec[alphabet %in% dssrow])
+      else
+        best <- NA
+      return(best)
+    }
+
+    prec <- stprec[lalph]*integr1 + (ici + (correction-1))
+    #prec <- cbind(prec, rep(0,nrow(prec)))
+    prec <- cbind(prec,apply(as.matrix(sdss),1,minstprec,stprec=stprec,alphabet=alphabet))
+    prec[,1] <- apply(prec,1,max)
+    prec[,2] <- rep(1,nrow(prec))
+    prec[,1] <- apply(prec,1,min)
+    prec <- prec[,1,drop=FALSE]
+  }
 
 	class(prec) <- c("seqprec","matrix")
 
