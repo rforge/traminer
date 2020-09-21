@@ -36,7 +36,7 @@ seqivardur <- function(seqdata, type=1, with.missing=FALSE){
     else
       maxnnv <- ifelse(dlgth==1, alph.size-1, alph.size-2)
     meand.max <- meand*(dlgth + nnvisit)/(dlgth + maxnnv)
-    print(meand.max)
+    ##print(meand.max)
     var.max <- ((dlgth-1)*(1-meand.max)^2 + (lgth-dlgth+1-meand.max)^2 + maxnnv*meand.max^2) / (dlgth + maxnnv)
   }
 

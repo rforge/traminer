@@ -10,8 +10,8 @@ Determines the state undesirableness degree from the state ordering or conversel
 }
 
 \usage{
-seqprecstart(seqdata, 
-    state.order=state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
+seqprecstart(seqdata,
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
     stprec=NULL, with.missing=FALSE)
 }
 
