@@ -6,7 +6,7 @@ seqprecstart <- function(seqdata, state.order=alphabet(seqdata, with.missing), s
 
   if (!is.null(stprec)) { ## state.order set from stprec
     if (!is.null(state.order)) {
-       msg.warn("state.order overriden by stprec order!")
+       msg.warn("state.order overridden by stprec order!")
     }
     ord <- order(stprec)
     ord <- ord[(1+sum(stprec<0)):length(ord)] ## only positive values

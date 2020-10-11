@@ -22,7 +22,7 @@ seqprecstart(seqdata,
 
   \item{state.equiv}{List of state equivalence classes. The classes in the list are each set as the vector of the short labels of the states forming the class. }
 
-  \item{stprec}{Vector of user defined state undesirableness degrees ordered conformably with the alphabet of seqdata. Use negative values to indicate non-comparable states.}
+  \item{stprec}{Vector of user defined state undesirableness degrees ordered conformably with the alphabet of \code{seqdata}. Use negative values to indicate non-comparable states.}
 
   \item{with.missing}{Logical. Should the missing state be considered as an element of the alphabet?
       }

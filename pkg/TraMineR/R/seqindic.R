@@ -1,23 +1,36 @@
 ## Table of indicators
 
 seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missing=FALSE,
-              ipos.args=list(), integr.args=list(), prec.args=list(), w=1) {
+              ipos.args=list(), prec.args=list(), w=1) {
 
 	if (!inherits(seqdata,"stslist"))
 		msg.stop("data is NOT a sequence object, see seqdef function to create one")
 
 #  indic.list <- c("lgth","nonm","dlgth","visited","recu","meand","dustd","meand2","dustd2",
 #    "trans","transp","entr","volat","cplx","turb","turbn","turb2","turb2n",
-#    "all","vpos","ppos","nvolat","inpos","prec","integr","visit","basic","diversity","complexity","binary")
-  basic.list <- c("lgth","nonm","dlgth","visited","recu","trans","transp","meand")
-  diversity.list <- c("meand","dustd","meand2","dustd2", "entr","volat")
-  complexity.list <- c("nsubs","cplx","turb","turbn","turb2","turb2n")
-  binary.list <- c("ppos","nvolat","vpos","inpos")
-  ranked.list <- c("bad","degrad","prec","prec2")
-  group.list <- c("all","basic","diversity","complexity","binary","ranked")
-  indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,"integr",ranked.list)
+#    "all","vpos","ppos","nvolat","inpos","prec","integr","visit","basic","diversity","complexity","binary","Develop")
+
+  if ("Develop" %in% indic){
+    basic.list <- c("lgth","nonm","dlgth","visited","recu","trans","transp","meand")
+    diversity.list <- c("meand","dustd","meand2","dustd2", "entr","volat")
+    complexity.list <- c("nsubs","cplx","turb","turbn","turb2","turb2n")
+    binary.list <- c("ppos","nvolat","vpos","inpos")
+    ranked.list <- c("bad","degrad","prec","prec2")
+    group.list <- c("all","basic","diversity","complexity","binary","ranked")
+    indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,ranked.list)
+    indic <- indic[indic != 'Develop']
+  } else {
+    basic.list <- c("lgth","nonm","dlgth","visited","recu","trans","transp","meand")
+    diversity.list <- c("meand","dustd","entr","volat")
+    complexity.list <- c("nsubs","cplx","turb","turbn")
+    binary.list <- c("ppos","nvolat","vpos","inpos")
+    ranked.list <- c("prec")
+    group.list <- c("all","basic","diversity","complexity","binary","ranked")
+    indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,ranked.list)
+  }
 
   if ("visit" %in% indic) indic[indic=="visit"] <- "visited"
+  if ("integr" %in% indic) indic[indic=="integr"] <- "inpos"
 
   if (!all(indic %in% c(indic.list, group.list))){
     msg.stop("invalid values in indic: ", paste(indic[!indic %in% c(indic.list, group.list)], collapse=", "))
@@ -70,8 +83,8 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
   }
 
 
-  if ("integr" %in% indic && length(integr.args)==0)
-    msg.stop("'integr' requires a non empty integr.args!")
+  #if ("integr" %in% indic && length(integr.args)==0)
+  #  msg.stop("'integr' requires a non empty integr.args!")
 
   #if ("prec" %in% indic && length(prec.args)==0)
   #  msg.warn("'prec' requested with empty prec.args!")
@@ -215,22 +228,22 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     lab <- c(lab,"Turb2")
   }
 
-  if("integr" %in% indic){
-  ## index of integration
-    if(!is.null(integr.args[["state"]])){
-      if(!is.null(integr.args[["seqdata"]]))
-        warning( "[!] seqdata argument in integr.args will be overwritten!" )
-      integr.args[["seqdata"]] <- seqdata
-      if(!is.null(integr.args[["with.missing"]]))
-        warning( "[!] with.missing argument in integr.args will be overwritten!" )
-      integr.args[["with.missing"]] <- with.missing
-      integr <- do.call(seqintegration, args=integr.args)
-      tab <- cbind(tab,integr)
-      lab <- c(lab,"Integr")
-    } else
-        warning( "[!] Integr not computed because no state specified in integr.args!" )
-
-  }
+###   if("integr" %in% indic){
+###   ## index of integration
+###     if(!is.null(integr.args[["state"]])){
+###       if(!is.null(integr.args[["seqdata"]]))
+###         warning( "[!] seqdata argument in integr.args will be overwritten!" )
+###       integr.args[["seqdata"]] <- seqdata
+###       if(!is.null(integr.args[["with.missing"]]))
+###         warning( "[!] with.missing argument in integr.args will be overwritten!" )
+###       integr.args[["with.missing"]] <- with.missing
+###       integr <- do.call(seqintegration, args=integr.args)
+###       tab <- cbind(tab,integr)
+###       lab <- c(lab,"Integr")
+###     } else
+###         warning( "[!] Integr not computed because no state specified in integr.args!" )
+###
+###   }
 
   ipos.dss <- NULL
   if(!is.null(ipos.args[["dss"]])) ipos.dss <- ipos.args[["dss"]]
@@ -260,7 +273,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     tab <- cbind(tab,ipos)
     lab <- c(lab,"Vpos")
   }
-if("inpos" %in% indic){
+  if("inpos" %in% indic){
   ## Potential to integrate pos states
     ipos.args[["index"]] <- "integration"
     ipos <- do.call(seqipos, args=ipos.args)
@@ -270,7 +283,7 @@ if("inpos" %in% indic){
 
   if("bad" %in% indic){
   ## index of precarity
-    dlist <- names(formals(seqibad))
+    dlist <- unique(c(names(formals(seqibad)),names(formals(seqprecstart))))
     bad <- do.call(seqibad, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,bad)
     lab <- c(lab,"Bad")
@@ -286,7 +299,7 @@ if("inpos" %in% indic){
 
   if("prec" %in% indic){
   ## index of precarity
-    dlist <- names(formals(seqprecarity.private))
+    dlist <- unique(c(names(formals(seqprecarity.private)),names(formals(seqdegrad.private))))
     prec.args[["type"]] <- 1
     prec <- do.call(seqprecarity.private, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,prec)
@@ -295,7 +308,7 @@ if("inpos" %in% indic){
 
   if("prec2" %in% indic){
   ## index of precarity
-    dlist <- names(formals(seqprecarity.private))
+    dlist <- unique(c(names(formals(seqprecarity.private)),names(formals(seqdegrad.private))))
     prec.args[["type"]] <- 2
     prec <- do.call(seqprecarity.private, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,prec)
