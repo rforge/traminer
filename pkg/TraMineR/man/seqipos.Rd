@@ -55,6 +55,12 @@
 \seealso{
 \code{\link{seqindic}}
 }
+\references{
+Brzinsky-Fay, C. (2007) Lost in Transition? Labour Market Entry Sequences of School Leavers in Europe, \emph{European Sociological Review}, 23(4). DOI: \href{https://doi.org/10.1093/esr/jcm011}{10.1093/esr/jcm011}
+
+Brzinsky-Fay, C. (2018) Unused Resources: Sequence and Trajectory Indicators. International Symposium on Sequence Analysis and Related Methods, Monte Verita, TI, Switzerland, October 10-12, 2018.
+}
+
 \examples{
 data(ex1)
 sx <- seqdef(ex1[,1:13], right="DEL")

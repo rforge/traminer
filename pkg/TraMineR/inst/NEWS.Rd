@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-1 [2020-10-11] (Development version)}{
+\section{Changes in version 2.3-1 [2020-10-21] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -20,9 +20,7 @@
   \subsection{Changes in existing functions}{
     \itemize{
       \item
-      \code{seqST()} gains an argument \code{type} to select whether the duration
-      variance should account for the 0-length spells
-      in non-visited states.
+      \code{seqST()} gains an argument \code{type} to select the type of duration variance used.
       \item
       \code{seqindic()} the possible indicator list gains elements
       \code{'recu'} for recurrence index,
@@ -31,9 +29,12 @@
       %\code{'bad'} for badness index,
       %\code{'prec2'} for revised precarity index,
       \code{'meand'} for mean spell duration,
-      \code{'dustd'} for standard deviation of the duration, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
-      \code{'turb2'}, and \code{'turb2n'}.
+      \code{'dustd'} for standard deviation of the duration.
+      %, as well as the type 2 forms \code{'meand2'}, \code{'dustd2'},
+      %\code{'turb2'}, and \code{'turb2n'}.
       The \code{indic} argument accepts now also values \code{'basic'}, \code{'diversity'},  \code{'complexity'}, and \code{'binary'} that each selects a subset of indicators.
+      \item
+      \code{seqprecstart()} the normalized \code{stprec} has now a minimum 0.
       \item
       \code{seqdist()} the check of allowed number of unique sequences now
       depends on \code{refseq} and used thresholds are \code{sqrt(.Machine$integer.max)} when

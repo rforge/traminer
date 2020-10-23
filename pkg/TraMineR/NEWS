@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-1 [2020-10-11] (Development version)
+Version 2.3-1 [2020-10-21] (Development version)
 
 New functions:
   - seqivardur() computes the variance of spell durations
@@ -9,25 +9,22 @@ New functions:
     the mean, standard deviation, variance, and max variance.
 
 Changes in existing functions:
-  - seqST() gains an argument 'type' to select whether the duration
-    variance should account for the 0-length spells
-    in non-visited states.
+  - seqST() gains an argument 'type' to select the type of duration
+    variance used.
   - seqindic() the possible indicator list gains elements
     'recu' for recurrence index,
     'nvolat' for normative volatility,
     'meand' for mean duration,
-    'dustd' for standard deviation of the duration,
-    as well as the type 2 forms 'meand2', 'dustd2',
-    'turb2', and 'turb2n'.
+    'dustd' for standard deviation of the duration.
     The 'indic' argument accepts now also
     values 'basic', 'diversity', 'complexity', and 'binary' that each
     selects a subset of indicators.
+  - seqprecstart() the normalized stprec has now a minimum 0.
   - seqdist() the check of allowed number of unique sequences now
     depends on refseq and used thresholds are
     sqrt(.Machine$integer.max) when refseq==NULL,
     and .Machine$integer.max otherwise. In addition, a new argument
     permits to skip the test.
-  - seqprecstart() the normalized stprec has now a minimum 0.
 
 Bug Fixes:
   - seqdur() returned sometimes bad values for the duration of the
