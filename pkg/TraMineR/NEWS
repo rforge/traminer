@@ -1,8 +1,9 @@
 ## =========
-Version 2.3-2 [2020-10-24] (Development version)
+Version 2.3-2 [2020-11-26] (Development version)
 
-Misc.:
-  - No changes
+Changes in existing functions:
+  - seqformat() with from='SPELL' and process=TRUE now issues 
+    a warning message when the max of the 'end' column exceeds limit. 
 
 
 ## =========

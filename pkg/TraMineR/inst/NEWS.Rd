@@ -1,12 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2020-10-24] (Development version)}{
+\section{Changes in version 2.3-2 [2020-11-26] (Development version)}{
 
-  \subsection{Misc.}{
+  \subsection{Changes in existing functions}{
     \itemize{
       \item
-      No changes
+      \code{seqformat()} with \code{from='SPELL'} and \code{process=TRUE} now issues
+      a warning message when the max of the \code{'end'} column exceeds \code{limit}.
     }
   }
 }
