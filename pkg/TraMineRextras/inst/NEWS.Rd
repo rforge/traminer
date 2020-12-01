@@ -1,11 +1,23 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.7.1 [2020-04-24 ] (Development version)}{
-  \subsection{Misc.}{
+\section{Changes in version 0.7.1 [2020-12-01] (Development version)}{
+  \subsection{New functions}{
     \itemize{
       \item
-      No changes.
+      \code{seqindic.dyn()} dynamic individual indicator values.
+      \item
+      \code{plot.dynin()} plot method for \code{dynin} objects produced
+      by \code{seqindic.dyn}.
+    }
+  }
+
+
+  \subsection{Changes in existing functions}{
+    \itemize{
+      \item
+      \code{seqplot.tentrop()} default color now set using
+      \code{qualitative_hcl} from \code{colorspace} with the \code{'Dark 3'} palette.
     }
   }
 }
