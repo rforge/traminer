@@ -122,7 +122,8 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
   if(is.null(xlab)) xlab<-"Window center"
 
   if(is.null(ylab)) ylab<-attr(x,"indic")
-  main=paste("Dynamic index, window =",attr(x,"window.size"))
+  if(is.null(main))
+    main=paste("Dynamic index, window size:",attr(x,"window.size"))
 
   if(is.null(ylim)){
         maxe <- max(tab.grp, na.rm=TRUE)
