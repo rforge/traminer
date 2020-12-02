@@ -12,7 +12,7 @@
      main=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL,
      ylab=NULL, xlab=NULL, xtlab=NULL, xtstep=NULL, tick.last=NULL,
      with.legend=TRUE, glabels=NULL, legend.pos="topright",
-     horiz=FALSE, cex.legend=1, ret.table=FALSE, ...)
+     horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, ret=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,7 +24,7 @@
 }
   \item{main}{character string: Plot title.
 }
-  \item{col}{color vector. Group line colors. If \code{NULL} (default), colors are automatically assigned using \code{qualitative_hcl} (see \code{\link[colorspace]{hcl_palettes}}).
+  \item{col}{color vector. Group line colors. If \code{NULL} (default), colors are automatically assigned using \code{qualitative_hcl} with the \code{'Dark 3'} palette (see \code{\link[colorspace]{hcl_palettes}}).
 }
   \item{lty}{string vector. Group line types (see \code{\link{lines}}). If \code{NULL} (default), types are automatically assigned.
 }
@@ -53,7 +53,12 @@
 
   \item{cex.legend}{Scale factor for the legend.}
   
-  \item{ret.table}{logical: Should the plotted values be returned?}
+  \item{conf}{logical: Should confidence bands be displayed? Applies only when \code{fstat=mean}}
+  
+  \item{bcol}{color vector. For confidence bands. If \code{NULL} (default), colors are automatically assigned using \code{qualitative_hcl}  with the \code{'Pastel 1'} palette (see \code{\link[colorspace]{hcl_palettes}}).
+  }
+  
+  \item{ret}{logical: Should the plotted values be returned?}
 
   \item{...}{additional plot parameters (see \code{\link{par}}).}
 }

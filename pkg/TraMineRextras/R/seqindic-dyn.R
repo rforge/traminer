@@ -69,9 +69,14 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
      main=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL,
      ylab=NULL, xlab=NULL, xtlab=NULL, xtstep=NULL, tick.last=NULL,
      with.legend=TRUE, glabels=NULL, legend.pos="topright",
-     horiz=FALSE, cex.legend=1, ret.table=FALSE, ...){
+     horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, ret=FALSE, ...){
 
-  if (class(fstat)!="function") TraMineR:::msg.stop("stat must be a function!")
+
+  if (class(fstat)!="function") TraMineR:::msg.stop("fstat must be a function!")
+  if (conf & !isTRUE(all.equal(fstat,mean))){
+      TraMineR:::msg.warn("conf=TRUE only allowed for fstat=mean, conf set as FALSE")
+      conf=FALSE
+  }
 
   nc <- ncol(x)
   nr <- nrow(x)
@@ -82,14 +87,27 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
   ngrp <- length(levels(group))
 
   tab.grp <- matrix(NA, nrow=ngrp, ncol=nc)
-  colnames(tab.grp) <- colnames(x)
-  rownames(tab.grp) <- levels(group)
 
   #for(i in 1:nc) {
   #  tab.grp[,i] <- tapply(x[,i],group,fstat)
   #}
 
   tab.grp <- apply(x,2,tapply,group,fstat)
+
+  if (conf) {
+    n.grp <- tapply(rep(1,length(group)),group,sum)
+    err.grp <- qnorm(.975)*apply(x,2,tapply,group,sd)
+    err.grp <- err.grp/as.vector(sqrt(n.grp))
+    U.grp <- tab.grp + err.grp
+    L.grp <- tab.grp - err.grp
+    dim(U.grp) <- dim(L.grp) <- c(ngrp,nc)
+  }
+
+  dim(tab.grp) <- c(ngrp,nc)
+
+
+  colnames(tab.grp) <- colnames(x)
+  rownames(tab.grp) <- levels(group)
 
   #default.col <- brewer.pal(9,"Set1")
   default.col <- qualitative_hcl(ngrp, palette = "Dark 3")
@@ -102,6 +120,17 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
   kk <- ceiling(ngrp/length(col))
   col <- rep(col,kk)
   col <- col[1:ngrp]
+
+  if (conf) {
+    default.bcol <- qualitative_hcl(ngrp, palette = "Pastel 1")
+    if(is.null(bcol)) {
+       #col <- colors.list[1:k]
+       bcol <- default.bcol
+    }
+    kk <- ceiling(ngrp/length(bcol))
+    bcol <- rep(bcol,kk)
+    bcol <- bcol[1:ngrp]
+  }
 
   default.lty <- c("solid","dashed","dotted")
   if(is.null(lty)) {
@@ -132,16 +161,40 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
         ylim <- c(floor(10*mine),ceiling(10*maxe))/10
   }
 
-
+  ## frame
   plot(0, type= "n", axes=FALSE, xlab=xlab, ylab=ylab, main=main, ylim=ylim, xlim=c(1,nc), ...)
-  for (i in 1:ngrp) {
-     lines(tab.grp[i,], col=col[i],  type="l", lty=lty[i], lwd=lwd[i], ...)
-  }
 	tpos <- seq(from=1, to=nc, by=xtstep)
   if (tick.last & tpos[length(tpos)] < nc) tpos <- c(tpos,nc)
   axis(1,labels=xtlab[tpos],at=tpos)
   #axis(1)
   axis(2)
+
+  if (conf) {
+      #set.seed(1234)
+      #df <- data.frame(x =1:10,
+      #           F =runif(10,1,2),
+      #           L =runif(10,0,1),
+      #           U =runif(10,2,3))
+
+
+      #plot(df$x, df$F, ylim = c(0,4), type = "l")
+      #make polygon where coordinates start with lower limit and
+      # then upper limit in reverse order
+      for (i in 1:ngrp) {
+        #polygon(c(df$x,rev(df$x)),c(df$L,rev(df$U)),col = "grey75", border = FALSE)
+        polygon(c(1:nc,rev(1:nc)),c(L.grp[i,],rev(U.grp[i,])), col = bcol[i], border = FALSE)
+        #add lines on borders of polygon
+        lines(L.grp[i,], col=col[i],  type="l", lty=2)
+        lines(U.grp[i,], col=col[i],  type="l", lty=2)
+      }
+  }
+
+  for (i in 1:ngrp) {
+     lines(tab.grp[i,], col=col[i],  type="l", lty=lty[i], lwd=lwd[i], ...)
+  }
+
+
+  ## legend
   non.na.rows <- apply(tab.grp,1,function(x)all(!is.na(x)))
   if(with.legend & ngrp>1){
     legend(legend.pos, legend=glabels[non.na.rows],
@@ -149,5 +202,12 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
       horiz=horiz, cex=cex.legend)
   }
 
-  if (ret.table) return(tab.grp)
+
+  if (ret) {
+    if (conf) {
+      attr(tab.grp,"L.grp") <- L.grp
+      attr(tab.grp,"U.grp") <- U.grp
+    }
+    return(tab.grp)
+  }
 }
