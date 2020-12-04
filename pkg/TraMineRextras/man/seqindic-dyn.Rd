@@ -60,4 +60,6 @@ plot(a.dyn, group=actcal[cases,'sex'], fstat=mean)
 ## Trimmed mean
 plot(a.dyn, group=actcal[cases,'sex'], fstat=function(x)mean(x, trim=.02))
 
+
+
 }

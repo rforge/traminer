@@ -8,17 +8,17 @@
 %%  Generic function for
 }
 \usage{
-\method{plot}{dynin}(x, fstat=mean, group=NULL,
+\method{plot}{dynin}(x, fstat=weighted.mean, group=NULL,
      main=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL,
      ylab=NULL, xlab=NULL, xtlab=NULL, xtstep=NULL, tick.last=NULL,
      with.legend=TRUE, glabels=NULL, legend.pos="topright",
-     horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, ret=FALSE, ...)
+     horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, na.rm=FALSE, ret=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{object of class \code{dynin} as produced by \code{\link{seqindic.dyn}}
 }
-  \item{fstat}{function: summary function to compute the values plotted. Default is \code{\link{mean}}.
+  \item{fstat}{function: summary function to compute the values plotted. Default is \code{\link{weighted.mean}} with weights taken from the \code{weights} attribute of \code{x}. When \code{\link{weighted.mean}} and \code{x} has no weights, \code{mean} is used instead.
 }
   \item{group}{factor or discrete vector: group membership; a curve is drawn for each group. If \code{NULL} (default) a single curve for the whole set is drawn.
 }
@@ -31,7 +31,7 @@
   \item{lwd}{integer vector: Group line widths (see \code{\link{lines}}). If \code{NULL} (default), set as 3.5.
 }
   \item{ylim}{pair of numerics defining the range for the y-axis. If left \code{NULL}, the limits are defined from the data.}
-  
+
   \item{ylab}{character string: y axis label.
   }
   \item{xlab}{character string: x axis label.
@@ -52,12 +52,14 @@
   \item{horiz}{logical: Should the legend be displayed horizontally. Set as \code{FALSE} by default, i.e., legend is displayed vertically.}
 
   \item{cex.legend}{Scale factor for the legend.}
-  
-  \item{conf}{logical: Should confidence bands be displayed? Applies only when \code{fstat=mean}}
-  
+
+  \item{conf}{logical: Should confidence bands be displayed? Applies only when \code{fstat=mean} or \code{fstat=weighted.mean}.}
+
   \item{bcol}{color vector. For confidence bands. If \code{NULL} (default), colors are automatically assigned using \code{qualitative_hcl}  with the \code{'Pastel 1'} palette (see \code{\link[colorspace]{hcl_palettes}}).
   }
-  
+
+  \item{na.rm}{logical. When \code{fstat} is \code{mean} or \code{weighted.mean}, should \code{NA}'s be stripped before computation? Ignored for any other \code{fstat} function.}
+
   \item{ret}{logical: Should the plotted values be returned?}
 
   \item{...}{additional plot parameters (see \code{\link{par}}).}
@@ -65,10 +67,15 @@
 \details{
   Based on an idea of \cite{Pelletier et al. (2020)}.
 %%  ~~ If necessary, more details than the description above ~~
+
+The function first computes the summary table using the \code{fstat} function. Each row of the summary table is plotted as a line, except rows with some \code{NA}s. Setting \code{na.rm=TRUE} helps sometimes to avoid \code{NA} in the summary table.
+
+Confidence bands are computed for a confidence level of 95\% and assuming a normal distribution.
+
 }
 
 \value{
-  If \code{ret.table=TRUE}, a matrix with the successive group summaries. One row per group.
+  If \code{ret=TRUE}, a matrix with the successive group summaries. One row per group.
 }
 
 \references{

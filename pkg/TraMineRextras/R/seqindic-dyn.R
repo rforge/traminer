@@ -44,6 +44,7 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2,
 
 
   class(ind.dyn) <- c("dynin",class(ind.dyn))
+  attr(ind.dyn, "weights") <- attr(seqdata,"weights")
   attr(ind.dyn,"xtstep") <- attr(seqdata,"xtstep")
   attr(ind.dyn,"tick.last") <- attr(seqdata,"tick.last")
   attr(ind.dyn, "window.size") <- step
@@ -65,17 +66,29 @@ print.dynin <- function(x, ...){
 
 #################################
 
-plot.dynin <- function(x, fstat=mean, group=NULL,
+plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
      main=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL,
      ylab=NULL, xlab=NULL, xtlab=NULL, xtstep=NULL, tick.last=NULL,
      with.legend=TRUE, glabels=NULL, legend.pos="topright",
-     horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, ret=FALSE, ...){
+     horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, na.rm=FALSE, ret=FALSE, ...){
 
 
   if (class(fstat)!="function") TraMineR:::msg.stop("fstat must be a function!")
-  if (conf & !isTRUE(all.equal(fstat,mean))){
-      TraMineR:::msg.warn("conf=TRUE only allowed for fstat=mean, conf set as FALSE")
+
+  is.w.mean <- isTRUE(all.equal(fstat,weighted.mean))
+  is.mean <- isTRUE(all.equal(fstat,mean))
+  if (conf & !is.mean & !is.w.mean){
+      TraMineR:::msg.warn("conf=TRUE works only with fstat=mean or weighted.mean, conf set as FALSE")
       conf=FALSE
+  }
+
+  if (is.mean | is.w.mean) fstat <- function(x)mean(x, na.rm=na.rm)
+  if (is.w.mean) {
+    wt <- attr(x,"weights")
+    if (is.null(wt)) {
+      #fstat <- function(x,na.rm)mean(x, na.rm=na.rm)
+      is.w.mean <- FALSE
+    }
   }
 
   nc <- ncol(x)
@@ -92,15 +105,40 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
   #  tab.grp[,i] <- tapply(x[,i],group,fstat)
   #}
 
-  tab.grp <- apply(x,2,tapply,group,fstat)
+  if (is.w.mean){
 
-  if (conf) {
-    n.grp <- tapply(rep(1,length(group)),group,sum)
-    err.grp <- qnorm(.975)*apply(x,2,tapply,group,sd)
-    err.grp <- err.grp/as.vector(sqrt(n.grp))
-    U.grp <- tab.grp + err.grp
-    L.grp <- tab.grp - err.grp
-    dim(U.grp) <- dim(L.grp) <- c(ngrp,nc)
+    fsapp <- function(y,group,wt,na.rm){
+      sapply(levels(group),
+        function(whichpart) weighted.mean(x = y[group == whichpart],
+                                          w = wt[group == whichpart],
+                                          na.rm = na.rm))
+    }
+    tab.grp <- apply(x,2,fsapp,group,wt,na.rm)
+
+
+    if (conf) {
+      n.grp <- tapply(wt,group,sum)
+      meanx2 <- apply(x^2,2,fsapp,group,wt,na.rm)
+      sdev <- sqrt(meanx2 - tab.grp^2)
+      err.grp <- qnorm(.975)*sdev
+      err.grp <- err.grp/as.vector(sqrt(n.grp))
+      U.grp <- tab.grp + err.grp
+      L.grp <- tab.grp - err.grp
+      dim(U.grp) <- dim(L.grp) <- c(ngrp,nc)
+    }
+  }
+  else
+  {
+    tab.grp <- apply(x,2,tapply,group,fstat)
+
+    if (conf) {
+      n.grp <- tapply(rep(1,length(group)),group,sum)
+      err.grp <- qnorm(.975)*apply(x,2,tapply,group,sd)
+      err.grp <- err.grp/as.vector(sqrt(n.grp))
+      U.grp <- tab.grp + err.grp
+      L.grp <- tab.grp - err.grp
+      dim(U.grp) <- dim(L.grp) <- c(ngrp,nc)
+    }
   }
 
   dim(tab.grp) <- c(ngrp,nc)
@@ -108,6 +146,20 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
 
   colnames(tab.grp) <- colnames(x)
   rownames(tab.grp) <- levels(group)
+
+
+  tab.grp.ori <- tab.grp ## will return table before transformation
+  na.rows <- apply(tab.grp,1,function(x)all(is.na(x)))
+  rows.with.na <- apply(tab.grp,1,function(x)any(is.na(x)))
+  if (sum(rows.with.na) > sum(na.rows)) {
+      TraMineR:::msg.warn("Rows of summary table with some NA turned into full NA rows!")
+      tab.grp[rows.with.na,] <- NA
+  }
+  non.na.rows <- !rows.with.na
+  if (all(is.na(tab.grp))){
+      TraMineR:::msg.warn("Only NA in summary table, nothing to plot.")
+      return(tab.grp)
+  }
 
   #default.col <- brewer.pal(9,"Set1")
   default.col <- qualitative_hcl(ngrp, palette = "Dark 3")
@@ -205,9 +257,9 @@ plot.dynin <- function(x, fstat=mean, group=NULL,
 
   if (ret) {
     if (conf) {
-      attr(tab.grp,"L.grp") <- L.grp
-      attr(tab.grp,"U.grp") <- U.grp
+      attr(tab.grp.ori,"L.grp") <- L.grp
+      attr(tab.grp.ori,"U.grp") <- U.grp
     }
-    return(tab.grp)
+    return(tab.grp.ori)
   }
 }
