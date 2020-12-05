@@ -1,7 +1,7 @@
 ## Evolution of indicator
-## Based on Pelletier et al., 2020
+## Inspired from Pelletier et al., 2020
 
-seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2,
+seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE,
       with.missing=TRUE, ...) {
 
 	if (!inherits(seqdata,"stslist"))
@@ -27,18 +27,22 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2,
 
   re <- step
   rs <- 1
+  slid <- as.integer(sliding)
 
   nr <- nrow(seqdata)
   nc <- maxl-step+1
   ind.dyn <- matrix(NA, nrow=nr, ncol=nc)
-  colnames(ind.dyn) <- colnames(seqdata)[ceiling(step/2):(nc+ceiling(step/2)-1)]
+  if (sliding)
+    colnames(ind.dyn) <- colnames(seqdata)[ceiling(step/2):(nc+ceiling(step/2)-1)]
+  else
+    colnames(ind.dyn) <- colnames(seqdata)[step:maxl]
   rownames(ind.dyn) <- rownames(seqdata)
   j <- 1
 
   while (re < maxl + 1) {
     ind.dyn[,j] <- seqindic(seqdata[,rs:re], indic=indic, with.missing=with.missing, ...)[,1]
     j  <- j+1
-    rs <- rs+1
+    rs <- rs+slid
     re <- re+1
   }
 
@@ -48,6 +52,7 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2,
   attr(ind.dyn,"xtstep") <- attr(seqdata,"xtstep")
   attr(ind.dyn,"tick.last") <- attr(seqdata,"tick.last")
   attr(ind.dyn, "window.size") <- step
+  attr(ind.dyn, "sliding") <- sliding
   attr(ind.dyn, "indic") <- indic
 
   return(ind.dyn)
@@ -200,8 +205,10 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
   if(is.null(xtstep)) xtstep <- attr(x,"xtstep")
   if(is.null(tick.last)) tick.last <- attr(x,"tick.last")
   if(is.null(xtlab)) xtlab <- colnames(x)
-  if(is.null(xlab)) xlab<-paste0("Window center (win size: ", attr(x,"window.size"),")")
-
+  if(is.null(xlab)){
+    slid.text <- ifelse(attr(x,"sliding"), "sliding window, (", "incremental window, (start")
+    xlab<-paste0("End of ",slid.text," win size: ", attr(x,"window.size"),")")
+  }
   if(is.null(ylab)) ylab<-attr(x,"indic")
   if(is.null(main))
     main=paste("Dynamic index",attr(x,'indic'))

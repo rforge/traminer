@@ -8,7 +8,7 @@
 \description{Dynamic (i.e. successive) values of an individual index. For each sequence, the values of the selected index is computed on sliding windows.
 }
 \usage{
-seqindic.dyn(seqdata, indic="cplx", window.size = .2,
+seqindic.dyn(seqdata, indic="cplx", window.size = .2, sliding=TRUE,
       with.missing=TRUE, ...)
 }
 \arguments{
@@ -16,7 +16,9 @@ seqindic.dyn(seqdata, indic="cplx", window.size = .2,
   }
   \item{indic}{character string: the individual index. Can be any value supported by \code{\link{seqindic}} except index group names.
   }
-  \item{window.size}{Integer or real. If an integer > 1, window size in number of positions. If real number in the range ]0,1), the window size is set as that proportion of the length of the longest sequence.
+  \item{window.size}{integer or real. If an integer > 1, window size in number of positions. If real number in the range ]0,1), the window size is set as that proportion of the length of the longest sequence.
+  }
+  \item{sliding}{logical: Should indic be computed on sliding windows? If \code{FALSE}, windows are incremented starting with a window of size \code{window.size}.
   }
   \item{with.missing}{logical. Should the missing state be treated as a state of the alphabet?
   }
@@ -25,11 +27,15 @@ seqindic.dyn(seqdata, indic="cplx", window.size = .2,
 }
 
 \details{
-The values of the \code{indic} index are computed for each sequence on sliding windows of size \code{window.size}.
+The function implements the dynamic sequence analysis approach of \cite{Pelletier et al. (2020)} and generalizes the method to any of the over 20 indicators provided by \code{\link{seqindic}}.
+
+The values of the \code{indic} index are computed for each sequence either on sliding windows of size \code{window.size} or on incremental windows starting from a first window of size \code{window.size}.
+
+Column names refer to the end the windows.
 }
 
 \value{
-A matrix of class \code{dynin} with attributes \code{xtstep}, \code{tick.last}, \code{window.size}, and \code{indic}. The first two as well as the row and column names are taken from \code{seqdata}. Column names indicate the middle position of the window.
+A matrix of class \code{dynin} with attributes \code{xtstep}, \code{tick.last}, \code{weights}, \code{window.size}, \code{sliding}, and \code{indic}. The first three as well as the row and column names are taken from \code{seqdata}.
 
 There are \code{print} and \code{plot} methods for \code{dynin} objects. See \code{\link{plot.dynin}}.
 }

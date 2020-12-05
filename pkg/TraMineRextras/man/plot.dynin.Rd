@@ -65,10 +65,10 @@
   \item{...}{additional plot parameters (see \code{\link{par}}).}
 }
 \details{
-  Based on an idea of \cite{Pelletier et al. (2020)}.
+Together with \code{\link{seqindic.dyn}} this function implements the dynamic sequence analysis approach of \cite{Pelletier et al. (2020)}.
 %%  ~~ If necessary, more details than the description above ~~
 
-The function first computes the summary table using the \code{fstat} function. Each row of the summary table is plotted as a line, except rows with some \code{NA}s. Setting \code{na.rm=TRUE} helps sometimes to avoid \code{NA} in the summary table.
+The function first computes the summary table using the \code{fstat} function. Each row of the summary table is then plotted as a line, except rows that contain \code{NA}s. Setting \code{na.rm=TRUE} helps sometimes to prevent some \code{NA}s in the summary table.
 
 Confidence bands are computed for a confidence level of 95\% and assuming a normal distribution.
 
