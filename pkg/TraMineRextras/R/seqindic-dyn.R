@@ -31,20 +31,32 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
 
   nr <- nrow(seqdata)
   nc <- maxl-step+1
-  ind.dyn <- matrix(NA, nrow=nr, ncol=nc)
-  if (sliding)
-    colnames(ind.dyn) <- colnames(seqdata)[ceiling(step/2):(nc+ceiling(step/2)-1)]
-  else
-    colnames(ind.dyn) <- colnames(seqdata)[step:maxl]
-  rownames(ind.dyn) <- rownames(seqdata)
   j <- 1
 
-  while (re < maxl + 1) {
-    ind.dyn[,j] <- seqindic(seqdata[,rs:re], indic=indic, with.missing=with.missing, ...)[,1]
-    j  <- j+1
-    rs <- rs+slid
-    re <- re+1
+  if (slid) {
+    windic <- function(k, seqdata, indic, with.missing, ...){
+      seqindic(seqdata[,(k-step+1):k], indic=indic, with.missing=with.missing, ...)
+    }
+  } else {
+    windic <- function(k, seqdata, indic, with.missing, ...){
+      seqindic(seqdata[,1:k], indic=indic, with.missing=with.missing, ...)
+    }
   }
+  ind.dyn <- sapply(re:maxl, FUN=windic, seqdata=seqdata, indic=indic, with.missing=with.missing, ...)
+
+  ind.dyn <- matrix(unlist(ind.dyn), ncol=maxl-re+1)
+
+
+###   ind.dyn <- matrix(NA, nrow=nr, ncol=nc)
+###   while (re < maxl + 1) {
+###     ind.dyn[,j] <- seqindic(seqdata[,rs:re], indic=indic, with.missing=with.missing, ...)[,1]
+###     j  <- j+1
+###     rs <- rs+slid
+###     re <- re+1
+###   }
+
+  colnames(ind.dyn) <- colnames(seqdata)[step:maxl]
+  rownames(ind.dyn) <- rownames(seqdata)
 
 
   class(ind.dyn) <- c("dynin",class(ind.dyn))
