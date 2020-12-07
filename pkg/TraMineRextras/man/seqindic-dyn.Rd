@@ -9,7 +9,7 @@
 }
 \usage{
 seqindic.dyn(seqdata, indic="cplx", window.size = .2, sliding=TRUE,
-      with.missing=TRUE, ...)
+      with.missing=FALSE, silent.indic=TRUE, ...)
 }
 \arguments{
   \item{seqdata}{state sequence object (\code{stslist}) as produced by \code{seqdef}
@@ -21,6 +21,8 @@ seqindic.dyn(seqdata, indic="cplx", window.size = .2, sliding=TRUE,
   \item{sliding}{logical: Should indic be computed on sliding windows? If \code{FALSE}, windows are incremented starting with a window of size \code{window.size}.
   }
   \item{with.missing}{logical. Should the missing state be treated as a state of the alphabet?
+  }
+  \item{silent.indic}{logical. Should messages issued during computation of indic be suppressed? 
   }
   \item{...}{additional arguments passed to \code{\link{seqindic}}
   }

@@ -2,7 +2,7 @@
 ## Inspired from Pelletier et al., 2020
 
 seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE,
-      with.missing=TRUE, ...) {
+      with.missing=FALSE, silent.indic = TRUE, ...) {
 
 	if (!inherits(seqdata,"stslist"))
 		TraMineR:::msg.stop("data is NOT a sequence object, see seqdef function to create one")
@@ -34,12 +34,24 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
   j <- 1
 
   if (slid) {
-    windic <- function(k, seqdata, indic, with.missing, ...){
-      seqindic(seqdata[,(k-step+1):k], indic=indic, with.missing=with.missing, ...)
+    if (silent.indic){
+      windic <- function(k, seqdata, indic, with.missing, ...){
+        suppressMessages(seqindic(seqdata[,(k-step+1):k], indic=indic, with.missing=with.missing, ...))
+      }
+    } else {
+      windic <- function(k, seqdata, indic, with.missing, ...){
+        seqindic(seqdata[,(k-step+1):k], indic=indic, with.missing=with.missing, ...)
+      }
     }
   } else {
-    windic <- function(k, seqdata, indic, with.missing, ...){
-      seqindic(seqdata[,1:k], indic=indic, with.missing=with.missing, ...)
+    if (silent.indic){
+      windic <- function(k, seqdata, indic, with.missing, ...){
+        suppressMessages(seqindic(seqdata[,1:k], indic=indic, with.missing=with.missing, ...))
+      }
+    } else {
+      windic <- function(k, seqdata, indic, with.missing, ...){
+        seqindic(seqdata[,1:k], indic=indic, with.missing=with.missing, ...)
+      }
     }
   }
   ind.dyn <- sapply(re:maxl, FUN=windic, seqdata=seqdata, indic=indic, with.missing=with.missing, ...)
