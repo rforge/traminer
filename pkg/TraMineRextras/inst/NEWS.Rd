@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.7.1 [2020-12-05] (Development version)}{
+\section{Changes in version 0.7.1 [2020-12-25] (Development version)}{
   \subsection{New functions}{
     \itemize{
       \item
@@ -9,6 +9,10 @@
       \item
       \code{plot.dynin()} plot method for \code{dynin} objects produced
       by \code{seqindic.dyn}.
+      \item
+      \code{linkedseqs()} degree of similarities between polyadic members
+      (contributed by Tim Liao)
+
     }
   }
 
