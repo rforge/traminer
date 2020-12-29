@@ -1,52 +1,100 @@
 ### linked sequences function for linked polyadic sequence data
-### Based on Version 1.0.1 (14.12.20), Tim Liao, University of Illinois
-### the function uses sequence data defined by TraMinerR
-### Implemented in TraMineRextras by Gilbert Ritschard
+### Version 1.0.2 (29.12.20), Tim Liao, University of Illinois
+### and Gilbert Ritschard
 
 linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist),2))),
-              s=36963, T=1000, core=1) {
+              s=36963, T=1000, core=1, replace=TRUE, with.missing=FALSE) {
+
+  if (!inherits(seqlist, "list") || length(seqlist)<2)
+    TraMineR:::msg.stop("seqlist must be a list of at least two stslist objects")
+
+  P <- length(seqlist)
+  for (p in 1:P) {
+    if (!inherits(seqlist[[p]],"stslist"))
+      TraMineR:::msg.stop("At least one element of seqlist is not a stslist object")
+  }
+
+  n = nrow(seqlist[[1]])
+  s = ncol(seqlist[[1]])
+  alph = alphabet(seqlist[[1]], with.missing=with.missing)
+  for (p in 2:P) {
+    is.samealph <- (all(alphabet(seqlist[[p]], with.missing=with.missing) %in% alph)
+                   & all(alph %in% alphabet(seqlist[[p]], with.missing=with.missing)))
+    if (nrow(seqlist[[p]]) != n | ncol(seqlist[[p]]) != s | !is.samealph)
+      TraMineR:::msg.stop("All stslist objects must have same size and alphabet")
+  }
+
+
+
+  gc(FALSE)
+  ptime.begin <- proc.time()
+
   #require(doParallel)
   #require(TraMineR)
   cl <- makeCluster(core, type="SOCK")
   registerDoParallel(cl)
 
+
   set.seed(s)
-  P <- length(seqlist)
   c <- combn(1:P,2)
   d = ncol(c)
-  n = nrow(seqlist[[1]])
-  s = ncol(seqlist[[1]])
-  p.seq=p.temp=p1.temp <- list()
+  #p.seq=
+  p.temp=p1.temp <- list()
   polyads.dist=polyads.dummy=test.p <- array(0,c(1,n))
 
-  for (p in 1:P) p.seq[[p]] <- suppressMessages(seqformat(seqlist[[p]],to="STS"))
+  seqall <- do.call("rbind", seqlist)
+  alldist <- suppressMessages(seqdist(seqall, method=method, with.missing=with.missing, ...))
 
-  l <- rep(NA,P)
-  random.dist <- foreach (i=1:T, .combine='c', .packages='TraMineR') %dopar% {
-    for (p in 1:P) {
-      l[p] <- sample(1:nrow(seqlist[[p]]),1)
-      if (a==1) p1.temp[[p]] <- seqlist[[p]][l[p],]
-      if (a==2) {
-        p.seq[[p]] <- suppressMessages(seqformat(seqlist[[p]],to="STS"))
-        p1.temp[[p]] <- seqdef(sample(p.seq[[p]][l[p],],s))
-      }
-    }
+  cj=0
+  for (p in 2:P) cj[p] <- n * (p-1)
 
-    seq.temp <- do.call("rbind",p1.temp)
-    sum(suppressMessages(seqdist(seq.temp,method=method,...))[upper.tri(matrix(NA,P,P))]*w)/d
+  ## Matrix of indexes of sampled sequences per generation
+  l.m <- matrix(NA,T,P)
+  for (i in 1:T) {
+      l.m[i,] <- cj + sample(1:n, P, replace=TRUE)
   }
+
+  if (a==1){
+    random.dist <- foreach (i=1:T, .combine='c') %dopar% {
+      sum(alldist[l.m[i,],l.m[i,]][upper.tri(matrix(NA,P,P))]*w)/d
+    }
+  } else if (a==2) {
+    ## resample states in sampled sequences
+    seqrandall <- seqall[as.vector(l.m),]
+    s <- ncol(seqrandall)
+    seqstrand <- matrix(NA,nrow=T*P,ncol=s)
+    for (i in 1:(T*P)) {
+      seqstrand[i,] <- t(sample(as.matrix(seqrandall)[i,], size=s, replace=replace))
+    }
+    suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alph))
+    suppressMessages(allrdist <-seqdist(seqstrand, method=method, with.missing=with.missing, ...))
+
+    random.dist <- foreach (i=1:T, .combine='c') %dopar% {
+      sum(allrdist[cj+i,cj+i][upper.tri(matrix(NA,P,P))]*w)/d
+    }
+    rm(allrdist)
+  } else {stop("Bad 'a' value")}
+
   stopCluster(cl)
+  #print(random.dist)
 
   for (j in 1:n) {
-    for (p in 1:P) p.temp[[p]] <- seqlist[[p]][j,]
-    seq.temp <- suppressMessages(seqdef(do.call("rbind",p.temp)))
-    polyads.dist[j] <- sum(suppressMessages(seqdist(seq.temp,method=method,...))[upper.tri(matrix(NA,P,P))]*w)/d
+    polyads.dist[j] <- sum(alldist[cj+j,cj+j][upper.tri(matrix(NA,P,P))]*w)/d
     test.p[j] <- sum(polyads.dist[j]<random.dist)/T
     if (test.p[j]>0.95) polyads.dummy[j] <- 1
     else polyads.dummy[j] <- 0
   }
   mean.U <- mean(random.dist) - polyads.dist
   U.p <- 2*pt(mean.U/{sd(random.dist)/sqrt(T)},T-1,lower.tail=F)
+
+  ptime.end <- proc.time()
+  time.begin <- as.POSIXct(sum(ptime.begin[1:2]), origin = "1960-01-01")
+  time.end <- as.POSIXct(sum(ptime.end[1:2]), origin = "1960-01-01")
+  time.elapsed <- format(round(difftime(time.end, time.begin), 3))
+
+  message("elapsed time:", time.elapsed)
+
+
   list(mean.obs=mean(polyads.dist),U=mean.U,U.tp=U.p,V=test.p,
        V.95=polyads.dummy,observed.dist=polyads.dist,random.dist=random.dist)
 }
