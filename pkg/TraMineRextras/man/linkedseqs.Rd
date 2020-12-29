@@ -71,7 +71,7 @@ Seq <- rbind(seqGrandP,seqParent,seqChild)
 colnames(Seq) <- 21:30
 seqIplot(Seq,group=Gen,ylim=c(10,0),ylab="Triad",xlab="Age")
 seqL <- list(seqGrandP,seqParent,seqChild)
-\donotrun{
+\dontrun{
 seqG2.Tim <- linkedseqs(seqL[1:2],method="HAM",a=1,core=4,T=100)
 seqG3.Tim <- linkedseqs(seqL,method="HAM",a=1,core=4,T=100)
 seqG2.Dur <- linkedseqs(seqL[1:2],method="CHI2",k=1,core=4,T=100)
