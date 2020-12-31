@@ -10,7 +10,7 @@ importFrom("colorspace", "qualitative_hcl")
 importFrom("survival","survfit", "coxph", "Surv")
 importFrom("gtools","permute")
 importFrom("doParallel","registerDoParallel")
-importFrom("parallel","makeCluster","stopCluster")
+importFrom("parallel","makePSOCKcluster","stopCluster")
 importFrom("foreach","foreach","%dopar%")
 
 export(

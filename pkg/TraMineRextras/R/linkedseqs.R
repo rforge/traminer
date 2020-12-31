@@ -31,9 +31,11 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
 
   #require(doParallel)
   #require(TraMineR)
-  cl <- makeCluster(core, type="SOCK")
-  registerDoParallel(cl)
-
+  #cl <- makeCluster(core, type="SOCK")
+  if (core>1) {
+    cl <- makePSOCKcluster(core)
+    registerDoParallel(cl)
+  }
 
   set.seed(s)
   c <- combn(1:P,2)
@@ -55,8 +57,12 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
   }
 
   if (a==1){
-    random.dist <- foreach (i=1:T, .combine='c') %dopar% {
-      sum(alldist[l.m[i,],l.m[i,]][upper.tri(matrix(NA,P,P))]*w)/d
+    if (core==1) {
+      random.dist <- sapply(1:T, function (x) sum(alldist[l.m[x,],l.m[x,]][upper.tri(matrix(NA,P,P))]*w)/d)
+    } else {
+      random.dist <- foreach (i=1:T, .combine='c') %dopar% {
+        sum(alldist[l.m[i,],l.m[i,]][upper.tri(matrix(NA,P,P))]*w)/d
+      }
     }
   } else if (a==2) {
     ## resample states in sampled sequences
@@ -69,13 +75,17 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
     suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alph))
     suppressMessages(allrdist <-seqdist(seqstrand, method=method, with.missing=with.missing, ...))
 
-    random.dist <- foreach (i=1:T, .combine='c') %dopar% {
-      sum(allrdist[cj+i,cj+i][upper.tri(matrix(NA,P,P))]*w)/d
+    if (core==1){
+      random.dist <- sapply(1:T, function(x) sum(allrdist[cj+x,cj+x][upper.tri(matrix(NA,P,P))]*w)/d)
+    } else {
+      random.dist <- foreach (i=1:T, .combine='c') %dopar% {
+        sum(allrdist[cj+i,cj+i][upper.tri(matrix(NA,P,P))]*w)/d
+      }
     }
     rm(allrdist)
   } else {stop("Bad 'a' value")}
 
-  stopCluster(cl)
+  if (core>1) stopCluster(cl)
   #print(random.dist)
 
   for (j in 1:n) {
