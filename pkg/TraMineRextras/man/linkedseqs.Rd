@@ -31,7 +31,7 @@ linkedseqs(seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist)
 
 \item{core}{Integer. Default 1. The procedure utilizes parallel processing. Use this parameter to choose the number of cores for the computation.
 }
-  \item{replace}{Logical. When \code{a=2}, should the should state sampling in each sequence be done with replacement?. Ignored when \code{a=1}.
+  \item{replace}{Logical. When \code{a=2}, should state sampling in each sequence be done with replacement?. Ignored when \code{a=1}.
   }
   \item{with.missing}{Logical. Should the missing state be considered as a regular state.
   }
@@ -71,15 +71,15 @@ Seq <- rbind(seqGrandP,seqParent,seqChild)
 colnames(Seq) <- 21:30
 seqIplot(Seq,group=Gen,ylim=c(10,0),ylab="Triad",xlab="Age")
 seqL <- list(seqGrandP,seqParent,seqChild)
-\dontrun{
-seqG2.Tim <- linkedseqs(seqL[1:2],method="HAM",a=1,core=4,T=100)
-seqG3.Tim <- linkedseqs(seqL,method="HAM",a=1,core=4,T=100)
-seqG2.Dur <- linkedseqs(seqL[1:2],method="CHI2",k=1,core=4,T=100)
-seqG3.Dur <- linkedseqs(seqL,method="CHI2",k=1,core=4,T=100)
-}
+core=1
+seqG2.Tim <- linkedseqs(seqL[1:2],method="HAM",a=1,core=core,T=100)
+seqG3.Tim <- linkedseqs(seqL,method="HAM",a=1,core=core,T=100)
+seqG2.Dur <- linkedseqs(seqL[1:2],method="CHI2",k=1,core=core,T=100)
+seqG3.Dur <- linkedseqs(seqL,method="CHI2",k=1,core=core,T=100)
+
 }
 
 \references{
 Tim F. Liao. Forthcoming. "Using Sequence Analysis to Quantify How Strongly Life Courses Are Linked.” \emph{Sociological Science} x: xxx–xxx.
 }
-\author{Tim Liao and Gilbert Ritschard}
+\author{Tim Liao and Gilbert Ritschard} 
