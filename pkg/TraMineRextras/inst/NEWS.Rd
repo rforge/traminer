@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.7.1 [2020-12-29] (Development version)}{
+\section{Changes in version 0.7.1 [2021-01-02] (Development version)}{
   \subsection{New functions}{
     \itemize{
       \item

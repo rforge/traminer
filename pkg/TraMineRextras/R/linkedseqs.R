@@ -3,7 +3,10 @@
 ### and Gilbert Ritschard
 
 linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist),2))),
-              s=36963, T=1000, core=1, replace=TRUE, with.missing=FALSE) {
+              s=36963, T=1000, core=1, replace=TRUE, with.missing=FALSE, show.time=FALSE) {
+
+  #gc(FALSE)
+  if (show.time) ptime.begin <- proc.time()
 
   if (!inherits(seqlist, "list") || length(seqlist)<2)
     TraMineR:::msg.stop("seqlist must be a list of at least two stslist objects")
@@ -24,15 +27,11 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
       TraMineR:::msg.stop("All stslist objects must have same size and alphabet")
   }
 
-
-
-  gc(FALSE)
-  ptime.begin <- proc.time()
-
   #require(doParallel)
   #require(TraMineR)
   #cl <- makeCluster(core, type="SOCK")
   if (core>1) {
+    i<-0
     cl <- makePSOCKcluster(core)
     registerDoParallel(cl)
   }
@@ -51,14 +50,21 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
   for (p in 2:P) cj[p] <- n * (p-1)
 
   ## Matrix of indexes of sampled sequences per generation
-  l.m <- matrix(NA,T,P)
-  for (i in 1:T) {
-      l.m[i,] <- cj + sample(1:n, P, replace=TRUE)
+  if (core==1) {
+    l.m <- t(sapply(1:T, function(x) {cj + sample(1:n, size=P, replace=TRUE)}))
+    #l.m <- matrix(NA,T,P)
+    #for (i in 1:T) {
+    #    l.m[i,] <- cj + sample(1:n, P, replace=TRUE)
+    #}
+  } else {
+    l.m <- foreach (i=1:T, .combine='rbind') %dopar% {
+      t(cj + sample(1:n, P, replace=TRUE))
+    }
   }
 
   if (a==1){
     if (core==1) {
-      random.dist <- sapply(1:T, function (x) sum(alldist[l.m[x,],l.m[x,]][upper.tri(matrix(NA,P,P))]*w)/d)
+      random.dist <- sapply(1:T, function(x) {sum(alldist[l.m[x,],l.m[x,]][upper.tri(matrix(NA,P,P))]*w)/d})
     } else {
       random.dist <- foreach (i=1:T, .combine='c') %dopar% {
         sum(alldist[l.m[i,],l.m[i,]][upper.tri(matrix(NA,P,P))]*w)/d
@@ -66,27 +72,38 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
     }
   } else if (a==2) {
     ## resample states in sampled sequences
-    seqrandall <- seqall[as.vector(l.m),]
+    seqrandall <- as.matrix(seqall[as.vector(l.m),])
     s <- ncol(seqrandall)
-    seqstrand <- matrix(NA,nrow=T*P,ncol=s)
-    for (i in 1:(T*P)) {
-      seqstrand[i,] <- t(sample(as.matrix(seqrandall)[i,], size=s, replace=replace))
+    if (core==1){
+      seqstrand <- t(sapply(1:(T*P), function(x) {sample(seqrandall[x,], size=s, replace=replace)}))
+      ##seqstrand <- matrix(NA,nrow=T*P,ncol=s)
+      ##for (i in 1:(T*P)) {
+      ##  seqstrand[i,] <- t(sample(seqrandall[i,], size=s, replace=replace))
+      ##}
+    } else {
+      seqstrand <- foreach (i=1:(T*P), .combine="rbind") %dopar% {
+          t(sample(seqrandall[i,], size=s, replace=replace))
+      }
     }
+
+    #print(head(seqrandall))
+    #print(head(seqstrand))
+
     suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alph))
     suppressMessages(allrdist <-seqdist(seqstrand, method=method, with.missing=with.missing, ...))
 
     if (core==1){
-      random.dist <- sapply(1:T, function(x) sum(allrdist[cj+x,cj+x][upper.tri(matrix(NA,P,P))]*w)/d)
+      random.dist <- sapply(1:T, function(x) {sum(allrdist[cj+x,cj+x][upper.tri(matrix(NA,P,P))]*w)/d})
     } else {
       random.dist <- foreach (i=1:T, .combine='c') %dopar% {
         sum(allrdist[cj+i,cj+i][upper.tri(matrix(NA,P,P))]*w)/d
       }
     }
-    rm(allrdist)
+    rm(allrdist,seqstrand,seqrandall)
   } else {stop("Bad 'a' value")}
 
+
   if (core>1) stopCluster(cl)
-  #print(random.dist)
 
   for (j in 1:n) {
     polyads.dist[j] <- sum(alldist[cj+j,cj+j][upper.tri(matrix(NA,P,P))]*w)/d
@@ -97,13 +114,7 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
   mean.U <- mean(random.dist) - polyads.dist
   U.p <- 2*pt(mean.U/{sd(random.dist)/sqrt(T)},T-1,lower.tail=F)
 
-  ptime.end <- proc.time()
-  time.begin <- as.POSIXct(sum(ptime.begin[1:2]), origin = "1960-01-01")
-  time.end <- as.POSIXct(sum(ptime.end[1:2]), origin = "1960-01-01")
-  time.elapsed <- format(round(difftime(time.end, time.begin), 3))
-
-  message("elapsed time:", time.elapsed)
-
+  if (show.time) print(proc.time()-ptime.begin)
 
   list(mean.obs=mean(polyads.dist),U=mean.U,U.tp=U.p,V=test.p,
        V.95=polyads.dummy,observed.dist=polyads.dist,random.dist=random.dist)
