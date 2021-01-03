@@ -21,8 +21,7 @@ linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
   s = ncol(seqlist[[1]])
   alph = alphabet(seqlist[[1]], with.missing=with.missing)
   for (p in 2:P) {
-    is.samealph <- (all(alphabet(seqlist[[p]], with.missing=with.missing) %in% alph)
-                   & all(alph %in% alphabet(seqlist[[p]], with.missing=with.missing)))
+    is.samealph <- identical(alphabet(seqlist[[p]], with.missing=with.missing), alph)
     if (nrow(seqlist[[p]]) != n | ncol(seqlist[[p]]) != s | !is.samealph)
       TraMineR:::msg.stop("All stslist objects must have same size and alphabet")
   }
