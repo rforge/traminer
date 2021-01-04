@@ -48,7 +48,7 @@ export(
     seqBIC,
     seqLRT,
     seqindic.dyn,
-    linkedseqs
+    seqpolyads
 )
 
 ## emlt methods

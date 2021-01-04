@@ -1,8 +1,9 @@
-### linked sequences function for linked polyadic sequence data
+### function for linked polyadic sequence data
 ### Version 1.0.2 (29.12.20), Tim Liao, University of Illinois
 ### and Gilbert Ritschard
 
-linkedseqs <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist),2))),
+
+seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist),2))),
               s=36963, T=1000, core=1, replace=TRUE, with.missing=FALSE, show.time=FALSE) {
 
   #gc(FALSE)

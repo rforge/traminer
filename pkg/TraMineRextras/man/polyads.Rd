@@ -1,6 +1,6 @@
-\name{linked}
+\name{polyads}
 \docType{data}
-\alias{linked}
+\alias{polyads}
 \title{Polyadic data example}
 
 \description{
@@ -9,7 +9,7 @@ This data set contains a data frame with 10 triads. The 10 first rows correspond
 \details{The first column is the generation variable Gen. The sequences of length 10 are in columns 2 to 11 named X1 to X10.
 }
 
-\usage{data(linked)}
+\usage{data(polyads)}
 \format{A data frame with 30 rows and 11 columns.}
 \keyword{Datasets}
 \author{Gilbert Ritschard}
