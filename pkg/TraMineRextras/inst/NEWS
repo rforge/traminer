@@ -1,4 +1,4 @@
-                CHANGES IN TraMineRextras VERSION 0.7.1 [2021-01-04] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.7.1 [2021-01-05] (Development version)
 
 New functions:
     o   seqindic.dyn() dynamic individual indicator values.
@@ -6,7 +6,7 @@ New functions:
         by seqindic.dyn.
     o   seqpolyads() degree of similarities between polyadic members
         (contributed by Tim Liao)
-    o   polyads data set
+    o   polyads example data set
 
 Changes in existing functions:
     o   seqplot.tentrop() default color now set using

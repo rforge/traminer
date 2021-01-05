@@ -88,8 +88,9 @@ seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
 
     #print(head(seqrandall))
     #print(head(seqstrand))
-
-    suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alph))
+    void <- attr(seqrandall,"void")
+    seqstrand[seqstrand==void] <- NA
+    suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alph, void=void))
     suppressMessages(allrdist <-seqdist(seqstrand, method=method, with.missing=with.missing, ...))
 
     if (core==1){
@@ -114,8 +115,11 @@ seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
   mean.U <- mean(random.dist) - polyads.dist
   U.p <- 2*pt(mean.U/{sd(random.dist)/sqrt(T)},T-1,lower.tail=F)
 
+  mean.dist <- c(mean(polyads.dist),mean(random.dist))
+  names(mean.dist) <- c("Obs","Rand")
+
   if (show.time) print(proc.time()-ptime.begin)
 
-  list(mean.obs=mean(polyads.dist),U=mean.U,U.tp=U.p,V=test.p,
+  list(mean.dist=mean.dist,U=mean.U,U.tp=U.p,V=test.p,
        V.95=polyads.dummy,observed.dist=polyads.dist,random.dist=random.dist)
 }

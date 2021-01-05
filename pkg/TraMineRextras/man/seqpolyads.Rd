@@ -41,25 +41,26 @@ seqpolyads(seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist)
 
 \value{The function outputs a list of seven objects:
 
-\item{mean.obs}{The average observed within-polyadic distance for the data.
+\item{mean.dist}{Vector of length 2 with the average observed and random within-polyadic distances.
 }
 
-\item{U}{A vector of \var{N} number of \var{U} statistics (see reference).
+
+\item{U}{Vector of \var{N} number of \var{U} statistics (see reference).
 }
 
-\item{U.tp}{A vector of \var{N} number of \var{p}-values for a two-tailed \var{t}-test of the \var{U} statistic.
+\item{U.tp}{Vector of \var{N} number of \var{p}-values for a two-tailed \var{t}-test of the \var{U} statistic.
 }
 
-\item{V}{A vector of \var{N} number of \var{V} statistics (see reference).
+\item{V}{Vector of \var{N} number of \var{V} statistics (see reference).
 }
 
-\item{V.95}{A vector of \var{N} number of 1s or 0s: 1 if a \var{V} value is at least 95 percent confident, 0 otherwise.
+\item{V.95}{Vector of \var{N} number of 1s or 0s: 1 if a \var{V} value is at least 95 percent confident, 0 otherwise.
 }
 
-\item{observed.dist}{A vector of within-polyadic distances for the observed  polyadic members.
+\item{observed.dist}{Vector of within-polyadic distances for the observed  polyadic members.
 }
 
-\item{random.dist}{A vector of within-polyadic distances for the \var{T} number of randomly matched polyadic members.
+\item{random.dist}{Vector of within-polyadic distances for the \var{T} number of randomly matched polyadic members.
 }
 }
 

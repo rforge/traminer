@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.7.1 [2021-01-04] (Development version)}{
+\section{Changes in version 0.7.1 [2021-01-05] (Development version)}{
   \subsection{New functions}{
     \itemize{
       \item
@@ -13,7 +13,7 @@
       \code{seqpolyads()} degree of similarities between polyadic members
       (contributed by Tim Liao)
       \item
-      \code{polyads} data set.
+      \code{polyads} example data set.
     }
   }
 
