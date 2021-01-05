@@ -87,10 +87,12 @@ seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
     }
 
     #print(head(seqrandall))
-    #print(head(seqstrand))
-    void <- attr(seqrandall,"void")
-    seqstrand[seqstrand==void] <- NA
-    suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alph, void=void))
+    print(head(seqstrand))
+    void <- attr(seqall,"void")
+    nr <- attr(seqall,"nr")
+    seqstrand[seqstrand %in% c(nr,void)] <- NA
+    print(alphabet(seqall))
+    suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alphabet(seqall), nr=nr, void=void))
     suppressMessages(allrdist <-seqdist(seqstrand, method=method, with.missing=with.missing, ...))
 
     if (core==1){
