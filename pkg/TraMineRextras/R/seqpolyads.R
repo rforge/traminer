@@ -87,12 +87,14 @@ seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
     }
 
     #print(head(seqrandall))
-    print(head(seqstrand))
+    #print(head(seqstrand))
     void <- attr(seqall,"void")
     nr <- attr(seqall,"nr")
+    right <- if (any(seqall==void)) 'DEL' else NA
+    if (!is.na(right)) TraMineR:::msg.warn("Found voids in input sequences: dropping all right missings in the resampled sequences!")
     seqstrand[seqstrand %in% c(nr,void)] <- NA
-    print(alphabet(seqall))
-    suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alphabet(seqall), nr=nr, void=void))
+    #print(alphabet(seqall))
+    suppressMessages(seqstrand <- seqdef(seqstrand, alphabet=alphabet(seqall), nr=nr, right=right, void=void))
     suppressMessages(allrdist <-seqdist(seqstrand, method=method, with.missing=with.missing, ...))
 
     if (core==1){
