@@ -1,13 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2020-11-26] (Development version)}{
+\section{Changes in version 2.3-2 [2021-01-11] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
       \item
       \code{seqformat()} with \code{from='SPELL'} and \code{process=TRUE} now issues
       a warning message when the max of the \code{'end'} column exceeds \code{limit}.
+      \item
+      \code{seqlegend()} gains an argument \code{boxes} to control how colors are displayed. In addition, now supports any argument of function \code{legend} and, e.g. \code{x} (or \code{x} and \code{y}) can be used instead of \code{position}.
     }
   }
 }

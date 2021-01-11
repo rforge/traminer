@@ -1,9 +1,13 @@
 ## =========
-Version 2.3-2 [2020-11-26] (Development version)
+Version 2.3-2 [2021-01-11] (Development version)
 
 Changes in existing functions:
-  - seqformat() with from='SPELL' and process=TRUE now issues 
-    a warning message when the max of the 'end' column exceeds limit. 
+  - seqformat() with from='SPELL' and process=TRUE now issues
+    a warning message when the max of the 'end' column exceeds limit.
+  - seqlegend() gains an argument 'boxes' to control how colors 
+    are displayed. In addition, now supports any argument of 
+    function legend and, e.g. 'x' (or 'x' and 'y') can be used instead 
+    of 'position'.
 
 
 ## =========

@@ -6,12 +6,12 @@ Plots a legend for the states in a sequence object. Useful if several graphics a
 }
 \usage{
 seqlegend(seqdata, with.missing = "auto", cpal = NULL, missing.color = NULL,
-  ltext = NULL, position = "topleft", cex = 1, fontsize, ...)
+  ltext = NULL, position = "topleft", cex = 1, boxes=TRUE, fontsize, ...)
 }
 \arguments{
-  \item{seqdata}{a sequence object as returned by the the \code{\link{seqdef}} function.}
+  \item{seqdata}{a state sequence object (of class \code{stslist}) as returned by the \code{\link{seqdef}} function.}
 
-  \item{with.missing}{if set to \code{"auto"} (default), a legend for the missing state is added automatically if one or more of the sequences in seqdata contains a missing state. If \code{TRUE} a legend for the missing state is added in any case. Setting to \code{FALSE} omits the legend for the missing state.}
+  \item{with.missing}{logical: if set to \code{"auto"} (default), a legend for the missing state is added automatically if one or more of the sequences in seqdata contains a missing state. If \code{TRUE} a legend for the missing state is added in any case. Setting to \code{FALSE} omits the legend for the missing state.}
 
   \item{cpal}{alternative color palette to use for the states. If user specified, a vector of colors with number of elements equal to the number of distinct states. By default, the 'cpal' attribute of the 'seqdata' sequence object is used (see \code{\link{seqdef}}).}
 
@@ -22,6 +22,9 @@ seqlegend(seqdata, with.missing = "auto", cpal = NULL, missing.color = NULL,
   \item{position}{the position of the legend in the graphic area. For accepted values, see \code{\link{legend}}. Defaults to \code{"topleft"}.}
 
   \item{cex}{size of the font for the labels. A value less than 1 decreases the font size, a value greater than 1 increases the font size. Defaults to 1.}
+      
+  \item{boxes}{logical: should the colors be displayed in small square boxes? Default is \code{TRUE}. If \code{FALSE}, colors are shown using small line segments of by default length .4 and width 15. The latter can be changed by means of the \code{lwd} and \code{seg.len} \code{\link{par}} arguments.
+      }
   \item{fontsize}{Deprecated. Use \code{cex} instead.}
 	\item{...}{optional arguments passed to the \code{\link{legend}} function.}
 }
