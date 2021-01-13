@@ -19,7 +19,7 @@ seqlegend(seqdata, with.missing = "auto", cpal = NULL, missing.color = NULL,
 
   \item{ltext}{optional description of the states to appear in the legend. Must be a vector of character strings with number of elements equal to the number of distinct states. If unspecified, the 'labels' attributes of the 'seqdata' sequence object is used (see \code{\link{seqdef}}). }
 
-  \item{position}{the position of the legend in the graphic area. For accepted values, see \code{\link{legend}}. Defaults to \code{"topleft"}.}
+  \item{position}{the position of the legend in the graphic area. For accepted values, see the \code{x} argument of \code{\link{legend}}. Defaults to \code{"topleft"}.}
 
   \item{cex}{size of the font for the labels. A value less than 1 decreases the font size, a value greater than 1 increases the font size. Defaults to 1.}
       
@@ -28,21 +28,28 @@ seqlegend(seqdata, with.missing = "auto", cpal = NULL, missing.color = NULL,
   \item{fontsize}{Deprecated. Use \code{cex} instead.}
 	\item{...}{optional arguments passed to the \code{\link{legend}} function.}
 }
+
+\details{When \code{x}, \code{legend}, or \code{col} arguments are provided, they supersede respectively the \code{position}, \code{ltext}, and \code{cpal} values.
+}
+
+\value{
+  Coordinate values returned by the \code{\link{legend}} function.
+}
 %\seealso{}
 \examples{
 ## Loading the 'actcal' example data set
-## and defining a sequence object with
-## (activity statuses from jan. to dec. 2000)
-## the data in columns 13 to 24
+## and defining a sequence object with 
+## activity statuses from Jan. to Dec. 2000 (columns 13 to 24)
+## of first 100 cases.
 data(actcal)
-actcal.seq <- seqdef(actcal,13:24,
+actcal.seq <- seqdef(actcal[1:100,13:24],
 	labels=c("> 37 hours", "19-36 hours", "1-18 hours", "no work"))
 
 ## Plotting the sequences frequency,
 ## the states distribution
 ## and the legend
 par(mfrow=c(2,2))
-seqiplot(actcal.seq, idxs=0, with.legend=FALSE, border=NA, space=0)
+seqIplot(actcal.seq, sortv="from.start", with.legend=FALSE)
 seqfplot(actcal.seq, pbarw=TRUE, with.legend=FALSE)
 seqdplot(actcal.seq, with.legend=FALSE)
 seqlegend(actcal.seq)

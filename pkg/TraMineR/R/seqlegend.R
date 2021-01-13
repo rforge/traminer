@@ -31,7 +31,6 @@ seqlegend <- function(seqdata, with.missing = "auto", cpal = NULL,
 	## nbstat <- nbstat+1
 	}
 
-
  	oolist <- list(...)
   if (! "col" %in% names(oolist)) oolist[["col"]] <- cpal
   if (! "x" %in% names(oolist)) oolist[["x"]] <- position
@@ -41,13 +40,13 @@ seqlegend <- function(seqdata, with.missing = "auto", cpal = NULL,
   if (boxes) {
 	  #legend(position, fill=cpal, legend=ltext, cex=cex,...)
     if (! "fill" %in% names(oolist)) oolist[["fill"]] <- cpal
-	  do.call(legend,oolist)
+	  res <- do.call(legend,oolist)
   } else {
  	  if (! "lty" %in% names(oolist)) oolist[["lty"]] <- 1
     if (! "lwd" %in% names(oolist)) oolist[["lwd"]] <- 15
     if (! "seg.len" %in% names(oolist)) oolist[["seg.len"]] <- .4
     if (! "x.intersp" %in% names(oolist)) oolist[["x.intersp"]] <- 1.5
-	  do.call(legend,oolist)
+	  res <- do.call(legend,oolist)
   }
-
+  invisible(res)
 }
