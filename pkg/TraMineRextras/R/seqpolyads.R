@@ -5,7 +5,7 @@
 
 seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist),2))),
               s=36963, T=1000, core=1, replace=TRUE, weighted=TRUE,
-              with.missing=FALSE, rand.weight.type=1, show.time=FALSE) {
+              with.missing=FALSE, rand.weight.type=1, role.weights=NULL, show.time=FALSE) {
 
   #gc(FALSE)
   if (show.time) ptime.begin <- proc.time()
@@ -17,6 +17,12 @@ seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
   for (p in 1:P) {
     if (!inherits(seqlist[[p]],"stslist"))
       TraMineR:::msg.stop("At least one element of seqlist is not a stslist object")
+  }
+
+  if (is.null(role.weights)) role.weights <- 1/P
+  else {
+    if (length(role.weights) != P)
+      TraMineR:::msg.stop("length of role.weights not equal to length of seqlist!")
   }
 
   n = nrow(seqlist[[1]])
@@ -119,9 +125,9 @@ seqpolyads <- function (seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:le
 
   l.weights <- array(1,T)
   if (weighted){
-    p.weights <- if (rand.weight.type == 2) apply(l.m,2,function(x){sum(weights[x])}) else P
+    p.weights <- if (rand.weight.type == 2) apply(l.m,2,function(x){sum(weights[x])}) else 1
     for (i in 1:T) {
-      l.weights[i] <- sum(weights[l.m[i,]]/p.weights)
+      l.weights[i] <- sum(weights[l.m[i,]]*role.weights/p.weights)
     }
   }
   l.weights <- l.weights/sum(l.weights)
