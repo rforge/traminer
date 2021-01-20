@@ -1,5 +1,5 @@
 Package: TraMineRextras
-Version: 0.7.1
+Version: 0.7.2
 Date: 2021-01-20
 Title: TraMineR Extension
 Authors@R: c(
@@ -7,9 +7,9 @@ Authors@R: c(
   email = "gilbert.ritschard@unige.ch", comment = c(ORCID = "0000-0001-7776-0903")),
   person("Matthias", "Studer", role = "aut", comment = c(ORCID = "0000-0002-6269-1412")),
   person("Reto", "Buergin", role = "aut"),
+  person("Tim", "Liao", role = "ctb"),
   person("Alexis", "Gabadinho", role = "ctb"),
   person("Pierre-Alexandre", "Fonta", role = "ctb"),
-  person("Tim", "Liao", role = "ctb"),
   person("Nicolas", "Muller", role = "ctb"),
   person("Patrick", "Rousset", role = "ctb"))
 Depends: R (>= 3.5.0), TraMineR (>= 2.2-1)

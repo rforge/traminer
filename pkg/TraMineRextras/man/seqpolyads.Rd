@@ -6,7 +6,7 @@
 \description{The function computes measures of the degree of similarities within polyadic member sequences compared to randomly assigned polyadic member sequences.}
 \usage{
 seqpolyads(seqlist, a=1, method="HAM", ..., w=rep(1,ncol(combn(1:length(seqlist),2))),
-              s=36963, T=1000, core=1, replace=TRUE, weighted=TRUE, 
+              s=36963, T=1000, core=1, replace=TRUE, weighted=TRUE,
               with.missing=FALSE, rand.weight.type=1, role.weights=NULL, show.time=FALSE)
 }
 \arguments{
@@ -103,6 +103,6 @@ seqG3.Dur <- seqpolyads(seqL,method="CHI2",step=slgth,core=core,T=100)
 }
 
 \references{
-Tim F. Liao (2021), "Using Sequence Analysis to Quantify How Strongly Life Courses Are Linked.” \emph{Sociological Science} \bold{8}, 48-72. DOI: \href{http://dx.doi.org/10.15195/v8.a3}{10.15195/v8.a3}
+Tim F. Liao (2021), "Using Sequence Analysis to Quantify How Strongly Life Courses Are Linked.” \emph{Sociological Science} \bold{8}, 48-72, \doi{10.15195/v8.a3}.
 }
 \author{Tim Liao and Gilbert Ritschard} 
