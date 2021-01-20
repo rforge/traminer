@@ -55,7 +55,7 @@ The \var{V} statistic is, for each observed polyad, the proportion of \code{T} r
 
 When the sequence objects in \code{seqlist} have weights and \code{weighted=TRUE}, the randomized sequences are sampled using the weights of the first element in the list. Each member of an observed polyad is supposed to have the same weight. This does not hold for the randomized polyads that are obtained by sampling their members independently. The weights of each randomized sequence is set as the average of the weights of its members.  When role weights are provided with \code{role.weights}, a weighted average of the member weights is used. When \code{rand.weight.type=1}, original member weights are used. When \code{rand.weight.type=2}, the weights of randomly selected members are adjusted by the sum of weights of all randomly drawn members of the same type.
 
-When \code{core > 1}, the function uses parallel computation by means of \code{makePSOCKcluster} and \code{foreach(...) \%dopar\%}
+When \code{core > 1}, the function uses the \code{doParallel} package for parallel computation.
 }
 
 \value{The function outputs a list of seven objects:
@@ -103,6 +103,6 @@ seqG3.Dur <- seqpolyads(seqL,method="CHI2",step=slgth,core=core,T=100)
 }
 
 \references{
-Tim F. Liao. Forthcoming. "Using Sequence Analysis to Quantify How Strongly Life Courses Are Linked.” \emph{Sociological Science} x: xxx–xxx.
+Tim F. Liao (2021), "Using Sequence Analysis to Quantify How Strongly Life Courses Are Linked.” \emph{Sociological Science} \bold{8}, 48-72. DOI: \href{http://dx.doi.org/10.15195/v8.a3}{10.15195/v8.a3}
 }
 \author{Tim Liao and Gilbert Ritschard} 
