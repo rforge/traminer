@@ -1,7 +1,12 @@
 ## =========
-Version 2.3-2 [2021-01-11] (Development version)
+Version 2.3-2 [2021-01-29] (Development version)
 
 Changes in existing functions:
+  - seqdist() can now compute distances between two subsets of 
+    sequences. The subsets are defined by providing a list with 
+    two subsets of sequence indexes as 'refseq' argument.
+  - seqdist() dimnames of the objects returned by seqdist are 
+    now all set from the rownames of the provided sequence object.
   - seqformat() with from='SPELL' and process=TRUE now issues
     a warning message when the max of the 'end' column exceeds limit.
   - seqlegend() gains an argument 'boxes' to control how colors 

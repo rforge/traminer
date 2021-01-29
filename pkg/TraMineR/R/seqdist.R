@@ -49,7 +49,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   nseqs <- nrow(seqdata)
   alphabet <- alphabet(seqdata)
   nstates <- length(alphabet)
-  seqs.dlens <- unique(seqlength(seqdata))
+  seqs.dlens <- unique(seqlength(seqdata)) ## should we account for with.missing value (FALSE by default)?
   seqdata.nr <- attr(seqdata, "nr")
 
   # method
@@ -61,9 +61,22 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     msg.stop.in("method", methods)
 
   # refseq
-  # refseq.type: "none", "sequence", "most frequent", "index"
+  # refseq.type: "none", "sequence", "most frequent", "index", "sets"
   if (!is.null(refseq)) {
-    if (inherits(refseq, "stslist")) {
+    ## if list of two sets of indexes, we will compute pairwise distances between the two sets
+    if (inherits(refseq, "list") & length(refseq) > 1) {
+      #if (method %in% c("OMstran"))
+      #    msg.stop("refseq as a list not supported for  'OMstran'")
+      if (length(refseq) > 2)
+          msg.warn("Only first two elements of the 'refseq' list are used!")
+      for (i in 1:2) {
+        if (!is.positive.integers(refseq[[i]]))
+          msg.stop("When a list, 'refseq' must contain two sets of indexes, ie of positive integer values.")
+        if (max(refseq[[i]]) > nseqs)
+          msg.stop("Some indexes in 'refseq' out of range.")
+      }
+      refseq.type <- "sets"
+    } else if (inherits(refseq, "stslist")) {
       if (nrow(refseq) != 1)
         msg.stop("'refseq' must contain a (single) sequence")
       if (!identical(alphabet(refseq), alphabet))
@@ -187,7 +200,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   #if (refseq.type == "sequence" && ! method %in% c("OM", "OMstran", "HAM", "DHD", "LCS", "LCP", "RLCP", "CHI2", "EUCLID"))
   #  msg.stop.impl("refseq", method, when = "it is an external sequence object")
 
-  # norm
+  # norm: all but  SVRspell, NMS, NMSMST
   if (norm != "none" && ! method %in% c("OM", "OMloc", "OMstran", "OMspell", "OMslen", "TWED", "HAM", "DHD", "CHI2", "EUCLID", "LCS", "LCP", "RLCP"))
   ##if (norm != "none" && ! method %in% c("OM", "HAM", "DHD", "LCS", "LCP", "RLCP"))
     msg.stop.impl("norm", method)
@@ -265,7 +278,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   # HAM, DHD
   if (method %in% c("HAM", "DHD")) {
     if (length(seqs.dlens) > 1)
-      msg.stop(method, "is not defined for sequence of different length")
+      msg.stop(method, "is not defined for sequences of different length")
   }
 
   # NMS, SVRspell
@@ -441,7 +454,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
   #### Pre-process data (part 1/2) ####
 
-  # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
+  # TODO Temporary fix because stringdist C++ code uses a sequence index, not a sequence object!
   if (refseq.type == "sequence") {
     seqs.lens.max <- max(seqs.dlens)
     refseq.len <- seqlength(refseq)[1, 1]
@@ -473,13 +486,25 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   seqdata.num <- seqnum(seqdata, with.missing)
 
   # Keep only distinct sequences
-  dseqs.num <- unique(seqdata.num)
-  # Check that dseqs.num does not exceed the max allowed
+
+  if (refseq.type == "sets") {
+    dseqs.num1 <- unique(seqdata.num[refseq[[1]],])
+    nunique1 <- nrow(dseqs.num1)
+    dseqs.num2 <- unique(seqdata.num[refseq[[2]],])
+    nunique2 <- nrow(dseqs.num2)
+    dseqs.num <- rbind(dseqs.num1,dseqs.num2)
+  } else {
+    dseqs.num <- unique(seqdata.num)
+  }
+  # Check that dseqs.num does not exceed the max allowed number
   if (check.max.size){
-    max.allowed.seq <- ifelse(refseq.type=="none",
+    max.allowed.seq <- ifelse(refseq.type == "none",
                           floor(sqrt(.Machine$integer.max)),
                           .Machine$integer.max - 1)
-    if (nrow(dseqs.num) > max.allowed.seq){
+    if (refseq.type == "sets") {
+      if((nunique1 * nunique2) > max.allowed.seq)
+        msg.stop("number of ",nunique1, " and ", nunique2, " unique sequences too large for max allowed distances ", max.allowed.seq)
+    } else if (nrow(dseqs.num) > max.allowed.seq) {
       msg.stop(nrow(dseqs.num), " unique sequences exceeds max allowed of ", max.allowed.seq)
     }
   }
@@ -488,12 +513,26 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
   # Find the index of the corresponding representative (distinct) sequence
   # Note: Must be before dseqs.num modification for OMspell, NMSMST, SVRspell
-  seqdata.didxs <- match(seqconc(seqdata.num), seqconc(dseqs.num))
+
+  if (refseq.type == "sets") {
+    seqdata.didxs1 <- match(seqconc(seqdata.num[refseq[[1]],]), seqconc(dseqs.num1))
+    seqdata.didxs2 <- match(seqconc(seqdata.num[refseq[[2]],]), seqconc(dseqs.num2))
+  } else {
+    seqdata.didxs <- match(seqconc(seqdata.num), seqconc(dseqs.num))
+  }
 
   if (refseq.type != "none") {
+    # sets
+    if (refseq.type == "sets") {
+      refseq.raw <- refseq
+      if (method %in% c("OMstran","CHI2", "EUCLID"))
+        refseq.id <- refseq ## list of the two sets
+      else
+        refseq.id <- c(nunique1, nunique1 + nunique2) ## vector of sets sizes
+    }
     # sequence
-    if (refseq.type == "sequence") {
-      # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
+    else if (refseq.type == "sequence") {
+      # TODO Temporary fix because stringdist C++ code uses a sequence index, not a sequence object!
       refseq.raw <- refseq
       if (method %in% c("OMstran","CHI2", "EUCLID"))
         refseq.id <- nseqs + 1
@@ -524,10 +563,14 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     else {
       msg.stop.ie("no known preparation for this 'refseq' type")
     }
-    refseq.sps <- suppressMessages(seqformat(refseq.raw, from = "STS", to = "SPS", compress = TRUE))
-    msg("using reference sequence", refseq.sps)
+    if (refseq.type == "sets") {
+      msg("pairwise measures between two subsets of sequences of sizes ",length(refseq[[1]])," and ",length(refseq[[2]]))
+    } else {
+      refseq.sps <- suppressMessages(seqformat(refseq.raw, from = "STS", to = "SPS", compress = TRUE))
+      msg("using reference sequence", refseq.sps)
+      rm(refseq.sps)
+    }
     rm(refseq.raw)
-    rm(refseq.sps)
   }
 
   #### Compute method specific values ####
@@ -573,7 +616,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
       sm <- adaptSmForHAM(sm, nstates, ncol(seqdata))
     # Maximum possible cost of the Hamming distance
     max.cost <- 0
-    for (i in 1:max(seqs.dlens))
+    for (i in 1:max(seqs.dlens))  ## actually seqs.dlens has here only one value
       max.cost <- max.cost + max(sm[, , i])
   }
 
@@ -767,7 +810,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
       result <- CHI2(seqdata, breaks = breaks, step = step,
         with.missing = with.missing, norm = norm.chi2euclid,  weighted = weighted,
         overlap = overlap, euclid = is.EUCLID, global.pdotj=global.pdotj, refseq=refseq.id)
-      names(result) <- rownames(seqdata)
+      ##names(result) <- rownames(seqdata)
       if (refseq.type == "sequence") result <- result[-length(result)]
     }
   }
@@ -783,7 +826,7 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
         previous = previous, add.column = add.column, with.missing=with.missing,
         weighted = weighted, refseq = refseq.id, norm = norm)
 
-      names(result) <- rownames(seqdata)
+      #names(result) <- rownames(seqdata)
 
       # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
       if (refseq.type == "sequence")
@@ -808,14 +851,21 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
 
     # Dissimilarities with a reference sequence
     if (refseq.type != "none") {
+      if (length(refseq.id)==1) refseq.id <- c(refseq.id,refseq.id)
       distances <- .Call(C_cstringrefseqdistance, dseqs.mat.vect, dseqs.mat.dim,
         dseqs.lens.vect, params, norm.num, method.num, as.integer(refseq.id))
 
       if (method %in% c("NMS", "NMSMST", "SVRspell"))
         distances <- sqrt(distances)
 
-      result <- distances[seqdata.didxs]
-      names(result) <- NULL
+      if (refseq.type == "sets") {
+        distances <- matrix(distances, nrow=nunique1, ncol=nunique2, byrow=FALSE)
+        result <- distances[seqdata.didxs1,seqdata.didxs2,drop=FALSE]
+        dimnames(result) <- list(rownames(seqdata)[refseq[[1]]],rownames(seqdata)[refseq[[2]]])
+      } else {
+        result <- distances[seqdata.didxs]
+        names(result) <- rownames(seqdata)
+      }
 
       # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
       if (refseq.type == "sequence")
@@ -841,7 +891,12 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
       attr(distances, "Upper") <- FALSE
       attr(distances, "method") <- method
 
-      result <- if (full.matrix) dist2matrix(distances) else distances
+      if (full.matrix) {
+        result <- dist2matrix(distances)
+        dimnames(result) <- list(rownames(seqdata),rownames(seqdata))
+      } else {
+        result <- distances
+      }
     }
   }
 

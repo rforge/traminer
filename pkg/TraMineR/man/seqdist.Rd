@@ -32,7 +32,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     \code{"SVRspell"}, or \code{"TWED"}. See the Details section.
   }
   \item{refseq}{
-    \code{NULL}, Integer, or State Sequence Object.
+    \code{NULL}, Integer, State Sequence Object, or List.
     Default: \code{NULL}.
     The baseline sequence to compute the distances from.
 
@@ -40,6 +40,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
 
     When a state sequence object, it must contain a single sequence and have the same
     alphabet as \code{seqdata}.
+    
+    When a list, it must be a list of two sets of indexes of \code{seqdata} rows.
   }
   \item{norm}{
     String.
@@ -325,9 +327,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   When \code{norm="auto"}, \code{"gmean"} is applied to \code{"LCS"},
   \code{"LCP"} and \code{"RLCP"} distances, \code{"maxlength"} is applied to \code{"OM"}, \code{"HAM"}
   and \code{"DHD"}, and the normalization "YujianBo" of \cite{Yujian and Bo (2007)} that preserves the
-  triangle inequality is used in the other cases.
-
-  The square of the \code{"CHI2"} and \code{"EUCLID"}
+  triangle inequality is used in the other cases except \code{"CHI2"} and \code{"EUCLID"}. 
+  For the latter two, the square of the 
   distances are normalized by the number of intervals and the maximal distance
   on each interval. Note that for 'CHI2' the maximal distance on each interval
   depends on the state distribution on the interval.
@@ -350,7 +351,9 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   When \code{refseq} is \code{NULL} (default), the whole matrix of pairwise
   distances between sequences or, if \code{full.matrix = FALSE},
   the corresponding \code{dist} object of pairwise distances between sequences
-  is returned. Otherwise, a vector with distances between the sequences in the
+  is returned. When \code{refseq} is a \code{list} of two sets of indexes, the matrix
+  of distances from the first set of sequences (rows) to the second set (columns). 
+  Otherwise, a vector with distances between the sequences in the
   state sequence object and the reference sequence specified with \code{refseq}
   is returned.
 }
@@ -358,11 +361,11 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   Studer, M. and G. Ritschard (2016), "What matters in differences between life
   trajectories: A comparative review of sequence dissimilarity measures",
   \emph{Journal of the Royal Statistical Society, Series A}. \bold{179}(2),
-  481-511. DOI: \href{http://dx.doi.org/10.1111/rssa.12125}{10.1111/rssa.12125}
+  481-511, \doi{10.1111/rssa.12125}
 
   Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence
   Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES,
-  Switzerland. DOI: \href{http://dx.doi.org/10.12682/lives.2296-1658.2014.33}{10.12682/lives.2296-1658.2014.33}
+  Switzerland, \doi{10.12682/lives.2296-1658.2014.33}
 
   Gabadinho, A., G. Ritschard, N. S. Müller and M. Studer (2011). Analyzing and
   Visualizing State Sequences in R with TraMineR. \emph{Journal of Statistical
@@ -375,17 +378,15 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   Halpin, B. (2014). Three Narratives of Sequence Analysis, in Blanchard, P.,
   Bühlmann, F. and Gauthier, J.-A. (Eds.) \emph{Advances in Sequence Analysis:
   Theory, Method, Applications}, Vol 2 of Series \emph{Life Course Research and
-  Social Policies}, pages 75--103, Heidelberg: Springer. DOI:
-  \href{http://dx.doi.org/10.1007/978-3-319-04969-4_5}{10.1007/978-3-319-04969-4_5}
+  Social Policies}, pages 75--103, Heidelberg: Springer. \doi{10.1007/978-3-319-04969-4_5}
 
   Marteau, P.-F. (2009). Time Warp Edit Distances with Stiffness Adjustment for
   Time Series Matching. \emph{IEEE Transactions on Pattern Analysis and Machine
-  Intelligence}, \bold{31}(2), 306--318. DOI:
-  \href{http://dx.doi.org/10.1109/TPAMI.2008.76}{10.1109/TPAMI.2008.76}
+  Intelligence}, \bold{31}(2), 306--318. \doi{10.1109/TPAMI.2008.76}
 
   Yujian, L. and Bo, L. (2007). A normalized Levenshtein distance metric.
   \emph{IEEE Transactions on Pattern Analysis and Machine Intelligence},
-  \bold{29}(6), 1091--1095. DOI: \href{http://dx.doi.org/10.1109/TPAMI.2007.1078}{10.1109/TPAMI.2007.1078}
+  \bold{29}(6), 1091--1095. \doi{10.1109/TPAMI.2007.1078}
 
   See also all references in \cite{Studer and Ritschard (2014, 2016)}
 }
@@ -432,6 +433,13 @@ ref <- seqdef(as.matrix("(0,5)-(3,5)-(4,6)"), informat = "SPS",
 biofam.dref2 <- seqdist(biofam.seq, method = "LCS",
                         refseq = ref)
 
+## LCS distances between two subsets of sequences
+set1 <- 1:10
+set2 <- 31:36
+biofam.dref2 <- seqdist(biofam.seq, method = "LCS",
+                        refseq = list(set1,set2))
+
+
 ## Chi-squared distance over the full observed timeframe
 biofam.chi.full <- seqdist(biofam.seq, method = "CHI2",
                            step = max(seqlength(biofam.seq)))
@@ -462,7 +470,7 @@ ex1.omloc <- seqdist(ex1.seq, method = "OMloc",
                      sm = costs.ex1$sm, expcost=.1, context = .4,
                      with.missing = TRUE)
 
-## OMspell works only with a scalar indel
+## OMspell with a scalar indel
 indel <- max(costs.ex1$indel)
 ## OM of spells
 ex1.omspell <- seqdist(ex1.seq, method = "OMspell",
