@@ -1,25 +1,38 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-01-29] (Development version)}{
+\section{Changes in version 2.3-2 [2021-02-08] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
       \item
-      \code{seqdist()} can now compute distances between two subsets of sequences. 
-      The subsets are defined by providing a list with two subsets of sequence 
+      \code{seqdist()} can now compute distances between two subsets of sequences.
+      The subsets are defined by providing a list with two subsets of sequence
       indexes as \code{refseq} argument.
       \item
-      \code{seqdist()} dimnames of the objects returned by seqdist are now all set 
+      \code{seqdist()} dimnames of the objects returned by seqdist are now all set
       from the rownames of the provided sequence object.
       \item
       \code{seqformat()} with \code{from='SPELL'} and \code{process=TRUE} now issues
-      a warning message when the max of the \code{'end'} column exceeds \code{limit}.
+      a warning message when the max of the \code{end} column exceeds \code{limit}.
       \item
       \code{seqlegend()} gains an argument \code{boxes} to control how colors are displayed. In addition, now supports any argument of function \code{legend} and, e.g. \code{x} (or \code{x} and \code{y}) can be used instead of \code{position}.
+      \item
+      \code{seqstatf()} gains the \code{with.missing} argument.
+      \item
+      \code{seqlogp()} gains the \code{with.missing} argument. In addition, 
+      the overall state distribution can now be used as starting point by 
+      setting \code{begin='global.freq'.}
     }
   }
   
+  \subsection{Bug fixes}{
+    \itemize{
+      \item
+      \code{seqlogp()} error for state sequences with missing values.
+    }
+  }
+
 }
 
 

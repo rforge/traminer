@@ -22,7 +22,7 @@ seqlegend(seqdata, with.missing = "auto", cpal = NULL, missing.color = NULL,
   \item{position}{the position of the legend in the graphic area. For accepted values, see the \code{x} argument of \code{\link{legend}}. Defaults to \code{"topleft"}.}
 
   \item{cex}{size of the font for the labels. A value less than 1 decreases the font size, a value greater than 1 increases the font size. Defaults to 1.}
-      
+
   \item{boxes}{logical: should the colors be displayed in small square boxes? Default is \code{TRUE}. If \code{FALSE}, colors are shown using small line segments of by default length .4 and width 15. The latter can be changed by means of the \code{lwd} and \code{seg.len} \code{\link{par}} arguments.
       }
   \item{fontsize}{Deprecated. Use \code{cex} instead.}
@@ -38,7 +38,7 @@ seqlegend(seqdata, with.missing = "auto", cpal = NULL, missing.color = NULL,
 %\seealso{}
 \examples{
 ## Loading the 'actcal' example data set
-## and defining a sequence object with 
+## and defining a sequence object with
 ## activity statuses from Jan. to Dec. 2000 (columns 13 to 24)
 ## of first 100 cases.
 data(actcal)
@@ -55,6 +55,6 @@ seqdplot(actcal.seq, with.legend=FALSE)
 seqlegend(actcal.seq)
 }
 
-\author{Alexis Gabadinho}
+\author{Alexis Gabadinho and Gilbert Ritschard}
 
 \keyword{Plot}

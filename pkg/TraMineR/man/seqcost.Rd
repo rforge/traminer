@@ -116,9 +116,9 @@ Gabadinho, A., G. Ritschard, M. Studer and N. S. Müller (2010). Mining Sequence
 \code{R} with the \code{TraMineR} package: A user's guide. Department of Econometrics and
 Laboratory of Demography, University of Geneva.
 
-Studer, M. & Ritschard, G. (2016), "What matters in differences between life trajectories: A comparative review of sequence dissimilarity measures", \emph{Journal of the Royal Statistical Society, Series A}. \bold{179}(2), 481-511. DOI: \href{http://dx.doi.org/10.1111/rssa.12125}{10.1111/rssa.12125}
+Studer, M. & Ritschard, G. (2016), "What matters in differences between life trajectories: A comparative review of sequence dissimilarity measures", \emph{Journal of the Royal Statistical Society, Series A}. \bold{179}(2), 481-511. \doi{10.1111/rssa.12125}
 
-Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES, Switzerland, 2014. DOI: \href{http://dx.doi.org/10.12682/lives.2296-1658.2014.33}{10.12682/lives.2296-1658.2014.33}
+Studer, M. and G. Ritschard (2014). "A Comparative Review of Sequence Dissimilarity Measures". \emph{LIVES Working Papers}, \bold{33}. NCCR LIVES, Switzerland, 2014. \doi{10.12682/lives.2296-1658.2014.33}
 }
 
 \examples{

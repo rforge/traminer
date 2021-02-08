@@ -16,10 +16,10 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by \code{\link[TraMineR]{seqdef}}.}
 
   \item{indic}{vector of character strings. List of selected indicators among \code{"lgth"} (sequence length), \code{"nonm"} (number of non-missing elements), \code{"dlgth"}, (number of successive distinct states), \code{"visited"} (number of visited states), \code{"recu"} (recurrence index), \code{"trans"} (number of state changes), \code{"transp"} (number of state changes as a proportion of maximum possible transitions), \code{"meand"} (mean spell duration), \code{"dustd"} (duration standard deviation),
-      %\code{"meand2"} (mean spell duration accounting for non-visited states), \code{"dustd2"} (duration standard deviation accounting for non-visited states), 
+      %\code{"meand2"} (mean spell duration accounting for non-visited states), \code{"dustd2"} (duration standard deviation accounting for non-visited states),
       \code{"entr"} (longitudinal normalized entropy), \code{"volat"} (objective volatility), \code{"nsubs"} (number of subsequences of the DSS sequence), \code{"cplx"} (complexity index),
-      \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence), 
-      %\code{"turbn2"} (normalized turbulence accounting for non-visited states), \code{"turb2"} (turbulence accounting for non-visited states), 
+      \code{"turbn"} (normalized turbulence), \code{"turb"} (turbulence),
+      %\code{"turbn2"} (normalized turbulence accounting for non-visited states), \code{"turb2"} (turbulence accounting for non-visited states),
       \code{"ppos"} (proportion of positive states), \code{"nvolat"} (normative volatility), \code{"vpos"} volatility of positive-negative state sequences, \code{"inpos"} (integration potential),  \code{"prec"} (precarity index). Can also be \code{"all"}, \code{"basic"}, \code{"diversity"}, \code{"complexity"},  or \code{"binary"} that each select a subset of the indicators. Setting \code{indic="all"} selects all indicators but \code{"ppos"}, \code{"vpos"}, \code{"nvolat"}, \code{"inpos"}, and \code{"prec"} that require an additional argument list.}
 
 	\item{with.missing}{logical: should non-void missing values be treated as a regular state? If \code{FALSE} (default) missing values are ignored.}
@@ -28,7 +28,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
 
   %\item{integr.args}{list: when \code{"integr"} requested, the arguments passed to \code{seqintegration} together with \code{seqdata} and \code{with.missing}. See \code{\link{seqintegration}}.}
 
-  \item{prec.args}{list: when \code{"prec"} requested, the arguments passed to \code{seqprecarity} together with \code{seqdata} and \code{with.missing}. See \code{\link{seqprecarity}}.}
+  \item{prec.args}{list: when \code{"prec"} is requested, the arguments passed to \code{seqprecarity} together with \code{seqdata} and \code{with.missing}. See \code{\link{seqprecarity}}.}
 
   \item{w}{real in range [0,1]: when \code{volat} weight coefficient passed to \code{\link{seqivolatility}}. Default is 1.}
 }

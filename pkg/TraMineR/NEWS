@@ -1,20 +1,26 @@
 ## =========
-Version 2.3-2 [2021-01-29] (Development version)
+Version 2.3-2 [2021-02-08] (Development version)
 
 Changes in existing functions:
-  - seqdist() can now compute distances between two subsets of 
-    sequences. The subsets are defined by providing a list with 
+  - seqdist() can now compute distances between two subsets of
+    sequences. The subsets are defined by providing a list with
     two subsets of sequence indexes as 'refseq' argument.
-  - seqdist() dimnames of the objects returned by seqdist are 
+  - seqdist() dimnames of the objects returned by seqdist are
     now all set from the rownames of the provided sequence object.
   - seqformat() with from='SPELL' and process=TRUE now issues
     a warning message when the max of the 'end' column exceeds limit.
-  - seqlegend() gains an argument 'boxes' to control how colors 
-    are displayed. In addition, now supports any argument of 
-    function legend and, e.g. 'x' (or 'x' and 'y') can be used instead 
+  - seqlegend() gains an argument 'boxes' to control how colors
+    are displayed. In addition, now supports any argument of
+    function legend and, e.g. 'x' (or 'x' and 'y') can be used instead
     of 'position'.
-
-
+  - seqstatf() gains the 'with.missing' argument.
+  - seqlogp() gains the with.missing argument. In addition,
+    the overall state distribution can now be used as starting 
+    point by setting begin='global.freq'.
+    
+Bug fixes:
+  - seqlogp() error for state sequences with missing values. 
+    
 ## =========
 Version 2.2-1 [2020-10-24]
 

@@ -33,7 +33,7 @@
 \details{
   The function transforms the provided state sequences into binary sequence of positive and negative states. When \code{dss = TRUE}, the count of positive and negative elements give the number of positive and negative spells. The binary state sequence object is returned as an attribute.
 
-  When \code{neg.states=NULL}, states not listed on the \code{pos.states} argument are considered as negative and conversely when \code{pos.states=NULL}. When \code{with.missing=TRUE}, the missing state \code{nr} will be considered as positive if included in the \code{pos.states} list or as negative if in \code{neg.states}.  When \code{with.missing=FALSE} (default) missing states are ignored. However, when missing values appear within a spell, such as in AA*ABB, the DSS sequence will have two consecutive occurrences of the spell. For the example we would have AAB, i.e. if A is positive and B negative, a proportion of 2/3 of positive spells.
+  When \code{neg.states=NULL}, states not listed on the \code{pos.states} argument are considered as negative and conversely when \code{pos.states=NULL}. When \code{with.missing=TRUE}, the missing state \code{nr} will be considered as positive if included in the \code{pos.states} list or as negative if in \code{neg.states}.  When \code{with.missing=FALSE} (default) missing states are ignored. However, when missing values appear within a spell, such as in AA*ABB, the spell is split into two consecutive spells in a same state. For the example we would have AAB, i.e. if A is positive and B negative, a proportion of 2/3 of positive spells.
 
   When both \code{pos.states} and \code{neg.states} are provided, states of the alphabet (including the \code{nr} code when \code{with.missing=TRUE}) that belong nor to \code{pos.states} nor to \code{neg.states} are ignored.
 
@@ -56,7 +56,7 @@
 \code{\link{seqindic}}
 }
 \references{
-Brzinsky-Fay, C. (2007) Lost in Transition? Labour Market Entry Sequences of School Leavers in Europe, \emph{European Sociological Review}, 23(4). DOI: \href{https://doi.org/10.1093/esr/jcm011}{10.1093/esr/jcm011}
+Brzinsky-Fay, C. (2007) Lost in Transition? Labour Market Entry Sequences of School Leavers in Europe, \emph{European Sociological Review}, 23(4). \doi{10.1093/esr/jcm011}
 
 Brzinsky-Fay, C. (2018) Unused Resources: Sequence and Trajectory Indicators. International Symposium on Sequence Analysis and Related Methods, Monte Verita, TI, Switzerland, October 10-12, 2018.
 }
