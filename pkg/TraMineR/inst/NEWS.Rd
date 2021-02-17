@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-02-08] (Development version)}{
+\section{Changes in version 2.3-2 [2021-02-17] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -20,12 +20,12 @@
       \item
       \code{seqstatf()} gains the \code{with.missing} argument.
       \item
-      \code{seqlogp()} gains the \code{with.missing} argument. In addition, 
-      the overall state distribution can now be used as starting point by 
+      \code{seqlogp()} gains the \code{with.missing} argument. In addition,
+      the overall state distribution can now be used as starting point by
       setting \code{begin='global.freq'.}
     }
   }
-  
+
   \subsection{Bug fixes}{
     \itemize{
       \item

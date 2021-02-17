@@ -479,7 +479,10 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
       weighted <- TRUE
     }
     attr(refseq,"weights") <- 0
+    rownames.ori <- rownames(seqdata)
     seqdata <- rbind(seqdata,refseq)
+    refname <- if ("ref" %in% rownames.ori) rownames(seqdata)[nrow(seqdata)] else "ref"
+    rownames(seqdata) <- c(rownames.ori,refname)
   }
 
   # Transform the alphabet into numbers
@@ -804,14 +807,23 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
       distances <- CHI2(seqdata, breaks = breaks, step = step,
         with.missing = with.missing, norm = norm.chi2euclid,  weighted = weighted,
         overlap = overlap, euclid = is.EUCLID, global.pdotj=global.pdotj)
-      result <- if (full.matrix) dist2matrix(distances) else distances
-    }
-    else { ## dist to ref
+      if (full.matrix) {
+        result <-  dist2matrix(distances)
+        dimnames(result) <- list(rownames(seqdata),rownames(seqdata))
+      } else {
+        result <- distances
+      }
+    } else { ## dist to ref
       result <- CHI2(seqdata, breaks = breaks, step = step,
         with.missing = with.missing, norm = norm.chi2euclid,  weighted = weighted,
         overlap = overlap, euclid = is.EUCLID, global.pdotj=global.pdotj, refseq=refseq.id)
       ##names(result) <- rownames(seqdata)
-      if (refseq.type == "sequence") result <- result[-length(result)]
+      if (refseq.type == "sets") {
+        dimnames(result) <- list(rownames(seqdata)[refseq[[1]]],rownames(seqdata)[refseq[[2]]])
+      } else {
+        names(result) <- rownames(seqdata)
+        if (refseq.type == "sequence") result <- result[-length(result)]
+      }
     }
   }
   # OMstran
@@ -864,12 +876,11 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
         dimnames(result) <- list(rownames(seqdata)[refseq[[1]]],rownames(seqdata)[refseq[[2]]])
       } else {
         result <- distances[seqdata.didxs]
+        # TODO Temporary fix because C++ code uses a sequence index, not a sequence object!
         names(result) <- rownames(seqdata)
+        if (refseq.type == "sequence") result <- result[-length(result)]
       }
 
-      # TODO Temporary fix because seqdist2 C++ code use a sequence index, not a sequence object!
-      if (refseq.type == "sequence")
-        result <- result[-length(result)]
     }
     # Pairwise dissimilarities between sequences
     else {

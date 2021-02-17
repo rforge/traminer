@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-2 [2021-02-08] (Development version)
+Version 2.3-2 [2021-02-17] (Development version)
 
 Changes in existing functions:
   - seqdist() can now compute distances between two subsets of
@@ -15,12 +15,12 @@ Changes in existing functions:
     of 'position'.
   - seqstatf() gains the 'with.missing' argument.
   - seqlogp() gains the with.missing argument. In addition,
-    the overall state distribution can now be used as starting 
+    the overall state distribution can now be used as starting
     point by setting begin='global.freq'.
-    
+
 Bug fixes:
-  - seqlogp() error for state sequences with missing values. 
-    
+  - seqlogp() error for state sequences with missing values.
+
 ## =========
 Version 2.2-1 [2020-10-24]
 

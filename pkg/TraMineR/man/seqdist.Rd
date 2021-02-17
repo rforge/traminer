@@ -40,7 +40,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
 
     When a state sequence object, it must contain a single sequence and have the same
     alphabet as \code{seqdata}.
-    
+
     When a list, it must be a list of two sets of indexes of \code{seqdata} rows.
   }
   \item{norm}{
@@ -327,8 +327,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   When \code{norm="auto"}, \code{"gmean"} is applied to \code{"LCS"},
   \code{"LCP"} and \code{"RLCP"} distances, \code{"maxlength"} is applied to \code{"OM"}, \code{"HAM"}
   and \code{"DHD"}, and the normalization "YujianBo" of \cite{Yujian and Bo (2007)} that preserves the
-  triangle inequality is used in the other cases except \code{"CHI2"} and \code{"EUCLID"}. 
-  For the latter two, the square of the 
+  triangle inequality is used in the other cases except \code{"CHI2"} and \code{"EUCLID"}.
+  For the latter two, the square of the
   distances are normalized by the number of intervals and the maximal distance
   on each interval. Note that for 'CHI2' the maximal distance on each interval
   depends on the state distribution on the interval.
@@ -350,12 +350,13 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
 \value{
   When \code{refseq} is \code{NULL} (default), the whole matrix of pairwise
   distances between sequences or, if \code{full.matrix = FALSE},
-  the corresponding \code{dist} object of pairwise distances between sequences
-  is returned. When \code{refseq} is a \code{list} of two sets of indexes, the matrix
-  of distances from the first set of sequences (rows) to the second set (columns). 
+  the corresponding \code{dist} object of pairwise distances between sequences.
+  
+  When \code{refseq} is a \code{list} of two sets of indexes, the matrix
+  of distances from the first set of sequences (rows) to the second set (columns).
+  
   Otherwise, a vector with distances between the sequences in the
-  state sequence object and the reference sequence specified with \code{refseq}
-  is returned.
+  state sequence object and the reference sequence specified with \code{refseq}.
 }
 \references{
   Studer, M. and G. Ritschard (2016), "What matters in differences between life
