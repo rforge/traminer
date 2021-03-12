@@ -8,11 +8,17 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
 		TraMineR:::msg.stop("data is NOT a sequence object, see seqdef function to create one")
 
   if (length(indic) > 1) {
-    TraMineR:::msg.warn("Vector indic, only first value is used!")
-    indic <- indic[1]
-  }
+    if (indic[1]!="Develop") {
+      TraMineR:::msg.warn("Vector indic, only first value is used!")
+      indic <- iindic <- indic[1]
+    } else if (length(indic) > 2){
+      TraMineR:::msg.warn("Develop vector indic, only first two value are used!")
+      indic <- indic[1:2]
+      iiindic <- iindic[2]
+    } else iindic <- indic[2]
+  } else iindic <- indic
   group.list <- c("all","basic","diversity","complexity","binary","ranked")
-  if (indic %in% group.list)
+  if (iindic %in% group.list)
 		TraMineR:::msg.stop("Bad indic value, group name not supported!")
 
   lgth <- seqlength(seqdata, with.missing=TRUE)
@@ -77,7 +83,7 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
   attr(ind.dyn,"tick.last") <- attr(seqdata,"tick.last")
   attr(ind.dyn, "window.size") <- step
   attr(ind.dyn, "sliding") <- sliding
-  attr(ind.dyn, "indic") <- indic
+  attr(ind.dyn, "indic") <- iindic
 
   return(ind.dyn)
 }
@@ -230,8 +236,8 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
   if(is.null(tick.last)) tick.last <- attr(x,"tick.last")
   if(is.null(xtlab)) xtlab <- colnames(x)
   if(is.null(xlab)){
-    slid.text <- ifelse(attr(x,"sliding"), "sliding window, (", "incremental window, (start")
-    xlab<-paste0("End of ",slid.text," win size: ", attr(x,"window.size"),")")
+    slid.text <- ifelse(attr(x,"sliding"), "sliding window (", "incremental window (start ")
+    xlab<-paste0("End of ",slid.text,"win size: ", attr(x,"window.size"),")")
   }
   if(is.null(ylab)) ylab<-attr(x,"indic")
   if(is.null(main))
