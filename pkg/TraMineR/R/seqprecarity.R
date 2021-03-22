@@ -22,6 +22,7 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
     otto=.2, a=switch(type,1,.5), b=switch(type,1.2,1-a), stprec=NULL,
     method = switch(type,"TRATEDSS","RANK"),
     state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE,
+    bound.insec=FALSE,
     ##degr = FALSE, start.integr=FALSE, spell.integr=FALSE,
     ##norm.trpen=FALSE,
     ...){
@@ -99,10 +100,10 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
     sps <- t(apply(Dur,1,make.sps))
     sps[is.na(Dur)] <- NA
     seqtmp <- suppressMessages(seqdef(sps, informat='SPS', SPS.in=list(xfix='',sdsep='/')))
-    integr1 <- seqintegration(seqtmp, state=1, pow=0)
+    integr1 <- seqintegr(seqtmp, state=1, pow=0)
     ## for sequence starting with missing we consider the second spell
     #if (length(nr1>0)){
-    #  integr2 <- seqintegration(seqtmp, state=2, pow=0)
+    #  integr2 <- seqintegr(seqtmp, state=2, pow=0)
     #  integr1[nr1] <- integr2[nr1]
     #}
 
@@ -123,21 +124,32 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
         best <- NA
       return(best)
     }
+    maxstprec <- function(dssrow,stprec,alphabet){
+      if (any(dssrow %in% alphabet))
+        worst <- max(stprec[alphabet %in% dssrow])
+      else
+        worst <- NA
+      return(worst)
+    }
 
     prec <- stprec[lalph]*integr1 + (ici + (correction-1))
-    #prec <- cbind(prec, rep(0,nrow(prec)))
-    prec <- cbind(prec,apply(as.matrix(sdss),1,minstprec,stprec=stprec,alphabet=alphabet))
-    prec[,1] <- apply(prec,1,max)
-    prec[,2] <- rep(1,nrow(prec))
-    prec[,1] <- apply(prec,1,min)
-    prec <- prec[,1,drop=FALSE]
+    if (isTRUE(bound.insec)){
+      prec <- cbind(prec,apply(as.matrix(sdss),1,minstprec,stprec=stprec,alphabet=alphabet))
+      prec <- cbind(prec,apply(as.matrix(sdss),1,maxstprec,stprec=stprec,alphabet=alphabet))
+      prec[,1] <- apply(prec[,1:2],1,max)
+      #prec[,2] <- rep(1,nrow(prec))
+      prec[,1] <- apply(prec[,c(1,3)],1,min)
+      prec <- prec[,1,drop=FALSE]
+    } else {
+      prec <- as.matrix(prec)
+    }
   }
 
 	class(prec) <- c("seqprec","matrix")
 
   ##attr(prec,'correction') <- correction
   attr(prec,'stprec') <- stprec
-  colnames(prec) <- switch(type,"prec","prec2")
+  colnames(prec) <- switch(type,"prec","insec")
 
   return(prec)
 }

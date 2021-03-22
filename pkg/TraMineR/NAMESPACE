@@ -38,6 +38,7 @@ export(
   seqici,
   seqient,
   seqindic,
+  seqintegr,
   seqintegration,
   seqiplot,
   seqIplot,

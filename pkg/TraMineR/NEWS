@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-2 [2021-02-17] (Development version)
+Version 2.3-2 [2021-03-22] (Development version)
 
 Changes in existing functions:
   - seqdist() can now compute distances between two subsets of
@@ -17,6 +17,13 @@ Changes in existing functions:
   - seqlogp() gains the with.missing argument. In addition,
     the overall state distribution can now be used as starting
     point by setting begin='global.freq'.
+  - seqintegration() renamed seqintegr()
+  - seqindic() value 'inpos' of indic renamed 'integr', 'volat' 
+    now in the 'complexity' group.
+  - seqindic() changes in index order in the returned table.
+  - seqdistmc() the returned distance matrix has now as attributes
+    the sm, indel, and alphabet of the newly created multichannel 
+    sequences.
 
 Bug fixes:
   - seqlogp() error for state sequences with missing values.

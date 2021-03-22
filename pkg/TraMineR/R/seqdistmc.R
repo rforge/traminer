@@ -213,6 +213,10 @@ seqdistmc <- function(channels, method, norm="none", indel=1, sm=NULL,
 	}
 	message(" [>] computing distances ...")
 	## Calling seqdist
-	return(seqdist(newseqdata, method=method, norm=norm, indel=newindel,
-		sm=newsm, with.missing=FALSE, full.matrix=full.matrix))
+	distmc <- seqdist(newseqdata, method=method, norm=norm, indel=newindel,
+		sm=newsm, with.missing=FALSE, full.matrix=full.matrix)
+  attr(distmc,"sm") <- newsm
+  attr(distmc,"indel") <- newindel
+  attr(distmc,"alphabet") <- alphabet
+  return(distmc)
 }

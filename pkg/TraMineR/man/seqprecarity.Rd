@@ -19,7 +19,7 @@ The precarity index is essentially the complexity index corrected by the differe
 \usage{
 seqprecarity(seqdata, correction=NULL,
     otto=.2, a=1, b=1.2, stprec=NULL, method = "TRATEDSS",
-    state.order=alphabet(seqdata, with.missing), state.equiv=NULL, 
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
     with.missing=FALSE, ...)
 
 seqprecorr(seqdata, state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
@@ -29,7 +29,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata, with.missing), state.equiv=NUL
 
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by the \code{\link[TraMineR]{seqdef}} function.}
-  
+
   %\item{type}{Integer: 1 or 2. \code{type = 1} is the precarity index of \cite{Ritschard et al (2018)} and \code{type = 2} is the modified index defined in \cite{Ritschard (2020)}.}
 
   \item{correction}{Vector of non-negative correction factor values. If \code{NULL}, the correction factors are set as 1 minus the value returned by \code{seqprecorr}.}
@@ -40,7 +40,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata, with.missing), state.equiv=NUL
 
   \item{b}{Non-negative real value. Exponent weight of the correction factor. Default is 1.2. }
 
-  \item{stprec}{Vector of state undesirableness degrees. If \code{NULL} the values are derived from the state order using \code{\link{seqprecstart}}. If not \code{NULL}, the values in \code{stprec} should conform the order of the alphabet. 
+  \item{stprec}{Vector of state undesirableness degrees. If \code{NULL} the values are derived from the state order using \code{\link{seqprecstart}}. If not \code{NULL}, the values in \code{stprec} should conform the order of the alphabet.
       Use negative values to indicate non-comparable states. See details.}
 
   \item{state.order}{Vector of short state labels defining the order of the states. First the less precarious (most positive) state and then the other states in increasing precariousness order. States of the alphabet that are not included here (and are not equivalent to one of the listed state) define the non-comparable states.}
@@ -84,10 +84,9 @@ The precarity index of a sequence \eqn{x} is based on the complexity index (\cit
 
  \deqn{prec(x) = \lambda a(x_1) + (1-\lambda) r(x)^\beta c(x)^\alpha}{prec(x) = lambda * a(x_1) + (1 - lambda)*r(x)^b*c(x)^a}
 
-where \eqn{r(x)} is the correction factor (argument \code{correction}) for the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the undesirableness of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (argument \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
+where \eqn{r(x)} is the correction factor (argument \code{correction}) for the sequence. The \eqn{\lambda}{lambda} parameter (argument \code{otto}) determines the trade-off between the importance of the undesirableness of the starting state and of the corrected complexity index. Parameters \eqn{\alpha}{a} and \eqn{\beta}{b} (arguments \code{a} and \code{b}) are exponent weights of respectively the complexity and the correction factor.
 
-When \code{correction = NULL} (default), \eqn{r(x)} is determined as \eqn{r(x) = 1 + q(x)}, where the penalty \eqn{q(x)} is the degrading index. %provided by \code{seqidegrad}. 
-When \code{correction = NULL} and \code{type=2}, the correction is set as \eqn{r(x) = (1 + q(x))/2}.
+When \code{correction = NULL} (default), \eqn{r(x)} is determined as \eqn{r(x) = 1 + q(x)}, where the penalty \eqn{q(x)} is the degrading index. %provided by \code{seqidegrad}.
 
 
 %When \code{spell.integr=TRUE}, the weight of each transition is multiplied by the integration index of the following spell in the computation of the proportions of downward and upward transitions. When \code{start.integr=TRUE} the precarity degree of the start state is multiplied by the integration index of the first spell.
@@ -98,7 +97,7 @@ When equivalent classes are provided, the class mean undesirableness degree is a
 
 Non-comparable states (those not listed on the \code{state.order} argument and not equivalent to a listed state) all receive the mean undesirableness value. For the count of transitions, transitions from and to non-comparable states are ignored and replaced by a transition between the states that immediately precede and follow a spell in non-comparable states.
 
-When there are missing states in the sequences, set \code{with.missing = TRUE} to treat the missing state as an additional state. In that case the missing state will be considered as non-comparable unless you include the \code{nr} attribute of \code{seqdata} in \code{state.order} or \code{state.equiv}. With \code{with.missing = FALSE}, transitions to and from the missing state will just be ignored and the undesirableness value of the first valid state will be used as starting undesirableness. 
+When there are missing states in the sequences, set \code{with.missing = TRUE} to treat the missing state as an additional state. In that case the missing state will be considered as non-comparable unless you include the \code{nr} attribute of \code{seqdata} in \code{state.order} or \code{state.equiv}. With \code{with.missing = FALSE}, transitions to and from the missing state will just be ignored and the undesirableness value of the first valid state will be used as starting undesirableness.
 %To drop these starting missing states, use \code{left='DEL'} in \code{\link{seqdef}} when defining the state sequence object.
 }
 
@@ -109,8 +108,8 @@ When there are missing states in the sequences, set \code{with.missing = TRUE} t
 For \code{seqprecarity}, an object of class \code{seqprec} with the value of the precarity index for each sequence. The returned object has an attribute \code{stprec} that contains the state precarity degree used at the starting position. The associated print method (\code{print.seqprec}) prints the state precarity values without the additional attribute.
 
 
-For \code{seqprecorr} %and \code{seqidegrad}, 
-an object of class \code{seqprecorr} with the weighted proportions \eqn{q(x)} 
+For \code{seqprecorr} %and \code{seqidegrad},
+an object of class \code{seqprecorr} with the weighted proportions \eqn{q(x)}
 %for \code{seqprecorr} or the degradation index \eqn{(1-q(x))/2} for \code{seqidegrad}
 and as additional attributes: \code{tr} the used transition weights; \code{signs} the transitions signs; \code{state.noncomp} the non-comparable states; and \code{state.order} the used state order. The associated print method (\code{print.seqprecorr}) prints the outcome values without the additional attributes.
 

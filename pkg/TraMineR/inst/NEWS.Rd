@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-02-17] (Development version)}{
+\section{Changes in version 2.3-2 [2021-03-22] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -23,6 +23,16 @@
       \code{seqlogp()} gains the \code{with.missing} argument. In addition,
       the overall state distribution can now be used as starting point by
       setting \code{begin='global.freq'.}
+      \item
+      \code{seqintegration()} renamed \code{seqintegr()}
+      \item
+      \code{seqindic()} value \code{'inpos'} of \code{indic} renamed \code{'integr'}, \code{'volat'} now in the \code{'complexity'} group.
+      \item
+      \code{seqindic()} changes in order of indicators in the returned table.
+      \ietm
+      \code{seqdistmc()} the returned distance matrix has now as attributes 
+      the \code{sm}, \code{indel}, and \code{alphabet} of the newly created 
+      multichannel sequences.
     }
   }
 

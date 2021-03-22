@@ -193,7 +193,7 @@ seqdegrad.private <- function(seqdata, tr.sum=TRUE, state.order=alphabet(seqdata
     sps <- t(apply(Dur,1,make.sps))
     sps[is.na(Dur)] <- NA
     seqtmp <- suppressMessages(seqdef(sps, informat='SPS', SPS.in=list(xfix='',sdsep='/')))
-    integr <- seqintegration(seqtmp, pow=pow)
+    integr <- seqintegr(seqtmp, pow=pow)
   }
 
 	##  default tr set above as 1s
