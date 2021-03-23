@@ -29,7 +29,7 @@
       \code{seqindic()} value \code{'inpos'} of \code{indic} renamed \code{'integr'}, \code{'volat'} now in the \code{'complexity'} group.
       \item
       \code{seqindic()} changes in order of indicators in the returned table.
-      \ietm
+      \item
       \code{seqdistmc()} the returned distance matrix has now as attributes 
       the \code{sm}, \code{indel}, and \code{alphabet} of the newly created 
       multichannel sequences.
