@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-2 [2021-03-22] (Development version)
+Version 2.3-2 [2021-03-25] (Development version)
 
 Changes in existing functions:
   - seqdist() can now compute distances between two subsets of
@@ -7,6 +7,10 @@ Changes in existing functions:
     two subsets of sequence indexes as 'refseq' argument.
   - seqdist() dimnames of the objects returned by seqdist are
     now all set from the rownames of the provided sequence object.
+  - seqdist() method="DHD" now supports sm="INDELS" and 
+    sm="INDELSLOG".
+  - seqcost() time.varying=TRUE works with "INDELS" 
+    and "INDELSLOG".
   - seqformat() with from='SPELL' and process=TRUE now issues
     a warning message when the max of the 'end' column exceeds limit.
   - seqlegend() gains an argument 'boxes' to control how colors
@@ -18,12 +22,12 @@ Changes in existing functions:
     the overall state distribution can now be used as starting
     point by setting begin='global.freq'.
   - seqintegration() renamed seqintegr()
-  - seqindic() value 'inpos' of indic renamed 'integr', 'volat' 
+  - seqindic() value 'inpos' of indic renamed 'integr', 'volat'
     now in the 'complexity' group.
   - seqindic() changes in index order in the returned table.
-  - seqdistmc() the returned distance matrix has now as attributes
-    the sm, indel, and alphabet of the newly created multichannel 
-    sequences.
+  - seqdistmc() gains a 'what' argument to choose what 
+    value will be returned: distances, costs, or combined 
+    state sequences.
 
 Bug fixes:
   - seqlogp() error for state sequences with missing values.

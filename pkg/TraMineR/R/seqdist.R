@@ -190,8 +190,8 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
   #### Check arguments not yet implemented ####
 
   # method
-  if (sm.type == "method" && sm %in% c("INDELS", "INDELSLOG") && method == "DHD")
-    msg.stop.impl("sm", method, values = c("INDELS", "INDELSLOG")) # See seqcost()
+  #if (sm.type == "method" && sm %in% c("INDELS", "INDELSLOG") && method == "DHD")
+  ##  msg.stop.impl("sm", method, values = c("INDELS", "INDELSLOG")) # See seqcost()
 
   # refseq
   #if (refseq.type != "none" && method %in% c("OMstran", "CHI2", "EUCLID"))
@@ -384,11 +384,10 @@ seqdist <- function(seqdata, method, refseq = NULL, norm = "none", indel = "auto
     else if (sm.type == "method") {
       tv <- FALSE
       cost <- NULL
-      #if (sm %in% c("INDELS", "INDELSLOG")) {
+      if (sm %in% c("INDELS", "INDELSLOG")) {
       #  cost <- NULL
-        #tv <- FALSE
-      #} else
-      if (sm == "TRATE") {
+        if(method == "DHD") tv <- TRUE
+      } else if (sm == "TRATE") {
         if (method == "OM") {
           cost <- 2
           #tv <- FALSE

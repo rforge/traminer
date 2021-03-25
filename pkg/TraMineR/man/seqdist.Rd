@@ -91,9 +91,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     third index referring to the position in the sequence.
 
     One of the strings \code{"CONSTANT"}, \code{"INDELS"}, \code{"INDELSLOG"},
-    or \code{"TRATE"}. Designates a \code{\link{seqcost}} method to be used
-    to build \code{sm}. For \code{"DHD"}, only \code{"TRATE"} applies. In this
-    latter case, the outcome is the same as with \code{sm=NULL}.
+    or \code{"TRATE"}. Designates a \code{\link{seqcost}} method 
+    to build \code{sm}. \code{"CONSTANT"} is not relevant for \code{"DHD"}.
 
     %for \code{"OM"}, \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"},
     %\code{"OMstran"}, \code{"HAM"}, and \code{"TWED"}, \code{"CONSTANT"} for
@@ -311,7 +310,8 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
 
   When \code{sm = NULL}, the substitution-cost matrix is automatically created
   for \code{"HAM"} with a single substitution cost of 1 and for \code{"DHD"} with
-  the costs derived from the transition rates at the successive positions.
+  the costs derived from the transition rates at the successive positions, i.e. with 
+  \code{sm = "TRATE"}.
 
   Some distances can optionally be normalized by means of the \code{norm} argument.
   Let \eqn{d} be the distance, \eqn{m} the maximum possible of the distance
@@ -351,10 +351,10 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   When \code{refseq} is \code{NULL} (default), the whole matrix of pairwise
   distances between sequences or, if \code{full.matrix = FALSE},
   the corresponding \code{dist} object of pairwise distances between sequences.
-  
+
   When \code{refseq} is a \code{list} of two sets of indexes, the matrix
   of distances from the first set of sequences (rows) to the second set (columns).
-  
+
   Otherwise, a vector with distances between the sequences in the
   state sequence object and the reference sequence specified with \code{refseq}.
 }

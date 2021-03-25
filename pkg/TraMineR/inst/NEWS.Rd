@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-03-22] (Development version)}{
+\section{Changes in version 2.3-2 [2021-03-25] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -12,6 +12,10 @@
       \item
       \code{seqdist()} dimnames of the objects returned by seqdist are now all set
       from the rownames of the provided sequence object.
+      \item
+      \code{seqdist()} \code{method="DHD"} now supports \code{sm="INDELS"} and \code{sm="INDELSLOG"}.
+      \item
+      \code{seqcost()} \code{time.varying=TRUE} works with \code{"INDELS"} and \code{"INDELSLOG"}.
       \item
       \code{seqformat()} with \code{from='SPELL'} and \code{process=TRUE} now issues
       a warning message when the max of the \code{end} column exceeds \code{limit}.
@@ -30,9 +34,8 @@
       \item
       \code{seqindic()} changes in order of indicators in the returned table.
       \item
-      \code{seqdistmc()} the returned distance matrix has now as attributes 
-      the \code{sm}, \code{indel}, and \code{alphabet} of the newly created 
-      multichannel sequences.
+      \code{seqdistmc()} gains a \code{what} argument to choose what value will
+      be returned: distances, costs, or combined state sequences.
     }
   }
 
