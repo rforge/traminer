@@ -70,7 +70,7 @@ The default option \code{squared="LRTonly"} corresponds to the initial propositi
 The computation is based on the pairwise distances between the sequences. The \code{opt} argument permits to chose between two strategies. With \code{opt=1}, the matrix of distances is computed successively for each pair of samples of size s. When \code{opt=2}, the matrix of distances is computed once for the observed sequences and the distances for the samples are extracted from that matrix. Option 2 is often more efficient, especially for distances based on spells. It may be slower for methods such as OM or LCS when the number of observed sequences becomes large.
 }
 
-\value{The function \code{seqLRT} (and seqCompare) with the default \code{"LRT"} stat value) outputs two variables, \var{LRT} and \var{p.LRT}.
+\value{The function \code{seqLRT} (and seqCompare with the default \code{"LRT"} stat value) outputs two variables, \var{LRT} and \var{p.LRT}.
 
   \item{LRT}{This is the likelihood ratio test statistic for comparing the two groups.
   }
