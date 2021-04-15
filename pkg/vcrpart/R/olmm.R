@@ -54,6 +54,8 @@
 ##             warnings under correct use and now the slot
 ##             'contrasts' also contains contrasts from the
 ##             model matrix for random effects
+## 2021-04-15: olmm_control, when length(fit) > 1 we set fit as fit[1] 
+##             (length(fit) > 1 caused an error in R 4.1). Fixed by GR.
 ##
 ## To do:
 ## - check 'nlopr' package
@@ -133,10 +135,13 @@ olmm_control <- function(fit = c("nlminb", "ucminf", "optim"), doFit = TRUE,
                          numGrad = FALSE, numHess = numGrad, nGHQ = 7L,
                          start = NULL, restricted = NULL, verbose = FALSE,
                          ...) {
+	## intial fit vector fit = c("nlminb", "ucminf", "optim") caused an error
+	if (length(fit) > 1) fit <- fit[1]
     dArgs <- list(...)
     dArgs <- dArgs[intersect(names(dArgs), names(formals(fit)))]
     dArgs <- dArgs[!names(dArgs) %in% c("par", "fn", "gr")]
     fit <- match.arg(fit)
+	
     if (fit == "optim" && is.null(dArgs$method)) {
         dArgs$method <- "BFGS"
     }

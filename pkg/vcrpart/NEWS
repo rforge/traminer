@@ -1,3 +1,8 @@
+Changes in Version 1.0-4 [2021-04-15]
+
+    o   In R 4.1, length(fix) > 1 in 'olmm_control' caused an 
+        error. Fixed by Gilbert Ritschard. 
+
 Changes in Version 1.0-3
 
     o   Fixed bug for option 'numHess = TRUE' of 'olmm_control'

@@ -18,7 +18,7 @@ olmm_control(fit = c("nlminb", "ucminf", "optim"),
 
 \arguments{
  \item{fit}{character string. The name of the function to be used for the 
-    optimization.}
+    optimization. Can be one of \code{"nlminb"}, \code{"ucminf"}, \code{"optim"}}
   \item{doFit}{logical scalar. When \code{FALSE} an unfitted
     \command{\link{olmm}} object is returned.}
   \item{numGrad}{logical scalar indicating whether the score function

@@ -6,7 +6,6 @@
 \alias{oobloss.fvcm}
 \alias{plot.fvcm}
 \alias{predict.fvcm}
-\alias{print.fvcm}
 \alias{ranef.fvcm}
 
 \title{Methods for \command{\link{fvcm}} objects}
