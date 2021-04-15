@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:          Reto Buergin
 ## E-Mail:          rbuergin@gmx.ch
-## Date:            2015-11-03
+## Date:            2020-02-04
 ##
 ## Description:
 ## Utility functions for the olmm function (see olmm.R). Some
@@ -46,6 +46,7 @@
 ##                       correlation of ML scores.
 ##
 ## Modifications:
+## 2020-02-04: modify checks for classes (newly use function 'inherits')
 ## 2016-11-03: Changes to 'olmm_fn' and 'olmm_gn' for new C-code.
 ## 2016-10-31: implementation of new C-code.
 ## 2014-09-08: partial substitution of 'rep' by 'rep.int'
@@ -568,14 +569,14 @@ olmm_decormat <- function(scores, subject, control = predecor_control()) {
     gEval <- olmm_g_decormat(T, Tindex, sVar, sCovWin, sCovBet, Nmax)
     par <- try(solve(gEval, -fEval) + par, silent = TRUE)
     eps <- max(abs(fEval / sCovBet[subs]))
-    if (class(par) != "try-error") {
+    if (!inherits(par, "try-error")) {
       T[] <- c(0, par)[Tindex + 1]
       if (control$verbose & nit > 1)
         cat("\nnit =", nit,
             "max|f| =", format(max(abs(fEval)), digits = 3, scientific = TRUE),
             "max|diff/f| =", format(eps, digits = 3, scientific = TRUE))
     }
-    if (class(par) == "try-error" || eps > 1e100 || is.nan(eps))
+    if (inherits(par, "try-error") || eps > 1e100 || is.nan(eps))
       error <- TRUE
   } 
   

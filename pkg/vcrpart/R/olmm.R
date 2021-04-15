@@ -1,7 +1,7 @@
 ## --------------------------------------------------------- #
 ## Author:       Reto Buergin
 ## E-Mail:       rbuergin@gmx.ch
-## Date:         2018-02-15
+## Date:         2021-04-15
 ##
 ## References:
 ## ordinal:     http://cran.r-project.org/web/packages/ordinal/index.html
@@ -135,13 +135,13 @@ olmm_control <- function(fit = c("nlminb", "ucminf", "optim"), doFit = TRUE,
                          numGrad = FALSE, numHess = numGrad, nGHQ = 7L,
                          start = NULL, restricted = NULL, verbose = FALSE,
                          ...) {
-	## intial fit vector fit = c("nlminb", "ucminf", "optim") caused an error
-	if (length(fit) > 1) fit <- fit[1]
+	  ## intial fit vector fit = c("nlminb", "ucminf", "optim") caused an error
+	  ## if (length(fit) > 1) fit <- fit[1]
+	  fit <- match.arg(fit)
     dArgs <- list(...)
     dArgs <- dArgs[intersect(names(dArgs), names(formals(fit)))]
     dArgs <- dArgs[!names(dArgs) %in% c("par", "fn", "gr")]
-    fit <- match.arg(fit)
-	
+
     if (fit == "optim" && is.null(dArgs$method)) {
         dArgs$method <- "BFGS"
     }
