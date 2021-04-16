@@ -57,7 +57,7 @@
   from a self-rated ordinal variable with nine categories on household 
   income and was adjusted by the OECD equivalence scales methodology
   (see
-  \url{http://www.oecd.org/eco/growth/OECD-Note-EquivalenceScales.pdf})
+  \url{https://www.oecd.org/economy/growth/OECD-Note-EquivalenceScales.pdf})
   to account for the household size. 
 
   The variables \code{Canton}, \code{Gender} and \code{AgeGroup}
@@ -70,7 +70,7 @@
   University of Geneva for providing the prepared data set.
 }
 
-\source{VLV survey, see also \url{http://cigev.unige.ch/recherches/vlv.html}}
+\source{VLV survey}
 
 \references{Ludwig, C., S. Cavalli and M. Oris
   \sQuote{Vivre/Leben/Vivere}: An interdisciplinary survey addressing

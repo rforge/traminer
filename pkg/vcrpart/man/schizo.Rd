@@ -32,7 +32,7 @@
 \details{The documentation file was copied from the \pkg{mixcat} package 
   and slightly modified.}
 
-\source{\url{http://tigger.uic.edu/~hedeker/ml.html}}
+\source{\url{https://hedeker.people.uic.edu/ml.html}}
 
 \references{Hedeker, D. and R. Gibbons (2006). \emph{Longitudinal Data
     Analysis}. New Jersey, USA: John Wiley & Sons.}
