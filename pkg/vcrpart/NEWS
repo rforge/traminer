@@ -1,7 +1,9 @@
-Changes in Version 1.0-4 [2021-04-15]
+Changes in Version 1.0-4 [2021-04-17]
 
     o   In R 4.1, length(fix) > 1 in 'olmm_control' caused an 
-        error. Fixed by Gilbert Ritschard. 
+        error. Fixed by Gilbert Ritschard.
+        
+    o   Vignette as Rnw file. 
 
 Changes in Version 1.0-3
 
