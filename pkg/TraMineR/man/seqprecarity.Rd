@@ -12,8 +12,8 @@
 \title{Precarity index}
 
 \description{
-%The degrading index returned by \code{seqidegrad} is a normalized transformation of the difference between the sum of downward and upward state changes (transitions).
-The precarity index is essentially the complexity index corrected by the difference between the proportion of downward and upward transitions, and the undesirableness of the first state in the sequence.
+%The degradation index returned by \code{seqidegrad} is a normalized transformation of the difference between the sum of downward and upward state changes (transitions).
+The precarity index is the weighted average between the complexity index corrected by the degradation tendency and the undesirableness of the first state in the sequence.
 }
 
 \usage{
@@ -30,7 +30,7 @@ seqprecorr(seqdata, state.order=alphabet(seqdata, with.missing), state.equiv=NUL
 \arguments{
   \item{seqdata}{a state sequence object (class \code{stslist}) as returned by the \code{\link[TraMineR]{seqdef}} function.}
 
-  %\item{type}{Integer: 1 or 2. \code{type = 1} is the precarity index of \cite{Ritschard et al (2018)} and \code{type = 2} is the modified index defined in \cite{Ritschard (2020)}.}
+  %\item{type}{Integer: 1 or 2. \code{type = 1} is the precarity index of \cite{Ritschard et al (2018)} and \code{type = 2} is the insecurity index defined in \cite{Ritschard (2021)}.}
 
   \item{correction}{Vector of non-negative correction factor values. If \code{NULL}, the correction factors are set as 1 minus the value returned by \code{seqprecorr}.}
 

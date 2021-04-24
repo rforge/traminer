@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-2 [2021-03-25] (Development version)
+Version 2.3-2 [2021-03-24] (Development version)
 
 Changes in existing functions:
   - seqdist() can now compute distances between two subsets of
@@ -7,9 +7,9 @@ Changes in existing functions:
     two subsets of sequence indexes as 'refseq' argument.
   - seqdist() dimnames of the objects returned by seqdist are
     now all set from the rownames of the provided sequence object.
-  - seqdist() method="DHD" now supports sm="INDELS" and 
+  - seqdist() method="DHD" now supports sm="INDELS" and
     sm="INDELSLOG".
-  - seqcost() time.varying=TRUE works with "INDELS" 
+  - seqcost() time.varying=TRUE works with "INDELS"
     and "INDELSLOG".
   - seqformat() with from='SPELL' and process=TRUE now issues
     a warning message when the max of the 'end' column exceeds limit.
@@ -25,8 +25,8 @@ Changes in existing functions:
   - seqindic() value 'inpos' of indic renamed 'integr', 'volat'
     now in the 'complexity' group.
   - seqindic() changes in index order in the returned table.
-  - seqdistmc() gains a 'what' argument to choose what 
-    value will be returned: distances, costs, or combined 
+  - seqdistmc() gains a 'what' argument to choose what
+    value will be returned: distances, costs, or combined
     state sequences.
 
 Bug fixes:

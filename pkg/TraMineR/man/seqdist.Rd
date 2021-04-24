@@ -91,7 +91,7 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
     third index referring to the position in the sequence.
 
     One of the strings \code{"CONSTANT"}, \code{"INDELS"}, \code{"INDELSLOG"},
-    or \code{"TRATE"}. Designates a \code{\link{seqcost}} method 
+    or \code{"TRATE"}. Designates a \code{\link{seqcost}} method
     to build \code{sm}. \code{"CONSTANT"} is not relevant for \code{"DHD"}.
 
     %for \code{"OM"}, \code{"OMloc"}, \code{"OMslen"}, \code{"OMspell"},
@@ -304,13 +304,13 @@ seqdist(seqdata, method, refseq = NULL, norm = "none", indel = "auto", sm = NULL
   For \code{"TWED"}, the (single) indel serves only for empty sequences.
   The distance to an empty sequence is set as \eqn{n*}\code{indel}, where \eqn{n} is
   the length of the non empty sequence. By default (\code{indel="auto"}), indel is set
-  as \code{2 * max(sm) + nu + lambda}.
+  as \code{2 * max(sm) + nu + h}.
 
   %%Currently, \code{"OM"} works only with sequences of equal lengths.
 
   When \code{sm = NULL}, the substitution-cost matrix is automatically created
   for \code{"HAM"} with a single substitution cost of 1 and for \code{"DHD"} with
-  the costs derived from the transition rates at the successive positions, i.e. with 
+  the costs derived from the transition rates at the successive positions, i.e. with
   \code{sm = "TRATE"}.
 
   Some distances can optionally be normalized by means of the \code{norm} argument.

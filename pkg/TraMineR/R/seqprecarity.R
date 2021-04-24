@@ -17,12 +17,32 @@ seqprecarity <- function(seqdata, correction=NULL,
   return(prec)
 }
 
+seqinsecurity <- function(seqdata, correction=NULL,
+    stprec=NULL,
+    method = "RANK",
+    pow = 0,
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE,
+    ...){
+
+  prec <- seqprecarity.private(seqdata, type=2, correction=correction,
+    stprec=stprec,
+    method = method,
+    pow = pow,
+    state.order=state.order, state.equiv=state.equiv, with.missing=with.missing,
+    ##degr = FALSE, start.integr=FALSE, spell.integr=FALSE,
+    ##norm.trpen=FALSE,
+    ...)
+
+  return(prec)
+}
+
 
 seqprecarity.private <- function(seqdata, type=1, correction=NULL,
     otto=.2, a=switch(type,1,.5), b=switch(type,1.2,1-a), stprec=NULL,
     method = switch(type,"TRATEDSS","RANK"),
     state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE,
     bound.insec=FALSE,
+    pow=1, spow = 0,
     ##degr = FALSE, start.integr=FALSE, spell.integr=FALSE,
     ##norm.trpen=FALSE,
     ...){
@@ -38,7 +58,7 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
     spell.integr=TRUE
     tr.sum=TRUE
     #degr=TRUE
-    if (a < 0 || a > 1) stop(call.=FALSE, "with type=2, a must be in [0,1]")
+    #if (a < 0 || a > 1) stop(call.=FALSE, "with type=2, a must be in [0,1]") ## Not used
   } else {
     start.integr=FALSE
     spell.integr=FALSE
@@ -65,7 +85,7 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
   if (is.null(correction)){
     correction <- 1 + seqdegrad.private(seqdata, method=method, state.order=state.order,
                   state.equiv=state.equiv, stprec=stprec, with.missing=with.missing,
-                  tr.sum=tr.sum,
+                  tr.sum=tr.sum, pow=pow,
                   ...)
     #if (degr) {
     #  correction <- correction #/2
@@ -75,7 +95,7 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
   }
 
 ##  index of complexity
-  if (a != 0){
+  if (a != 0 || type == 2){
     ici <- suppressMessages(seqici(seqdata, with.missing=with.missing))
     #if (type==2) ici <- 1+ici
   }
@@ -100,7 +120,8 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
     sps <- t(apply(Dur,1,make.sps))
     sps[is.na(Dur)] <- NA
     seqtmp <- suppressMessages(seqdef(sps, informat='SPS', SPS.in=list(xfix='',sdsep='/')))
-    integr1 <- seqintegr(seqtmp, state=1, pow=0)
+    ##integr1 <- seqintegr(seqtmp, state=1, pow=pow)
+    integr1 <- seqintegr(seqtmp, state=1, pow=spow) ## used spow=0 for the paper
     ## for sequence starting with missing we consider the second spell
     #if (length(nr1>0)){
     #  integr2 <- seqintegr(seqtmp, state=2, pow=0)

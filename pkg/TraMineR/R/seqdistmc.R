@@ -235,7 +235,7 @@ seqdistmc <- function(channels, method, norm="none", indel=1, sm=NULL,
       return(newsm)
     }
   }
-  if (what == "dist") {
+  if (what == "diss") {
 	   message(" [>] computing distances ...")
 	   ## Calling seqdist
 	   return(seqdist(newseqdata, method=method, norm=norm, indel=newindel,
