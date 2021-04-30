@@ -1,11 +1,13 @@
 \name{NEWS}
 \title{NEWS file for the TraMineRextras package}
 
-\section{Changes in version 0.7.2 [2021-03-12] (Development version)}{
+\section{Changes in version 0.7.2 [2021-04-30] (Development version)}{
   \subsection{Changes in existing functions}{
     \itemize{
       \item
       \code{TSE_to_STS()} now checks that \code{tmin > 0}.
+      \item
+      \code{seqplot.rf()} returns (invisibly) group memberships.
     }
   }
 }

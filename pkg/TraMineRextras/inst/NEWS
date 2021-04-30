@@ -1,7 +1,8 @@
-                CHANGES IN TraMineRextras VERSION 0.7.2 [2021-03-12] (Development version)
+                CHANGES IN TraMineRextras VERSION 0.7.2 [2021-04-30] (Development version)
 
 Changes in existing functions:
     o   TSE_to_STS() now checks that tmin > 0.
+    o   seqplot.rf() now returns (invisibly) group memberships.
 
 
                 CHANGES IN TraMineRextras VERSION 0.6.1 [2021-01-20]
