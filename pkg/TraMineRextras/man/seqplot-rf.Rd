@@ -33,7 +33,7 @@ Since ties in \code{sortv} or mds are randomly ordered, one has to set the seed 
 Unlike the other \code{\link{TraMineR}} plotting functions, the \code{seqplot.rf} function ignores the \code{weights} and does not support the \code{group} argument.
 }
 
-\values{
+\value{
 A vector with the group membership (medoid of the group) of each sequence.
 }
 
