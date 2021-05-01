@@ -1,7 +1,15 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-03-24] (Development version)}{
+\section{Changes in version 2.3-2 [2021-05-01] (Development version)}{
+
+  \subsection{New functions}{
+    \itemize{
+      \item
+      \code{dissdomassoc()} computes measures proposed in Piccarreta (SMR 2017) to assess the degree of association between domains.
+    }
+  }
+  
 
   \subsection{Changes in existing functions}{
     \itemize{
