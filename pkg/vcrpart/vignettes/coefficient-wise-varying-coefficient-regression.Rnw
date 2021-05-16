@@ -79,6 +79,7 @@ empirical applications.
 \usepackage{xr}
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \raisebox{13.5cm}[0cm][0cm]{\parbox{\linewidth}{\small\normalfont This vignette is distributed with the \proglang{R} package \pkg{vcrpart}. Please cite as:\\[.5ex]
 B\"{u}rgin, R. and G. Ritschard (2017). ``Coefficient-Wise Tree-Based Varying Coefficient Regression with \pkg{vcrpart}.'' \textit{Journal of Statistical Software}, \textbf{80}(6), 1--33. DOI \href{http://dx.doi.org/10.18637/jss.v080.i06}{10.18637/jss.v080.i06}}}
