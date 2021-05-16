@@ -1,3 +1,9 @@
+Changes in Version 1.0-6 [2021-05-16]
+
+    o   Newest grid.rect() version seems seems to use white as default
+        background (and not transparent as previously). Was a problem in 
+        panel_coef()
+
 Changes in Version 1.0-4 [2021-04-17]
 
     o   In R 4.1, length(fix) > 1 in 'olmm_control' caused an 

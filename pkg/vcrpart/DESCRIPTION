@@ -1,8 +1,8 @@
 Package: vcrpart
 Type: Package
 Title: Tree-Based Varying Coefficient Regression for Generalized Linear and Ordinal Mixed Models
-Version: 1.0-4
-Date: 2021-04-17
+Version: 1.0-5
+Date: 2021-05-16
 Authors@R: c(
   person("Reto", "Buergin", role = c("aut", "cre", "cph"), email = "rbuergin@gmx.ch"),
   person("Gilbert", "Ritschard", role = c("ctb", "ths"), 
