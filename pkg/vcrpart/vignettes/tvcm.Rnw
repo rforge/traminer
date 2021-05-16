@@ -1,0 +1,12 @@
+\documentclass{article}
+\usepackage{pdfpages}
+
+% \VignetteIndexEntry{Coefficient-Wise Tree-Based Varying Coefficient Regression with vcrpart}
+%\VignetteKeywords{regression trees, varying coefficient models, generalized linear models, statistical learning, R package, CART}
+%\VignettePackage{vcrpart}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+\includepdf[pages=-, fitpaper=true]{v80i06.pdf}
+\end{document}
+
