@@ -39,11 +39,10 @@ with \eqn{P(s_{t},t)}{P(s_t,t)} the probability to observe state \eqn{s_t} at po
 
 There are different ways to determine the state probabilities \eqn{P(s_t,t)}. The method is chosen by means of the \code{prob} argument.
 
-With \code{prop = "freq"}, the probability \eqn{P(s_{t},t)}{P(s_t,t)} is set as the observed relative frequency at position \eqn{t}. In that case, the probability of does not depend on the probabilities of transition. Here again, the relative frequencies can be computed over the entire covered period (\code{time.varying=FALSE}) or separately for each position \eqn{t} (\code{time.varying=TRUE}).
+With \code{prop = "freq"}, the probability \eqn{P(s_{t},t)}{P(s_t,t)} is set as the observed relative frequency at position \eqn{t}. In that case, the probability does not depend on the probabilities of transition. By default (\code{time.varying=TRUE}), the relative frequencies are computed separately for each position \eqn{t}. With \code{time.varying=FALSE}, the relative frequencies are computed over the entire covered period, i.e. the same frequencies are used at each \eqn{t}.
 
 
-Option \code{prop = "trate"} assumes that each \eqn{P(s_t,t)}, \eqn{t>1} is set as the transition probability \eqn{p(s_t|s_{t-1})}{p(s_t|s_(t-1))}. The state distribution used to determine the probability of the first state $s_1$ is set by means of the \code{begin} argument (see below).
-With \code{time.varying=FALSE}, the transition probabilities are assumed to be constant over the successive positions and  are estimated over the entire sequence duration, ie from all observed transitions. With \code{time.varying=TRUE}), the transition probabilities are estimated separately at each position, yielding an array of transition matrices. 
+Option \code{prop = "trate"} assumes that each \eqn{P(s_t,t)}, \eqn{t>1} is set as the transition probability \eqn{p(s_t|s_{t-1})}{p(s_t|s_(t-1))}. The state distribution used to determine the probability of the first state \eqn{s_1} is set by means of the \code{begin} argument (see below). With the default \code{time.varying=TRUE}), the transition probabilities are estimated separately at each position, yielding an array of transition matrices. With \code{time.varying=FALSE}, the transition probabilities are assumed to be constant over the successive positions and  are estimated over the entire sequence duration, i.e. from all observed transitions.
 
 Custom transition probabilities can be provided by passing a matrix or a 3-dimensional array as \code{prob} argument.
 

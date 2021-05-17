@@ -31,7 +31,7 @@
   The recency exponent \eqn{pow} permits to control the focus given on the latest positions in the sequence. The higher \code{pow}, the higher the importance of the last positions relative to the first ones.
 
   When \code{with.missing = FALSE}, the index is obtained by using the sum of the positions numbers of the non-missing elements as denominator. To compute the index for the missing state, \code{with.missing} should be set as \code{TRUE}.
-  
+
   For capability to integrate a set of states see \code{\link{seqipos}}.
 }
 
@@ -45,6 +45,8 @@ Brzinsky-Fay, C. (2007) Lost in Transition? Labour Market Entry Sequences of Sch
 Brzinsky-Fay, C. (2018) Unused Resources: Sequence and Trajectory Indicators. International Symposium on Sequence Analysis and Related Methods, Monte Verita, TI, Switzerland, October 10-12, 2018.
 
 Manzoni, A and I. Mooi-Reci (2018) Measuring Sequence Quality, in Ritschard and Studer (eds), \emph{Sequence Analysis and Related Approaches. Innovative Methods and Applications}, Springer, 2018, pp 261-278.
+
+Ritschard, G. (2021), "Measuring the nature of individual sequences", \emph{Sociological Methods and Research}, forthcoming.
 }
 
 \seealso{

@@ -1,15 +1,20 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-05-01] (Development version)}{
+\section{Changes in version 2.3-2 [2021-05-17] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
       \item
+      \code{seqidegrad()} degradation index (replaces \code{seqprecorr()} that
+      becomes obsolete). Class \code{seqprecorr} now named \code{seqidegrad} and associated print method renamed accordingly.
+      \item
+      \code{seqibad()} badness index.
+      \item
       \code{dissdomassoc()} computes measures proposed in Piccarreta (SMR 2017) to assess the degree of association between domains.
     }
   }
-  
+
 
   \subsection{Changes in existing functions}{
     \itemize{
@@ -25,6 +30,25 @@
       \item
       \code{seqcost()} \code{time.varying=TRUE} works with \code{"INDELS"} and \code{"INDELSLOG"}.
       \item
+      \code{seqdistmc()} gains a \code{what} argument to choose what value will
+      be returned: distances, costs, or combined state sequences.
+      \item
+      \code{seqintegration()} renamed \code{seqintegr()}
+      \item
+      \code{seqindic()} the possible \code{indic} list gains elements
+      \code{'degrad'} for degradation index,
+      \code{'bad'} for badness index,
+      \code{'insec'} for insecurity index,
+      and the type 2 forms 
+      \code{'meand2'}, \code{'dustd2'}, \code{'turb2'}, and \code{'turb2n'}
+      taking non-visited states into account.
+      In addition, \code{indic} accepts now also
+      value \code{'ranked'} that is equivalent to \code{c('degrad','bad','prec','insec')}.
+      \item
+      \code{seqindic()} value \code{'inpos'} of \code{indic} renamed \code{'integr'}, \code{'volat'} now in the \code{'complexity'} group.
+      \item
+      \code{seqindic()} changes in order of indicators in the returned table.
+      \item
       \code{seqformat()} with \code{from='SPELL'} and \code{process=TRUE} now issues
       a warning message when the max of the \code{end} column exceeds \code{limit}.
       \item
@@ -35,15 +59,6 @@
       \code{seqlogp()} gains the \code{with.missing} argument. In addition,
       the overall state distribution can now be used as starting point by
       setting \code{begin='global.freq'.}
-      \item
-      \code{seqintegration()} renamed \code{seqintegr()}
-      \item
-      \code{seqindic()} value \code{'inpos'} of \code{indic} renamed \code{'integr'}, \code{'volat'} now in the \code{'complexity'} group.
-      \item
-      \code{seqindic()} changes in order of indicators in the returned table.
-      \item
-      \code{seqdistmc()} gains a \code{what} argument to choose what value will
-      be returned: distances, costs, or combined state sequences.
     }
   }
 
@@ -53,6 +68,7 @@
       \code{seqlogp()} error for state sequences with missing values.
     }
   }
+  
 
 }
 
@@ -63,7 +79,7 @@
     \itemize{
       \item
       \code{seqivardur()} computes the variance of spell durations for each individual sequence.
-      Either the variance of the observed spells or by accounting also for the 0-time spent
+      Either the variance of the observed spells or by considering also the 0-time spent
       in non-visited states. The associated print method can print
       the mean, standard deviation, variance, and max variance.
       %\item
@@ -1265,9 +1281,9 @@
     \item
     \code{dissrep()}, \code{seqrep()}: error when \code{nrep} cannot be reached (reported by M. Studer)
     \item
-    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto B\"{u}rgin).
+    \code{seqefsub()}: when using \code{strsubseq} argument, \code{countMethod} of \code{seqeconstraint} was not taken into account (Reported by Reto Bürgin).
     \item
-    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto B\"{u}rgin).
+    \code{seqeconstraint()}: added consistency checks to avoid misuses (Reported by Reto Bürgin).
     \item
     \code{print.seqelist()} and \code{as.character.seqelist()}: generated \code{segfault} when converting long event sequences to character (Reported by Pierre Molinier).
     \item

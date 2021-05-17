@@ -29,7 +29,7 @@ When a \code{jointdiss} distance matrix or object is provided, correlations of e
 \value{A list with the requested association measures
 }
 \references{
-    Piccarreta (2011). Joint Sequence Analysis: Association and Clustering. \emph{Sociological Methods \& Research}, 46(2), 252–287. \doi{10.1177/0049124115591013}.
+    Piccarreta (2017). Joint Sequence Analysis: Association and Clustering. \emph{Sociological Methods \& Research}, 46(2), 252–287. \doi{10.1177/0049124115591013}.
 }
 %\note{ ~~further notes~~ }
 

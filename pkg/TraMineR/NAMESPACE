@@ -35,11 +35,14 @@ export(
   seqfpos,
   seqgen,
   seqHtplot,
+  seqibad,
   seqici,
+  seqidegrad,
   seqient,
   seqindic,
   seqintegr,
   seqintegration,
+   seqinsecurity,
   seqiplot,
   seqIplot,
   seqipos,
@@ -135,7 +138,7 @@ S3method(summary ,TraMineRPermut)
 S3method(hist ,TraMineRPermut)
 
 ## seqprecarity methods
-S3method(print , seqprecorr)
+S3method(print , seqidegrad)
 S3method(print , seqprec)
 
 ## seqipos methods

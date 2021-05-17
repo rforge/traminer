@@ -60,7 +60,7 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), n
     res[["Spearman"]] <- correlation
     if ("R2" %in% assoc) res[["Spearman.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
   }
-  #if ("kendall" %in% assoc){
+  #if ("kendall" %in% assoc){  ## kendall takes too much time
   #  correlation <- cor(dissmat, method='kendall')
   #  res[["Kendall"]] <- correlation
   #  if ("R2" %in% assoc) res[["Kendall.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
@@ -79,13 +79,16 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), n
     cron.subset <- numeric()
     if (ndom>2) {
       for(p in (ndom-1):2) {
+        set.start <- length(cron.subset) + 1
         sets <- combn(1:ndom, p, simplify=FALSE)
+        set.end <- length(cron.subset) + length(sets)
         for(i in 1:length(sets)) {
           sigmatot <- var(rowSums(sdissmat[,sets[[i]],drop=FALSE]))
           cronbach <- (p/(p-1))*(1-p/sigmatot)
           cron.subset <- c(cron.subset,cronbach)
-          names(cron.subset)[length(cron.subset)] <- paste0('(',paste0(names[sets[[i]]],collapse=','),')')
+          #names(cron.subset)[length(cron.subset)] <- paste0('(',paste0(names[sets[[i]]],collapse=','),')')
         }
+        names(cron.subset)[set.start:set.end] <- lapply(sets, function(x) paste0('(',paste0(names[x],collapse=','),')'))
       }
       res[["Cronbach.subsets"]] <- cron.subset
     }

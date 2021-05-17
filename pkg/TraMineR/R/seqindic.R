@@ -10,7 +10,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
 #    "trans","transp","entr","volat","cplx","turb","turbn","turb2","turb2n",
 #    "all","vpos","ppos","nvolat","integr","prec","integr","visit","basic","diversity","complexity","binary","Develop")
 
-  if ("Develop" %in% indic){
+###  if ("Develop" %in% indic){
     basic.list <- c("lgth","nonm","dlgth","visited","visitp","recu","trans","transp","meand","meand2")
     diversity.list <- c("visitp","entr","dustd","dustd2")
     complexity.list <- c("transp","nsubs","volat","cplx","turb","turbn","turb2","turb2n")
@@ -19,15 +19,15 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     group.list <- c("all","basic","diversity","complexity","binary","ranked")
     indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,ranked.list)
     indic <- indic[indic != 'Develop']
-  } else {
-    basic.list <- c("lgth","nonm","dlgth","visited","visitp","recu","trans","transp","meand")
-    diversity.list <- c("visitp","entr","dustd")
-    complexity.list <- c("transp","nsubs","volat","cplx","turb","turbn")
-    binary.list <- c("ppos","nvolat","vpos","integr")
-    ranked.list <- c("prec")
-    group.list <- c("all","basic","diversity","complexity","binary","ranked")
-    indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,ranked.list)
-  }
+###  } else {
+###     basic.list <- c("lgth","nonm","dlgth","visited","visitp","recu","trans","transp","meand")
+###     diversity.list <- c("visitp","entr","dustd")
+###     complexity.list <- c("transp","nsubs","volat","cplx","turb","turbn")
+###     binary.list <- c("ppos","nvolat","vpos","integr")
+###     ranked.list <- c("prec")
+###     group.list <- c("all","basic","diversity","complexity","binary","ranked")
+###     indic.list <- c(basic.list,diversity.list,complexity.list,binary.list,ranked.list)
+###   }
 
   if ("visit" %in% indic) indic[indic=="visit"] <- "visited"
   if ("inpos" %in% indic) indic[indic=="inpos"] <- "integr"
@@ -151,6 +151,13 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     tab <- cbind(tab,trans)
     lab <- c(lab,"Transp")
   }
+  if("entr" %in% indic){
+	## Longitudinal Entropy
+	  ient <- suppressMessages(
+		  seqient(seqdata, with.missing=with.missing, norm=TRUE))
+    tab <- cbind(tab,ient)
+    lab <- c(lab,"Entr")
+  }
   if(any(c("meand","dustd") %in% indic)){
     vardur <- suppressMessages(
 		  seqivardur(seqdata, with.missing=with.missing, type=1))
@@ -183,12 +190,11 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
       lab <- c(lab,"Dustd2")
     }
   }
-  if("entr" %in% indic){
-	## Longitudinal Entropy
-	  ient <- suppressMessages(
-		  seqient(seqdata, with.missing=with.missing, norm=TRUE))
-    tab <- cbind(tab,ient)
-    lab <- c(lab,"Entr")
+  if("nsubs" %in% indic){
+  ## number of subsequences of the DSS
+    nsubs <- seqsubsn(seqdata, with.missing=with.missing)
+    tab <- cbind(tab,nsubs)
+    lab <- c(lab,"Nsubs")
   }
   if("volat" %in% indic){
 	## Longitudinal Entropy
@@ -197,12 +203,6 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     tab <- cbind(tab,volat)
     lab <- c(lab,"Volat")
   }
-  if("nsubs" %in% indic){
-  ## number of subsequences of the DSS
-    nsubs <- seqsubsn(seqdata, with.missing=with.missing)
-    tab <- cbind(tab,nsubs)
-    lab <- c(lab,"Nsubs")
-  }
   if("cplx" %in% indic){
 	## Complexity
 	  ici <- suppressMessages(
@@ -210,23 +210,17 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     tab <- cbind(tab,ici)
     lab <- c(lab,"Cplx")
   }
-  if("turbn" %in% indic){
-	## Normalized Turbulence
-	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE, type=1))
-    tab <- cbind(tab,turb)
-    lab <- c(lab,"Turbn")
-  }
   if("turb" %in% indic){
 	## Turbulence
 	  turb <- suppressMessages(seqST(seqdata, norm=FALSE, with.missing=with.missing, silent=TRUE, type=1))
     tab <- cbind(tab,turb)
     lab <- c(lab,"Turb")
   }
-  if("turb2n" %in% indic){
+  if("turbn" %in% indic){
 	## Normalized Turbulence
-	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE, type=2))
+	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE, type=1))
     tab <- cbind(tab,turb)
-    lab <- c(lab,"Turb2n")
+    lab <- c(lab,"Turbn")
   }
   if("turb2" %in% indic){
 	## Turbulence
@@ -234,7 +228,14 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
     tab <- cbind(tab,turb)
     lab <- c(lab,"Turb2")
   }
+  if("turb2n" %in% indic){
+	## Normalized Turbulence
+	  turb <- suppressMessages(seqST(seqdata, norm=TRUE, with.missing=with.missing, silent=TRUE, type=2))
+    tab <- cbind(tab,turb)
+    lab <- c(lab,"Turb2n")
+  }
 
+#### Superseeded by the call below of seqipos with index="integr"
 ###   if("integr" %in% indic){
 ###   ## index of integration
 ###     if(!is.null(integr.args[["state"]])){
@@ -306,7 +307,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
 
   if("prec" %in% indic){
   ## index of precarity
-    dlist <- unique(c(names(formals(seqprecarity.private)),names(formals(seqdegrad.private))))
+    dlist <- unique(c(names(formals(seqprecarity.private)),names(formals(seqidegrad.private))))
     prec.args[["type"]] <- 1
     prec <- do.call(seqprecarity.private, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,prec)
@@ -315,7 +316,7 @@ seqindic <- function(seqdata, indic=c("visited","trans","entr","cplx","turb2n"),
 
   if("insec" %in% indic){
   ## index of precarity
-    dlist <- unique(c(names(formals(seqprecarity.private)),names(formals(seqdegrad.private))))
+    dlist <- unique(c(names(formals(seqprecarity.private)),names(formals(seqidegrad.private))))
     prec.args[["type"]] <- 2
     prec <- do.call(seqprecarity.private, args=prec.args[names(prec.args) %in% dlist])
     tab <- cbind(tab,prec)

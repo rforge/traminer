@@ -1,9 +1,9 @@
 ## aliases for simplified precarity
 
 seqprecarity <- function(seqdata, correction=NULL,
-    otto=.2, a=1, b=1.2, stprec=NULL,
-    method = "TRATEDSS",
-    state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE,
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
+    stprec=NULL, with.missing=FALSE,
+    otto=.2, a=1, b=1.2, method = "TRATEDSS",
     ...){
 
   prec <- seqprecarity.private(seqdata, type=1, correction=correction,
@@ -18,16 +18,15 @@ seqprecarity <- function(seqdata, correction=NULL,
 }
 
 seqinsecurity <- function(seqdata, correction=NULL,
-    stprec=NULL,
-    method = "RANK",
-    pow = 0,
-    state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE,
+    state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
+    stprec=NULL, with.missing=FALSE,
+    pow = 1, spow=pow, bound=FALSE, method = "RANK",
     ...){
 
   prec <- seqprecarity.private(seqdata, type=2, correction=correction,
     stprec=stprec,
     method = method,
-    pow = pow,
+    pow = pow, spow=spow, bound=bound,
     state.order=state.order, state.equiv=state.equiv, with.missing=with.missing,
     ##degr = FALSE, start.integr=FALSE, spell.integr=FALSE,
     ##norm.trpen=FALSE,
@@ -41,7 +40,7 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
     otto=.2, a=switch(type,1,.5), b=switch(type,1.2,1-a), stprec=NULL,
     method = switch(type,"TRATEDSS","RANK"),
     state.order=alphabet(seqdata, with.missing), state.equiv=NULL, with.missing=FALSE,
-    bound.insec=FALSE,
+    bound=FALSE,
     pow=1, spow = 0,
     ##degr = FALSE, start.integr=FALSE, spell.integr=FALSE,
     ##norm.trpen=FALSE,
@@ -56,20 +55,18 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
   if (type==2){
     start.integr=TRUE
     spell.integr=TRUE
-    tr.sum=TRUE
     #degr=TRUE
     #if (a < 0 || a > 1) stop(call.=FALSE, "with type=2, a must be in [0,1]") ## Not used
   } else {
     start.integr=FALSE
     spell.integr=FALSE
-    tr.sum = FALSE
     #degr=FALSE
   }
 
 	if (!inherits(seqdata,"stslist"))
-		stop(call.=FALSE, "seqprecarity: data is not a state sequence object, use seqdef function to create one")
+		stop("seqdata is not a state sequence object, use seqdef function to create one")
   if (!is.null(stprec) && length(stprec) != length(alphabet(seqdata, with.missing=with.missing)))
-    stop(call.=FALSE, "seqprecarity: length(stprec) should equal length of alphabet")
+    stop("length(stprec) should equal length of alphabet")
 
   ##if (!with.missing && any(seqdata[,1] == attr(seqdata,"nr")))
   ##  message(" [>] At least one sequence starts with a missing value!
@@ -83,9 +80,9 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
   ##}
 
   if (is.null(correction)){
-    correction <- 1 + seqdegrad.private(seqdata, method=method, state.order=state.order,
+    correction <- seqidegrad.private(seqdata, method=method, state.order=state.order,
                   state.equiv=state.equiv, stprec=stprec, with.missing=with.missing,
-                  tr.sum=tr.sum, pow=pow,
+                  spell.integr=spell.integr, pow=pow,
                   ...)
     #if (degr) {
     #  correction <- correction #/2
@@ -135,7 +132,7 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
 #    prec <- integr1 * stprec[lalph] + correction
 #  else
   if (type==1){
-    prec <- otto*(stprec[lalph]*integr1) + (1-otto) * ici^a * correction^b
+    prec <- otto*(stprec[lalph]*integr1) + (1-otto) * ici^a * (1 + correction)^b
   }
   else {
     minstprec <- function(dssrow,stprec,alphabet){
@@ -153,8 +150,8 @@ seqprecarity.private <- function(seqdata, type=1, correction=NULL,
       return(worst)
     }
 
-    prec <- stprec[lalph]*integr1 + (ici + (correction-1))
-    if (isTRUE(bound.insec)){
+    prec <- stprec[lalph]*integr1 + (ici + correction)
+    if (isTRUE(bound)){
       prec <- cbind(prec,apply(as.matrix(sdss),1,minstprec,stprec=stprec,alphabet=alphabet))
       prec <- cbind(prec,apply(as.matrix(sdss),1,maxstprec,stprec=stprec,alphabet=alphabet))
       prec[,1] <- apply(prec[,1:2],1,max)

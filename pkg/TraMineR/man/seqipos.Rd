@@ -47,7 +47,7 @@
 \value{
   A numeric vector of \cr
   - when \code{index="share"}, the proportion of positive states (or spells) within each sequence;\cr
-  - when \code{index="volatility"}, the objective volatility of the sequences;\cr
+  - when \code{index="volatility"}, the objective volatility of the binary sequences;\cr
   - when \code{index="integration"}, the index of integration into a positive state.\cr
   The binary sequence as an attribute \code{sbinary}.
 }
@@ -59,6 +59,8 @@
 Brzinsky-Fay, C. (2007) Lost in Transition? Labour Market Entry Sequences of School Leavers in Europe, \emph{European Sociological Review}, 23(4). \doi{10.1093/esr/jcm011}
 
 Brzinsky-Fay, C. (2018) Unused Resources: Sequence and Trajectory Indicators. International Symposium on Sequence Analysis and Related Methods, Monte Verita, TI, Switzerland, October 10-12, 2018.
+
+Ritschard, G. (2021), "Measuring the nature of individual sequences", \emph{Sociological Methods and Research}, forthcoming.
 }
 
 \examples{
