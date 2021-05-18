@@ -30,7 +30,7 @@
   The frequency of transition is \eqn{ftrans = \frac{transn}{max.transn}} where
   \eqn{transn} is the number of transitions (state changes) within the sequence, and \eqn{max.transn} the maximum possible transitions in the sequence.
 
-  For the normative volatility computed for a set of positive states, see \code{\link{seqipos}}.
+  For the normative volatility, see \code{\link{seqipos}}. For alternative measures of sequence complexity see \code{\link{seqST}},  \code{\link{seqici}}, \code{\link{seqindic}}.
 }
 
 \value{
@@ -42,6 +42,9 @@
 }
 \references{
 Brzinsky-Fay, C. Unused Resources: Sequence and Trajectory Indicators. International Symposium on Sequence Analysis and Related Methods, Monte Verita, TI, Switzerland, Oct 10-11, 2018
+
+Ritschard, Gilbert (2021) Measuring the nature of state sequences, \emph{Sociological Methods and Research}, forthcoming.
+
 }
 
 

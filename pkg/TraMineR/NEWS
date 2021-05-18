@@ -1,11 +1,12 @@
 ## =========
-Version 2.3-2 [2021-05-17] (Development version)
+Version 2.3-2 [2021-05-18] (Development version)
 
 New functions:
   - seqidegrad() degradation index (replaces seqprecorr() that
     becomes obsolete). Class seqprecorr now named seqidegrad 
     and associated print method renamed accordingly.
   - seqibad() badness index.
+  - seqinsecurity() insecurity index.
   - dissdomassoc() computes measures proposed in
     Piccarreta (SMR 2017) to assess the degree of association
     between domains.

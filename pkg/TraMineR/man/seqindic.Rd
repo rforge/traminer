@@ -35,7 +35,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
 \details{
   The number of visited states is the number of different elements in the sequence, e.g. 2 for \code{aababba}. The recurrence index \code{'recu'} is the average number of visits of visited states, i.e. \code{Dlgth/Visited}, the number of spells on the number of visited states.
 
-  The sequence length, number of transitions, longitudinal entropy, duration standard deviation, volatility, complexity, turbulence, degradation, badness, precarity, and insecurity are computed respectively with functions \code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivardur}},  \code{\link{seqivolatility}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqidegrad}}, and \code{\link{seqibad}},  \code{\link{seqprecarity}}, and  \code{\link{seqinsecurity}}. The proportion of positive states, normative volatility, and integrative potential are computed with \code{\link{seqipos}}. See corresponding help pages for details.
+  The sequence length, number of transitions, longitudinal entropy, duration standard deviation, volatility, complexity, turbulence, degradation, badness, precarity, and insecurity are computed respectively with functions \code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivardur}},  \code{\link{seqivolatility}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqidegrad}}, \code{\link{seqibad}},  \code{\link{seqprecarity}}, and  \code{\link{seqinsecurity}}. The proportion of positive states, normative volatility, and integrative potential are computed with \code{\link{seqipos}}. See corresponding help pages for details.
 
   The proportion of positive states (\code{'ppos'}) and the normative volatility (\code{'nvolat'}) are the proportions of positive elements in respectively the original sequences and the DSS. They ignore the value of \code{dss} in the \code{ipos.args} list.
 
@@ -73,8 +73,7 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
   \cr \code{Insec}: Insecurity
 }
 \seealso{
-\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivolatility}}, \code{\link{seqivardur}}, \code{\link{seqici}},  \code{\link{seqST}}, \code{\link{seqipos}}, \code{\link{seqintegr}} and \code{\link{seqprecarity}}
-}
+\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivardur}},  \code{\link{seqivolatility}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqidegrad}}, \code{\link{seqibad}},  \code{\link{seqprecarity}},  \code{\link{seqinsecurity}}, \code{\link{seqipos}}}.
 
 \references{
 Ritschard, G. (2021), "Measuring the nature of individual sequences", \emph{Sociological Methods and Research}, forthcoming.

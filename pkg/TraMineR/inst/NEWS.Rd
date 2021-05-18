@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-05-17] (Development version)}{
+\section{Changes in version 2.3-2 [2021-05-18] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -10,6 +10,8 @@
       becomes obsolete). Class \code{seqprecorr} now named \code{seqidegrad} and associated print method renamed accordingly.
       \item
       \code{seqibad()} badness index.
+      \item
+      \code{seqinsecurity()} insecurity index.
       \item
       \code{dissdomassoc()} computes measures proposed in Piccarreta (SMR 2017) to assess the degree of association between domains.
     }
