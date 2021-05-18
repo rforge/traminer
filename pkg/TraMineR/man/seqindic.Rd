@@ -73,7 +73,9 @@ seqindic(seqdata, indic=c("visited","trans","entr","cplx","turb2n"), with.missin
   \cr \code{Insec}: Insecurity
 }
 \seealso{
-\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivardur}},  \code{\link{seqivolatility}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqidegrad}}, \code{\link{seqibad}},  \code{\link{seqprecarity}},  \code{\link{seqinsecurity}}, \code{\link{seqipos}}}.
+\code{\link{seqlength}}, \code{\link{seqtransn}}, \code{\link{seqient}}, \code{\link{seqivardur}},  \code{\link{seqivolatility}}, \code{\link{seqici}}, \code{\link{seqST}}, \code{\link{seqidegrad}}, \code{\link{seqibad}},  \code{\link{seqprecarity}},  \code{\link{seqinsecurity}}, \code{\link{seqipos}}.
+}
+
 
 \references{
 Ritschard, G. (2021), "Measuring the nature of individual sequences", \emph{Sociological Methods and Research}, forthcoming.
