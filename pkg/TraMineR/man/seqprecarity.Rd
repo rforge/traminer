@@ -21,7 +21,7 @@ The precarity and insecurity indexes are composite measures of complexity, degra
 seqidegrad(seqdata, state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
     stprec=NULL, with.missing=FALSE,
     penalized="BOTH", method="RANK", weight.type="ADD",
-    spell.integr=TRUE, pow=1, border.effect=10)
+    pow=1, border.effect=10)
 
 seqprecarity(seqdata, correction=NULL,
     state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
@@ -66,9 +66,7 @@ seqprecorr(...)
 
   \item{weight.type}{One of \code{'ADD'} (default), \code{'INV'}, or \code{'LOGINV'}. When \code{method} is one of \code{'FREQ'}, \code{'TRATE'} or \code{'TRATEDSS'}, how weights are derived from the transition probabilities: \code{'ADD'} additive (1-p), \code{'INV'} inverse (1/p), and \code{'LOGINV'} log of inverse. Ignored when any other \code{method} is selected.}
 
-  \item{spell.integr}{Logical. Should transition weights be adjusted by the potential to integrate the following spell? See details.}
-
-  \item{pow}{Real. Recency weight exponent for potential to integrate the next spell.}
+  \item{pow}{Real or logical. Recency weight exponent for potential to integrate the next spell. If real, transition weights are  adjusted by the potential to integrate the next state using the \code{pow} value. \code{pow=TRUE} is equivalent to \code{pow=1}. (See details.)}
 
   \item{spow}{Real. Recency weight exponent for potential to integrate the first spell.}
 
@@ -84,8 +82,7 @@ seqprecorr(...)
 The \code{seqidegrad} function returns for each sequence \eqn{x} the difference \eqn{q(x)} between the proportions of downward and upward transitions (state changes). 
 
 The argument \code{penalized} allows to chose between three strategies for computing \eqn{q(x)}: only penalizing negative weights (in which case \eqn{q(x)} is the proportion of negative transitions), only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type of transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. To avoid a border effect, when any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, where \eqn{d} is the \code{border.effect} parameter. With \code{method="RANK"}, the weights are set as the differences between the to and from state undesirableness.
-When \code{spell.integr=TRUE}, the weight of each transition is multiplied by the integration index of the following spell. 
-
+When \code{pow} is not \code{FALSE}, the weight of each transition is multiplied by the potential to integrate the next spell using the provided \code{pow} value.
 
 The precarity and insecurity indexes of a sequence \eqn{x} are both based on the complexity index (\cite{Gabadinho et al., 2010}) \eqn{c(x)} (See the \code{\link[TraMineR]{seqici}} function) and the undesirableness degree \eqn{\pi(x_1)}{pi(x_1)} of the starting state.
 
@@ -101,7 +98,7 @@ The insecurity index applies an additive correction of the complexity:
 
 where \eqn{integr(x,sp1)} is the potential to integrate the first spell (proportion of sequence length covered by first spell when \code{spow=0}). 
 
-When \code{correction = NULL} (default), \eqn{r(x)} is set as the degradation index \eqn{q(x)} provided by \code{seqidegrad}. The degradation is computed with \code{spell.integr=FALSE} for the precarity and \code{spell.integr=TRUE} for the insecurity.
+When \code{correction = NULL} (default), \eqn{r(x)} is set as the degradation index \eqn{q(x)} provided by \code{seqidegrad}. The degradation is computed with \code{pow=FALSE} for the precarity and using the provided \code{pow} value for the insecurity.
 
 When \code{stprec} is a vector, negative values indicate non-comparable sates that receive each the mean positive undesirableness value. After this transformation, the vector is normalized such that the minimum is 0 and the maximum 1.
 
@@ -112,7 +109,7 @@ Non-comparable states (those not listed on the \code{state.order} argument and n
 When there are missing states in the sequences, set \code{with.missing = TRUE} to treat the missing state as an additional state. In that case the missing state will be considered as non-comparable unless you include the \code{nr} attribute of \code{seqdata} in \code{state.order} or \code{state.equiv}. With \code{with.missing = FALSE}, transitions to and from the missing state will just be ignored and the undesirableness value of the first valid state will be used as starting undesirableness.
 %To drop these starting missing states, use \code{left='DEL'} in \code{\link{seqdef}} when defining the state sequence object.
 
-The earlier \code{seqprecorr} function is obsolete, use \code{seqidegrad} with \code{spell.integr=FALSE} and \code{method='TRATEDSS'} instead.
+The earlier \code{seqprecorr} function is obsolete, use \code{seqidegrad} with \code{pow=FALSE} and \code{method='TRATEDSS'} instead.
 }
 
 

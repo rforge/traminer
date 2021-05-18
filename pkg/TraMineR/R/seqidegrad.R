@@ -1,11 +1,18 @@
-## alias for degrading index
+## degradation index
+##  seqidegrad superseeds previous seqprecorr function
 
 seqidegrad <- function(seqdata,
     state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
     stprec=NULL, with.missing=FALSE,
     penalized="BOTH", method = "RANK", weight.type="ADD",
-    spell.integr=TRUE, pow=1, border.effect=10){
+    pow=1, border.effect=10){
 
+  if (is.logical(pow)) {
+    spell.integr <- pow
+    pow <- 1
+  } else {
+    spell.integr <- TRUE
+  }
   degr <- seqidegrad.private(seqdata,
             state.order=state.order, state.equiv=state.equiv, stprec=stprec,
             penalized=penalized, method=method, weight.type=weight.type,
@@ -18,7 +25,7 @@ seqidegrad <- function(seqdata,
 
 ## for backward compatibility
 seqprecorr <- function(...){
-  msg.stop("seqprecorr is deprecated, use seqidegrad with spell.integr=FALSE and method='TRATEDSS' instead")
+  msg.stop("seqprecorr is obsolete, use seqidegrad with spell.integr=FALSE and method='TRATEDSS' instead")
   #olist <- list(...)
   #if (!"method" %in% names(olist)) olist[["method"]] <- 'TRATEDSS'
   #if (!"spell.integr" %in% names(olist)) olist[["spell.integr"]] <- FALSE
@@ -52,9 +59,10 @@ seqidegrad.private <- function(seqdata, spell.integr=TRUE, state.order=alphabet(
 	if (!inherits(seqdata,"stslist"))
 		msg.stop("seqidegrad: seqdata is NOT a sequence object, see seqdef function to create one")
 
-  if(!is.null(stprec) && length(stprec) != length(alphabet(seqdata, with.missing)))
-    msg.stop("seqidegrad: length of stprec does not match the size of the alphabet!")
-  if(method %in% c("RANK","RANK+") || spell.integr){
+  if(!is.null(stprec)) {
+    if(length(stprec) != length(alphabet(seqdata, with.missing)))
+      msg.stop("seqidegrad: length of stprec does not match the size of the alphabet!")
+  } else if(method %in% c("RANK","RANK+") || spell.integr){
     stprec <- suppressMessages(seqprecstart(seqdata, state.order=state.order,
                         state.equiv=state.equiv, stprec=stprec, with.missing=with.missing))
   }

@@ -1,4 +1,4 @@
-## aliases for simplified precarity
+## seqprecarity and seqinsecurity are both computed with seqprecarity.private
 
 seqprecarity <- function(seqdata, correction=NULL,
     state.order=alphabet(seqdata, with.missing), state.equiv=NULL,
