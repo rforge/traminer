@@ -43,7 +43,7 @@ seqprecorr(...)
 
   %\item{type}{Integer: 1 or 2. \code{type = 1} is the precarity index of \cite{Ritschard et al (2018)} and \code{type = 2} is the insecurity index defined in \cite{Ritschard (2021)}.}
 
-  \item{correction}{Vector of non-negative correction factor values. If \code{NULL} (default), the correction factor is based on the degradation value returned by \code{seqidegrad}. See details.}
+  \item{correction}{Vector of non-negative correction factor values. If \code{NULL} (default), the correction factor is set as the degradation value returned by \code{seqidegrad}. See details.}
 
   \item{state.order}{Vector of short state labels defining the order of the states. First the less precarious (most positive) state and then the other states in increasing precariousness order. States of the alphabet that are not included here (and are not equivalent to one of the listed state) define the non-comparable states.}
 
@@ -62,7 +62,7 @@ seqprecorr(...)
 
   \item{penalized}{One of \code{'BOTH'} (default), \code{'NEG'}, \code{'POS'}, or \code{'NO'}. What should be penalized or rewarded? \code{'NEG'} only negative transitions, \code{POS} only positive transitions (with negative penalization), \code{'BOTH'} penalize negative transitions and reward positive ones, \code{NO} no penalization. Can also be logical with \code{TRUE} equivalent to \code{'BOTH'} and \code{FALSE} equivalent to \code{'NO'}.}
 
-  \item{method}{One of \code{'FREQ'}, \code{'FREQ+'}, \code{'TRATE'}, \code{'TRATE+'}, \code{'TRATEDSS'} (default for \code{seqprecarity}), \code{'TRATEDSS+'}, \code{'RANK'} (default for \code{seqinsecurity} and \code{seqidegrad}), \code{'RANK+'}, or \code{'ONE'}. Method for determining transition weights. Weights based on transition probabilities: \code{'FREQ'} overall frequency of the transitions, \code{'TRATE'} transition probabilities, and \code{'TRATEDSS'} transition probabilites in the DSS sequences. \code{'RANK'} differences between state precarity degrees. \code{'ONE'} no weight. With the \code{+} form the returned penalty is adjusted by the mean transition weight in the sequence.}
+  \item{method}{One of \code{'FREQ'}, \code{'FREQ+'}, \code{'TRATE'}, \code{'TRATE+'}, \code{'TRATEDSS'} (default for \code{seqprecarity} for backward compatibility), \code{'TRATEDSS+'}, \code{'RANK'} (default for \code{seqinsecurity} and \code{seqidegrad}), \code{'RANK+'}, or \code{'ONE'}. Method for determining transition weights. Weights based on transition probabilities: \code{'FREQ'} overall frequency of the transitions, \code{'TRATE'} transition probabilities, and \code{'TRATEDSS'} transition probabilites in the DSS sequences. \code{'RANK'} differences between state undesirableness degrees. \code{'ONE'} no weight. With the \code{+} form the returned penalty is adjusted by the mean transition weight in the sequence.}
 
   \item{weight.type}{One of \code{'ADD'} (default), \code{'INV'}, or \code{'LOGINV'}. When \code{method} is one of \code{'FREQ'}, \code{'TRATE'} or \code{'TRATEDSS'}, how weights are derived from the transition probabilities: \code{'ADD'} additive (1-p), \code{'INV'} inverse (1/p), and \code{'LOGINV'} log of inverse. Ignored when any other \code{method} is selected.}
 

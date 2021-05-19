@@ -9,7 +9,7 @@ seqidegrad <- function(seqdata,
 
   if (is.logical(pow)) {
     spell.integr <- pow
-    pow <- 1
+    pow <- as.numeric(pow)
   } else {
     spell.integr <- TRUE
   }
@@ -62,7 +62,8 @@ seqidegrad.private <- function(seqdata, spell.integr=TRUE, state.order=alphabet(
   if(!is.null(stprec)) {
     if(length(stprec) != length(alphabet(seqdata, with.missing)))
       msg.stop("seqidegrad: length of stprec does not match the size of the alphabet!")
-  } else if(method %in% c("RANK","RANK+") || spell.integr){
+  }
+  if(method %in% c("RANK","RANK+") || spell.integr){
     stprec <- suppressMessages(seqprecstart(seqdata, state.order=state.order,
                         state.equiv=state.equiv, stprec=stprec, with.missing=with.missing))
   }
