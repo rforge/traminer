@@ -7,7 +7,8 @@ Measures of association between domains are computed as the association between 
 }
 
 \usage{
-  dissdomassoc(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), names=NULL)
+  dissdomassoc(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), 
+        names=NULL, weights=NULL)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -18,6 +19,7 @@ Measures of association between domains are computed as the association between 
   %\item{weights}{optional numerical vector containing weights.}
   \item{assoc}{String or vector of strings: requested association measures among \code{'pearson'}, \code{'spearman'}, \code{'R2'} \code{'cronbach'}, \code{'cronbach.subsets'}. Can also be \code{'all'} for all measures.}
   \item{names}{\code{NULL} (default) or string vector of length equal to number of domains. Names of domains. If \code{NULL}, set as \code{names(domdiss)}.}
+  \item{weights}{vector of non-negative weights. If \code{NULL}, unit weights are used.}
 }
 
 \details{ The \code{dissdomassoc} function computes the domain association measures proposed by \cite{Piccarreta (2017)}.
@@ -43,6 +45,8 @@ bf <- as.matrix(biofam[1:200, 10:25])
 children <-  bf==4 | bf==5 | bf==6
 married <- bf == 2 | bf== 3 | bf==6
 left <- bf==1 | bf==3 | bf==5 | bf==6
+## weights
+weights <- biofam[1:200,"wp00tbgs"]
 
 ## Building sequence objects
 child.seq <- seqdef(children)
@@ -56,14 +60,14 @@ dbiofam <- list(dchild,dmarr,dleft)
 names(dbiofam) <- c("child","marr","left")
 
 ## Association between domains and R2 by domain
-rass <- dissdomassoc(dbiofam)
+rass <- dissdomassoc(dbiofam, weights=weights)
 
 ## Joint distance matrix based on substitution costs
 ## derived from indels based on log of state frequencies
 mcdist <- seqdistmc(channels=list(child.seq, marr.seq, left.seq),
                     method="OM", sm =list("INDELSLOG", "INDELSLOG", "INDELSLOG"))
 
-rassj <- dissdomassoc(dbiofam, jointdiss=mcdist, assoc="all")
+rassj <- dissdomassoc(dbiofam, jointdiss=mcdist, assoc="all", weights=weights)
 rassj[["Pearson.Rsquare"]]
 rass[["Pearson.Rsquare"]]
 }

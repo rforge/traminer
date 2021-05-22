@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-2 [2021-05-19] (Development version)
+Version 2.3-2 [2021-05-22] (Development version)
 
 New functions:
   - seqidegrad() degradation index (replaces seqprecorr() that
@@ -50,6 +50,9 @@ Changes in existing functions:
 
 Bug fixes:
   - seqlogp() error for state sequences with missing values.
+  
+Misc.:
+  - New imports from psych and cNORM (for dissdomassoc)
 
 ## =========
 Version 2.2-1 [2020-10-24]

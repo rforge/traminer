@@ -2,7 +2,8 @@
 ##  measures of association between dimensions
 ##  portions of code inspired from the assoc.domains function of seqhandbook
 
-dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), names=NULL) {
+dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
+      names=NULL, weights=NULL) {
 
 ## domdiss: list of dissimilarities matrices or objects (one per channel)
 ## jointdiss: dissimilarity matrix or object between sequences of combined states
@@ -24,6 +25,23 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), n
     stop("R2 can only be used in combination with 'pearson' or 'spearman'")
   }
 
+  ## setting weights
+  if (inherits(domdiss[[1]],'dist'))
+    ncases <- attr(domdiss[[1]],'Size')
+  else
+    ncases <- nrow(domdiss[[1]])
+  if (is.null(weights)) {
+    weights <- rep(1, ncases)
+    weighted=FALSE
+    }
+  else {
+    if (length(weights) != ncases)
+      stop("length of weights not equal to number of cases!")
+    weighted=TRUE
+  }
+  ww <- as.numeric(as.dist(weights %*% t(weights)))
+  sww <- sqrt(ww)
+
   ndom <- length(domdiss)
   ndomv <- ndom - 1
   ## transforming into vector of distances
@@ -37,10 +55,23 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), n
       stop("when not NULL, jointdiss must be a distance matrix or object")
     jointdiss <- as.numeric(as.dist(jointdiss))
     dissmat <- cbind(dissmat,jointdiss)
-    colnames(dissmat)[ncol(dissmat)] <- 'Joint'
     ndomv <- c(rep(ndom-1,ndom),ndom)
   }
+  dissmat <- apply(dissmat,2,scale)
 
+  if ("spearman" %in% assoc) { ## we replace columns with weighted ranked
+    dissmat.spear <- apply(dissmat,2,weighted.rank)
+    ## weighted.rank returns NA for min and max ranks
+    ## we replace these NAs with the non-weighted ranks
+    rankmat <- apply(dissmat,2,weighted.rank)
+    dissmat.spear[is.na(dissmat.spear)] <- rankmat[is.na(dissmat.spear)]
+    #rm(rankmat)
+    dissmat.spear <- apply(dissmat.spear,2,scale)
+    ##dissmat.spearw <- diag(sww) %*% dissmat.spear
+  }
+  dissmatw <- sww * dissmat
+
+  ## defining function
   rsquare.corr <- function(correlation, jointdiss, ndom, ndomv) {
     corr.tmp <- correlation
     if (!is.null(jointdiss)) {
@@ -50,13 +81,15 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), n
   }
 
   res <- list()
-  if ("pearson" %in% assoc){
-    correlation <- cor(dissmat, method='pearson')
+  if ("pearson" %in% assoc){ ## cor.wt from the psych package
+    ##correlation <- cor(dissmatw, method='pearson')
+    correlation <- cor.wt(dissmat, w=ww)$r
     res[["Pearson"]] <- correlation
     if ("R2" %in% assoc) res[["Pearson.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
   }
   if ("spearman" %in% assoc){
-    correlation <- cor(dissmat, method='spearman')
+    ##correlation <- cor(dissmat.spearw)
+    correlation <- cor.wt(dissmat.spear, w=ww)$r
     res[["Spearman"]] <- correlation
     if ("R2" %in% assoc) res[["Spearman.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
   }
@@ -67,8 +100,8 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), n
   #}
   if (any(c("cronbach","cron.subsets") %in% assoc)){
     ## Cronbach alpha for all domains
-    sdissmat <- scale(dissmat)
-    sigmatot <- var(rowSums(sdissmat[,1:ndom]))
+    #sdissmat <- scale(dissmat)
+    sigmatot <- var(rowSums(dissmat[,1:ndom]))
     chron <- (ndom/(ndom-1))*(1-ndom/sigmatot)
     names(chron) <- paste0('(',paste0(names,collapse=','),')')
     res[["Cronbach"]] <- chron
@@ -83,7 +116,7 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"), n
         sets <- combn(1:ndom, p, simplify=FALSE)
         set.end <- length(cron.subset) + length(sets)
         for(i in 1:length(sets)) {
-          sigmatot <- var(rowSums(sdissmat[,sets[[i]],drop=FALSE]))
+          sigmatot <- var(rowSums(dissmat[,sets[[i]],drop=FALSE]))
           cronbach <- (p/(p-1))*(1-p/sigmatot)
           cron.subset <- c(cron.subset,cronbach)
           #names(cron.subset)[length(cron.subset)] <- paste0('(',paste0(names[sets[[i]]],collapse=','),')')

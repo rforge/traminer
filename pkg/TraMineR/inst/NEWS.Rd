@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-05-19] (Development version)}{
+\section{Changes in version 2.3-2 [2021-05-22] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -68,6 +68,13 @@
     \itemize{
       \item
       \code{seqlogp()} error for state sequences with missing values.
+    }
+  }
+  
+  \subsection{Misc.}{
+    \itemize{
+      \item
+      New imports from psych and cNORM (for \code{dissdomassoc})
     }
   }
   

@@ -6,6 +6,8 @@ importFrom("utils", "combn", "download.file", "read.table", packageDescription, 
 importFrom("Hmisc", "errbar")
 importFrom("cluster", "daisy")
 importFrom("colorspace", "qualitative_hcl")
+importFrom("psych", "cor.wt")
+importFrom("cNORM", "weighted.rank")
 
 export(
   alphabet,
