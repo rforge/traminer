@@ -60,16 +60,20 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
   dissmat <- apply(dissmat,2,scale)
 
   if ("spearman" %in% assoc) { ## we replace columns with weighted ranked
-    dissmat.spear <- apply(dissmat,2,weighted.rank)
-    ## weighted.rank returns NA for min and max ranks
-    ## we replace these NAs with the non-weighted ranks
-    rankmat <- apply(dissmat,2,weighted.rank)
-    dissmat.spear[is.na(dissmat.spear)] <- rankmat[is.na(dissmat.spear)]
+    rankmat <- apply(dissmat,2,rank)
+    if (weighted) {
+      dissmat.spear <- apply(dissmat,2,weighted.rank)
+      ## weighted.rank returns NA for min and max ranks
+      ## we replace these NAs with the non-weighted ranks
+      dissmat.spear[is.na(dissmat.spear)] <- rankmat[is.na(dissmat.spear)]
+    } else {
+      dissmat.spear <- rankmat
+    }
     #rm(rankmat)
     dissmat.spear <- apply(dissmat.spear,2,scale)
-    ##dissmat.spearw <- diag(sww) %*% dissmat.spear
+    ##dissmat.spearw <- sww * dissmat.spear
   }
-  dissmatw <- sww * dissmat
+  ##dissmatw <- sww * dissmat
 
   ## defining function
   rsquare.corr <- function(correlation, jointdiss, ndom, ndomv) {
