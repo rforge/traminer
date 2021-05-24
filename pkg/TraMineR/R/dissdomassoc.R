@@ -20,7 +20,7 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
   whatlist <- c("pearson","spearman","R2","cronbach","cron.subsets","all")
   if (!all(what %in% whatlist))
     stop("bad what values, allowed are ", paste(whatlist, collapse=","))
-  if ("all" %in% what) what <- whatlist[c(1,2,3,5)]
+  if ("all" %in% what) what <- whatlist[c(1,3,5)]
   if ("R2" %in% what & !any(c("pearson","spearman") %in% what) ) {
     stop("R2 can only be used in combination with 'pearson' or 'spearman'")
   }

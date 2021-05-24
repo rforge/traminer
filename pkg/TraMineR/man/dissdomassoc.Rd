@@ -17,7 +17,7 @@ Measures of association between domains are computed as the association between 
   \item{domdiss}{List of symmetrical matrices or dist objects: the pairwise dissimilarities per domain.}
   \item{jointdiss}{\code{NULL} (default), matrix or dist object: pairwise dissimilarities for joint dimensions.}
   %\item{weights}{optional numerical vector containing weights.}
-  \item{what}{String or vector of strings: requested association measures among \code{'pearson'}, \code{'spearman'}, \code{'R2'} \code{'cronbach'}, \code{'cronbach.subsets'}. Can also be \code{'all'} for all measures.}
+  \item{what}{String or vector of strings: requested association measures among \code{'pearson'}, \code{'spearman'}, \code{'R2'} \code{'cronbach'}, \code{'cron.subsets'}. Can also be \code{'all'} for all measures but \code{'spearman'}.}
   \item{names}{\code{NULL} (default) or string vector of length equal to number of domains. Names of domains. If \code{NULL}, set as \code{names(domdiss)}.}
   \item{weights}{vector of non-negative weights. If \code{NULL}, no weights are applied. (Currently Cronbach measures ignore weights!)}
 }
@@ -69,7 +69,7 @@ rass <- dissdomassoc(dbiofam, weights=weights)
 mcdist <- seqdistmc(channels=list(child.seq, marr.seq, left.seq),
                     method="OM", sm =list("INDELSLOG", "INDELSLOG", "INDELSLOG"))
 
-rassj <- dissdomassoc(dbiofam, jointdiss=mcdist, what="all", weights=weights)
+rassj <- dissdomassoc(dbiofam, jointdiss=mcdist, what=c("all"), weights=weights)
 rassj[["Pearson.Rsquare"]]
 rass[["Pearson.Rsquare"]]
 }
