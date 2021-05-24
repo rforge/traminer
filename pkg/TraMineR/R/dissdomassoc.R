@@ -2,12 +2,12 @@
 ##  measures of association between dimensions
 ##  portions of code inspired from the assoc.domains function of seqhandbook
 
-dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
+dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
       names=NULL, weights=NULL) {
 
 ## domdiss: list of dissimilarities matrices or objects (one per channel)
 ## jointdiss: dissimilarity matrix or object between sequences of combined states
-## assoc: requested measure of association
+## what: requested measure of association
 
   if (!is.list(domdiss) || length(domdiss) < 2)
     stop("domdiss should be a list of at least two distance matrices or objects")
@@ -15,13 +15,13 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
   if (!all(is.numeric(unlist(domdiss, use.names=FALSE))))
     stop("non numeric values in distance matrices")
 
-  #assoclist <- c("pearson","spearman","kendall","R2","cronbach","cron.subsets","all")
+  #whatlist <- c("pearson","spearman","kendall","R2","cronbach","cron.subsets","all")
   ## kendall takes too much time for large number of diss values
-  assoclist <- c("pearson","spearman","R2","cronbach","cron.subsets","all")
-  if (!all(assoc %in% assoclist))
-    stop("bad assoc values, allowed are ", paste(assoclist, collapse=","))
-  if ("all" %in% assoc) assoc <- assoclist[c(1,2,3,5)]
-  if ("R2" %in% assoc & !any(c("pearson","spearman") %in% assoc) ) {
+  whatlist <- c("pearson","spearman","R2","cronbach","cron.subsets","all")
+  if (!all(what %in% whatlist))
+    stop("bad what values, allowed are ", paste(whatlist, collapse=","))
+  if ("all" %in% what) what <- whatlist[c(1,2,3,5)]
+  if ("R2" %in% what & !any(c("pearson","spearman") %in% what) ) {
     stop("R2 can only be used in combination with 'pearson' or 'spearman'")
   }
 
@@ -40,7 +40,7 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
     weighted=TRUE
   }
   ww <- as.numeric(as.dist(weights %*% t(weights)))
-  sww <- sqrt(ww)
+  #sww <- sqrt(ww)
 
   ndom <- length(domdiss)
   ndomv <- ndom - 1
@@ -59,10 +59,11 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
   }
   dissmat <- apply(dissmat,2,scale)
 
-  if ("spearman" %in% assoc) { ## we replace columns with weighted ranked
+  if ("spearman" %in% what) { ## we replace columns with weighted ranked
     rankmat <- apply(dissmat,2,rank)
     if (weighted) {
-      dissmat.spear <- apply(dissmat,2,weighted.rank)
+      cat("\nPlease wait, Spearman with weights may take a while ...")
+      dissmat.spear <- apply(dissmat,2,weighted.rank,weights=ww)
       ## weighted.rank returns NA for min and max ranks
       ## we replace these NAs with the non-weighted ranks
       dissmat.spear[is.na(dissmat.spear)] <- rankmat[is.na(dissmat.spear)]
@@ -85,24 +86,24 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
   }
 
   res <- list()
-  if ("pearson" %in% assoc){ ## cor.wt from the psych package
+  if ("pearson" %in% what){ ## cor.wt from the psych package
     ##correlation <- cor(dissmatw, method='pearson')
     correlation <- cor.wt(dissmat, w=ww)$r
     res[["Pearson"]] <- correlation
-    if ("R2" %in% assoc) res[["Pearson.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
+    if ("R2" %in% what) res[["Pearson.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
   }
-  if ("spearman" %in% assoc){
+  if ("spearman" %in% what){
     ##correlation <- cor(dissmat.spearw)
     correlation <- cor.wt(dissmat.spear, w=ww)$r
     res[["Spearman"]] <- correlation
-    if ("R2" %in% assoc) res[["Spearman.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
+    if ("R2" %in% what) res[["Spearman.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
   }
-  #if ("kendall" %in% assoc){  ## kendall takes too much time
+  #if ("kendall" %in% what){  ## kendall takes too much time
   #  correlation <- cor(dissmat, method='kendall')
   #  res[["Kendall"]] <- correlation
-  #  if ("R2" %in% assoc) res[["Kendall.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
+  #  if ("R2" %in% what) res[["Kendall.Rsquare"]] <- rsquare.corr(correlation, jointdiss, ndom, ndomv)
   #}
-  if (any(c("cronbach","cron.subsets") %in% assoc)){
+  if (any(c("cronbach","cron.subsets") %in% what)){
     ## Cronbach alpha for all domains
     #sdissmat <- scale(dissmat)
     sigmatot <- var(rowSums(dissmat[,1:ndom]))
@@ -112,7 +113,7 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, assoc = c("pearson","R2"),
   }
 
   ## Cronbach alpha for each combination of domains
-  if ("cron.subsets" %in% assoc) {
+  if ("cron.subsets" %in% what) {
     cron.subset <- numeric()
     if (ndom>2) {
       for(p in (ndom-1):2) {
