@@ -27,7 +27,7 @@ These are for each pair of domains the correlation (Pearson or Spearman) between
 
 When a \code{jointdiss} distance matrix or object is provided, correlations of each individual with this joint domain are also computed. The R2 of the joint domain takes account of all domains. However, R2's for the domains remain unchanged, i.e. they ignore the joint domain. Likewise, \code{jointdiss} does not affect the Cronbach alpha.
 
-Spearman correlations are based on rank values of the distances. The computation of these ranks for weighted data is done with the \code{\link[cNORM]{weighted.rank}} function of the \code{cNORM} package and may take a while for large number (}\code{> 1000}) of sequences.
+Spearman correlations are based on rank values of the distances. The computation of these ranks for weighted data is done with the \code{\link[cNORM]{weighted.rank}} function of the \code{cNORM} package and may take a while for large number (\code{> 1000}) of sequences.
 }
 
 \value{A list with the requested association measures
