@@ -19,7 +19,7 @@ Measures of association between domains are computed as the association between 
   %\item{weights}{optional numerical vector containing weights.}
   \item{what}{String or vector of strings: requested association measures among \code{'pearson'}, \code{'spearman'}, \code{'R2'} \code{'cronbach'}, \code{'cron.subsets'}. Can also be \code{'all'} for all measures but \code{'spearman'}.}
   \item{names}{\code{NULL} (default) or string vector of length equal to number of domains. Names of domains. If \code{NULL}, set as \code{names(domdiss)}.}
-  \item{weights}{vector of non-negative weights. If \code{NULL}, no weights are applied. (Currently Cronbach measures ignore weights!). Caution: Non-null weights considerably slow down computation when used in conjunction with \code{'spearman'}!
+  \item{weights}{vector of non-negative weights. If \code{NULL}, no weights are applied. (Currently Cronbach measures ignore weights!). Caution: Non-null weights considerably slow down computation when used in conjunction with \code{'spearman'}!}
 }
 
 \details{ The \code{dissdomassoc} function computes the domain association measures proposed by \cite{Piccarreta (2017)}.
