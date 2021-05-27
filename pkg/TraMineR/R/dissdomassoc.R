@@ -20,9 +20,12 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
   whatlist <- c("pearson","spearman","R2","cronbach","cron.subsets","all")
   if (!all(what %in% whatlist))
     stop("bad what values, allowed are ", paste(whatlist, collapse=","))
-  if ("all" %in% what) what <- whatlist[c(1,3,5)]
+  if ("all" %in% what) {
+    what <- unique(c(what,whatlist[c(1,3,5)]))
+    what <- what[what!="all"]
+  }
   if ("R2" %in% what & !any(c("pearson","spearman") %in% what) ) {
-    stop("R2 can only be used in combination with 'pearson' or 'spearman'")
+    what <- c("pearson",what)
   }
 
   ## setting weights
@@ -63,6 +66,8 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
     rankmat <- apply(dissmat,2,rank)
     if (weighted) {
       cat("\nPlease wait, Spearman with weights may take a while ...")
+      #dissmat.spear <- apply(dissmat,2,w.rank,w=ww)
+      ## above proper solution is much slower than weighted.rank from cNORM
       dissmat.spear <- apply(dissmat,2,weighted.rank,weights=ww)
       ## weighted.rank returns NA for min and max ranks
       ## we replace these NAs with the non-weighted ranks
@@ -140,3 +145,26 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
 
   return(res)
 }
+
+
+##################
+
+### w.rank <- function(x, w) {
+###   ox <- order(x)
+###   ## original order
+###   oox <- rank(x,ties.method='first')
+###   ooxt <- rank(x) ## with ties
+###   ## sorted weights
+###   sw <- w[ox]
+###   ## cumsum normalized to range from 1 to length(x)
+###   csw <- cumsum(sw)
+###   rcsw <- (length(w)-1)*(csw-1)/(csw[length(csw)]-1) + 1
+###
+###   ## replace weighted rank of ties by mean weighted rank of the ties
+###   for (i in unique(ooxt)){
+###     rcsw[oox[ooxt==i]]<-mean(rcsw[oox[ooxt==i]])
+###   }
+###
+###   ## setting original order
+###   return(rcsw[oox])
+### }

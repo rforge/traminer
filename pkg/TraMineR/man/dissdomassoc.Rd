@@ -19,7 +19,7 @@ Measures of association between domains are computed as the association between 
   %\item{weights}{optional numerical vector containing weights.}
   \item{what}{String or vector of strings: requested association measures among \code{'pearson'}, \code{'spearman'}, \code{'R2'} \code{'cronbach'}, \code{'cron.subsets'}. Can also be \code{'all'} for all measures but \code{'spearman'}.}
   \item{names}{\code{NULL} (default) or string vector of length equal to number of domains. Names of domains. If \code{NULL}, set as \code{names(domdiss)}.}
-  \item{weights}{vector of non-negative weights. If \code{NULL}, no weights are applied. (Currently Cronbach measures ignore weights!)}
+  \item{weights}{vector of non-negative weights. If \code{NULL}, no weights are applied. (Currently Cronbach measures ignore weights!). Caution: Non-null weights considerably slow down computation when used in conjunction with \code{'spearman'}!
 }
 
 \details{ The \code{dissdomassoc} function computes the domain association measures proposed by \cite{Piccarreta (2017)}.
@@ -27,7 +27,7 @@ These are for each pair of domains the correlation (Pearson or Spearman) between
 
 When a \code{jointdiss} distance matrix or object is provided, correlations of each individual with this joint domain are also computed. The R2 of the joint domain takes account of all domains. However, R2's for the domains remain unchanged, i.e. they ignore the joint domain. Likewise, \code{jointdiss} does not affect the Cronbach alpha.
 
-Spearman correlations are based on rank values of the distances. The computation of these ranks for weighted data is done with the \code{\link[cNORM]{weighted.rank}} function of the \code{cNORM} package and may take a while for large number (\code{> 1000}) of sequences.
+Spearman correlations are based on rank values of the distances. The computation of these ranks for weighted data is done with the \code{\link[cNORM]{weighted.rank}} function of the \code{cNORM} package and may take a while for large number (\code{> 500}) of sequences.
 }
 
 \value{A list with the requested association measures

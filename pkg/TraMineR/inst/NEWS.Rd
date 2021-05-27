@@ -1,7 +1,7 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-2 [2021-05-24] (Development version)}{
+\section{Changes in version 2.3-2 [2021-05-27] (Development version)}{
 
   \subsection{New functions}{
     \itemize{
@@ -41,7 +41,7 @@
       \code{'degrad'} for degradation index,
       \code{'bad'} for badness index,
       \code{'insec'} for insecurity index,
-      and the type 2 forms 
+      and the type 2 forms
       \code{'meand2'}, \code{'dustd2'}, \code{'turb2'}, and \code{'turb2n'}
       taking non-visited states into account.
       In addition, \code{indic} accepts now also
@@ -70,14 +70,14 @@
       \code{seqlogp()} error for state sequences with missing values.
     }
   }
-  
+
   \subsection{Misc.}{
     \itemize{
       \item
       New imports from psych and cNORM (for \code{dissdomassoc})
     }
   }
-  
+
 
 }
 

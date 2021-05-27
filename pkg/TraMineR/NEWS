@@ -1,9 +1,9 @@
 ## =========
-Version 2.3-2 [2021-05-24] (Development version)
+Version 2.3-2 [2021-05-27] (Development version)
 
 New functions:
   - seqidegrad() degradation index (replaces seqprecorr() that
-    becomes obsolete). Class seqprecorr now named seqidegrad 
+    becomes obsolete). Class seqprecorr now named seqidegrad
     and associated print method renamed accordingly.
   - seqibad() badness index.
   - seqinsecurity() insecurity index.
@@ -50,7 +50,7 @@ Changes in existing functions:
 
 Bug fixes:
   - seqlogp() error for state sequences with missing values.
-  
+
 Misc.:
   - New imports from psych and cNORM (for dissdomassoc)
 
