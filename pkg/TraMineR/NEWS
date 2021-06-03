@@ -1,5 +1,5 @@
 ## =========
-Version 2.3-2 [2021-05-27] (Development version)
+Version 2.3-2 [2021-06-03] (Development version)
 
 New functions:
   - seqidegrad() degradation index (replaces seqprecorr() that

@@ -1,9 +1,11 @@
 ## From Joint Sequence Analysis, (R. Piccarreta, SMR, 2017)
 ##  measures of association between dimensions
 ##  portions of code inspired from the assoc.domains function of seqhandbook
+##  Main diff with assoc.domains is that here the functions supports weights
+##  It also is faster.
 
 dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
-      names=NULL, weights=NULL) {
+      dnames=names(domdiss), weights=NULL, w.rank=FALSE) {
 
 ## domdiss: list of dissimilarities matrices or objects (one per channel)
 ## jointdiss: dissimilarity matrix or object between sequences of combined states
@@ -21,7 +23,7 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
   if (!all(what %in% whatlist))
     stop("bad what values, allowed are ", paste(whatlist, collapse=","))
   if ("all" %in% what) {
-    what <- unique(c(what,whatlist[c(1,3,5)]))
+    what <- unique(c(what,whatlist[c(1,2,3,5)]))
     what <- what[what!="all"]
   }
   if ("R2" %in% what & !any(c("pearson","spearman") %in% what) ) {
@@ -40,7 +42,9 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
   else {
     if (length(weights) != ncases)
       stop("length of weights not equal to number of cases!")
-    weighted=TRUE
+    if (all(weights==1))
+      weighted <- FALSE
+    else weighted <- TRUE
   }
   ww <- as.numeric(as.dist(weights %*% t(weights)))
   #sww <- sqrt(ww)
@@ -50,8 +54,8 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
   ## transforming into vector of distances
   distlist <- lapply(domdiss, function(x) as.numeric(as.dist(x)))
   dissmat <- matrix(unlist(distlist, use.names=FALSE), ncol=ndom, byrow=FALSE)
-  if (is.null(names)) names <- names(domdiss)
-  colnames(dissmat) <- names
+  if (is.null(dnames)) dnames <- paste0('dom.',1:ndom)
+  colnames(dissmat) <- dnames
 
   if (!is.null(jointdiss)){
     if (!all(is.numeric(jointdiss)))
@@ -64,8 +68,8 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
 
   if ("spearman" %in% what) { ## we replace columns with weighted ranked
     rankmat <- apply(dissmat,2,rank)
-    if (weighted) {
-      cat("\nPlease wait, Spearman with weights may take a while ...")
+    if (weighted & w.rank) {
+      cat("\nPlease wait, computing weighted ranks may take a while ...")
       #dissmat.spear <- apply(dissmat,2,w.rank,w=ww)
       ## above proper solution is much slower than weighted.rank from cNORM
       dissmat.spear <- apply(dissmat,2,weighted.rank,weights=ww)
@@ -110,10 +114,9 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
   #}
   if (any(c("cronbach","cron.subsets") %in% what)){
     ## Cronbach alpha for all domains
-    #sdissmat <- scale(dissmat)
     sigmatot <- var(rowSums(dissmat[,1:ndom]))
     chron <- (ndom/(ndom-1))*(1-ndom/sigmatot)
-    names(chron) <- paste0('(',paste0(names,collapse=','),')')
+    names(chron) <- paste0('(',paste0(dnames,collapse=','),')')
     res[["Cronbach"]] <- chron
   }
 
@@ -129,19 +132,14 @@ dissdomassoc <- function(domdiss, jointdiss = NULL, what = c("pearson","R2"),
           sigmatot <- var(rowSums(dissmat[,sets[[i]],drop=FALSE]))
           cronbach <- (p/(p-1))*(1-p/sigmatot)
           cron.subset <- c(cron.subset,cronbach)
-          #names(cron.subset)[length(cron.subset)] <- paste0('(',paste0(names[sets[[i]]],collapse=','),')')
         }
-        names(cron.subset)[set.start:set.end] <- lapply(sets, function(x) paste0('(',paste0(names[x],collapse=','),')'))
+        names(cron.subset)[set.start:set.end] <- lapply(sets, function(x) paste0('(',paste0(dnames[x],collapse=','),')'))
       }
       res[["Cronbach.subsets"]] <- cron.subset
     }
     else
       message("Two or less domains, no subset possible for Cronbach alpha")
   }
-
-  #res <- list(correlation, Rsquare, res3)
-
-  #names(res) <- c(corrname,'Rsquared',"Cronbach alpha")
 
   return(res)
 }
