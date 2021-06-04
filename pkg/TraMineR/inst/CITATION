@@ -23,7 +23,7 @@ citEntry(entry = "Article",
         "Analyzing and Visualizing State Sequences in R with TraMineR.",
         "Journal of Statistical Software, 40(4), 1-37.",
         "DOI http://dx.doi.org/10.18637/jss.v040.i04."),
-        header="For state sequences:\n"
+        header="For the package and state sequences:\n"
 )
 
 citEntry(entry="Article",
@@ -116,7 +116,6 @@ citEntry(entry="incollection",
   doi = "10.1007/978-3-319-95420-2_16",
 
   textVersion="Ritschard, G., Bussi, M. & O'Reilly, J. (2018), An Index of Precarity for Measuring Early Employment Insecurity, In Ritschard, G. & Studer, M. (eds) Sequence Analysis and Related Approaches: Innovative Methods and Applications. Series: Life Course Research and Social Policies. Vol. 10, pp. 279-295. Cham: Springer. DOI http://dx.doi.org/10.1007/978-3-319-95420-2_16",
-  header="For the precarity index:"
 )
 citEntry(entry="incollection",
   author = personList(p2, p5, p3),
