@@ -1,8 +1,10 @@
 ## =========
-Version 2.3-3 [2021-06-03] (Development version)
+Version 2.3-3 [2021-06-11] (Development version)
 
-Misc.
-  - no changes
+Bug fixes
+  - seqdiff() negative values in cmprange caused an error.
+  - seqdiff() Changed deprecated norm=TRUE into 
+    norm='auto' in default seqdist.args value.
 
 ## =========
 Version 2.2-2 [2021-06-03]

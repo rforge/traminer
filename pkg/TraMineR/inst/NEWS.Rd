@@ -1,12 +1,14 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-3 [2021-06-03] (Development version)}{
+\section{Changes in version 2.3-3 [2021-06-11] (Development version)}{
 
-  \subsection{Misc.}{
+  \subsection{Bug fixes}{
     \itemize{
       \item
-      No changes
+      \code{seqdiff()} Negative values in \code{cmprange} caused an error.
+      \item
+      \code{seqdiff()} Changed deprecated \code{norm=TRUE} into \code{norm='auto'} in default \code{seqdist.args} value. 
     }
   }
 }

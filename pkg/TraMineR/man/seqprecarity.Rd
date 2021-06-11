@@ -7,8 +7,9 @@
 \alias{seqinsecurity}
 %%\alias{seqprecarity.old}
 \alias{seqprecorr}
+\alias{print.seqidegrad}
 \alias{print.seqprec}
-\alias{print.seqprecorr}
+%\alias{print.seqprecorr}
 
 \title{Degradation, Precarity and Insecurity indexes}
 
@@ -79,7 +80,7 @@ seqprecorr(...)
 
 
 \details{
-The \code{seqidegrad} function returns for each sequence \eqn{x} the difference \eqn{q(x)} between the proportions of downward and upward transitions (state changes). 
+The \code{seqidegrad} function returns for each sequence \eqn{x} the difference \eqn{q(x)} between the proportions of downward and upward transitions (state changes).
 
 The argument \code{penalized} allows to chose between three strategies for computing \eqn{q(x)}: only penalizing negative weights (in which case \eqn{q(x)} is the proportion of negative transitions), only rewarding (with negative penalties) positive transitions, and applying both positive and negative penalties. The transitions can be weighted and the type of transition weights used is selected with the \code{method} argument. For weights based on transition probabilities, the way how theses probabilites are transformed into weights is controlled with \code{weight.type}. To avoid a border effect, when any computed transition probability \eqn{p} is close from 1 (\eqn{p > 1 - .1/d}), all \eqn{p}'s are adjusted as \eqn{p - p/d}, where \eqn{d} is the \code{border.effect} parameter. With \code{method="RANK"}, the weights are set as the differences between the to and from state undesirableness.
 When \code{pow} is not \code{FALSE}, the weight of each transition is multiplied by the potential to integrate the next spell using the provided \code{pow} value.
@@ -96,7 +97,7 @@ The insecurity index applies an additive correction of the complexity:
 
   \deqn{insec(x) = \pi(x_1) integr(x,sp1) + r(x) + c(x)}{insec(x) = pi(x_1) integr(x,sp1) + r(x) + c(x)}
 
-where \eqn{integr(x,sp1)} is the potential to integrate the first spell (proportion of sequence length covered by first spell when \code{spow=0}). 
+where \eqn{integr(x,sp1)} is the potential to integrate the first spell (proportion of sequence length covered by first spell when \code{spow=0}).
 
 When \code{correction = NULL} (default), \eqn{r(x)} is set as the degradation index \eqn{q(x)} provided by \code{seqidegrad}. The degradation is computed with \code{pow=FALSE} for the precarity and using the provided \code{pow} value for the insecurity.
 
