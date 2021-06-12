@@ -31,7 +31,7 @@
 }
 
 \references{
-Ritschard, G. (2020), "Measuring the nature of individual sequences", manuscript.
+Ritschard, Gilbert (2021) Measuring the nature of individual sequences, \emph{Sociological Methods and Research}, forthcoming.
 }
 
 \seealso{

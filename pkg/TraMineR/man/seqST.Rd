@@ -62,7 +62,7 @@ The normalized value is obtained by subtracting 1 to the index and then dividing
   De-standardization of Family-Life Trajectories of Young Adults: A Cross-National Comparison Using Sequence Analysis.
   \emph{European Journal of Population}, 23, 225-250.
 
-Ritschard, Gilbert (2021) Measuring the nature of state sequences, \emph{Sociological Methods and Research}, forthcoming.
+Ritschard, Gilbert (2021) Measuring the nature of individual sequences, \emph{Sociological Methods and Research}, forthcoming.
 }
 \examples{
   ## Loading the 'actcal' example data set

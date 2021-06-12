@@ -63,7 +63,7 @@ séquences catégorielles", In \emph{Extraction et gestion des
 connaissances (EGC 2010), Revue des nouvelles technologies de
 l'information RNTI}. Vol. E-19, pp. 61-66. 
 
-Ritschard, Gilbert (2021) Measuring the nature of state sequences, \emph{Sociological Methods and Research}, forthcoming.
+Ritschard, Gilbert (2021) Measuring the nature of individual sequences, \emph{Sociological Methods and Research}, forthcoming.
 }
 \examples{
 ## Creating a sequence object from the mvad data set

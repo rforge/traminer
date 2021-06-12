@@ -45,7 +45,7 @@ seqivardur(seqdata, type=1, with.missing=FALSE)
 \code{\link{seqdur}}, \code{\link{seqindic}}
 }
 \references{
-Ritschard, Gilbert (2021) Measuring the nature of state sequences, \emph{Sociological Methods and Research}, forthcoming.
+Ritschard, Gilbert (2021) Measuring the nature of individual sequences, \emph{Sociological Methods and Research}, forthcoming.
 }
 
 
