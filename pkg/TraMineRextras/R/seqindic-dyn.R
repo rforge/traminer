@@ -2,7 +2,7 @@
 ## Inspired from Pelletier et al., 2020
 
 seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE,
-      with.missing=FALSE, silent.indic = TRUE, ...) {
+      wstep=1, with.missing=FALSE, endmiss.as.void=FALSE, silent.indic = TRUE, ...) {
 
 	if (!inherits(seqdata,"stslist"))
 		TraMineR:::msg.stop("data is NOT a sequence object, see seqdef function to create one")
@@ -36,10 +36,10 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
   slid <- as.integer(sliding)
 
   nr <- nrow(seqdata)
-  nc <- maxl-step+1
+  nc <- ceiling((maxl-step+1)/wstep)
   j <- 1
 
-  if (slid) {
+  if (sliding) {
     if (silent.indic){
       windic <- function(k, seqdata, indic, with.missing, ...){
         suppressMessages(seqindic(seqdata[,(k-step+1):k], indic=indic, with.missing=with.missing, ...))
@@ -60,20 +60,36 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
       }
     }
   }
-  ind.dyn <- sapply(re:maxl, FUN=windic, seqdata=seqdata, indic=indic, with.missing=with.missing, ...)
+  ##ind.dyn <- sapply(re:maxl, FUN=windic, seqdata=seqdata, indic=indic, with.missing=with.missing, ...)
 
-  ind.dyn <- matrix(unlist(ind.dyn), ncol=maxl-re+1)
+  ##ind.dyn <- matrix(unlist(ind.dyn), ncol=maxl-re+1)
 
 
-###   ind.dyn <- matrix(NA, nrow=nr, ncol=nc)
-###   while (re < maxl + 1) {
+  ind.dyn <- matrix(NA, nrow=nr, ncol=nc)
+  re.range <- seq(from=re, to=maxl, by=wstep)
+  if (length(re.range) < 2)
+    TraMineR:::msg.stop("There is only one window, wstep probably too large!")
+  void <- attr(seqdata,"void")
+  nr <- attr(seqdata,"nr")
+  miss.code <- if (endmiss.as.void & !with.missing) c(void,nr) else void
+  #miss.code <- if (with.missing) void else c(void,nr)
+  j <- 0
+  for (k in re.range) {
+    j <- j+1
+    ## k is position of end of window
+    ind.dyn[,j] <- as.matrix(windic(k, seqdata=seqdata, indic=indic, with.missing=with.missing, ...))
+    ## setting NA for uncomplete windows
+    wna <- seqdata[,k] %in% miss.code
+    ind.dyn[wna,j] <- NA
+###  while (re < maxl + 1) {
 ###     ind.dyn[,j] <- seqindic(seqdata[,rs:re], indic=indic, with.missing=with.missing, ...)[,1]
 ###     j  <- j+1
 ###     rs <- rs+slid
 ###     re <- re+1
 ###   }
+  }
 
-  colnames(ind.dyn) <- colnames(seqdata)[step:maxl]
+  colnames(ind.dyn) <- colnames(seqdata)[re.range]
   rownames(ind.dyn) <- rownames(seqdata)
 
 
@@ -82,6 +98,7 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
   attr(ind.dyn,"xtstep") <- attr(seqdata,"xtstep")
   attr(ind.dyn,"tick.last") <- attr(seqdata,"tick.last")
   attr(ind.dyn, "window.size") <- step
+  attr(ind.dyn, "wstep") <- wstep
   attr(ind.dyn, "sliding") <- sliding
   attr(ind.dyn, "indic") <- iindic
 
@@ -107,17 +124,16 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
      with.legend=TRUE, glabels=NULL, legend.pos="topright",
      horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, na.rm=FALSE, ret=FALSE, ...){
 
-
   if (class(fstat)!="function") TraMineR:::msg.stop("fstat must be a function!")
 
-  is.w.mean <- isTRUE(all.equal(fstat,weighted.mean))
-  is.mean <- isTRUE(all.equal(fstat,mean))
+  is.w.mean <- identical(fstat,weighted.mean)
+  is.mean <- identical(fstat,mean)
   if (conf & !is.mean & !is.w.mean){
       TraMineR:::msg.warn("conf=TRUE works only with fstat=mean or weighted.mean, conf set as FALSE")
       conf=FALSE
   }
 
-  if (is.mean | is.w.mean) fstat <- function(x)mean(x, na.rm=na.rm)
+  if (is.mean | is.w.mean) fstat <- function(x){mean(x, na.rm=na.rm)}
   if (is.w.mean) {
     wt <- attr(x,"weights")
     if (is.null(wt)) {
@@ -128,11 +144,13 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
 
   nc <- ncol(x)
   nr <- nrow(x)
+
   if (is.null(group)){
     group <- rep(1,nr)
   }
   if (!is.factor(group)) group <- factor(group)
   ngrp <- length(levels(group))
+
 
   tab.grp <- matrix(NA, nrow=ngrp, ncol=nc)
 
@@ -150,7 +168,6 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
     }
     tab.grp <- apply(x,2,fsapp,group,wt,na.rm)
 
-
     if (conf) {
       n.grp <- tapply(wt,group,sum)
       meanx2 <- apply(x^2,2,fsapp,group,wt,na.rm)
@@ -167,8 +184,8 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
     tab.grp <- apply(x,2,tapply,group,fstat)
 
     if (conf) {
-      n.grp <- tapply(rep(1,length(group)),group,sum)
-      err.grp <- qnorm(.975)*apply(x,2,tapply,group,sd)
+      n.grp <- tapply(rep(1,length(group)),group,sum,na.rm=na.rm)
+      err.grp <- qnorm(.975)*apply(x,2,tapply,group,sd,na.rm=na.rm)
       err.grp <- err.grp/as.vector(sqrt(n.grp))
       U.grp <- tab.grp + err.grp
       L.grp <- tab.grp - err.grp
@@ -178,7 +195,6 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
 
   dim(tab.grp) <- c(ngrp,nc)
 
-
   colnames(tab.grp) <- colnames(x)
   rownames(tab.grp) <- levels(group)
 
@@ -186,11 +202,11 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
   tab.grp.ori <- tab.grp ## will return table before transformation
   na.rows <- apply(tab.grp,1,function(x)all(is.na(x)))
   rows.with.na <- apply(tab.grp,1,function(x)any(is.na(x)))
-  if (sum(rows.with.na) > sum(na.rows)) {
-      TraMineR:::msg.warn("Rows of summary table with some NA turned into full NA rows!")
-      tab.grp[rows.with.na,] <- NA
-  }
-  non.na.rows <- !rows.with.na
+  #if (sum(rows.with.na) > sum(na.rows)) {
+  #    TraMineR:::msg.warn("Rows of summary table with some NA turned into full NA rows!")
+  #    tab.grp[rows.with.na,] <- NA
+  #}
+  #non.na.rows <- !rows.with.na
   if (all(is.na(tab.grp))){
       TraMineR:::msg.warn("Only NA in summary table, nothing to plot.")
       return(tab.grp)
@@ -270,21 +286,44 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
       #make polygon where coordinates start with lower limit and
       # then upper limit in reverse order
       for (i in 1:ngrp) {
-        #polygon(c(df$x,rev(df$x)),c(df$L,rev(df$U)),col = "grey75", border = FALSE)
-        polygon(c(1:nc,rev(1:nc)),c(L.grp[i,],rev(U.grp[i,])), col = bcol[i], border = FALSE)
-        #add lines on borders of polygon
-        lines(L.grp[i,], col=col[i],  type="l", lty=2)
-        lines(U.grp[i,], col=col[i],  type="l", lty=2)
+            cat("\n drawing polygon ",i,"  ",any(!is.na(tab.grp[i,])),"\n")
+
+        L.grp[i,is.na(L.grp[i,])] <- tab.grp[i,is.na(L.grp[i,])]
+        U.grp[i,is.na(U.grp[i,])] <- tab.grp[i,is.na(U.grp[i,])]
+        tab.na <- which(is.na(tab.grp[i,]))
+        tabg <- tab.grp[i,]
+        if (length(tab.na) > 0) {
+          for (j in 1:length(tab.na)) {
+            jj <- tab.na[j]
+            if (jj > 1)
+              L.grp[i,jj] <- U.grp[i,jj] <- tabg[jj] <- tabg[jj-1]
+            else {
+              TraMineR:::msg.warn("Some confidence bands not drawn because of NA at first position in summary table!!")
+              break
+            }
+          }
+        }
+
+
+        poly.range <- 1:nc
+        if (length(tab.na) > 0) poly.range <- 1:(min(tab.na)-1)
+        if (poly.range[length(poly.range)] > 1) {
+          polygon(c(poly.range,rev(poly.range)),c(L.grp[i,poly.range],rev(U.grp[i,poly.range])), col = bcol[i], border = FALSE)
+          #add lines on borders of polygon
+          lines(L.grp[i,poly.range], col=col[i],  type="l", lty=2)
+          lines(U.grp[i,poly.range], col=col[i],  type="l", lty=2)
+        }
       }
   }
 
   for (i in 1:ngrp) {
+    if (any(!is.na(tab.grp[i,])))
      lines(tab.grp[i,], col=col[i],  type="l", lty=lty[i], lwd=lwd[i], ...)
   }
 
 
   ## legend
-  non.na.rows <- apply(tab.grp,1,function(x)all(!is.na(x)))
+  non.na.rows <- apply(tab.grp,1,function(x)any(!is.na(x)))
   if(with.legend & ngrp>1){
     legend(legend.pos, legend=glabels[non.na.rows],
       lwd=lwd[non.na.rows], lty=lty[non.na.rows], col=col[non.na.rows],

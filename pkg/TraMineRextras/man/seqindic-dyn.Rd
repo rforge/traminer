@@ -9,7 +9,7 @@
 }
 \usage{
 seqindic.dyn(seqdata, indic="cplx", window.size = .2, sliding=TRUE,
-      with.missing=FALSE, silent.indic=TRUE, ...)
+      wstep=1, with.missing=FALSE, endmiss.as.void=FALSE, silent.indic=TRUE, ...)
 }
 \arguments{
   \item{seqdata}{state sequence object (\code{stslist}) as produced by \code{seqdef}
@@ -20,9 +20,13 @@ seqindic.dyn(seqdata, indic="cplx", window.size = .2, sliding=TRUE,
   }
   \item{sliding}{logical: Should indic be computed on sliding windows? If \code{FALSE}, windows are incremented starting with a window of size \code{window.size}.
   }
+  \item{wstep}{integer: size of position gap between successive windows.
+  }
   \item{with.missing}{logical. Should the missing state be treated as a state of the alphabet?
   }
-  \item{silent.indic}{logical. Should messages issued during computation of indic be suppressed? 
+  \item{endmiss.as.void}{logical. When \code{with.missing=FALSE}, should missings at end of windows be considered as voids, i.e. should the sequence end before end missings? When \code{FALSE} (default), the index is set as \code{NA} for windows that end with a void and, when \code{TRUE}, for windows that end with a void or a missing. Ignored when \code{with.missing=TRUE}.
+  }
+  \item{silent.indic}{logical. Should messages issued during computation of indic be suppressed?
   }
   \item{...}{additional arguments passed to \code{\link{seqindic}}
   }
@@ -70,4 +74,4 @@ plot(a.dyn, group=actcal[cases,'sex'], fstat=function(x)mean(x, trim=.02))
 
 
 
-}
+} 
