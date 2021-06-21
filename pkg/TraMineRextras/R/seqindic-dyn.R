@@ -286,8 +286,6 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
       #make polygon where coordinates start with lower limit and
       # then upper limit in reverse order
       for (i in 1:ngrp) {
-            cat("\n drawing polygon ",i,"  ",any(!is.na(tab.grp[i,])),"\n")
-
         L.grp[i,is.na(L.grp[i,])] <- tab.grp[i,is.na(L.grp[i,])]
         U.grp[i,is.na(U.grp[i,])] <- tab.grp[i,is.na(U.grp[i,])]
         tab.na <- which(is.na(tab.grp[i,]))
