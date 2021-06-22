@@ -65,13 +65,30 @@ cases <- 1:100
 actcal <- actcal[cases,] ## Here, only a subset
 actcal.seq <- seqdef(actcal[,13:24], alphabet=c('A','B','C','D'))
 
-a.dyn <- seqindic.dyn(actcal.seq, indic='cplx', with.missing=FALSE)
+## Using windows every three positions
+a.dyn <- seqindic.dyn(actcal.seq, indic='cplx', with.missing=FALSE, wstep=3)
+plot(a.dyn, group=actcal[cases,'sex'])
 
-plot(a.dyn, group=actcal[cases,'sex'], fstat=mean)
-
-## Trimmed mean
+## Trimmed mean (to illustrate fstat with specific arguments) 
 plot(a.dyn, group=actcal[cases,'sex'], fstat=function(x)mean(x, trim=.02))
 
+## Incremental windows
+a.dyn <- seqindic.dyn(actcal.seq, indic='cplx', with.missing=FALSE, wstep=3, 
+                sliding=FALSE)
+plot(a.dyn, group=actcal[cases,'sex'])
 
+#############
+## Sequences of different lengths, and with missing values and weights
+data(ex1)
+s.ex1 <- seqdef(ex1[,1:13],weights=ex1[,"weights"])
+seqlength(s.ex1)
+seqlength(s.ex1, with.missing=FALSE)
+group <- c(1,1,1,2,2,2,2)
 
+ind.d <- seqindic.dyn(s.ex1, indic='cplx', with.missing=FALSE)
+plot(ind.d, group=group, fstat=weighted.mean, na.rm=TRUE, conf=TRUE, ret=TRUE)
+
+## Treating 'missing' as a regular state
+ind.d <- seqindic.dyn(s.ex1, indic='cplx', with.missing=TRUE)
+plot(ind.d, group=group, fstat=weighted.mean, na.rm=TRUE, conf=TRUE, ret=TRUE)
 } 
