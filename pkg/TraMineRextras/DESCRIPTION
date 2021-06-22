@@ -1,6 +1,6 @@
 Package: TraMineRextras
 Version: 0.7.2
-Date: 2021-06-21
+Date: 2021-06-22
 Title: TraMineR Extension
 Authors@R: c(
   person("Gilbert", "Ritschard", role = c("aut", "cre", "ths", "cph"),

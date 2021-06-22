@@ -50,7 +50,7 @@ There are \code{print} and \code{plot} methods for \code{dynin} objects. See \co
 }
 
 \references{
-Pelletier, D.; Bignami-Van Assche, S. & Simard-Gendron, A. (2020) Measuring Life Course Complexity with Dynamic Sequence Analysis, \emph{Social Indicators Research} \doi{10.1007/s11205-020-02464-y}.
+Pelletier, D., Bignami-Van Assche, S., & Simard-Gendron, A. (2020) Measuring Life Course Complexity with Dynamic Sequence Analysis, \emph{Social Indicators Research} \doi{10.1007/s11205-020-02464-y}.
 
 %% ~put references to the literature/web site here ~
 }
@@ -73,9 +73,9 @@ plot(a.dyn, group=actcal[cases,'sex'])
 plot(a.dyn, group=actcal[cases,'sex'], fstat=function(x)mean(x, trim=.02))
 
 ## Incremental windows
-a.dyn <- seqindic.dyn(actcal.seq, indic='cplx', with.missing=FALSE, wstep=3, 
+ai.dyn <- seqindic.dyn(actcal.seq, indic='cplx', with.missing=FALSE, wstep=3, 
                 sliding=FALSE)
-plot(a.dyn, group=actcal[cases,'sex'])
+plot(ai.dyn, group=actcal[cases,'sex'])
 
 #############
 ## Sequences of different lengths, and with missing values and weights
@@ -89,6 +89,6 @@ ind.d <- seqindic.dyn(s.ex1, indic='cplx', with.missing=FALSE)
 plot(ind.d, group=group, fstat=weighted.mean, na.rm=TRUE, conf=TRUE, ret=TRUE)
 
 ## Treating 'missing' as a regular state
-ind.d <- seqindic.dyn(s.ex1, indic='cplx', with.missing=TRUE)
-plot(ind.d, group=group, fstat=weighted.mean, na.rm=TRUE, conf=TRUE, ret=TRUE)
+ind.dm <- seqindic.dyn(s.ex1, indic='cplx', with.missing=TRUE)
+plot(ind.dm, group=group, fstat=weighted.mean, na.rm=TRUE, conf=TRUE, ret=TRUE)
 } 

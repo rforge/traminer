@@ -118,16 +118,25 @@ print.dynin <- function(x, ...){
 
 #################################
 
-plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
+plot.dynin <- function(x, fstat=weighted.mean, group=NULL, conf=FALSE,
      main=NULL, col=NULL, lty=NULL, lwd=3.5, ylim=NULL,
      ylab=NULL, xlab=NULL, xtlab=NULL, xtstep=NULL, tick.last=NULL,
      with.legend=TRUE, glabels=NULL, legend.pos="topright",
-     horiz=FALSE, cex.legend=1, conf=FALSE, bcol=NULL, na.rm=FALSE, ret=FALSE, ...){
+     horiz=FALSE, cex.legend=1, bcol=NULL, na.rm=FALSE,
+     ret=FALSE, ...){
 
   if (class(fstat)!="function") TraMineR:::msg.stop("fstat must be a function!")
 
   is.w.mean <- identical(fstat,weighted.mean)
   is.mean <- identical(fstat,mean)
+
+  p.conf <- 0.975
+  if (!is.logical(conf)){
+    if (!is.numeric(conf) | conf <= 0 | conf >= 1)
+      TraMineR:::msg.stop("Invalid conf value: should be logical or real between 0 and 1.")
+    p.conf <- 1-(1-conf)/2
+    conf <- TRUE
+  }
   if (conf & !is.mean & !is.w.mean){
       TraMineR:::msg.warn("conf=TRUE works only with fstat=mean or weighted.mean, conf set as FALSE")
       conf=FALSE
@@ -172,7 +181,7 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
       n.grp <- tapply(wt,group,sum)
       meanx2 <- apply(x^2,2,fsapp,group,wt,na.rm)
       sdev <- sqrt(meanx2 - tab.grp^2)
-      err.grp <- qnorm(.975)*sdev
+      err.grp <- qnorm(p.conf)*sdev
       err.grp <- err.grp/as.vector(sqrt(n.grp))
       U.grp <- tab.grp + err.grp
       L.grp <- tab.grp - err.grp
@@ -185,7 +194,7 @@ plot.dynin <- function(x, fstat=weighted.mean, group=NULL,
 
     if (conf) {
       n.grp <- tapply(rep(1,length(group)),group,sum,na.rm=na.rm)
-      err.grp <- qnorm(.975)*apply(x,2,tapply,group,sd,na.rm=na.rm)
+      err.grp <- qnorm(p.conf)*apply(x,2,tapply,group,sd,na.rm=na.rm)
       err.grp <- err.grp/as.vector(sqrt(n.grp))
       U.grp <- tab.grp + err.grp
       L.grp <- tab.grp - err.grp
