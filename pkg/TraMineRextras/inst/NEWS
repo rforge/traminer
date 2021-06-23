@@ -13,6 +13,9 @@ Changes in existing functions:
     o   TSE_to_STS() now checks that tmin > 0.
     o   seqplot.rf() now returns (invisibly) group memberships.
 
+Bug fixes:
+    o   plot.dynin() issue with check of fstat.
+
 
                 CHANGES IN TraMineRextras VERSION 0.6.1 [2021-01-20]
 

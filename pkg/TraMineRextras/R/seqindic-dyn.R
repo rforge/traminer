@@ -21,6 +21,10 @@ seqindic.dyn <- function(seqdata, indic="cplx", window.size = .2, sliding = TRUE
   if (iindic %in% group.list)
 		TraMineR:::msg.stop("Bad indic value, group name not supported!")
 
+  wstep <- as.integer(wstep)
+  if (wstep < 1)
+		TraMineR:::msg.stop("wstep must be a strictly positive integer!")
+
   lgth <- seqlength(seqdata, with.missing=TRUE)
   maxl <- max(lgth)
   if (window.size <= 0)
