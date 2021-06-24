@@ -44,7 +44,7 @@ plot.stslist.meant <- function(x, cpal = NULL, ylab = NULL, yaxis = TRUE,
     df=attr(x,"nbseq")-1
     if(df >= 1) {
        qt <- qt(.975, df=df)
-       errbar(1.2*xx - .5, mt, mt-qt*se.mt, mt+qt*se.mt, add=TRUE)
+       tmr.errbar(1.2*xx - .5, mt, mt-qt*se.mt, mt+qt*se.mt, add=TRUE)
     }
     else {
        	warning(paste("Error bars not displayed because df =", df, "too small"))
