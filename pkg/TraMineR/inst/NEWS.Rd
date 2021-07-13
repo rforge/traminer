@@ -1,11 +1,11 @@
 \name{NEWS}
 \title{NEWS file for the TraMineR package}
 
-\section{Changes in version 2.3-3 [2021-06-24] (Development version)}{
+\section{Changes in version 2.3-3 [2021-07-13] (Development version)}{
 
   \subsection{Changes in existing functions}{
     \itemize{
-      \item 
+      \item
       \code{plot.stslist.modst()} New attribute \code{info} to control whether frequency of sequence of modal state should be displayed.
       \item
       \code{plot.ststlist.meant()} now uses an internal function
@@ -19,6 +19,13 @@
       \code{seqdiff()} Negative values in \code{cmprange} caused an error.
       \item
       \code{seqdiff()} Changed deprecated \code{norm=TRUE} into \code{norm='auto'} in default \code{seqdist.args} value.
+    }
+  }
+  
+  \subsection{Misc.}{
+    \itemize{
+      \item
+      Dependence on boot and RColorBrewer replaced by importFrom of functions \code{boot} and \code{brewer.pal}.
     }
   }
 }

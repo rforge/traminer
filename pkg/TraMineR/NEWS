@@ -1,19 +1,23 @@
 ## =========
-Version 2.3-3 [2021-06-24] (Development version)
+Version 2.3-3 [2021-07-13] (Development version)
 
 Changes in existing functions:
   - plot.stslist.modst() new attribute 'info' to control
     whether frequency of sequence of modal state should
     be displayed.
   - plot.ststlist.meant() now uses an internal function
-    to draw error bars to avoid issues with dependence 
+    to draw error bars to avoid issues with dependence
     on Hmisc.
 
 Bug fixes:
   - seqdiff() negative values in cmprange caused an error.
   - seqdiff() Changed deprecated norm=TRUE into
     norm='auto' in default seqdist.args value.
-    
+
+Misc.
+  - Dependence on boot and RColorBrewer replaced by importFrom 
+    of functions boot and brewer.pal.
+
 
 ## =========
 Version 2.2-2 [2021-06-03]
