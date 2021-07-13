@@ -19,6 +19,8 @@ wcKMedRange,
 wcPropertyClustering,
 wcSilhouetteObs,
 seqclustname,
+seqnull,
+seqnullcqi, 
 seqpropclust
 
 )
@@ -39,6 +41,12 @@ S3method(summary, clustrange)
 S3method(print, clustrangefamily)
 S3method(plot, clustrangefamily)
 S3method(summary, clustrangefamily)
+
+
+
+S3method(print, seqnullcqi)
+S3method(plot, seqnullcqi)
+
 
 S3method(print, kmedoids)
 
