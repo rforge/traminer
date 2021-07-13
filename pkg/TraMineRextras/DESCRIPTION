@@ -14,7 +14,7 @@ Authors@R: c(
   person("Patrick", "Rousset", role = "ctb"))
 Depends: R (>= 3.5.0), TraMineR (>= 2.2-1)
 Imports: grDevices, graphics, gtools, stats, cluster, RColorBrewer, colorspace, survival, doParallel, parallel, foreach
-Description: Collection of ancillary functions and utilities to be used in conjunction with the 'TraMineR' package for sequence data exploration. Includes, among others, specific functions such as state survival plots, position-wise group-typical states, dynamic sequence indicators, and dissimilarities between event sequences, and contributions of non-members of the TraMineR team such as the relative frequency plot and methods for polyadic data.
+Description: Collection of ancillary functions and utilities to be used in conjunction with the 'TraMineR' package for sequence data exploration. Includes, among others, specific functions such as state survival plots, position-wise group-typical states, dynamic sequence indicators, and dissimilarities between event sequences. Also includes contributions by non-members of the TraMineR team such as the relative frequency plot and methods for polyadic data.
 License: GPL (>= 2)
 URL: http://traminer.unige.ch/
 Encoding: UTF-8
