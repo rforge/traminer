@@ -1,6 +1,6 @@
 Package: TraMineRextras
 Version: 0.7.3
-Date: 2021-06-24
+Date: 2021-07-13
 Title: TraMineR Extension
 Authors@R: c(
   person("Gilbert", "Ritschard", role = c("aut", "cre", "ths", "cph"),
@@ -13,8 +13,8 @@ Authors@R: c(
   person("Nicolas", "Muller", role = "ctb"),
   person("Patrick", "Rousset", role = "ctb"))
 Depends: R (>= 3.5.0), TraMineR (>= 2.2-1)
-Imports: grDevices, graphics, gtools, stats, cluster, RColorBrewer, colorspace, survival, doParallel, foreach
-Description: Collection of ancillary functions and utilities to be used in conjunction with the 'TraMineR' package for sequence data exploration. Most of the functions are in test phase, lack systematic consistency check of the arguments and are subject to changes. Once fully checked, some of the functions of this collection could be included in a next release of 'TraMineR'.
+Imports: grDevices, graphics, gtools, stats, cluster, RColorBrewer, colorspace, survival, doParallel, parallel, foreach
+Description: Collection of ancillary functions and utilities to be used in conjunction with the 'TraMineR' package for sequence data exploration. Includes, among others, specific functions such as state survival plots, position-wise group-typical states, dynamic sequence indicators, and dissimilarities between event sequences, and contributions of non-members of the TraMineR team such as the relative frequency plot and methods for polyadic data.
 License: GPL (>= 2)
 URL: http://traminer.unige.ch/
 Encoding: UTF-8
