@@ -10,10 +10,14 @@
 \code{seqnullcqi} implements the methodology proposed by Studer (2021) for the validation of sequence analysis typologies using  parametric bootstraps. The method works by comparing the cluster quality of an observed typology with the quality obtained by clustering similar but nonclustered data. Several models to test the different structuring aspects of the sequences important in life-course research, namely, sequencing, timing, and duration (see function \code{\link{seqnull}}). This strategy allows identifying the key structural aspects captured by the observed typology. Plot and print methods of the \code{seqnullcqi} results are also provide. 
 }
 \usage{
-seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing", "stateindep", "Markov", "userpos"),
+seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing", 
+											"stateindep", "Markov", "userpos"),
            seqdist.args=list(), kmedoid = FALSE, hclust.method="ward.D", ...)
+		   
 \method{plot}{seqnullcqi}(x, stat, type = c("line", "density", "boxplot", "seqdplot"), 
-quant = 0.95, norm = TRUE, legendpos = "topright", alpha = 0.2, ...)
+							quant = 0.95, norm = TRUE, legendpos = "topright", 
+							alpha = 0.2, ...)
+
 \method{print}{seqnullcqi}(x, stat="all", digits=2, ...) 
 } 
 %- maybe also 'usage' for other objects documented here.
@@ -32,7 +36,7 @@ quant = 0.95, norm = TRUE, legendpos = "topright", alpha = 0.2, ...)
 	\item{norm}{Logical. If \code{TRUE}, cluster quality indices are standardized using the mean and standard deviation of the null distribution.}
 	\item{legendpos}{Character. legend position, see \code{\link{legend}}.}
 	\item{alpha}{Transparency parameter for the lines to be drawn (only for \code{type="line"}).}
-	\item{digits}{Transparency parameter for the lines to be drawn (only for \code{type="line"}).}
+	\item{digits}{Number of digits to be printed.}
 	\item{\dots}{Additionnal parameters passed to \code{\link{seqnull} (for \code{seqnullcqi}) or \code{\link{plot}} or \code{\link{print}}}.}
 }
 \details{
@@ -61,11 +65,39 @@ quant = 0.95, norm = TRUE, legendpos = "topright", alpha = 0.2, ...)
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+data(biofam)
 
-## The function is currently defined as
+## Create the sequence object
+bfstates <- c("Parent", "Left", "Married", "Left/Married",  
+			"Child", "Left/Child", "Left/Married/Child", "Divorced")
+bf.shortlab <- c("P","L","M","LM","C","LC", "LMC", "D")
+bf.seq <- seqdef(biofam[sample.int(nrow(biofam), 100),10:25], alphabet=0:7, 
+				states=bf.shortlab, labels=bfstates)
+
+## Library fastcluster greatly improve computation time when using hclust
+## library(fastcluster)
+## Computing distances
+diss <- seqdist(bf.seq, method="HAM")
+## Hierarchical clustering
+hc <- hclust(as.dist(diss), method="ward.D")
+# Computing cluster quality measures.
+clustqual <- as.clustrange(hc, diss=diss, ncluster=7)
+
+# Compute cluster quality measure for the null model "combined"
+# seqdist.args should be the same as for seqdist above
+# Clustering methods should be the same as above.
+bcq <- seqnullcqi(bf.seq, clustqual, R=10, model=c("combined"), 
+				seqdist.args=list(method="HAM"), kmedoid=FALSE, 
+				hclust.method="ward.D")
+
+# Print the results
+bcq
+
+## Plot of different kind
+
+plot(bcq, type="line")
+plot(bcq, type="density")
+plot(bcq, type="boxplot")
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
