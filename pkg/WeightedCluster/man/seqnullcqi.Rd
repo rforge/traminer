@@ -10,9 +10,9 @@
 \usage{
 seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing", "stateindep", "Markov", "userpos"),
            seqdist.args=list(), kmedoid = FALSE, hclust.method="ward.D", ...)
-\method{plot}{seqnullcqi}(x, stat, type = c("line", "density", "beanplot", "seqdplot"), 
+\method{plot}{seqnullcqi}(x, stat, type = c("line", "density", "boxplot", "seqdplot"), 
 quant = 0.95, norm = TRUE, legendpos = "topright", alpha = 0.2, ...)
-\method{plot}{seqnullcqi}(x, stat="all", digits=2, ...) 
+\method{print}{seqnullcqi}(x, stat="all", digits=2, ...) 
 } 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -64,48 +64,7 @@ quant = 0.95, norm = TRUE, legendpos = "topright", alpha = 0.2, ...)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (seqdata, clustrange, model, R, distargs, kmed = kmed, 
-    ...) 
-{
-    ncluster <- max(clustrange$kvals)
-    if (!all.equal(clustrange$kvals, 2:ncluster)) {
-        stop(" [!] Original cluster quality measures should be computed for the number of groups from 2 to ncluster\n")
-    }
-    extractStat <- function(bcq, stat = "ASW") {
-        bb <- t(sapply(bcq, function(x) x[, stat]))
-        colnames(bb) <- rownames(bcq[[1]])
-        return(bb)
-    }
-    nc <- list()
-    allseq <- list()
-    for (i in 1:R) {
-        print(i)
-        suppressMessages(ss <- seqnull(seqdata, model = model, 
-            ...))
-        distargs$seqdata <- ss
-        allseq[[i]] <- ss
-        suppressMessages(diss <- do.call(seqdist, distargs))
-        hc <- hclust(as.dist(diss), method = "ward.D")
-        if (kmed) {
-            nc[[i]] <- wcKMedRange(diss = diss, kvals = 2:ncluster, 
-                initialclust = hc)$stats
-        }
-        else {
-            nc[[i]] <- as.clustrange(hc, diss = diss, ncluster = ncluster)$stats
-        }
-    }
-    stnames <- colnames(nc[[i]])
-    stats <- list()
-    for (st in stnames) {
-        stats[[st]] <- extractStat(nc, st)
-    }
-    allseq <- do.call(rbind, allseq)
-    bcq <- list(seqdata = allseq, stats = stats, clustrange = clustrange, 
-        R = R, distargs = distargs, nullmodel = list(model = model, 
-            ...))
-    class(bcq) <- "bootNullCQI"
-    return(bcq)
-  }
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):
