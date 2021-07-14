@@ -60,7 +60,7 @@ State sequence object of class \code{stslist}.
 	A state sequence object of class \code{stslist}.
 }
 \references{
-Studer, M. (2021). Validating Sequence Analysis Typologies Using Parametric Bootstrap. Sociological Methodology. https://doi.org/10.1177/00811750211014232
+Studer, M. (2021). Validating Sequence Analysis Typologies Using Parametric Bootstrap. \emph{Sociological Methodology}. \doi{10.1177/00811750211014232}
 }
 
 
