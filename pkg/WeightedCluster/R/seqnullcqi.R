@@ -22,9 +22,10 @@ normstatcqi <- function(bcq, stat, norm=TRUE){
 }
 confcqi <- function(nullstat, quant, n){
 	alpha <- (1-quant)/2
-	calpha <- alpha+(alpha-1)/n
+	#calpha <- alpha+(alpha-1)/n
 	#print(c(calpha, alpha))
-	minmax <- quantile(nullstat, c(calpha, 1-calpha))
+	#minmax <- quantile(nullstat, c(calpha, 1-calpha))
+	minmax <- quantile(nullstat, c(alpha, 1-alpha))
 	return(minmax)
 }
 plotncqdensity2 <- function(bcq, stat, quant=NULL, norm=FALSE, maxt=TRUE,  ...){
@@ -78,12 +79,13 @@ print.seqnullcqi <- function(x, norm=TRUE, quant=0.95, digits=2, ...){
 	for(ss in colnames(alls)){
 		sumcqi <- normstatcqi(x, stat=ss, norm=norm)
 		alls[, ss] <- as.character(round(sumcqi$origstat, digits=digits))
-		borne <- confcqi(sumcqi$alldatamax, quant, x$R)
-		quants[ss] <- as.character(round(ifelse(ss=="HC", min(borne), max(borne)), digits=digits))
+		borne <- as.character(round(confcqi(sumcqi$alldatamax, quant, x$R),  digits=digits))
+		quants[ss] <- paste0("[", borne[1], "; ", borne[2],"]")
 	}
 	alls <- rbind(alls, rep("", length(quants)), quants)
-	rownames(alls) <- c(rownames(x$clustrange$stats), paste("Max-T", quant, "Threshold"))
-	return(alls)
+	rownames(alls) <- c(rownames(x$clustrange$stats), "", paste("Null Max-T", quant, "interval"))
+	print(alls, ...)
+	return(invisible(alls))
 }
 
 plot.seqnullcqi <- function(x, stat, type=c("line", "density", "boxplot", "seqdplot"), quant=0.95, norm=TRUE, legendpos="topright", alpha=.2, ...){
@@ -125,7 +127,7 @@ plot.seqnullcqi <- function(x, stat, type=c("line", "density", "boxplot", "seqdp
 		allstat <- rbind(origstat, nullstat)
 		allrange <- range(allstat)
 		alpha <- (1-quant)/2
-		calpha <- alpha+(alpha-1)/nrow(nullstat)		
+		#calpha <- alpha+(alpha-1)/nrow(nullstat)		
 		if(type!="boxplot"){
 			plot(kvals, origstat, ylim=allrange, lwd=2, col="black", type="b", main=main, ylab=ylab, xlab="Number of clusters")
 			
@@ -134,7 +136,7 @@ plot.seqnullcqi <- function(x, stat, type=c("line", "density", "boxplot", "seqdp
 			}
 			
 			if(!is.null(quant)){
-				minmax <- sapply(seq_along(kvals), function(x)quantile(allstat[, x], c(calpha, 1-calpha))) 
+				minmax <- sapply(seq_along(kvals), function(x)quantile(allstat[, x], c(alpha, 1-alpha))) 
 				polygondata <- data.frame(x=c(kvals, rev(kvals), kvals[1]), y=c(minmax[2,], rev(minmax[1,]), minmax[2,1]))
 				polygon(polygondata, col=adjustcolor("lightgray", alpha.f=0.15))  
 			}
@@ -148,7 +150,7 @@ plot.seqnullcqi <- function(x, stat, type=c("line", "density", "boxplot", "seqdp
 		}
 		
 		if(!is.null(quant)){
-			threashold <- ifelse(stat=="HC", calpha, c(1-calpha))
+			threashold <- ifelse(stat=="HC", alpha, c(1-alpha))
 			#overallq <- quantile(as.vector(nullstat), threashold)
 			#abline(h=overallq, lty=3, col="#377EB8", lwd=2)
 			if(stat=="HC"){

@@ -9,9 +9,10 @@ Generate nonclustered sequence data according to different null models.
     \code{"Markov"}. The \code{"userpos"} model allows to fully specify a sequence generating model using a starting distribution and a transition rate matrix.
 }
 \usage{
-seqnull(seqdata, model = c("combined", "duration", "sequencing", "stateindep", "Markov", "userpos"), 
-		imp.trans = NULL, imp.trans.limit = -1, trate = "trate", begin = "freq", time.varying = TRUE, 
-		weighted = TRUE)
+seqnull(seqdata, model = c("combined", "duration", "sequencing", 
+							"stateindep", "Markov", "userpos"),
+		imp.trans = NULL, imp.trans.limit = -1, trate = "trate", 
+		begin = "freq", time.varying = TRUE, weighted = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
