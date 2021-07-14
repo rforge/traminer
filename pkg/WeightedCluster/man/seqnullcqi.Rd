@@ -82,7 +82,7 @@ data(biofam)
 bf.seq <- seqdef(biofam[sample.int(nrow(biofam), 100),10:25])
 
 ## Library fastcluster greatly improve computation time when using hclust
-## library(fastcluster)
+# library(fastcluster)
 ## Computing distances
 diss <- seqdist(bf.seq, method="HAM")
 ## Hierarchical clustering
@@ -91,28 +91,19 @@ hc <- hclust(as.dist(diss), method="ward.D")
 clustqual <- as.clustrange(hc, diss=diss, ncluster=7)
 
 # Compute cluster quality measure for the null model "combined"
-# seqdist.args should be the same as for seqdist above
+# seqdist.args should be the same as for seqdist above except the sequence data.
 # Clustering methods should be the same as above.
 bcq <- seqnullcqi(bf.seq, clustqual, R=10, model=c("combined"), 
-				seqdist.args=list(method="HAM"), kmedoid=FALSE, 
+				seqdist.args=list(method="HAM"),
 				hclust.method="ward.D")
 
 # Print the results
 bcq
 
-## Plot of different kind
+## Different kind of plots
 
 plot(bcq, stat="ASW", type="line")
 plot(bcq, stat="ASW", type="density")
 plot(bcq, stat="ASW", type="boxplot")
 
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory (show via RShowDoc("KEYWORDS")):
-% \keyword{ ~kwd1 }
-% \keyword{ ~kwd2 }
-% Use only one keyword per line.
-% For non-standard keywords, use \concept instead of \keyword:
-% \concept{ ~cpt1 }
-% \concept{ ~cpt2 }
-% Use only one concept per line.
