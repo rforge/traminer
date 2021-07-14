@@ -37,7 +37,7 @@ seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing",
 	\item{legendpos}{Character. legend position, see \code{\link{legend}}.}
 	\item{alpha}{Transparency parameter for the lines to be drawn (only for \code{type="line"}).}
 	\item{digits}{Number of digits to be printed.}
-	\item{\dots}{Additionnal parameters passed to \code{\link{seqnull} (for \code{seqnullcqi}) or \code{\link{plot}} or \code{\link{print}}}.}
+	\item{\dots}{Additionnal parameters passed to \code{\link{seqnull}} (for \code{seqnullcqi}) or \code{\link{plot}} or \code{\link{print}}.}
 }
 \details{
 	
