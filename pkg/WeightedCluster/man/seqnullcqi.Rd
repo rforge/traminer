@@ -18,7 +18,7 @@ seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing",
 							quant = 0.95, norm = TRUE, legendpos = "topright", 
 							alpha = 0.2, ...)
 
-\method{print}{seqnullcqi}(x, stat="all", digits=2, ...) 
+\method{print}{seqnullcqi}(x, norm=TRUE, quant=0.95, digits=2, ...) 
 } 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -68,11 +68,7 @@ seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing",
 data(biofam)
 
 ## Create the sequence object
-bfstates <- c("Parent", "Left", "Married", "Left/Married",  
-			"Child", "Left/Child", "Left/Married/Child", "Divorced")
-bf.shortlab <- c("P","L","M","LM","C","LC", "LMC", "D")
-bf.seq <- seqdef(biofam[sample.int(nrow(biofam), 100),10:25], alphabet=0:7, 
-				states=bf.shortlab, labels=bfstates)
+bf.seq <- seqdef(biofam[sample.int(nrow(biofam), 100),10:25])
 
 ## Library fastcluster greatly improve computation time when using hclust
 ## library(fastcluster)

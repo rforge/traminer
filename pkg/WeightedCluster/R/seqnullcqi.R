@@ -40,15 +40,15 @@ plotncqdensity2 <- function(bcq, stat, quant=NULL, norm=FALSE, maxt=TRUE,  ...){
 		dens <- density(alldata)
 		#plot(dens, ...)
 		if(add){
-			lines(dens, col=adjustcolor(col, alpha=.9),...)
+			lines(dens, col=adjustcolor(col, alpha.f=.9),...)
 		}else{
-			plot(dens, xlim=allrange, col=adjustcolor(col, alpha=.9),...)
+			plot(dens, xlim=allrange, col=adjustcolor(col, alpha.f=.9),...)
 		}
 		if(!is.null(quant)){
 			minmax <- confcqi(alldata, quant, bcq$R)
 			x1 <- min(which(dens$x >= minmax[1]))  
 			x2 <- max(which(dens$x <  minmax[2]))
-			with(dens, polygon(x=c(x[c(x1, x1:x2, x2)]), y= c(0, y[x1:x2], 0), col=adjustcolor(col, alpha=.15), border=adjustcolor(col, alpha=.9)))
+			with(dens, polygon(x=c(x[c(x1, x1:x2, x2)]), y= c(0, y[x1:x2], 0), col=adjustcolor(col, alpha.f=.15), border=adjustcolor(col, alpha.f=.9)))
 			print(minmax)
 		}
 		if(seg){
@@ -136,7 +136,7 @@ plot.seqnullcqi <- function(x, stat, type=c("line", "density", "boxplot", "seqdp
 			if(!is.null(quant)){
 				minmax <- sapply(seq_along(kvals), function(x)quantile(allstat[, x], c(calpha, 1-calpha))) 
 				polygondata <- data.frame(x=c(kvals, rev(kvals), kvals[1]), y=c(minmax[2,], rev(minmax[1,]), minmax[2,1]))
-				polygon(polygondata, col=adjustcolor("lightgray", alpha=0.15))  
+				polygon(polygondata, col=adjustcolor("lightgray", alpha.f=0.15))  
 			}
 			lines(kvals, origstat, lwd=2, col="black", type="b")
 		}else{
