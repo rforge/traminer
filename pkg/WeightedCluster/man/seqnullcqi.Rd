@@ -14,9 +14,9 @@ seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing",
                     "stateindep", "Markov", "userpos"), seqdist.args=list(), 
 					kmedoid = FALSE, hclust.method="ward.D", ...)
 		   
-\method{plot}{seqnullcqi}(x, stat, type = c("line", "density", "boxplot", "seqdplot"), 
-							quant = 0.95, norm = TRUE, legendpos = "topright", 
-							alpha = 0.2, ...)
+\method{plot}{seqnullcqi}(x, stat, type = c("line", "density", "boxplot", "seqdplot"),
+                          quant = 0.95, norm = TRUE, legendpos = "topright",
+                          alpha = 0.2, ...)
 
 \method{print}{seqnullcqi}(x, norm=TRUE, quant=0.95, digits=2, ...) 
 } 
@@ -40,7 +40,21 @@ seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing",
 	\item{\dots}{Additionnal parameters passed to \code{\link{seqnull}} (for \code{seqnullcqi}) or \code{\link{plot}} or \code{\link{print}}.}
 }
 \details{
-	
+The \code{seqnullcqi} function provides a validation method for sequence analysis typologies using parametric bootstraps as proposed in Studer (2021). This method works by comparing the value of the cluster quality of an observed typology with the cluster quality obtained by clustering similar but nonclustered data. More precisely it works as follows. 
+
+\enumerate{
+	\item Cluster the observed sequence data and compute the associated cluster quality indices. 
+	\item Repeat \code{R} times:
+	\enumerate{
+		\item Generate similar but nonclustered data using a \emph{null} model (see \code{\link{seqnull}} for available \emph{null} models).
+		\item Cluster the generated data using the same distance measure and clustering algorithm as in step 1. 
+		\item Record the quality indices values of this null clustering. 
+	}
+	\item Compare the quality of the observed typology with the one obtained in the \code{R} bootstraps with the \emph{null} sequence data using plot and print methods. 
+	\item If the cluster quality measure of the observed typology is constantly higher than the ones obtained with \emph{null} data, a \dQuote{good} typology has been found.
+}
+
+Several \emph{null} models are provided to test the different structuring aspects of the sequences important in life-course research, namely, sequencing, timing, and duration (see function \code{\link{seqnull}} and Studer, 2021). This strategy allows identifying the key structural aspects captured by the observed typology.
 }
 \value{
 \code{seqnullcqi} returns a \code{"seqnullcqi"} object with the following components:
@@ -55,7 +69,7 @@ seqnullcqi(seqdata, clustrange, R, model=c("combined", "duration", "sequencing",
 }
 
 \references{
-Studer, M. (2021). Validating Sequence Analysis Typologies Using Parametric Bootstrap. Sociological Methodology. https://doi.org/10.1177/00811750211014232
+Studer, M. (2021). Validating Sequence Analysis Typologies Using Parametric Bootstrap. Sociological Methodology. \url{https://doi.org/10.1177/00811750211014232}
 }
 
 \seealso{

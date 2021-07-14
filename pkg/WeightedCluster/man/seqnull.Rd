@@ -10,9 +10,9 @@ Generate nonclustered sequence data according to different null models.
 }
 \usage{
 seqnull(seqdata, model = c("combined", "duration", "sequencing", 
-							"stateindep", "Markov", "userpos"),
-		imp.trans = NULL, imp.trans.limit = -1, trate = "trate", 
-		begin = "freq", time.varying = TRUE, weighted = TRUE)
+        "stateindep", "Markov", "userpos"), imp.trans = NULL, 
+		imp.trans.limit = -1, trate = "trate", begin = "freq", 
+		time.varying = TRUE, weighted = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
