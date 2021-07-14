@@ -112,6 +112,19 @@ seqnullspell <- function(seqdata,  randomize, impossibleTrans, impossibleTransTr
 
 
 seqnullpos <- function(seqdata, prob="trate", time.varying=TRUE, begin="freq", weighted=TRUE){
+	seqasnum <- function (seqdata, with.missing = FALSE) 
+	{
+		mnum <- matrix(NA, nrow = seqdim(seqdata)[1], ncol = seqdim(seqdata)[2])
+		rownames(mnum) <- rownames(seqdata)
+		colnames(mnum) <- colnames(seqdata)
+		statl <- attr(seqdata, "alphabet")
+		if (with.missing) 
+			statl <- c(statl, attr(seqdata, "nr"))
+		for (i in 1:length(statl)) {
+			mnum[seqdata == statl[i]] <- i - 1
+		}
+		return(mnum)
+	}
 
 	sl <- seqlength(seqdata)
 	maxage <- max(sl)
@@ -119,7 +132,7 @@ seqnullpos <- function(seqdata, prob="trate", time.varying=TRUE, begin="freq", w
 	agedtr <- vector(mode="list", length=maxage)
 	
 	## On ajoute 1 pour que les codes correspondent aux index R (commence a 1)
-	seqdatanum <- TraMineR:::seqasnum(seqdata)+1
+	seqdatanum <- seqasnum(seqdata)+1
 	nbstates <- max(seqdatanum)
 	## User defined begin frequencies
 	if(is.numeric(begin)){

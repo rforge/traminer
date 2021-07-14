@@ -1,5 +1,7 @@
 \name{seqnullcqi}
 \alias{seqnullcqi}
+\alias{plot.seqnullcqi}
+\alias{print.seqnullcqi}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 	 Sequence Analysis Typologies Validation Using Parametric Bootstrap 
