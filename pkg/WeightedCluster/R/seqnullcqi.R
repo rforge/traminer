@@ -136,7 +136,7 @@ plot.seqnullcqi <- function(x, stat, type=c("line", "density", "boxplot", "seqdp
 			}
 			
 			if(!is.null(quant)){
-				minmax <- sapply(seq_along(kvals), function(x)quantile(allstat[, x], c(alpha, 1-alpha))) 
+				minmax <- sapply(seq_along(kvals), function(x)quantile(nullstat[, x], c(alpha, 1-alpha))) 
 				polygondata <- data.frame(x=c(kvals, rev(kvals), kvals[1]), y=c(minmax[2,], rev(minmax[1,]), minmax[2,1]))
 				polygon(polygondata, col=adjustcolor("lightgray", alpha.f=0.15))  
 			}
@@ -154,9 +154,9 @@ plot.seqnullcqi <- function(x, stat, type=c("line", "density", "boxplot", "seqdp
 			#overallq <- quantile(as.vector(nullstat), threashold)
 			#abline(h=overallq, lty=3, col="#377EB8", lwd=2)
 			if(stat=="HC"){
-				overallmaxq <- quantile(apply(allstat, 1, min), threashold)
+				overallmaxq <- quantile(apply(nullstat, 1, min), threashold)
 			}else{
-				overallmaxq <- quantile(apply(allstat, 1, max), threashold)
+				overallmaxq <- quantile(apply(nullstat, 1, max), threashold)
 			}
 			abline(h=overallmaxq, lty=3, col="#E41A1C", lwd=2)
 		}
